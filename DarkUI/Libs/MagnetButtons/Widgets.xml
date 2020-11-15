@@ -1,0 +1,137 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <CheckButton name="MagnetSecureButtonTemplate"
+                 inherits="SecureHandlerStateTemplate,SecureActionButtonTemplate,ActionButtonTemplate" virtual="true"
+                 id="0">
+        <Size>
+            <AbsDimension x="32" y="32"/>
+        </Size>
+        <Anchors>
+            <Anchor point="BOTTOMLEFT">
+                <Offset>
+                    <AbsDimension x="0" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Layers>
+            <Layer level="OVERLAY">
+                <Texture name="$parentIcon">
+                    <Size>
+                        <AbsDimension x="32" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <Texture name="$parentAutoCastable" file="Interface\Buttons\UI-AutoCastableOverlay" hidden="true">
+                    <Size>
+                        <AbsDimension x="58" y="58"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame name="$parentShine" inherits="AutoCastShineTemplate">
+                <Anchors>
+                    <Anchor point="CENTER">
+                        <Offset>
+                            <AbsDimension x="0" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Size>
+                    <AbsDimension x="28" y="28"/>
+                </Size>
+            </Frame>
+            <Cooldown name="$parentCooldown" inherits="CooldownFrameTemplate" parentKey="cooldown">
+                <Size x="36" y="36"/>
+                <Anchors>
+                    <Anchor point="CENTER" x="0" y="-1"/>
+                </Anchors>
+                <SwipeTexture>
+                    <Color r="1" g="1" b="1" a="0.8"/>
+                </SwipeTexture>
+            </Cooldown>
+        </Frames>
+        <Scripts>
+            <OnLoad>
+                self.TimeSinceLastUpdate = 0;
+                securecall(MagnetButtons.OnLoad, self);
+            </OnLoad>
+            <OnAttributeChanged>
+                <!-- securecall(ActionButton_UpdateAction, self, name, value); -->
+            </OnAttributeChanged>
+            <OnEvent>
+                securecall(MagnetButtons.OnEvent, self, event, ...);
+            </OnEvent>
+            <OnReceiveDrag>
+                securecall(MagnetButtons.OnReceiveDrag, self);
+            </OnReceiveDrag>
+            <OnEnter>
+                securecall(MagnetButtons.DisplayTooltip, self);
+                securecall(MagnetButtons.OnEnter, self);
+            </OnEnter>
+            <OnLeave>
+                GameTooltip:Hide();
+                securecall(MagnetButtons.OnLeave, self);
+            </OnLeave>
+            <OnUpdate>
+                securecall(MagnetButtons.OnUpdate, self, elapsed);
+            </OnUpdate>
+            <PreClick>
+                securecall(MagnetButtons.PreClick, self, button);
+            </PreClick>
+            <PostClick>
+                securecall(MagnetButtons.PostClick, self, button);
+            </PostClick>
+            <OnMouseDown>
+                securecall(MagnetButtons.OnMouseDown, self, button);
+            </OnMouseDown>
+            <OnMouseUp>
+                securecall(MagnetButtons.OnMouseUp, self);
+                securecall(MagnetButtons.CompanionClickHandler, self);
+                securecall(MagnetButtons.OnUpdate, self);
+            </OnMouseUp>
+        </Scripts>
+        <NormalTexture name="$parentNormalTexture" file="Interface\Buttons\UI-Quickslot2">
+            <Size>
+                <AbsDimension x="52" y="52"/>
+            </Size>
+            <Anchors>
+                <Anchor point="CENTER">
+                    <Offset>
+                        <AbsDimension x="0" y="0"/>
+                    </Offset>
+                </Anchor>
+            </Anchors>
+        </NormalTexture>
+    </CheckButton>
+
+    <Frame name="MagnetButtonFrameDefault" movable="true" hidden="false" virtual="true">
+        <Size>
+            <AbsDimension x="32" y="32"/>
+        </Size>
+        <Anchors>
+            <Anchor point="CENTER" relativeTo="UIParent">
+                <Offset>
+                    <AbsDimension x="0" y="0"/>
+                </Offset>
+            </Anchor>
+        </Anchors>
+        <Backdrop bgFile="Interface\TutorialFrame\TutorialFrameBackground">
+        </Backdrop>
+        <Frames>
+            <CheckButton name="$parentCheckButton" inherits="MagnetSecureButtonTemplate"/>
+        </Frames>
+    </Frame>
+</Ui>

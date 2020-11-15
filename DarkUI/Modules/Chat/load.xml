@@ -1,0 +1,11 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+	<Script file="Bubbles.lua" />
+    <Script file="ChatFrame.lua" />
+	<Script file="ChatBar.lua" />
+	<Script file="ChatTab.lua" />
+	<Script file="ChatInvite.lua" />
+	<Script file="Filters.lua" />
+	<Script file="RealLinks.lua" />
+</Ui>

@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <Script file="Core.lua" />
+	<Script file="Element\Bags.lua" />
+	<Script file="Element\Coords.lua" />
+	<Script file="Element\Durability.lua" />
+	<Script file="Element\Friends.lua" />
+	<Script file="Element\Fps.lua" />
+	<Script file="Element\Gold.lua" />
+	<Script file="Element\Guild.lua" />
+	<Script file="Element\Latency.lua" />
+	<Script file="Element\Location.lua" />
+	<Script file="Element\Memory.lua" />
+</Ui>

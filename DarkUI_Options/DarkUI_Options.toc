@@ -1,0 +1,32 @@
+## Interface: 90001
+## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - Options
+## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - 配置管理
+## Notes-zhCN: DarkUI - 配置管理
+## Notes: DarkUI - Options GUI
+## Author: SolardiaX
+## Version: 9.0.1-b1.0.2
+## RequiredDeps: DarkUI
+## SavedVariables: SavedOptions
+## SavedVariablesPerCharacter: SavedOptionsPerChar
+## X-Credits: Elv, Shestak, Tuller, zork
+
+Locales\load.xml
+
+Settings.lua
+Modules\01-General.lua
+Modules\02-Actionbar.lua
+Modules\03-Map.lua
+Modules\04-Unitframe.lua
+Modules\05-Nameplate.lua
+Modules\06-Aura.lua
+Modules\07-Loot.lua
+Modules\08-DataText.lua
+Modules\09-Quest.lua
+Modules\10-Tooltip.lua
+Modules\11-Chat.lua
+Modules\12-Combat.lua
+Modules\13-Misc.lua
+Modules\14-Command.lua
+
+Core.lua
+GUI.lua

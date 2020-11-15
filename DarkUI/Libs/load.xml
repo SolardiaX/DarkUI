@@ -1,0 +1,26 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <!-- LibStub -->
+    <Include file="LibStub\load.xml" />
+
+    <!-- LitePanels -->
+    <Script file="LitePanels\LitePanels.lua" />
+    <!--Script file="LitePanels\Layout.lua" /-->
+
+    <!-- oGlow -->
+    <Include file="oGlow\load.xml" />
+
+    <!-- oUF -->
+    <Include file="oUF\load.xml" />
+
+    <!-- MagnetButtons -->
+    <!--Include file="MagnetButtons\load.xml" /-->
+
+    <!-- LibButtonGlow -->
+    <Script file="LibButtonGlow.lua" />
+
+    <!-- cargBags -->
+    <Include file="cargBags\load.xml" />
+
+    <!-- MagnetButtons -->
+    <Include file="MagnetButtons\load.xml" />
+</Ui>

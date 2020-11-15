@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+ 
+    <Script file="AlreadyKnown.lua" />
+    <Script file="LFGQueueTimer.lua" />
+    <Script file="TrainAll.lua" />
+    <Script file="SocialTabs.lua" />
+    <Script file="ProfessionTabs.lua" />
+    <Script file="Focuser.lua" />
+    <Script file="Merchant.lua" />
+    <Script file="MerchantItemlevel.lua" />
+    <Script file="SlotItemLevel.lua" />
+    <Script file="RaidUtility.lua" />
+</Ui>

@@ -1,0 +1,14 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Init.lua" />
+    <Script file="Rectangle.lua" />
+    <Script file="DoIt.lua" />
+    <Include file="Widgets.xml" />
+    <Script file="Global.lua" />
+    <Script file="Buttons.lua" />
+    <Script file="ButtonAttributes.lua" />
+    <Script file="ButtonOnUpdate.lua" />
+    <Script file="ButtonEvents.lua" />
+    <Script file="ButtonMoving.lua" />
+    <Script file="OverlayFrame.lua" />
+    <Script file="Startup.lua" />
+</Ui>

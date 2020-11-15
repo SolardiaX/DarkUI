@@ -1,0 +1,97 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Init.lua"/>
+	<Script file="Private.lua"/>
+	<Script file="oUF.lua"/>
+	<Script file="Events.lua"/>
+	<Script file="Factory.lua"/>
+	<Script file="Blizzard.lua"/>
+	<Script file="Units.lua"/>
+	<Script file="Colors.lua"/>
+
+	<Script file="Elements\AlternativePower.lua"/>
+	<Script file="Elements\AssistantIndicator.lua"/>
+	<Script file="Elements\Auras.lua"/>
+	<Script file="Elements\CastBar.lua"/>
+	<Script file="Elements\CombatIndicator.lua"/>
+	<Script file="Elements\GroupRoleIndicator.lua"/>
+	<Script file="Elements\HealPrediction.lua"/>
+	<Script file="Elements\Health.lua"/>
+	<Script file="Elements\LeaderIndicator.lua"/>
+	<Script file="Elements\PhaseIndicator.lua"/>
+	<Script file="Elements\Portraits.lua"/>
+	<Script file="Elements\Power.lua"/>
+	<Script file="Elements\PowerPrediction.lua"/>
+	<Script file="Elements\QuestIndicator.lua"/>
+	<Script file="Elements\RaidTargetIndicator.lua"/>
+	<Script file="Elements\Range.lua"/>
+	<Script file="Elements\ReadyCheckIndicator.lua"/>
+	<Script file="Elements\RestingIndicator.lua"/>
+	<Script file="Elements\ResurrectIndicator.lua"/>
+	<Script file="Elements\Runes.lua"/>
+	<Script file="Elements\Stagger.lua"/>
+	<Script file="Elements\SummonIndicator.lua"/>
+	<Script file="Elements\Tags.lua"/>
+	<Script file="Elements\ThreatIndicator.lua"/>
+
+	<Script file="Finalize.lua"/>
+
+	<Script file="modules\DebuffHighlight.lua"/>
+    <Script file="modules\RaidDebuffs.lua"/>
+    <Script file="modules\Smooth.lua"/>
+    <Script file="modules\Fader.lua"/>
+	<Script file="modules\NazjatarFollowerXP.lua"/>
+	<Script file="modules\QuakeTimer.lua"/>
+	<Button name="oUF_MainTank" inherits="SecureUnitButtonTemplate" virtual="true">
+		<Frames>
+			<Button name="$parentTarget" inherits="SecureUnitButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Attributes>
+					<Attribute name="unitsuffix" type="string" value="target"/>
+					<Attribute name="useparent-unit" type="boolean" value="true"/>
+					<Attribute name="type1" type="string" value="target"/>
+					<Attribute name="initial-unitWatch" type="boolean" value="true"/>
+				</Attributes>
+			</Button>
+		</Frames>
+	</Button>
+	<Button name="oUF_MainTankTT" inherits="SecureUnitButtonTemplate" virtual="true">
+		<Frames>
+			<Button name="$parentTarget" inherits="SecureUnitButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Attributes>
+					<Attribute name="unitsuffix" type="string" value="target"/>
+					<Attribute name="useparent-unit" type="boolean" value="true"/>
+					<Attribute name="type1" type="string" value="target"/>
+					<Attribute name="initial-unitWatch" type="boolean" value="true"/>
+				</Attributes>
+			</Button>
+			<Button name="$parentTargetTarget" inherits="SecureUnitButtonTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentTarget">
+						<Offset>
+							<AbsDimension x="7" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Attributes>
+					<Attribute name="unitsuffix" type="string" value="targettarget"/>
+					<Attribute name="useparent-unit" type="boolean" value="true"/>
+					<Attribute name="type1" type="string" value="targettarget"/>
+					<Attribute name="initial-unitWatch" type="boolean" value="true"/>
+				</Attributes>
+			</Button>
+		</Frames>
+	</Button>
+</Ui>

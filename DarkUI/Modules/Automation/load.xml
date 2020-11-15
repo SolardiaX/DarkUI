@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+ 
+    <Script file="AutoInvite.lua" />
+    <Script file="AutoRelease.lua" />
+    <Script file="AutoRepair.lua" />
+    <Script file="AutoSell.lua" />
+    <Script file="AutoDisenchant.lua" />
+    <Script file="AutoGreed.lua" />
+    <Script file="AutoQuest.lua" />
+    <Script file="DeclineDuel.lua" />
+    <Script file="SetRole.lua" />
+    <Script file="TabBinder.lua" />
+</Ui>
