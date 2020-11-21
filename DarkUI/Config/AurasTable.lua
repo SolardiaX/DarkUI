@@ -14,7 +14,7 @@ local FocusAuraPoint = { "LEFT", UIParent, "CENTER", -450, 260 }
 local CDPoint = { "BOTTOMLEFT", UIParent, "BOTTOMLEFT", 5, 240 }
 local WarningAuraPoint = { "LEFT", UIParent, "CENTER", 200, 40 }
 local RaidDebuffPoint = { "LEFT", UIParent, "CENTER", 200, 100 }
-local InternalPoint = { "BOTTOMRIGHT", UIParent, "BOTTOM", -425, 125 }
+local InternalPoint = { "BOTTOM", UIParent, "BOTTOM", -300, 180 }
 
 local groups = {
     -- groups name = direction, interval, mode, iconsize, position, barwidth
