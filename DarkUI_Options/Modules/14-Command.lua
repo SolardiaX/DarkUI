@@ -17,7 +17,7 @@ ns.OptionList[14] = { -- Command
     {0, '/rc', ' - ', L_OPT_COMMAND_RC, false},
     {0, '/gm', ' - ', L_OPT_COMMAND_GM, false},
     {0, '/rl', ' - ', L_OPT_COMMAND_RL, false},
-    {0, '/restui', ' - ', L_OPT_COMMAND_RESTUI, false},
+    {0, '/resetui', ' - ', L_OPT_COMMAND_RESETUI, false},
     {0, '/frame <name>', ' - ', L_OPT_COMMAND_FRAME, false},
     {0, '/align', ' - ', L_OPT_COMMAND_ALIGN, false},
     --{0, '/testui', ' - ', L_OPT_COMMAND_TESTUI, false},

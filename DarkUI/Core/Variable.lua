@@ -117,5 +117,5 @@ StaticPopupDialogs["RESETUI_CONFIRM"] = {
     hideOnEscape = 1,
 }
 
-SLASH_RESETUI = "/resetui"
+SLASH_RESETUI1 = "/resetui"
 SlashCmdList.RESETUI = function() StaticPopup_Show("RESETUI_CONFIRM") end
