@@ -1,33 +1,33 @@
+local E, C, L = select(2, ...):unpack()
+
 ----------------------------------------------------------------------------------------
 --  Hover Key Bind
 ----------------------------------------------------------------------------------------
-local E, C, L = select(2, ...):unpack()
 
-local bind, localmacros = CreateFrame("Frame", "ncHoverBind", UIParent), 0
--- SLASH COMMAND
+local bind, oneBind, localmacros = CreateFrame("Frame", "HoverBind", UIParent), true, 0
+
 SlashCmdList.MOUSEOVERBIND = function()
 	if InCombatLockdown() then print(L.ACTIONBAR_BINDING_INCOMBATLOCKDOWN) return end
 	if not bind.loaded then
-		local find = string.find
-		local _G = getfenv(0)
 
 		bind:SetFrameStrata("DIALOG")
 		bind:EnableMouse(true)
 		bind:EnableKeyboard(true)
 		bind:EnableMouseWheel(true)
 		bind.texture = bind:CreateTexture()
-		bind.texture:SetAllPoints(bind)
-		bind.texture:SetTexture(0, 0, 0, .25)
+		bind.texture:SetPoint("TOPLEFT", bind, 2, -2)
+		bind.texture:SetPoint("BOTTOMRIGHT", bind, -2, 2)
+		bind.texture:SetColorTexture(1, 1, 1, 0.3)
 		bind:Hide()
 
 		local elapsed = 0
 		GameTooltip:HookScript("OnUpdate", function(self, e)
 			elapsed = elapsed + e
-			if elapsed < .2 then return else elapsed = 0 end
-			if (not self.comparing and IsModifiedClick("COMPAREITEMS")) then
+			if elapsed < 0.2 then return else elapsed = 0 end
+			if not self.comparing and IsModifiedClick("COMPAREITEMS") then
 				GameTooltip_ShowCompareItem(self)
 				self.comparing = true
-			elseif ( self.comparing and not IsModifiedClick("COMPAREITEMS")) then
+			elseif self.comparing and not IsModifiedClick("COMPAREITEMS") then
 				for _, frame in pairs(self.shoppingTooltips) do
 					frame:Hide()
 				end
@@ -38,8 +38,8 @@ SlashCmdList.MOUSEOVERBIND = function()
 
 		bind:SetScript("OnEvent", function(self) self:Deactivate(false) end)
 		bind:SetScript("OnLeave", function(self) self:HideFrame() end)
-		bind:SetScript("OnKeyUp", function(self, key) self:Listener(key) end)
-		bind:SetScript("OnMouseUp", function(self, key) self:Listener(key) end)
+		bind:SetScript("OnKeyDown", function(self, key) self:Listener(key) end)
+		bind:SetScript("OnMouseDown", function(self, key) self:Listener(key) end)
 		bind:SetScript("OnMouseWheel", function(self, delta) if delta>0 then self:Listener("MOUSEWHEELUP") else self:Listener("MOUSEWHEELDOWN") end end)
 
 		function bind:Update(b, spellmacro)
@@ -57,7 +57,6 @@ SlashCmdList.MOUSEOVERBIND = function()
 				self.button.id = SpellBook_GetSpellBookSlot(self.button)
 				self.button.name = GetSpellBookItemName(self.button.id, SpellBookFrame.bookType)
 				
-				GameTooltip:AddLine(L.ACTIONBAR_BINDING_TRIGGER)
 				GameTooltip:Show()
 				GameTooltip:SetScript("OnHide", function(self)
 					self:SetOwner(bind, "ANCHOR_NONE")
@@ -78,7 +77,7 @@ SlashCmdList.MOUSEOVERBIND = function()
 			elseif spellmacro=="MACRO" then
 				self.button.id = self.button:GetID()
 				
-				if localmacros==1 then self.button.id = self.button.id + 36 end
+				if localmacros == 1 then self.button.id = self.button.id + MAX_ACCOUNT_MACROS end
 				
 				self.button.name = GetMacroInfo(self.button.id)
 				
@@ -108,7 +107,6 @@ SlashCmdList.MOUSEOVERBIND = function()
 					self.button.bindstring = (spellmacro=="STANCE" and "SHAPESHIFTBUTTON" or "BONUSACTIONBUTTON")..self.button.id
 				end
 				
-				GameTooltip:AddLine("Trigger")
 				GameTooltip:Show()
 				GameTooltip:SetScript("OnHide", function(self)
 					self:SetOwner(bind, "ANCHOR_NONE")
@@ -134,11 +132,11 @@ SlashCmdList.MOUSEOVERBIND = function()
 				
 				if not self.button.action or self.button.action < 1 or self.button.action > 132 then
 					self.button.bindstring = "CLICK "..self.button.name..":LeftButton"
-				elseif self.button.action < 121 and self.button.action > 108  then
-						self.button.bindstring = "CLICK "..self.button.name..":LeftButton"
 				else
 					local modact = 1+(self.button.action-1)%12
-					if self.button.action < 25 or self.button.action > 72 then
+					if self.button.name == "ExtraActionButton1" then
+						self.button.bindstring = "EXTRAACTIONBUTTON1"
+					elseif self.button.action < 13 or self.button.action > 72 then
 						self.button.bindstring = "ACTIONBUTTON"..modact
 					elseif self.button.action < 73 and self.button.action > 60 then
 						self.button.bindstring = "MULTIACTIONBAR1BUTTON"..modact
@@ -153,13 +151,13 @@ SlashCmdList.MOUSEOVERBIND = function()
 					end
 				end
 				
-				GameTooltip:AddLine(L.ACTIONBAR_BINDING_TRIGGER)
+				GameTooltip:AddLine(bind.button.name)
 				GameTooltip:Show()
+				bind.button.bindings = {GetBindingKey(bind.button.bindstring)}
 				GameTooltip:SetScript("OnHide", function(self)
 					self:SetOwner(bind, "ANCHOR_NONE")
 					self:SetPoint("BOTTOM", bind, "TOP", 0, 1)
 					self:AddLine(bind.button.name, 1, 1, 1)
-					bind.button.bindings = {GetBindingKey(bind.button.bindstring)}
 					if #bind.button.bindings == 0 then
 						self:AddLine(L.ACTIONBAR_BINDING_NOBINDING, .6, .6, .6)
 					else
@@ -256,27 +254,31 @@ SlashCmdList.MOUSEOVERBIND = function()
 		}
 
 		-- REGISTERING
-		local stance = StanceButton1:GetScript("OnClick")
-		local pet = PetActionButton1:GetScript("OnClick")
-		local button = ActionButton1:GetScript("OnClick")
+		for i = 1, 12 do
+			local b = _G["ActionButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self) end)
 
-		local function register(val)
-			if val.IsProtected and val.GetObjectType and val.GetScript and val:GetObjectType()=="CheckButton" and val:IsProtected() then
-				local script = val:GetScript("OnClick")
-				if script==button then
-					val:HookScript("OnEnter", function(self) bind:Update(self) end)
-				elseif script==stance then
-					val:HookScript("OnEnter", function(self) bind:Update(self, "STANCE") end)
-				elseif script==pet then
-					val:HookScript("OnEnter", function(self) bind:Update(self, "PET") end)
+			b = _G["MultiBarBottomLeftButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self) end)
+
+			b = _G["MultiBarLeftButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self) end)
+
+			b = _G["MultiBarRightButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self) end)
+
+			b = _G["MultiBarBottomRightButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self) end)
 				end
-			end
+
+		for i = 1, NUM_STANCE_SLOTS do
+			local b = _G["StanceButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self, "STANCE") end)
 		end
 
-		local val = EnumerateFrames()
-		while val do
-			register(val)
-			val = EnumerateFrames(val)
+		for i = 1, NUM_PET_ACTION_SLOTS do
+			local b = _G["PetActionButton"..i]
+			b:HookScript("OnEnter", function(self) bind:Update(self, "PET") end)
 		end
 
 		for i=1,12 do
@@ -284,6 +286,7 @@ SlashCmdList.MOUSEOVERBIND = function()
 			b:HookScript("OnEnter", function(self) bind:Update(self, "SPELL") end)
 		end
 		
+		ExtraActionButton1:HookScript("OnEnter", function(self) bind:Update(self) end)
 		local function registermacro()
 			for i = 1, MAX_ACCOUNT_MACROS do
 				local b = _G["MacroButton"..i]
