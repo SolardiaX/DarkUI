@@ -35,8 +35,8 @@ ai:RegisterEvent("PARTY_INVITE_REQUEST")
 ai:SetScript("OnEvent", function(_, _, name, _, _, _, _, _, inviterGUID)
     if QueueStatusMinimapButton:IsShown() or GetNumGroupMembers() > 0 then return end
     if CheckFriend(inviterGUID) then
-        RaidNotice_AddMessage(RaidWarningFrame, L.INFO_INVITE .. name, { r = 0.41, g = 0.8, b = 0.94 }, 3)
-        print(format("|cffffff00" .. L.INFO_INVITE .. name .. ".|r"))
+        RaidNotice_AddMessage(RaidWarningFrame, L.AUTO_INVITE_INFO .. name, { r = 0.41, g = 0.8, b = 0.94 }, 3)
+        print(format("|cffffff00" .. L.AUTO_INVITE_INFO .. name .. ".|r"))
         AcceptGroup()
         for i = 1, STATICPOPUP_NUMDIALOGS do
             local frame = _G["StaticPopup" .. i]
