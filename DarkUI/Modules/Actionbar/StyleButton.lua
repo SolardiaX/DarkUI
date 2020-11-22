@@ -486,12 +486,12 @@ extraButtonConfig.buttonstyle = { file = "" }
 StyleExtraActionButton(ExtraActionButton1, extraButtonConfig)
 
 --DarkUI extra buttons
---[[
 StyleActionButton(_G["DarkUIExtraButtons_MainLeftButton"], actionButtonConfig)
 StyleActionButton(_G["DarkUIExtraButtons_MainRightButton"], actionButtonConfig)
 StyleActionButton(_G["DarkUIExtraButtons_TopLeftButton"], actionButtonConfig)
 StyleActionButton(_G["DarkUIExtraButtons_TopRightButton"], actionButtonConfig)
-]]--
+
+--[[
 local host = CreateFrame("Frame")
 host:RegisterEvent("PLAYER_LOGIN")
 host:SetScript("OnEvent", function()
@@ -499,3 +499,4 @@ host:SetScript("OnEvent", function()
         StyleActionButton(_G["MagnetButtonFrame" .. i .. "CheckButton"], actionButtonConfig)
     end
 end)
+]]--

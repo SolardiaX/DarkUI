@@ -57,8 +57,6 @@ function addon.OnMouseDown(self, button)
         addon.StartBlockMove(self);
     elseif (not addon.IsButtonLocked()) and (button == "LeftButton") and (shiftDown) then
         addon.StartButtonMove(self)
-    elseif (not self.IsMoving) and (button == "LeftButton") and ctrlDown and not (UnitAffectingCombat("player") or InCombatLockdown()) then
-        addon.ShowProps(self);
     end
 end
 function addon.OnMouseUp(self)
