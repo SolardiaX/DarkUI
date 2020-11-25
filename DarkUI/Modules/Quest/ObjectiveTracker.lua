@@ -40,11 +40,21 @@ ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
-for _, headerName in pairs({ "QuestHeader", "AchievementHeader", "ScenarioHeader" }) do
-    ObjectiveTrackerFrame.BlocksFrame[headerName].Background:Hide()
+local headers = {
+	ObjectiveTrackerBlocksFrame.CampaignQuestHeader,
+	ObjectiveTrackerBlocksFrame.QuestHeader,
+	ObjectiveTrackerBlocksFrame.ScenarioHeader,
+	ObjectiveTrackerBlocksFrame.AchievementHeader,
+	BONUS_OBJECTIVE_TRACKER_MODULE.Header,
+	WORLD_QUEST_TRACKER_MODULE.Header,
+	ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
+}
+for i = 1, #headers do
+	local header = headers[i]
+	if header then
+		header.Background:Hide()
+	end
 end
-BONUS_OBJECTIVE_TRACKER_MODULE.Header.Background:Hide()
-WORLD_QUEST_TRACKER_MODULE.Header.Background:Hide()
 
 ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
 
