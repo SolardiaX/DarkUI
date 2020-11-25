@@ -14,7 +14,7 @@
 	<Script file="MicroMenu.lua" />
 	<Script file="Bags.lua" />
 	<Script file="Texture.lua" />
-	<Script file="ExtraButton.old.lua" />
+	<Script file="ExtraButton.lua" />
 	<Script file="StyleButton.lua" />
 	<Script file="StyleCooldown.lua" />
 	<Script file="StyleRange.lua" />
