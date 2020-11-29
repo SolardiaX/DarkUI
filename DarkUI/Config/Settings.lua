@@ -131,7 +131,7 @@ local bars = {
         fader_combat    = nil
     },
     leave_vehicle    = {
-        pos             = { "CENTER", "UIParent", "CENTER", 0, -140 },
+        pos             = { "CENTER", "UIParent", "CENTER", 0, -260 },
         button          = {
             size  = 24,
             space = 6
