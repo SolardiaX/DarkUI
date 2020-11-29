@@ -69,7 +69,7 @@ hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
 			spellButton.NormalTexture:SetAlpha(0)
 			spellButton:SetPushedTexture(C.media.button.pushed) --force it to gain a texture
 			spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-			spellButton:StripTextures()
+			--spellButton:StripTextures()
 			spellButton:SetSize(cfg.button.size, cfg.button.size)
 			spellButton:CreateTextureBorder()
 
@@ -93,6 +93,6 @@ end)
 -- Fix button visibility
 hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
 	if parent == ExtraAbilityContainer then
-		self:SetParent(zoneFrame)
+		self:SetParent(zoneBar)
 	end
 end)
