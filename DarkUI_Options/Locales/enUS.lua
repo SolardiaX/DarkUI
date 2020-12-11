@@ -90,6 +90,7 @@ L_OPT_NAMEPLATE_SHOW_STEALABLE_BUFFS = 'Show stealable buff'
 L_OPT_NAMEPLATE_SHOW_SPIRAL = 'cooldown with buff/debuff'
 L_OPT_NAMEPLATE_ARROW = 'Show arrow to current target'
 L_OPT_NAMEPLATE_HEALER_ICON = 'Show healer icon in battleground/arena'
+L_OPT_NAMEPLATE_QUEST = 'Show quest info'
 
 L_OPT_AURA_ENABLE = 'Enable buff/debuff module'
 L_OPT_AURA_SHOW_CASTER = 'Show caster of buff/debuff'

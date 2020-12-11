@@ -60,7 +60,7 @@ local function OpenGUI()
     globalChecked:SetPoint("BOTTOMLEFT", 20, 15)
     globalChecked.name:SetText(L_GLOBAL_OPTION)
     globalChecked:SetChecked(SavedOptions.global)
-    globalChecked:HookScript("OnClick", function(self)
+    globalChecked:SetScript("OnClick", function(self)
         local source = self:GetChecked() and SavedOptionsPerChar or SavedOptions
 
         local target = ns.DeepCopy(source)

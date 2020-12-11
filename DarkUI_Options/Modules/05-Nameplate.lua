@@ -54,4 +54,5 @@ ns.OptionList[5] = { -- Nameplate
     { 1, 'nameplate', 'show_spiral', L_OPT_NAMEPLATE_SHOW_SPIRAL, false },
     { 1, 'nameplate', 'arrow', L_OPT_NAMEPLATE_ARROW, false },
     { 1, 'nameplate', 'healer_icon', L_OPT_NAMEPLATE_HEALER_ICON, false },
+    { 1, 'nameplate', 'quest', L_OPT_NAMEPLATE_QUEST, false },
 }

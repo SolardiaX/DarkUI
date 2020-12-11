@@ -373,6 +373,88 @@ local function UpdateName(self)
     end
 end
 
+-- Quest progress
+local isInInstance
+local function CheckInstanceStatus()
+	isInInstance = IsInInstance()
+end
+
+function frame:PLAYER_ENTERING_WORLD()
+    CheckInstanceStatus()
+end
+
+local function questIconCheck()
+    CheckInstanceStatus()
+	frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+end
+
+local isInGroup = IsInGroup()
+local scanTip = CreateFrame("GameTooltip", "DarkUI_ScanTooltip", nil, "GameTooltipTemplate")
+local function updateQuestUnit(self)
+	if isInInstance then
+		self.questIcon:Hide()
+		self.questCount:SetText("")
+		return
+	end
+
+	unit = self.unit
+
+	local isLootQuest, questProgress
+	scanTip:SetOwner(UIParent, "ANCHOR_NONE")
+    scanTip:SetUnit(unit)
+	for i = 2, scanTip:NumLines() do
+		local textLine = _G["DarkUI_ScanTooltipTextLeft"..i]
+        local text = textLine:GetText()
+		if textLine and text then
+			local r, g, b = textLine:GetTextColor()
+			if r > .99 and g > .82 and b == 0 then
+				if isInGroup and text == E.name or not isInGroup then
+					isLootQuest = true
+
+					local questLine = _G["DarkUI_ScanTooltipTextLeft"..(i+1)]
+					local questText = questLine:GetText()
+					if questLine and questText then
+						local current, goal = strmatch(questText, "(%d+)/(%d+)")
+						local progress = strmatch(questText, "(%d+)%%")
+						if current and goal then
+							current = tonumber(current)
+							goal = tonumber(goal)
+							if current == goal then
+								isLootQuest = nil
+							elseif current < goal then
+								questProgress = goal - current
+								break
+							end
+						elseif progress then
+							progress = tonumber(progress)
+							if progress == 100 then
+								isLootQuest = nil
+							elseif progress < 100 then
+								questProgress = progress.."%"
+								--break -- lower priority on progress
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if questProgress then
+		self.questCount:SetText(questProgress)
+		self.questIcon:SetAtlas("Warfronts-BaseMapIcons-Horde-Barracks-Minimap")
+		self.questIcon:Show()
+	else
+		self.questCount:SetText("")
+		if isLootQuest then
+			self.questIcon:SetAtlas("adventureguide-microbutton-alert")
+			self.questIcon:Show()
+		else
+			self.questIcon:Hide()
+		end
+	end
+end
+
 local function castColor(self, ...)
     if self.notInterruptible then
         self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
@@ -397,6 +479,8 @@ local function callback(self, _, unit)
             self.Castbar:SetAlpha(1)
             self.RaidTargetIndicator:SetAlpha(1)
         end
+
+        updateQuestUnit(self)
     end
 end
 
@@ -720,6 +804,22 @@ local function style(self, unit)
     self.NazjatarFollowerXP.BG:SetTexture(C.media.texture.status_s)
     self.NazjatarFollowerXP.BG:SetVertexColor(0, 0, 0, .5)
     self.NazjatarFollowerXP.progressText = DUF.CreateFont(self.NazjatarFollowerXP, STANDARD_TEXT_FONT, 9, "OUTLINE")
+
+    if cfg.quest then 
+        local qicon = self:CreateTexture(nil, "OVERLAY", nil, 2)
+        qicon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
+        qicon:SetSize(28, 28)
+        qicon:SetAtlas("Warfronts-BaseMapIcons-Horde-Barracks-Minimap")
+        qicon:Hide()
+        local count = self:CreateFontString(nil, "OVERLAY")
+        count:SetFont(unpack(C.media.standard_font))
+        count:SetPoint("LEFT", qicon, "RIGHT", -5, 0)
+        count:SetTextColor(.6, .8, 1)
+
+        self.questIcon = qicon
+        self.questCount = count
+        self:RegisterEvent("QUEST_LOG_UPDATE", updateQuestUnit, true)
+    end
 
     -- Every event should be register with this
     tinsert(self.__elements, UpdateName)
