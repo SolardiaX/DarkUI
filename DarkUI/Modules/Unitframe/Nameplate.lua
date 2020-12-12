@@ -391,6 +391,8 @@ end
 local isInGroup = IsInGroup()
 local scanTip = CreateFrame("GameTooltip", "DarkUI_ScanTooltip", nil, "GameTooltipTemplate")
 local function updateQuestUnit(self)
+    if not cfg.quest then return end
+    
 	if isInInstance then
 		self.questIcon:Hide()
 		self.questCount:SetText("")
