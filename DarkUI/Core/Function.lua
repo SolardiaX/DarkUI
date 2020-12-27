@@ -92,7 +92,7 @@ function E:ShortValue(value)
     elseif value >= 1e3 then
         return ("%.1fk"):format(value / 1e3):gsub("%.?0+([km])$", "%1")
     else
-        return value
+        return format("%.0f", value)
     end
 end
 

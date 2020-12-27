@@ -39,15 +39,15 @@ end
 oUF.Tags.Events["dd:nameplateNameColor"] = "UNIT_POWER_UPDATE UNIT_FLAGS"
 
 oUF.Tags.Methods["dd:nameplateHealth"] = function(unit)
-    local hp = UnitHealth(unit)
-    local maxhp = UnitHealthMax(unit)
-    if maxhp == 0 then
-        return 0
-    else
-        return ("%s - %d%%"):format(E:ShortValue(hp), hp / maxhp * 100 + 0.5)
-    end
+	local hp = UnitHealth(unit)
+	local maxhp = UnitHealthMax(unit)
+	if maxhp == 0 then
+		return 0
+	else
+		return ("%s - %d%%"):format(E:ShortValue(hp), hp / maxhp * 100 + 0.5)
+	end
 end
-oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
+oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
 
 oUF.Tags.Methods["dd:nameLong"] = function(unit)
     local name = UnitName(unit)

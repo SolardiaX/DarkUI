@@ -525,8 +525,8 @@ local function style(self, unit)
     -- Create Health Text
     if cfg.health_value == true then
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
-        self.Health.value:SetFont(unpack(C.media.standard_font))
-        self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", 0, 0)
+        self.Health.value:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
+        self.Health.value:SetPoint("CENTER", self.Health, "CENTER", 0, 0)
         self:Tag(self.Health.value, "[dd:nameplateHealth]")
     end
 
