@@ -688,7 +688,10 @@ styler.rTips[E.addonName] = function()
         for _, name in pairs({ "DropDownList", "L_DropDownList", "Lib_DropDownList" }) do
             for i = 1, UIDROPDOWNMENU_MAXLEVELS do
                 local menu = _G[name .. i .. "MenuBackdrop"]
-                if menu and not menu.styled then hook(menu) end
+                if menu and not menu.menustyled then 
+                    hook(menu) 
+                    menu.menustyled = true
+                end
             end
         end
     end)
