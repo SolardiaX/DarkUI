@@ -180,6 +180,7 @@ StageBlock.backdrop:SetPoint("BOTTOMRIGHT", ScenarioStageBlock.NormalBG, -6, 5)
 StageBlock.NormalBG:SetAlpha(0)
 StageBlock.FinalBG:SetAlpha(0)
 StageBlock.GlowTexture:SetTexture("")
+
 ----------------------------------------------------------------------------------------
 --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 ----------------------------------------------------------------------------------------
