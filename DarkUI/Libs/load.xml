@@ -12,9 +12,6 @@
     <!-- oUF -->
     <Include file="oUF\load.xml" />
 
-    <!-- MagnetButtons -->
-    <!--Include file="MagnetButtons\load.xml" /-->
-
     <!-- LibButtonGlow -->
     <Script file="LibButtonGlow.lua" />
 
@@ -22,5 +19,5 @@
     <Include file="cargBags\load.xml" />
 
     <!-- MagnetButtons -->
-    <Include file="MagnetButtons\load.xml" />
+    <!--Include file="MagnetButtons\load.xml" /-->
 </Ui>
