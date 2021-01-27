@@ -31,8 +31,9 @@ local list = {
         { AuraID = 5116, UnitID = "target", Caster = "player" }, -- 震荡射击
         { AuraID = 19386, UnitID = "target", Caster = "player" }, -- 翼龙钉刺
         { AuraID = 24394, UnitID = "target", Caster = "pet" }, -- 胁迫
+        {AuraID = 321538, UnitID = "target", Caster = "pet"},		-- 血溅十方
         { AuraID = 117526, UnitID = "target" }, -- 束缚射击
-        {AuraID = 257284, UnitID = "target"},						-- 猎人印记
+        {AuraID = 257284, UnitID = "target", Caster = "player"},	-- 猎人印记
         { AuraID = 131894, UnitID = "target", Caster = "player" }, -- 夺命黑鸦
         { AuraID = 199803, UnitID = "target", Caster = "player" }, -- 精确瞄准
         { AuraID = 195645, UnitID = "target", Caster = "player" }, -- 摔绊
@@ -55,6 +56,7 @@ local list = {
         {AuraID = 336746, UnitID = "target", Caster = "player"},	-- 魂铸余烬，橙装
         {AuraID = 328275, UnitID = "target", Caster = "player"},	-- 野性印记
         {AuraID = 324149, UnitID = "target", Caster = "player"},	-- 劫掠射击
+        {AuraID = 308498, UnitID = "target", Caster = "player"},	-- 共鸣箭
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 19574, UnitID = "player" }, -- 狂野怒火
@@ -83,7 +85,8 @@ local list = {
         { AuraID = 203155, UnitID = "player" }, -- 狙击
         { AuraID = 235712, UnitID = "player", Combat = true }, -- 回转稳定，橙手
         { AuraID = 264735, UnitID = "player" }, -- 优胜劣汰
-        { AuraID = 260242, UnitID = "player" }, -- 弹无虚发
+        {AuraID = 281195, UnitID = "player"},	-- 优胜劣汰
+        {AuraID = 260242, UnitID = "player", Flash = true},	-- 弹无虚发
         { AuraID = 260395, UnitID = "player" }, -- 致命射击
         { AuraID = 269502, UnitID = "player" }, -- 致命射击
         { AuraID = 281036, UnitID = "player" }, -- 凶暴野兽
@@ -93,7 +96,7 @@ local list = {
         { AuraID = 265898, UnitID = "player" }, -- 接战协定
         { AuraID = 268552, UnitID = "player" }, -- 蝰蛇毒液
         { AuraID = 260249, UnitID = "player" }, -- 掠食者
-        { AuraID = 257622, UnitID = "player", Text = "A" }, -- 技巧射击
+        {AuraID = 257622, UnitID = "player", Text = "AoE"},	-- 技巧射击
         { AuraID = 288613, UnitID = "player" }, -- 百发百中
         { AuraID = 274447, UnitID = "player" }, -- 千里之目
         {AuraID = 260243, UnitID = "player"},	-- 乱射
