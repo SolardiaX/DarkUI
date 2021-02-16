@@ -4,4 +4,5 @@
  
     <Script file="AutoCollapse.lua" />
     <Script file="ObjectiveTracker.lua" />
+    <Script file="AutoButton.lua" />
 </Ui>
