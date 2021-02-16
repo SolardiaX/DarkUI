@@ -207,7 +207,7 @@ local createStyle = function(self)
     self:SetPoint(unpack(cfg.pet.position))
     self:SetScale(cfg.scale)
 
-    self:RegisterForClicks("AnyDown")
+    self:RegisterForClicks("AnyUp")
     self:SetScript("OnEnter", UnitFrame_OnEnter)
     self:SetScript("OnLeave", UnitFrame_OnLeave)
 

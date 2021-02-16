@@ -173,7 +173,7 @@ local createStyle = function(self)
     self:SetSize(100, 33)
     self:SetScale(cfg.scale)
 
-    self:RegisterForClicks("AnyDown")
+    self:RegisterForClicks("AnyUp")
     self:SetScript("OnEnter", UnitFrame_OnEnter)
     self:SetScript("OnLeave", UnitFrame_OnLeave)
 

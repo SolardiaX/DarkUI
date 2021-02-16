@@ -214,7 +214,7 @@ C.announcement = {
 local style = {
     enable           = true,
     show_caster      = true, -- enable/disable show caster of aura when mouse over
-    disable_timers   = false, -- enable/disable buffs/debuffs timers
+    show_timers      = true, -- enable/disable buffs/debuffs timers
     row_num          = 16, -- buffs/debuffs num per row
     spacing          = 6, -- spacing between icons
     icon_padding     = 2, -- spacing between icon and it's background or shadow
@@ -458,7 +458,9 @@ C.misc = {
 C.quest = {
     enable            = true,
     auto_collapse     = true,
-    quest_tracker_pos = { "TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", -70, -25 }
+    quest_tracker_pos = { "TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", -70, -25 },
+    auto_button       = true,
+    auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -20 },
 }
 
 ----------------------------------------------------------------------------------------
@@ -501,7 +503,7 @@ C.nameplate = {
     ad_height            = 0, -- Additional height for selected nameplate
     ad_width             = 40, -- Additional width for selected nameplate
     combat               = false, -- Automatically show nameplate in combat
-    health_value         = false, -- Numeral health value
+    health_value         = true, -- Numeral health value
     show_castbar_name    = true, -- Show castbar name
     enhance_threat       = true, -- If tank good aggro = green, bad = red
     class_icons          = true, -- Icons by class in PvP
@@ -519,8 +521,10 @@ C.nameplate = {
     healer_icon          = true, -- Show icon above enemy healers nameplate in battlegrounds
     totem_icons          = true, -- Show icon above enemy totems nameplate
     show_spiral          = true, -- Spiral on aura icons
+    show_timers          = true, -- cooldown timer on aura
     icon_padding         = 4, -- spacing between icons
-    arrow                = true -- enable/disable show arrow of current target
+    arrow                = true, -- enable/disable show arrow of current target
+    quest                = true, -- show quest infomation
 }
 ----------------------------------------------------------------------------------------
 --  Configuration of Unitframe

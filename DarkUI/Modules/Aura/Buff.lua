@@ -186,8 +186,8 @@ f:RegisterEvent("VARIABLES_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
 f:SetScript("OnEvent", function(self, event, ...)
     if event == "VARIABLES_LOADED" then
-        if cfg.disable_timers then cfg.disable_timers = 0 else cfg.disable_timers = 1 end
-        SetCVar("buffDurations", cfg.disable_timers)    -- enabling buff durations
+        show_timer = cfg.show_timers and 1 or 0
+        SetCVar("buffDurations", show_timer)    -- enabling buff durations
     else
         Initialize()
     end

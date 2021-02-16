@@ -595,6 +595,43 @@ local function skinButton(f, strip)
     f:HookScript("OnLeave", setOriginalBackdrop)
 end
 
+local function styleButton(button, t, size)
+    if not size then size = 2 end
+    if button.SetHighlightTexture and not button.hover then
+        local hover = button:CreateTexture()
+        hover:SetColorTexture(1, 1, 1, 0.3)
+        hover:SetPoint("TOPLEFT", button, size, -size)
+        hover:SetPoint("BOTTOMRIGHT", button, -size, size)
+        button.hover = hover
+        button:SetHighlightTexture(hover)
+    end
+
+    if not t and button.SetPushedTexture and not button.pushed then
+        local pushed = button:CreateTexture()
+        pushed:SetColorTexture(0.9, 0.8, 0.1, 0.3)
+        pushed:SetPoint("TOPLEFT", button, size, -size)
+        pushed:SetPoint("BOTTOMRIGHT", button, -size, size)
+        button.pushed = pushed
+        button:SetPushedTexture(pushed)
+    end
+
+    if button.SetCheckedTexture and not button.checked then
+        local checked = button:CreateTexture()
+        checked:SetColorTexture(0, 1, 0, 0.3)
+        checked:SetPoint("TOPLEFT", button, size, -size)
+        checked:SetPoint("BOTTOMRIGHT", button, -size, size)
+        button.checked = checked
+        button:SetCheckedTexture(checked)
+    end
+
+    local cooldown = button:GetName() and _G[button:GetName().."Cooldown"]
+    if cooldown then
+        cooldown:ClearAllPoints()
+        cooldown:SetPoint("TOPLEFT", button, size, -size)
+        cooldown:SetPoint("BOTTOMRIGHT", button, -size, size)
+    end
+end
+
 ----------------------------------------------------------------------------------------
 --  Apply api function
 ----------------------------------------------------------------------------------------
@@ -656,7 +693,9 @@ local function addapi(object)
     end
 
     -- Style API
-
+    if not object.StyleButton then
+        mt.StyleButton = styleButton
+    end
     if not object.SkinCheckBox then
         mt.SkinCheckBox = skinCheckBox
     end

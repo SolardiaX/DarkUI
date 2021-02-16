@@ -44,7 +44,7 @@ f:SetScript("OnEvent", function()
     else
         for _, object in next, oUF.objects do
             if not object.focuser then
-                SetFocusHotkey(frame)
+                SetFocusHotkey(object)
             end
         end
     end

@@ -51,6 +51,7 @@ ns.OptionList[5] = { -- Nameplate
     { 1, 'nameplate', 'track_buffs', L_OPT_NAMEPLATE_TRACK_BUFFS, false },
     { 1, 'nameplate', 'player_aura_only', L_OPT_NAMEPLATE_PLAYER_AURA_ONLY, false },
     { 1, 'nameplate', 'show_stealable_buffs', L_OPT_NAMEPLATE_SHOW_STEALABLE_BUFFS, false },
+    { 1, 'nameplate', 'show_timers', L_OPT_NAMEPLATE_SHOW_TIMERS, false },
     { 1, 'nameplate', 'show_spiral', L_OPT_NAMEPLATE_SHOW_SPIRAL, false },
     { 1, 'nameplate', 'arrow', L_OPT_NAMEPLATE_ARROW, false },
     { 1, 'nameplate', 'healer_icon', L_OPT_NAMEPLATE_HEALER_ICON, false },

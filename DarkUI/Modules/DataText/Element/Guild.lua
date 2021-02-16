@@ -11,7 +11,7 @@ local C_GuildInfo_GuildRoster = C_GuildInfo.GuildRoster
 local EasyMenu = EasyMenu
 local IsInGuild = IsInGuild
 local IsAltKeyDown, IsShiftKeyDown = IsAltKeyDown, IsShiftKeyDown
-local InviteUnit = InviteUnit
+local C_PartyInfo_InviteUnit = C_PartyInfo.InviteUnit
 local GetRealZoneText = GetRealZoneText
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local GetNumGuildMembers = GetNumGuildMembers
@@ -41,6 +41,7 @@ local function BuildGuildTable()
     wipe(guildTable)
     for i = 1, GetNumGuildMembers() do
         local name, rank, _, level, _, zone, note, officernote, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
+        if not name then break end
         name = Ambiguate(name, "none")
         guildTable[i] = { name, rank, level, zone, note, officernote, connected, status, class, mobile }
     end
@@ -127,7 +128,7 @@ module:Inject("Guild", {
                                 notCheckable = true,
                                 func         = function(_, arg1)
                                     module.menuFrame:Hide()
-                                    InviteUnit(arg1)
+                                    C_PartyInfo_InviteUnit(arg1)
                                 end
                             }
                         end

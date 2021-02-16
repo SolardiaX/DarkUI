@@ -67,7 +67,16 @@ module:Inject("Location", {
     end,
     OnClick  = function(self)
         if IsShiftKeyDown() then
-            SendChatMessage(format(" (%s: %s)", self.zone, module:Coords()), E:CheckChat())
+            local mapID = C_Map.GetBestMapForUnit("player")
+            if C_Map.CanSetUserWaypointOnMap(mapID) then
+                local pos = C_Map.GetPlayerMapPosition(mapID, "player")
+                local mapPoint = UiMapPoint.CreateFromVector2D(mapID, pos)
+                C_Map.SetUserWaypoint(mapPoint)
+            end
+            local hyperlink = C_Map.GetUserWaypointHyperlink() or ""
+            ChatEdit_ActivateChat(ChatEdit_ChooseBoxForSend())
+            ChatEdit_ChooseBoxForSend():Insert(format(" (%s: %s) %s", self.zone, module:Coords(), hyperlink))
+            C_Map.ClearUserWaypoint()
         else
             ToggleFrame(WorldMapFrame)
         end

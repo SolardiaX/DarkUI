@@ -41,19 +41,19 @@ ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
 local headers = {
-	ObjectiveTrackerBlocksFrame.CampaignQuestHeader,
-	ObjectiveTrackerBlocksFrame.QuestHeader,
-	ObjectiveTrackerBlocksFrame.ScenarioHeader,
-	ObjectiveTrackerBlocksFrame.AchievementHeader,
-	BONUS_OBJECTIVE_TRACKER_MODULE.Header,
-	WORLD_QUEST_TRACKER_MODULE.Header,
-	ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
+    ObjectiveTrackerBlocksFrame.ScenarioHeader,
+    ObjectiveTrackerBlocksFrame.CampaignQuestHeader,
+    ObjectiveTrackerBlocksFrame.QuestHeader,
+    ObjectiveTrackerBlocksFrame.AchievementHeader,
+    BONUS_OBJECTIVE_TRACKER_MODULE.Header,
+    WORLD_QUEST_TRACKER_MODULE.Header,
+    ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
 }
 for i = 1, #headers do
-	local header = headers[i]
-	if header then
-		header.Background:Hide()
-	end
+    local header = headers[i]
+    if header then
+        header.Background:Hide()
+    end
 end
 
 ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
@@ -66,7 +66,21 @@ hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
     if item and not item.skinned then
         item:SetSize(26, 26)
         item:CreateTextureBorder()
+        item:SetNormalTexture(nil)
 
+        item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+        item.icon:SetPoint("TOPLEFT", item, 2, -2)
+        item.icon:SetPoint("BOTTOMRIGHT", item, -2, 2)
+
+        item.Cooldown:SetAllPoints(item.icon)
+
+        item.Count:ClearAllPoints()
+        item.Count:SetPoint("TOPLEFT", 1, -1)
+        item.Count:SetFont(STANDARD_TEXT_FONT, 10, THINOUTLINE)
+        item.Count:SetShadowOffset(1, -1)
+
+        item.HotKey:SetFontObject(NumberFont_OutlineThick_Mono_Small)
+        
         item.skinned = true
     end
 end)
@@ -107,7 +121,7 @@ hooksecurefunc(QUEST_TRACKER_MODULE, "Update", function()
         if not questID then
             break
         end
-	local col = GetDifficultyColor(C_PlayerInfo_GetContentDifficultyQuestForPlayer(questID))
+    local col = GetDifficultyColor(C_PlayerInfo_GetContentDifficultyQuestForPlayer(questID))
         local block = QUEST_TRACKER_MODULE:GetExistingBlock(questID)
         if block then
             block.HeaderText:SetTextColor(col.r, col.g, col.b)
@@ -159,6 +173,15 @@ ScenarioStageBlock:HookScript("OnEnter", function(self)
     end
 end)
 
+do
+    if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+        local list = ScenarioBlocksFrame.MawBuffsBlock.Container.List
+        if list then
+            list:ClearAllPoints()
+            list:SetPoint("TOPLEFT", ScenarioBlocksFrame.MawBuffsBlock.Container, "TOPRIGHT", 15, 0)
+        end
+    end
+end
 ----------------------------------------------------------------------------------------
 --	Kill reward animation when finished dungeon or bonus objectives
 ----------------------------------------------------------------------------------------
@@ -185,20 +208,20 @@ StageBlock.GlowTexture:SetTexture("")
 --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 ----------------------------------------------------------------------------------------
 hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
-	if IsControlKeyDown() then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_AbandonQuest(self.questID)
-	elseif IsAltKeyDown() and C_QuestLog.IsPushableQuest(self.questID) then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_ShareQuest(self.questID)
-	end
+    if IsControlKeyDown() then
+        CloseDropDownMenus()
+        QuestMapQuestOptions_AbandonQuest(self.questID)
+    elseif IsAltKeyDown() and C_QuestLog.IsPushableQuest(self.questID) then
+        CloseDropDownMenus()
+        QuestMapQuestOptions_ShareQuest(self.questID)
+    end
 end)
 hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(_, block)
-	if IsControlKeyDown() then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_AbandonQuest(block.id)
-	elseif IsAltKeyDown() and C_QuestLog.IsPushableQuest(block.id) then
-		CloseDropDownMenus()
-		QuestMapQuestOptions_ShareQuest(block.id)
-	end
+    if IsControlKeyDown() then
+        CloseDropDownMenus()
+        QuestMapQuestOptions_AbandonQuest(block.id)
+    elseif IsAltKeyDown() and C_QuestLog.IsPushableQuest(block.id) then
+        CloseDropDownMenus()
+        QuestMapQuestOptions_ShareQuest(block.id)
+    end
 end)

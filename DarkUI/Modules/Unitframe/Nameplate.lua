@@ -728,7 +728,7 @@ local function style(self, unit)
         end
 
         self.Auras.PostUpdateIcon = function(_, _, icon, _, _, duration, expiration, debuffType)
-            if duration and duration > 0 and cfg.disable_timers ~= true then
+            if duration and duration > 0 and cfg.show_timers then
                 icon.remaining:Show()
                 icon.timeLeft = expiration
                 icon:SetScript("OnUpdate", CreateAuraTimer)
@@ -829,7 +829,7 @@ local function style(self, unit)
 
     tinsert(self.__elements, UpdateTarget)
     self:RegisterEvent("PLAYER_TARGET_CHANGED", UpdateTarget, true)
-    -- Disable movement via /moveui
+    -- Disable movement
     self.disableMovement = true
 end
 

@@ -13,9 +13,15 @@ ns.OptionList[9] = { -- Quest
     { 1, 'quest', 'enable', L_OPT_QUEST_ENABLE, false, nil, function(self)
         self:HookScript("OnClick", function(self)
             ns.opt_widgets['quest:auto_collapse']:SetEnabled(self:GetChecked())
+            ns.opt_widgets['quest:auto_button']:SetEnabled(self:GetChecked())
         end)
     end },
     { 1, 'quest', 'auto_collapse', L_OPT_QUEST_AUTO_COLLAPSE, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['quest:enable']:GetChecked())
+        end)
+    end },
+    { 1, 'quest', 'auto_button', L_OPT_QUEST_AUTO_BUTTON, false, nil, function(self)
         self:HookScript('OnShow', function(self)
             self:SetEnabled(ns.opt_widgets['quest:enable']:GetChecked())
         end)

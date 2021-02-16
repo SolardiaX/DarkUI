@@ -20,7 +20,8 @@ module:Inject("Coords", {
     text    = { string = function() return module:Coords() end },
     OnClick = function()
         if IsShiftKeyDown() then
-            SendChatMessage(format(" (%s: %s)", GetZoneText(), module:Coords()), E:CheckChat())
+            ChatEdit_ActivateChat(ChatEdit_ChooseBoxForSend())
+            ChatEdit_ChooseBoxForSend(format(" (%s: %s)", GetZoneText(), module:Coords()))
         else
             ToggleFrame(WorldMapFrame)
         end

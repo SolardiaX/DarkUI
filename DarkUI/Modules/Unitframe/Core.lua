@@ -263,7 +263,6 @@ function DUF.PostCreateIcon(_, button)
     button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     button.icon:SetDrawLayer("BACKGROUND", -8)
     button.icon:SetTexCoord(.08, .92, .08, .92)
-
     
     button.overlay:SetTexture(C.media.texture.border)
     button.overlay:SetTexCoord(0, 1, 0, 1)
@@ -273,10 +272,9 @@ function DUF.PostCreateIcon(_, button)
     button.overlay:SetVertexColor(0.25, 0.25, 0.25)
     
     button:CreateTextureBorder()
-    --button:CreateBackdrop('Default', 1)
     button:CreateShadow()
 
-    --button.overlay.Hide = E.dummy
+    button.overlay.Hide = E.dummy
 end
 
 function DUF.PostUpdateIcon(icons, unit, icon, index, ...)
@@ -293,23 +291,19 @@ function DUF.PostUpdateIcon(icons, unit, icon, index, ...)
             if icons.onlyShowPlayer then
                 icon:Hide()
             else
-                --icon.backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
-                icon.border:SetVertexColor(unpack(C.media.border_color))
+                icon.overlay:SetVertexColor(unpack(C.media.border_color))
                 icon.icon:SetDesaturated(true)
             end
         else
             local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
-            --icon.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-            icon.border:SetVertexColor(color.r * .6, color.g * .6, color.b * .6)
+            icon.overlay:SetVertexColor(color.r * .6, color.g * .6, color.b * .6)
             icon.icon:SetDesaturated(false)
         end
     else
         if (isStealable or ((E.class == "MAGE" or E.class == "PRIEST" or E.class == "SHAMAN" or E.class == "HUNTER") and dtype == "Magic")) and not UnitIsFriend("player", unit) then
-            --icon.backdrop:SetBackdropBorderColor(1, 0.85, 0)
-            icon.border:SetVertexColor(1, 0.85, 0)
+            icon.overlay:SetVertexColor(1, 0.85, 0)
         else
-            --icon.backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
-            icon.border:SetVertexColor(unpack(C.media.border_color))
+            icon.overlay:SetVertexColor(unpack(C.media.border_color))
         end
         icon.icon:SetDesaturated(false)
     end

@@ -14,6 +14,7 @@ local EasyMenu = EasyMenu
 local GetFriendInfo = GetFriendInfo
 local C_FriendList_GetNumFriends = C_FriendList.GetNumFriends
 local C_FriendList_GetNumOnlineFriends = C_FriendList.GetNumOnlineFriends
+local C_FriendList_GetFriendInfo = C_FriendList.GetFriendInfo
 local GetLocale = GetLocale
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local GetRealZoneText = GetRealZoneText
@@ -45,7 +46,7 @@ local function BuildFriendTable(total)
     wipe(friendTable)
 
     for i = 1, total do
-        local name, level, class, area, connected, status, note = GetFriendInfo(i)
+        local name, level, class, area, connected, status, note = C_FriendList_GetFriendInfo(i)
         for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do if class == v then class = k end end
         if GetLocale() ~= "enUS" then
             for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do if class == v then class = k end end
