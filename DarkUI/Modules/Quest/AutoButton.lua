@@ -82,7 +82,7 @@ Scanner:SetScript("OnEvent", function()
         for s = 1, GetContainerNumSlots(b) do
             local itemID = GetContainerItemID(b, s)
             itemID = tonumber(itemID)
-            if T.ABItems[itemID] then
+            if C.autobutton[itemID] then
                 local itemName = GetItemInfo(itemID)
                 local count = GetItemCount(itemID)
                 local itemIcon = GetItemIcon(itemID)
