@@ -492,7 +492,7 @@ function WorldQuestList_WQIcons_AddIcons(frame,pinName)
                                 for j=2, inspectScantip:NumLines() do
                                     local tooltipLine = _G["WorldmapRewardIconWorldQuestListInspectScanningTooltipTextLeft"..j]								                       	
                                     local text = tooltipLine:GetText()
-                                    if text and text:find(ANIMA.."|r$") then
+                                    if text and text:find(WORLD_QUEST_REWARD_FILTERS_ANIMA.."|r$") then
                                         isAnima = 100
                                     elseif text and isAnima and text:find("^"..LE.ITEM_SPELL_TRIGGER_ONUSE) then
                                         local num = text:gsub("(%d+)[ %.,]+(%d+)","%1%2"):match("%d+")
