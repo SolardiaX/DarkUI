@@ -1,3 +1,27 @@
+--[[
+# Element: Group Role Indicator
+
+Toggles the visibility of an indicator based on the unit's current group role (tank, healer or damager).
+
+## Widget
+
+GroupRoleIndicator - A `Texture` used to display the group role icon.
+
+## Notes
+
+A default texture will be applied if the widget is a Texture and doesn't have a texture or a color set.
+
+## Examples
+
+    -- Position and size
+    local GroupRoleIndicator = self:CreateTexture(nil, 'OVERLAY')
+    GroupRoleIndicator:SetSize(16, 16)
+    GroupRoleIndicator:SetPoint('LEFT', self)
+
+    -- Register it with oUF
+    self.GroupRoleIndicator = GroupRoleIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 
@@ -14,14 +38,8 @@ local function Update(self, event)
 	end
 
 	local role = UnitGroupRolesAssigned(self.unit)
-	if role == 'TANK' then
-		element:SetTexture([[Interface\AddOns\ShestakUI\Media\Textures\Tank.tga]])
-		element:Show()
-	elseif role == 'HEALER' then
-		element:SetTexture([[Interface\AddOns\ShestakUI\Media\Textures\Healer.tga]])
-		element:Show()
-	elseif role == 'DAMAGER' then
-		element:SetTexture([[Interface\AddOns\ShestakUI\Media\Textures\Damager.tga]])
+	if(role == 'TANK' or role == 'HEALER' or role == 'DAMAGER') then
+		element:SetTexCoord(GetTexCoordsForRoleSmallCircle(role))
 		element:Show()
 	else
 		element:Hide()
@@ -65,6 +83,10 @@ local function Enable(self)
 			self:RegisterEvent('GROUP_ROSTER_UPDATE', Path, true)
 		end
 
+		if(element:IsObjectType('Texture') and not element:GetTexture()) then
+			element:SetTexture([[Interface\LFGFrame\UI-LFG-ICON-PORTRAITROLES]])
+		end
+
 		return true
 	end
 end
@@ -75,7 +97,7 @@ local function Disable(self)
 		element:Hide()
 
 		self:UnregisterEvent('PLAYER_ROLES_ASSIGNED', Path)
-		self:UnregisterEvent('GROUP_ROSTER_UPDATE', Path, true)
+		self:UnregisterEvent('GROUP_ROSTER_UPDATE', Path)
 	end
 end
 

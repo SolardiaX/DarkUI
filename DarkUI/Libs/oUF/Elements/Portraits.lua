@@ -32,14 +32,7 @@ local function Update(self, event, unit)
 				element:SetUnit(unit)
 			end
 		else
-			if element.classIcons then
-				local _, class = UnitClass(self.unit)
-				local texcoord = CLASS_ICON_TCOORDS[class]
-				element.Icon:SetTexCoord(texcoord[1] + 0.015, texcoord[2] - 0.02, texcoord[3] + 0.018, texcoord[4] - 0.02)
-			else
-				SetPortraitTexture(element.Icon, unit)
-				element.Icon:SetTexCoord(0.15, 0.85, 0.15, 0.85)
-			end
+			SetPortraitTexture(element, unit)
 		end
 
 		element.guid = guid
