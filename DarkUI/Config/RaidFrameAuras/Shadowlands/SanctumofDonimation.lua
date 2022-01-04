@@ -9,8 +9,7 @@ BOSS = 2435 -- 塔拉格鲁
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 347283) -- 捕食者之嚎
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 347286) -- 不散之惧
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 346986) -- 粉碎护甲
-module:RegisterDebuff(TIER, INSTANCE, BOSS, 347991) -- 高塔之十
-module:RegisterDebuff(TIER, INSTANCE, BOSS, 347269) -- 永恒锁链
+module:RegisterDebuff(TIER, INSTANCE, BOSS, 347269, 6) -- 永恒锁链
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 346985) -- 压制
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 347274) -- 毁灭猛击
 
@@ -55,7 +54,7 @@ module:RegisterDebuff(TIER, INSTANCE, BOSS, 348987) -- 好战者枷锁
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 350927) -- 好战者枷锁
 
 BOSS = 2443 -- 痛楚工匠莱兹纳尔
-module:RegisterDebuff(TIER, INSTANCE, BOSS, 356472) -- 萦绕烈焰
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 356472) -- 萦绕烈焰
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 355505) -- 影铸锁链
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 355506) -- 影铸锁链
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 348456) -- 烈焰套索陷阱

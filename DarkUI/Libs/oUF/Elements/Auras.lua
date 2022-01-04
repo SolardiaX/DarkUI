@@ -1,3 +1,74 @@
+--[[
+# Element: Auras
+
+Handles creation and updating of aura icons.
+
+## Widget
+
+Auras   - A Frame to hold `Button`s representing both buffs and debuffs.
+Buffs   - A Frame to hold `Button`s representing buffs.
+Debuffs - A Frame to hold `Button`s representing debuffs.
+
+## Notes
+
+At least one of the above widgets must be present for the element to work.
+
+## Options
+
+.disableMouse       - Disables mouse events (boolean)
+.disableCooldown    - Disables the cooldown spiral (boolean)
+.size               - Aura icon size. Defaults to 16 (number)
+.width              - Aura icon width. Takes priority over `size` (number)
+.height             - Aura icon height. Takes priority over `size` (number)
+.onlyShowPlayer     - Shows only auras created by player/vehicle (boolean)
+.showStealableBuffs - Displays the stealable texture on buffs that can be stolen (boolean)
+.spacing            - Spacing between each icon. Defaults to 0 (number)
+.['spacing-x']      - Horizontal spacing between each icon. Takes priority over `spacing` (number)
+.['spacing-y']      - Vertical spacing between each icon. Takes priority over `spacing` (number)
+.['growth-x']       - Horizontal growth direction. Defaults to 'RIGHT' (string)
+.['growth-y']       - Vertical growth direction. Defaults to 'UP' (string)
+.initialAnchor      - Anchor point for the icons. Defaults to 'BOTTOMLEFT' (string)
+.filter             - Custom filter list for auras to display. Defaults to 'HELPFUL' for buffs and 'HARMFUL' for
+                      debuffs (string)
+.tooltipAnchor      - Anchor point for the tooltip. Defaults to 'ANCHOR_BOTTOMRIGHT', however, if a frame has anchoring
+                      restrictions it will be set to 'ANCHOR_CURSOR' (string)
+
+## Options Auras
+
+.numBuffs     - The maximum number of buffs to display. Defaults to 32 (number)
+.numDebuffs   - The maximum number of debuffs to display. Defaults to 40 (number)
+.numTotal     - The maximum number of auras to display. Prioritizes buffs over debuffs. Defaults to the sum of
+                .numBuffs and .numDebuffs (number)
+.gap          - Controls the creation of an invisible icon between buffs and debuffs. Defaults to false (boolean)
+.buffFilter   - Custom filter list for buffs to display. Takes priority over `filter` (string)
+.debuffFilter - Custom filter list for debuffs to display. Takes priority over `filter` (string)
+
+## Options Buffs
+
+.num - Number of buffs to display. Defaults to 32 (number)
+
+## Options Debuffs
+
+.num - Number of debuffs to display. Defaults to 40 (number)
+
+## Attributes
+
+button.caster   - the unit who cast the aura (string)
+button.filter   - the filter list used to determine the visibility of the aura (string)
+button.isDebuff - indicates if the button holds a debuff (boolean)
+button.isPlayer - indicates if the aura caster is the player or their vehicle (boolean)
+
+## Examples
+
+    -- Position and size
+    local Buffs = CreateFrame('Frame', nil, self)
+    Buffs:SetPoint('RIGHT', self, 'LEFT')
+    Buffs:SetSize(16 * 2, 16 * 16)
+
+    -- Register with oUF
+    self.Buffs = Buffs
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 
@@ -32,7 +103,6 @@ local function createAuraIcon(element, index)
 
 	local cd = CreateFrame('Cooldown', '$parentCooldown', button, 'CooldownFrameTemplate')
 	cd:SetAllPoints()
-	cd:SetDrawEdge(false)
 
 	local icon = button:CreateTexture(nil, 'BORDER')
 	icon:SetAllPoints()
@@ -110,6 +180,7 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 		button.caster = caster
 		button.filter = filter
 		button.isDebuff = isDebuff
+		button.spellID = spellID
 		button.isPlayer = caster == 'player' or caster == 'vehicle'
 
 		--[[ Override: Auras:CustomFilter(unit, button, ...)
@@ -163,8 +234,9 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 			if(button.icon) then button.icon:SetTexture(texture) end
 			if(button.count) then button.count:SetText(count > 1 and count) end
 
-			local size = element.size or 16
-			button:SetSize(size, size)
+			local width = element.width or element.size or 16
+			local height = element.height or element.size or 16
+			button:SetSize(width, height)
 
 			button:EnableMouse(not element.disableMouse)
 			button:SetID(index)
@@ -195,8 +267,10 @@ local function updateIcon(element, unit, index, offset, filter, isDebuff, visibl
 end
 
 local function SetPosition(element, from, to)
-	local sizex = (element.size or 16) + (element['spacing-x'] or element.spacing or 0)
-	local sizey = (element.size or 16) + (element['spacing-y'] or element.spacing or 0)
+	local width = element.width or element.size or 16
+	local height = element.height or element.size or 16
+	local sizex = width + (element['spacing-x'] or element.spacing or 0)
+	local sizey = height + (element['spacing-y'] or element.spacing or 0)
 	local anchor = element.initialAnchor or 'BOTTOMLEFT'
 	local growthx = (element['growth-x'] == 'LEFT' and -1) or 1
 	local growthy = (element['growth-y'] == 'DOWN' and -1) or 1
@@ -259,7 +333,7 @@ local function UpdateAuras(self, event, unit)
 		local numDebuffs = auras.numDebuffs or 40
 		local max = auras.numTotal or numBuffs + numDebuffs
 
-		local visibleBuffs, hiddenBuffs = filterIcons(auras, unit, auras.buffFilter or auras.filter or 'HELPFUL', math.min(numBuffs, max), nil, 0, true)
+		local visibleBuffs = filterIcons(auras, unit, auras.buffFilter or auras.filter or 'HELPFUL', math.min(numBuffs, max), nil, 0, true)
 
 		local hasGap
 		if(visibleBuffs ~= 0 and auras.gap) then
@@ -281,7 +355,7 @@ local function UpdateAuras(self, event, unit)
 			if(button.count) then button.count:SetText() end
 
 			button:EnableMouse(false)
-			button:Hide()
+			button:Show()
 
 			--[[ Callback: Auras:PostUpdateGapIcon(unit, gapButton, visibleBuffs)
 			Called after an invisible aura button has been created. Only used by Auras when the `gap` option is enabled.
@@ -296,7 +370,7 @@ local function UpdateAuras(self, event, unit)
 			end
 		end
 
-		local visibleDebuffs, hiddenDebuffs = filterIcons(auras, unit, auras.debuffFilter or auras.filter or 'HARMFUL', math.min(numDebuffs, max - visibleBuffs), true, visibleBuffs)
+		local visibleDebuffs = filterIcons(auras, unit, auras.debuffFilter or auras.filter or 'HARMFUL', math.min(numDebuffs, max - visibleBuffs), true, visibleBuffs)
 		auras.visibleDebuffs = visibleDebuffs
 
 		if(hasGap and visibleDebuffs == 0) then
@@ -350,7 +424,7 @@ local function UpdateAuras(self, event, unit)
 		if(buffs.PreUpdate) then buffs:PreUpdate(unit) end
 
 		local numBuffs = buffs.num or 32
-		local visibleBuffs, hiddenBuffs = filterIcons(buffs, unit, buffs.filter or 'HELPFUL', numBuffs)
+		local visibleBuffs = filterIcons(buffs, unit, buffs.filter or 'HELPFUL', numBuffs)
 		buffs.visibleBuffs = visibleBuffs
 
 		local fromRange, toRange
@@ -371,7 +445,7 @@ local function UpdateAuras(self, event, unit)
 		if(debuffs.PreUpdate) then debuffs:PreUpdate(unit) end
 
 		local numDebuffs = debuffs.num or 40
-		local visibleDebuffs, hiddenDebuffs = filterIcons(debuffs, unit, debuffs.filter or 'HARMFUL', numDebuffs, true)
+		local visibleDebuffs = filterIcons(debuffs, unit, debuffs.filter or 'HARMFUL', numDebuffs, true)
 		debuffs.visibleDebuffs = visibleDebuffs
 
 		local fromRange, toRange
@@ -432,7 +506,7 @@ local function Enable(self)
 			buffs.anchoredIcons = 0
 			buffs.tooltipAnchor = buffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
-			-- buffs:Show()
+			buffs:Show()
 		end
 
 		local debuffs = self.Debuffs
@@ -446,7 +520,7 @@ local function Enable(self)
 			debuffs.anchoredIcons = 0
 			debuffs.tooltipAnchor = debuffs.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
-			-- debuffs:Show()
+			debuffs:Show()
 		end
 
 		local auras = self.Auras
@@ -460,7 +534,7 @@ local function Enable(self)
 			auras.anchoredIcons = 0
 			auras.tooltipAnchor = auras.tooltipAnchor or 'ANCHOR_BOTTOMRIGHT'
 
-			-- auras:Show()
+			auras:Show()
 		end
 
 		return true

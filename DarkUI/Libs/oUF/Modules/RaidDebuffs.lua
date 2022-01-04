@@ -219,7 +219,7 @@ local function Update(self, _, unit)
     end
 
     if rd.priority == invalidPrio then
-        rd.index, _name = nil, nil
+		rd.index, rd.spellID, _name = nil, nil, nil
     end
 
     UpdateDebuffFrame(self, _name, _icon, _count, _debuffType, _duration, _expiration)

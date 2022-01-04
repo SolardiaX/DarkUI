@@ -1,3 +1,27 @@
+--[[
+# Element: Assistant Indicator
+
+Toggles the visibility of an indicator based on the unit's raid assistant status.
+
+## Widget
+
+AssistantIndicator - Any UI widget.
+
+## Notes
+
+A default texture will be applied if the widget is a Texture and doesn't have a texture or a color set.
+
+## Examples
+
+    -- Position and size
+    local AssistantIndicator = self:CreateTexture(nil, 'OVERLAY')
+    AssistantIndicator:SetSize(16, 16)
+    AssistantIndicator:SetPoint('TOP', self)
+
+    -- Register it with oUF
+    self.AssistantIndicator = AssistantIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 

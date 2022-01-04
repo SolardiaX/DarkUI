@@ -1,3 +1,38 @@
+--[[
+# Element: Phasing Indicator
+
+Toggles the visibility of an indicator based on the unit's phasing relative to the player.
+
+## Widget
+
+PhaseIndicator - Any UI widget.
+
+## Sub-Widgets
+
+Icon - A `Texture` to represent the phased status.
+
+## Notes
+
+A default texture will be applied if the widget is a Texture and doesn't have a texture or a color set.
+OnEnter and OnLeave script handlers will be set to display a Tooltip if the widget is mouse enabled and does not have
+OnEnter and/or OnLeave handlers.
+
+## Examples
+
+    -- Position and size
+    local PhaseIndicator = CreateFrame('Frame', nil, self)
+    PhaseIndicator:SetSize(16, 16)
+    PhaseIndicator:SetPoint('TOPLEFT', self)
+    PhaseIndicator:EnableMouse(true)
+
+    local Icon = PhaseIndicator:CreateTexture(nil, 'OVERLAY')
+    Icon:SetAllPoints()
+    PhaseIndicator.Icon = Icon
+
+    -- Register it with oUF
+    self.PhaseIndicator = PhaseIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 

@@ -1,3 +1,34 @@
+--[[
+# Element: Monk Stagger Bar
+
+Handles the visibility and updating of the Monk's stagger bar.
+
+## Widget
+
+Stagger - A `StatusBar` used to represent the current stagger level.
+
+## Sub-Widgets
+
+.bg - A `Texture` used as a background. It will inherit the color of the main StatusBar.
+
+## Notes
+
+A default texture will be applied if the widget is a StatusBar and doesn't have a texture set.
+
+## Sub-Widgets Options
+
+.multiplier - Used to tint the background based on the main widgets R, G and B values. Defaults to 1 (number)[0-1]
+
+## Examples
+
+    local Stagger = CreateFrame('StatusBar', nil, self)
+    Stagger:SetSize(120, 20)
+    Stagger:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, 0)
+
+    -- Register with oUF
+    self.Stagger = Stagger
+--]]
+
 if(select(2, UnitClass('player')) ~= 'MONK') then return end
 
 local _, ns = ...
@@ -18,9 +49,12 @@ local STAGGER_GREEN_INDEX = STAGGER_GREEN_INDEX or 1
 local STAGGER_YELLOW_INDEX = STAGGER_YELLOW_INDEX or 2
 local STAGGER_RED_INDEX = STAGGER_RED_INDEX or 3
 
-local function UpdateColor(element, cur, max)
-	local colors = element.__owner.colors.power[BREWMASTER_POWER_BAR_NAME]
-	local perc = cur / max
+local function UpdateColor(self, event, unit)
+	if(unit and unit ~= self.unit) then return end
+	local element = self.Stagger
+
+	local colors = self.colors.power[BREWMASTER_POWER_BAR_NAME]
+	local perc = (element.cur or 0) / (element.max or 1)
 
 	local t
 	if(perc >= STAGGER_RED_TRANSITION) then
@@ -43,6 +77,18 @@ local function UpdateColor(element, cur, max)
 				bg:SetVertexColor(r * mu, g * mu, b * mu)
 			end
 		end
+	end
+
+	--[[ Callback: Stagger:PostUpdateColor(r, g, b)
+	Called after the element color has been updated.
+
+	* self - the Stagger element
+	* r    - the red component of the used color (number)[0-1]
+	* g    - the green component of the used color (number)[0-1]
+	* b    - the blue component of the used color (number)[0-1]
+	--]]
+	if(element.PostUpdateColor) then
+		element:PostUpdateColor(r, g, b)
 	end
 end
 
@@ -67,14 +113,8 @@ local function Update(self, event, unit)
 	element:SetMinMaxValues(0, max)
 	element:SetValue(cur)
 
-	--[[ Override: Stagger:UpdateColor(cur, max)
-	Used to completely override the internal function for updating the widget's colors.
-
-	* self - the Stagger element
-	* cur  - the amount of staggered damage (number)
-	* max  - the player's maximum possible health value (number)
-	--]]
-	element:UpdateColor(cur, max)
+	element.cur = cur
+	element.max = max
 
 	--[[ Callback: Stagger:PostUpdate(cur, max)
 	Called after the element has been updated.
@@ -96,7 +136,16 @@ local function Path(self, ...)
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	return (self.Stagger.Override or Update)(self, ...)
+	(self.Stagger.Override or Update)(self, ...);
+
+	--[[ Override: Stagger.UpdateColor(self, event, unit)
+	Used to completely override the internal function for updating the widgets' colors.
+
+	* self  - the parent object
+	* event - the event triggering the update (string)
+	* unit  - the unit accompanying the event (string)
+	--]]
+	(self.Stagger.UpdateColor or UpdateColor) (self, ...)
 end
 
 local function Visibility(self, event, unit)
@@ -105,17 +154,13 @@ local function Visibility(self, event, unit)
 			self.Stagger:Hide()
 			self:UnregisterEvent('UNIT_AURA', Path)
 		end
-		if SPEC_MONK_WINDWALKER ~= GetSpecialization() then
-			if self.Debuffs then self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 5) end	-- ShestakUI
-		end
 	else
 		if(not self.Stagger:IsShown()) then
 			self.Stagger:Show()
 			self:RegisterEvent('UNIT_AURA', Path)
 		end
-		if self.Debuffs then self.Debuffs:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 2, 19) end	-- ShestakUI
 
-		return Path(self, event, unit)
+		Path(self, event, unit)
 	end
 end
 
@@ -127,33 +172,24 @@ local function VisibilityPath(self, ...)
 	* event - the event triggering the update (string)
 	* unit  - the unit accompanying the event (string)
 	--]]
-	return (self.Stagger.OverrideVisibility or Visibility)(self, ...)
+	(self.Stagger.OverrideVisibility or Visibility)(self, ...)
 end
 
 local function ForceUpdate(element)
-	return VisibilityPath(element.__owner, 'ForceUpdate', element.__owner.unit)
+	VisibilityPath(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
-local function Enable(self)
+local function Enable(self, unit)
 	local element = self.Stagger
-	if(element) then
+	if(element and UnitIsUnit(unit, 'player')) then
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
 		self:RegisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
 		self:RegisterEvent('PLAYER_TALENT_UPDATE', VisibilityPath, true)
 
-		element.handler = CreateFrame("Frame", nil, element)	-- ShestakUI
-		element.handler:RegisterEvent("PLAYER_TALENT_UPDATE")
-		element.handler:RegisterEvent("PLAYER_ENTERING_WORLD")
-		element.handler:SetScript("OnEvent", function() Visibility(self) end)
-
-		if(element:IsObjectType('StatusBar') and not element:GetStatusBarTexture()) then
+		if(element:IsObjectType('StatusBar') and not (element:GetStatusBarTexture() or element:GetStatusBarAtlas())) then
 			element:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
-		end
-
-		if(not element.UpdateColor) then
-			element.UpdateColor = UpdateColor
 		end
 
 		MonkStaggerBar:UnregisterEvent('PLAYER_ENTERING_WORLD')
@@ -162,7 +198,6 @@ local function Enable(self)
 		MonkStaggerBar:UnregisterEvent('UNIT_EXITED_VEHICLE')
 		MonkStaggerBar:UnregisterEvent('UPDATE_VEHICLE_ACTIONBAR')
 
-		-- do not change this without taking Visibility into account
 		element:Hide()
 
 		return true

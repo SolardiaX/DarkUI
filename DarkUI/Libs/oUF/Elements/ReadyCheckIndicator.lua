@@ -1,3 +1,41 @@
+--[[
+# Element: Ready Check Indicator
+
+Handles the visibility and updating of an indicator based on the unit's ready check status.
+
+## Widget
+
+ReadyCheckIndicator - A `Texture` representing ready check status.
+
+## Notes
+
+This element updates by changing the texture.
+Default textures will be applied if the layout does not provide custom ones. See Options.
+
+## Options
+
+.finishedTime    - For how many seconds the icon should stick after a check has completed. Defaults to 10 (number).
+.fadeTime        - For how many seconds the icon should fade away after the stick duration has completed. Defaults to
+                   1.5 (number).
+.readyTexture    - Path to an alternate texture for the ready check 'ready' status.
+.notReadyTexture - Path to an alternate texture for the ready check 'notready' status.
+.waitingTexture  - Path to an alternate texture for the ready check 'waiting' status.
+
+## Attributes
+
+.status - the unit's ready check status (string?)['ready', 'noready', 'waiting']
+
+## Examples
+
+    -- Position and size
+    local ReadyCheckIndicator = self:CreateTexture(nil, 'OVERLAY')
+    ReadyCheckIndicator:SetSize(16, 16)
+    ReadyCheckIndicator:SetPoint('TOP')
+
+    -- Register with oUF
+    self.ReadyCheckIndicator = ReadyCheckIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 local Private = oUF.Private
@@ -89,9 +127,9 @@ local function Enable(self, unit)
 		element.__owner = self
 		element.ForceUpdate = ForceUpdate
 
-		element.readyTexture = element.readyTexture or READY_CHECK_READY_TEXTURE
-		element.notReadyTexture = element.notReadyTexture or READY_CHECK_NOT_READY_TEXTURE
-		element.waitingTexture = element.waitingTexture or READY_CHECK_WAITING_TEXTURE
+		element.readyTexture = element.readyTexture or _G.READY_CHECK_READY_TEXTURE
+		element.notReadyTexture = element.notReadyTexture or _G.READY_CHECK_NOT_READY_TEXTURE
+		element.waitingTexture = element.waitingTexture or _G.READY_CHECK_WAITING_TEXTURE
 
 		local AnimationGroup = element:CreateAnimationGroup()
 		AnimationGroup:HookScript('OnFinished', OnFinished)

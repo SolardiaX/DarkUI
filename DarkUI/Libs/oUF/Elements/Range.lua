@@ -1,3 +1,30 @@
+--[[
+# Element: Range Fader
+
+Changes the opacity of a unit frame based on whether the frame's unit is in the player's range.
+
+## Widget
+
+Range - A table containing opacity values.
+
+## Notes
+
+Offline units are handled as if they are in range.
+
+## Options
+
+.outsideAlpha - Opacity when the unit is out of range. Defaults to 0.55 (number)[0-1].
+.insideAlpha  - Opacity when the unit is within range. Defaults to 1 (number)[0-1].
+
+## Examples
+
+    -- Register with oUF
+    self.Range = {
+        insideAlpha = 1,
+        outsideAlpha = 1/2,
+    }
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 

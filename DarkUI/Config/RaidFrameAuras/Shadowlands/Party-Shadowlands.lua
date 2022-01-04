@@ -7,11 +7,13 @@ local INSTANCE -- 5人本
 local SEASON_SPELLS = {
     [209858] = 2, -- 死疽
     [240443] = 2, -- 爆裂
-    [240559] = 2, -- 重伤
+	[240559] = 1, -- 重伤
 	[342494] = 2, -- 狂妄吹嘘，S1
 	[355732] = 2, -- 融化灵魂
+	[356666] = 2, -- 刺骨之寒
 	[356667] = 2, -- 刺骨之寒
 	[356925] = 2, -- 屠戮
+	[358777] = 2, -- 痛苦之链
 }
 local function RegisterSeasonSpells(INSTANCE)
     for spellID, priority in pairs(SEASON_SPELLS) do
@@ -156,6 +158,7 @@ module:RegisterDebuff(TIER, INSTANCE, 0, 326632) -- 石化血脉
 module:RegisterDebuff(TIER, INSTANCE, 0, 323650) -- 萦绕锁定
 module:RegisterDebuff(TIER, INSTANCE, 0, 326874) -- 脚踝撕咬
 module:RegisterDebuff(TIER, INSTANCE, 0, 340446) -- 嫉妒之印
+module:RegisterDebuff(TIER, INSTANCE, 0, 323437) -- 傲慢罪印
 
 INSTANCE = 1189 -- 赤红深渊
 RegisterSeasonSpells(INSTANCE)

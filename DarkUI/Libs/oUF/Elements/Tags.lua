@@ -1,10 +1,114 @@
 -- Credits: Vika, Cladhaire, Tekkub
+--[[
+# Element: Tags
+
+Provides a system for text-based display of information by binding a tag string to a font string widget which in turn is
+tied to a unit frame.
+
+## Widget
+
+A FontString to hold a tag string. Unlike other elements, this widget must not have a preset name.
+
+## Notes
+
+A `Tag` is a Lua string consisting of a function name surrounded by square brackets. The tag will be replaced by the
+output of the function and displayed as text on the font string widget with that the tag has been registered.
+
+A `Tag String` is a Lua string consisting of one or multiple tags with optional literals and parameters around them.
+Each tag will be updated individually and the output will follow the tags order. Literals will be displayed in the
+output string regardless of whether the surrounding tag functions return a value. I.e. `"[curhp]/[maxhp]"` will resolve
+to something like `2453/5000`.
+
+There's also an optional prefix and suffix that are separated from the tag name by `$>` and `<$` respectively,
+for example, `"[==$>name<$==]"` will resolve to `==Thrall==`, and `"[perhp<$%]"` will resole to `100%`, however, said
+affixes will only be added if the tag function returns a non-empty string, if it returns `nil` or `""` affixes will be
+omitted.
+
+Additionally, it's possible to pass optional arguments to a tag function to alter its behaviour. Optional arguments are
+defined via `()` at the end of a tag and separated by commas (`,`). For example, `"[name(a,r,g,s)]"`, in this case 4
+additional arguments, `"a"`, `"r"`, `"g"`, and `"s"` will be passed to the name tag function, what to do with them,
+however, is up to a developer to decide.
+
+The full tag syntax looks like this: `"[prefix$>tag<$suffix(a,r,g,s)]"`. The order of optional elements is important,
+while they can be independently omitted, they can't be reordered.
+
+A `Tag Function` is used to replace a single tag in a tag string by its output. A tag function receives only two
+arguments - the unit and the realUnit of the unit frame used to register the tag (see Options for further details). The
+tag function is called when the unit frame is shown or when a specified event has fired. It the tag is registered on an
+eventless frame (i.e. one holding the unit "targettarget"), then the tag function is called in a set time interval.
+
+A number of built-in tag functions exist. The layout can also define its own tag functions by adding them to the
+`oUF.Tags.Methods` table. The events upon which the function will be called are specified in a white-space separated
+list added to the `oUF.Tags.Events` table. Should an event fire without unit information, then it should also be listed
+in the `oUF.Tags.SharedEvents` table as follows: `oUF.Tags.SharedEvents.EVENT_NAME = true`.
+
+## Options
+
+.overrideUnit    - if specified on the font string widget, the frame's realUnit will be passed as the second argument to
+                   every tag function whose name is contained in the relevant tag string. Otherwise the second argument
+                   is always nil (boolean)
+.frequentUpdates - defines how often the corresponding tag function(s) should be called. This will override the events
+                   for the tag(s), if any. If the value is a number, it is taken as a time interval in seconds. If the
+                   value is a boolean, the time interval is set to 0.5 seconds (number or boolean)
+
+## Attributes
+
+.parent - the unit frame on which the tag has been registered
+
+## Examples
+
+### Example 1
+
+    -- define the tag function
+    oUF.Tags.Methods['mylayout:threatname'] = function(unit, realUnit)
+        local color = _TAGS['threatcolor'](unit)
+        local name = _TAGS['name'](unit, realUnit)
+        return string.format('%s%s|r', color, name)
+    end
+
+    -- add the events
+    oUF.Tags.Events['mylayout:threatname'] = 'UNIT_NAME_UPDATE UNIT_THREAT_SITUATION_UPDATE'
+
+    -- create the text widget
+    local info = self.Health:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
+    info:SetPoint('LEFT')
+
+    -- register the tag on the text widget with oUF
+    self:Tag(info, '[mylayout:threatname]')
+
+### Example 2
+
+    -- define the tag function that accepts optional arguments
+    oUF.Tags.Methods['mylayout:name'] = function(unit, realUnit, ...)
+        local name = _TAGS['name'](unit, realUnit)
+        local length = tonumber(...)
+        if(length) then
+            return name:sub(1, length) -- please note, this code doesn't support UTF-8 chars
+        else
+            return name
+        end
+    end
+
+    -- add the events
+    oUF.Tags.Events['mylayout:name'] = 'UNIT_NAME_UPDATE'
+
+    -- create the text widget
+    local info = self.Health:CreateFontString(nil, 'OVERLAY', 'GameFontNormal')
+    info:SetPoint('LEFT')
+
+    -- register the tag on the text widget with oUF
+    self:Tag(info, '[mylayout:name(5)]') -- the output will be shortened to 5 characters
+    -- self:Tag(info, '[mylayout:name]') -- alternative, the output won't be adjusted
+    -- self:Tag(info, '[mylayout:name(10)]') -- alternative, the output will be shortened to 10 characters
+--]]
 
 local _, ns = ...
 local oUF = ns.oUF
 local Private = oUF.Private
 
+local nierror = Private.nierror
 local unitExists = Private.unitExists
+local xpcall = Private.xpcall
 
 local _PATTERN = '%[..-%]+'
 
@@ -154,7 +258,7 @@ local tagStrings = {
 	end]],
 
 	['level'] = [[function(u)
-		local l = UnitLevel(u)
+		local l = UnitEffectiveLevel(u)
 		if(UnitIsWildBattlePet(u) or UnitIsBattlePetCompanion(u)) then
 			l = UnitBattlePetLevel(u)
 		end
@@ -478,6 +582,7 @@ local unitlessEvents = {
 	NEUTRAL_FACTION_SELECT_RESULT = true,
 	PARTY_LEADER_CHANGED = true,
 	PLAYER_LEVEL_UP = true,
+	PLAYER_TALENT_UPDATE = true,
 	PLAYER_TARGET_CHANGED = true,
 	PLAYER_UPDATE_RESTING = true,
 	RUNE_POWER_UPDATE = true,
@@ -544,7 +649,7 @@ local function getBracketData(tag)
 	-- full tag syntax: '[prefix$>tag-name<$suffix(a,r,g,s)]'
 	local suffixEnd = (tag:match('()%(') or -1) - 1
 
-	local prefixEnd, prefixOffset = tag:match('()%$>'), 1
+	local prefixEnd, prefixOffset = tag:match('()$>'), 1
 	if(not prefixEnd) then
 		prefixEnd = 1
 	else
@@ -552,7 +657,7 @@ local function getBracketData(tag)
 		prefixOffset = 3
 	end
 
-	local suffixStart, suffixOffset = tag:match('%<$()', prefixEnd), 1
+	local suffixStart, suffixOffset = tag:match('<$()', prefixEnd), 1
 	if(not suffixStart) then
 		suffixStart = suffixEnd + 1
 	else
@@ -567,6 +672,12 @@ local function getTagFunc(tagstr)
 	if(not func) then
 		local format, numTags = tagstr:gsub('%%', '%%%%'):gsub(_PATTERN, '%%s')
 		local args = {}
+		local idx = 1
+
+		local format_ = {}
+		for i = 1, numTags do
+			format_[i] = '%s'
+		end
 
 		for bracket in tagstr:gmatch(_PATTERN) do
 			local tagFunc = funcPool[bracket] or tags[bracket:sub(2, -2)]
@@ -574,14 +685,14 @@ local function getTagFunc(tagstr)
 				local tagName, prefixEnd, suffixStart, suffixEnd, customArgs = getBracketData(bracket)
 				local tag = tags[tagName]
 				if(tag) then
-					if(prefixEnd ~= 1 and suffixStart - suffixEnd ~= 1) then
-						local prefix = bracket:sub(2, prefixEnd)
-						local suffix = bracket:sub(suffixStart, suffixEnd)
+					if(prefixEnd ~= 1 or suffixStart - suffixEnd ~= 1) then
+						local prefix = prefixEnd ~= 1 and bracket:sub(2, prefixEnd) or ''
+						local suffix = suffixStart - suffixEnd ~= 1 and bracket:sub(suffixStart, suffixEnd) or ''
 
 						tagFunc = function(unit, realUnit)
 							local str
 							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
+								str = tag(unit, realUnit, string.split(',', customArgs))
 							else
 								str = tag(unit, realUnit)
 							end
@@ -590,41 +701,11 @@ local function getTagFunc(tagstr)
 								return prefix .. str .. suffix
 							end
 						end
-					elseif(prefixEnd ~= 1) then
-						local prefix = bracket:sub(2, prefixEnd)
-
-						tagFunc = function(unit, realUnit)
-							local str
-							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
-							else
-								str = tag(unit, realUnit)
-							end
-
-							if(str and str ~= '') then
-								return prefix .. str
-							end
-						end
-					elseif(suffixStart - suffixEnd ~= 1) then
-						local suffix = bracket:sub(suffixStart, -2)
-
-						tagFunc = function(unit, realUnit)
-							local str
-							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
-							else
-								str = tag(unit, realUnit)
-							end
-
-							if(str and str ~= '') then
-								return str .. suffix
-							end
-						end
 					else
 						tagFunc = function(unit, realUnit)
 							local str
 							if(customArgs) then
-								str = tag(unit, realUnit, strsplit(',', customArgs))
+								str = tag(unit, realUnit, string.split(',', customArgs))
 							else
 								str = tag(unit, realUnit)
 							end
@@ -641,8 +722,16 @@ local function getTagFunc(tagstr)
 
 			if(tagFunc) then
 				table.insert(args, tagFunc)
+
+				idx = idx + 1
 			else
-				return error(string.format('Attempted to use invalid tag %s.', bracket), 3)
+				nierror(string.format('Attempted to use invalid tag %s.', bracket))
+
+				format_[idx] = bracket
+				format = format:format(unpack(format_, 1, numTags))
+				format_[idx] = '%s'
+
+				numTags = numTags - 1
 			end
 		end
 
@@ -673,8 +762,10 @@ end
 local function registerEvent(fontstr, event)
 	if(not events[event]) then events[event] = {} end
 
-	eventFrame:RegisterEvent(event)
-	table.insert(events[event], fontstr)
+	local isOK = xpcall(eventFrame.RegisterEvent, eventFrame, event)
+	if(isOK) then
+		table.insert(events[event], fontstr)
+	end
 end
 
 local function registerEvents(fontstr, tagstr)
@@ -691,14 +782,20 @@ end
 
 local function unregisterEvents(fontstr)
 	for event, data in next, events do
-		for i, tagfsstr in next, data do
+		local index = 1
+		local tagfsstr = data[index]
+		while tagfsstr do
 			if(tagfsstr == fontstr) then
 				if(#data == 1) then
 					eventFrame:UnregisterEvent(event)
 				end
 
-				table.remove(data, i)
+				table.remove(data, index)
+			else
+				index = index + 1
 			end
+
+			tagfsstr = data[index]
 		end
 	end
 end
@@ -769,10 +866,16 @@ local function Untag(self, fs)
 
 	unregisterEvents(fs)
 	for _, timers in next, eventlessUnits do
-		for i, fontstr in next, timers do
+		local index = 1
+		local fontstr = timers[index]
+		while fontstr do
 			if(fs == fontstr) then
-				table.remove(timers, i)
+				table.remove(timers, index)
+			else
+				index = index + 1
 			end
+
+			fontstr = timers[index]
 		end
 	end
 
@@ -784,7 +887,7 @@ end
 
 local function strip(tag)
 	-- remove prefix, custom args, and suffix
-	return tag:gsub('%[.-%$>', '['):gsub('%(.-%)%]', ']'):gsub('<$.-%]', ']')
+	return tag:gsub('%[.-$>', '['):gsub('%(.-%)%]', ']'):gsub('<$.-%]', ']')
 end
 
 oUF.Tags = {

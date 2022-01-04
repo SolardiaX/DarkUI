@@ -1,3 +1,37 @@
+--[[
+# Element: Portraits
+
+Handles the updating of the unit's portrait.
+
+## Widget
+
+Portrait - A `PlayerModel` or a `Texture` used to represent the unit's portrait.
+
+## Notes
+
+A question mark model will be used if the widget is a PlayerModel and the client doesn't have the model information for
+the unit.
+
+## Examples
+
+    -- 3D Portrait
+    -- Position and size
+    local Portrait = CreateFrame('PlayerModel', nil, self)
+    Portrait:SetSize(32, 32)
+    Portrait:SetPoint('RIGHT', self, 'LEFT')
+
+    -- Register it with oUF
+    self.Portrait = Portrait
+
+    -- 2D Portrait
+    local Portrait = self:CreateTexture(nil, 'OVERLAY')
+    Portrait:SetSize(32, 32)
+    Portrait:SetPoint('RIGHT', self, 'LEFT')
+
+    -- Register it with oUF
+    self.Portrait = Portrait
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 
@@ -84,10 +118,6 @@ local function Enable(self, unit)
 		-- information we want.
 		if(unit == 'party') then
 			self:RegisterEvent('PARTY_MEMBER_ENABLE', Path)
-		end
-
-		if element.classIcons then
-			element.Icon:SetTexture("Interface\\WorldStateFrame\\Icons-Classes")
 		end
 
 		element:Show()

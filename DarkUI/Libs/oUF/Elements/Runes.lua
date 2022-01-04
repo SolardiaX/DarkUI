@@ -1,3 +1,47 @@
+--[[
+# Element: Runes
+
+Handles the visibility and updating of Death Knight's runes.
+
+## Widget
+
+Runes - An `table` holding `StatusBar`s.
+
+## Sub-Widgets
+
+.bg - A `Texture` used as a background. It will inherit the color of the main StatusBar.
+
+## Notes
+
+A default texture will be applied if the sub-widgets are StatusBars and don't have a texture set.
+
+## Options
+
+.colorSpec - Use `self.colors.runes[specID]` to color the bar based on player's spec. `specID` is defined by the return
+             value of [GetSpecialization](http://wowprogramming.com/docs/api/GetSpecialization.html) (boolean)
+.sortOrder - Sorting order. Sorts by the remaining cooldown time, 'asc' - from the least cooldown time remaining (fully
+             charged) to the most (fully depleted), 'desc' - the opposite (string?)['asc', 'desc']
+
+## Sub-Widgets Options
+
+.multiplier - Used to tint the background based on the main widgets R, G and B values. Defaults to 1 (number)[0-1]
+
+## Examples
+
+    local Runes = {}
+    for index = 1, 6 do
+        -- Position and size of the rune bar indicators
+        local Rune = CreateFrame('StatusBar', nil, self)
+        Rune:SetSize(120 / 6, 20)
+        Rune:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', index * 120 / 6, 0)
+
+        Runes[index] = Rune
+    end
+
+    -- Register with oUF
+    self.Runes = Runes
+--]]
+
 if(select(2, UnitClass('player')) ~= 'DEATHKNIGHT') then return end
 
 local _, ns = ...

@@ -81,7 +81,7 @@ local createBar = function(self)
     --health bar
     self.Health = CreateFrame("StatusBar", nil, self)
     self.Health:SetFrameStrata("LOW")
-    self.Health:SetFrameLevel(3)
+    self.Health:SetFrameLevel(4)
     self.Health:SetSize(212, 28)
     self.Health:SetPoint('CENTER', self, -40, -2)
 

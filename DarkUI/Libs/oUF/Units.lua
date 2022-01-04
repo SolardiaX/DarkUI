@@ -1,4 +1,4 @@
-local parent, ns = ...
+local _, ns = ...
 local oUF = ns.oUF
 local Private = oUF.Private
 
@@ -48,7 +48,7 @@ local function updateArenaPreparationElements(self, event, elementName, specID)
 			-- this section just replicates the color options available to the Health and Power elements
 			local r, g, b, t, _
 			-- if(element.colorPower and elementName == 'Power') then
-				-- no idea if we can get power type here without the unit
+				-- FIXME: no idea if we can get power type here without the unit
 			if(element.colorClass) then
 				local _, _, _, _, _, class = GetSpecializationInfoByID(specID)
 				t = self.colors.class[class]
@@ -164,7 +164,7 @@ end
 
 -- Handles unit specific actions.
 function oUF:HandleUnit(object, unit)
-	local unit = object.unit or unit
+	unit = object.unit or unit
 	if(unit == 'target') then
 		object:RegisterEvent('PLAYER_TARGET_CHANGED', object.UpdateAllElements, true)
 	elseif(unit == 'mouseover') then

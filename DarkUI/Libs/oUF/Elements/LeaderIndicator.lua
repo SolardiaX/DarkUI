@@ -1,3 +1,27 @@
+--[[
+# Element: Leader Indicator
+
+Toggles the visibility of an indicator based on the unit's leader status.
+
+## Widget
+
+LeaderIndicator - Any UI widget.
+
+## Notes
+
+A default texture will be applied if the widget is a Texture and doesn't have a texture or a color set.
+
+## Examples
+
+    -- Position and size
+    local LeaderIndicator = self:CreateTexture(nil, 'OVERLAY')
+    LeaderIndicator:SetSize(16, 16)
+    LeaderIndicator:SetPoint('BOTTOM', self, 'TOP')
+
+    -- Register it with oUF
+    self.LeaderIndicator = LeaderIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 

@@ -1,3 +1,27 @@
+--[[
+# Element: Quest Indicator
+
+Handles the visibility and updating of an indicator based on the unit's involvement in a quest.
+
+## Widget
+
+QuestIndicator - Any UI widget.
+
+## Notes
+
+A default texture will be applied if the widget is a Texture and doesn't have a texture or a color set.
+
+## Examples
+
+    -- Position and size
+    local QuestIndicator = self:CreateTexture(nil, 'OVERLAY')
+    QuestIndicator:SetSize(16, 16)
+    QuestIndicator:SetPoint('TOPRIGHT', self)
+
+    -- Register it with oUF
+    self.QuestIndicator = QuestIndicator
+--]]
+
 local _, ns = ...
 local oUF = ns.oUF
 
