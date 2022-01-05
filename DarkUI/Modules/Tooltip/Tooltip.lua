@@ -111,7 +111,7 @@ styler.rTips = {}
 
 local function __GetBackdrop() return backdrop end
 local function __GetBackdropColor() return unpack(backdropColor) end
-local function __GetBackdropBorderColor() return unpack(backdropBorderColor) end
+local function __GetBackdropBorderColor() return unpack(backdropBorderColor)end
 
 -- style from FreebTip
 local function hook(f)
@@ -119,16 +119,16 @@ local function hook(f)
         if tt:IsForbidden() then return end
 
         if not tt.styled then
-            if tt.SetBackdrop then tt:SetBackdrop(nil) end
-            tt.SetBackdrop = E.dummy
+            if tt.NineSlice then tt.NineSlice:SetAlpha(0) end
+		    if tt.SetBackdrop then tt:SetBackdrop(nil) end
             if tt.BackdropFrame then tt.BackdropFrame:SetBackdrop(nil) end
             
     		tt:DisableDrawLayer("BACKGROUND")
             
-            tt.bg = CreateFrame("Frame", nil, tt) --, "BackdropTemplate")
+            tt.bg = CreateFrame("Frame", nil, tt, "BackdropTemplate")
             tt.bg:SetPoint("TOPLEFT")
             tt.bg:SetPoint("BOTTOMRIGHT")
-            tt.bg:SetFrameLevel(tt:GetFrameLevel() - 1)
+            tt.bg:SetFrameLevel(tt:GetFrameLevel())
             tt.bg:SetTemplate("Blur")
             tt.bg:SetBackdropBorderColor(unpack(backdropBorderColor))
 
