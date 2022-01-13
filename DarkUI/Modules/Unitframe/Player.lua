@@ -260,7 +260,7 @@ local createCastbar = function(self)
     time:SetJustifyH("RIGHT")
     castbar.Time = time
 
-    castbar.PostCastStart = DUF.PostCastStart
+    castbar.CastStart = DUF.PostCastStart
     castbar.PostCastFailed = DUF.PostCastFailed
     castbar.PostCastInterrupted = DUF.PostCastInterrupted
     castbar.PostCastInterruptible = DUF.UpdateCastbarColor
