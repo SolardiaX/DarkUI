@@ -49,7 +49,7 @@ tinsert(extraBar.buttonList, button) --add the button object to the list
 button:SetSize(cfg.button.size, cfg.button.size)
 
 --show/hide the frame on a given state driver
-RegisterStateDriver(extraBar, "visibility", "[petbattle][overridebar][vehicleui] hide; show")
+RegisterStateDriver(extraBar, "visibility", "[extrabar] show; hide")
 
 --zone ability
 local zoneBar = CreateFrame("Frame", "ZoneAbilityBarHolder", UIParent)

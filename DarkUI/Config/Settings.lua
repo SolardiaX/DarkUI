@@ -124,7 +124,7 @@ local bars = {
     barextra         = {
         pos             = { "CENTER", "UIParent", "CENTER", 0, -180 },
         button          = {
-            size  = 28,
+            size  = 36,
             space = 6
         },
         fader_mouseover = nil,
