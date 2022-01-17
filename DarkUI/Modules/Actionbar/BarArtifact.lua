@@ -8,11 +8,11 @@ if not C.actionbar.bars.enable or not C.actionbar.bars.artifact.enable then retu
 
 local _G = _G
 local CreateFrame = CreateFrame
-local C_ArtifactUI_GetCostForPointAtRank = C_ArtifactUI.GetCostForPointAtRank
 local C_ArtifactUI_GetEquippedArtifactInfo = C_ArtifactUI.GetEquippedArtifactInfo
 local C_ArtifactUI_IsEquippedArtifactDisabled = C_ArtifactUI.IsEquippedArtifactDisabled
 local C_AzeriteItem_HasActiveAzeriteItem = C_AzeriteItem.HasActiveAzeriteItem
 local C_AzeriteItem_FindActiveAzeriteItem = C_AzeriteItem.FindActiveAzeriteItem
+local C_AzeriteItem_IsAzeriteItemAtMaxLevel = C_AzeriteItem.IsAzeriteItemAtMaxLevel
 local C_AzeriteItem_GetAzeriteItemXPInfo = C_AzeriteItem.GetAzeriteItemXPInfo
 local C_AzeriteItem_GetPowerLevel = C_AzeriteItem.GetPowerLevel
 local HasArtifactEquipped = HasArtifactEquipped
@@ -24,73 +24,70 @@ local UIParent = _G.UIParent
 
 local cfg = C.actionbar.bars.artifact
 
-local function getNumArtifactTraitsPurchasableFromXP(pointsSpent, artifactXP, artifactTier)
-    local numPoints = 0
-    local xpForNextPoint = C_ArtifactUI_GetCostForPointAtRank(pointsSpent, artifactTier)
-
-    while artifactXP >= xpForNextPoint and xpForNextPoint > 0 do
-        artifactXP = artifactXP - xpForNextPoint
-
-        pointsSpent = pointsSpent + 1
-        numPoints = numPoints + 1
-
-        xpForNextPoint = C_ArtifactUI_GetCostForPointAtRank(pointsSpent, artifactTier)
-    end
-
-    return numPoints, artifactXP, xpForNextPoint
+local function IsAzeriteAvailable()
+	local itemLocation = C_AzeriteItem_FindActiveAzeriteItem()
+	return itemLocation and itemLocation:IsEquipmentSlot() and not C_AzeriteItem_IsAzeriteItemAtMaxLevel()
 end
 
 local function bar_OnEvent(self, _, ...)
-    if HasArtifactEquipped() then
-        local _, _, name, _, totalPower, traitsLearned, _, _, _, _, _, _, tier = C_ArtifactUI_GetEquippedArtifactInfo()
-        local _, power, powerForNextTrait = getNumArtifactTraitsPurchasableFromXP(traitsLearned, totalPower, tier)
-
+    if IsAzeriteAvailable() then
+		local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
+		local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
+		self:SetStatusBarColor(.9, .8, .6)
+		self:SetMinMaxValues(0, totalLevelXP)
+		self:SetValue(xp)
+    elseif HasArtifactEquipped() then
         if C_ArtifactUI_IsEquippedArtifactDisabled() then
-            self:SetStatusBarColor(.6, .6, .6)
-            self:SetMinMaxValues(0, 1)
-            self:SetValue(1)
-        else
-            self:SetMinMaxValues(0, powerForNextTrait)
-            self:SetValue(power)
-        end
-
-        self.name = name
-        self.power = power
-        self.powerForNext = powerForNextTrait
-        self.totalPower = totalPower
-
-        self:Show()
-    elseif C_AzeriteItem_HasActiveAzeriteItem() then
-        local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
-        local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
-        local azeriteItemName = azeriteItem:GetItemName()
-        local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
-
-        self:SetStatusBarColor(.9, .8, .6)
-        self:SetMinMaxValues(0, totalLevelXP)
-        self:SetValue(xp)
-
-        self.name = azeriteItemName
-        self.power = xp
-        self.powerForNext = totalLevelXP
-        self.totalPower = C_AzeriteItem_GetPowerLevel(azeriteItemLocation)
-
-        self:Show()
+			self:SetStatusBarColor(.6, .6, .6)
+			self:SetMinMaxValues(0, 1)
+			self:SetValue(1)
+		else
+			local _, _, _, _, totalPower, pointsSpent, _, _, _, _, _, _, artifactTier = C_ArtifactUI_GetEquippedArtifactInfo()
+			local _, power, powerForNextPoint = ArtifactBarGetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP, artifactTier)
+			power = powerForNextPoint == 0 and 0 or xp
+			self:SetStatusBarColor(.9, .8, .6)
+			self:SetMinMaxValues(0, powerForNextPoint)
+			self:SetValue(power)            
+		end
     end
+    
+    self:Show()
 end
 
 local function bar_OnEnter(self)
     GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
-
     GameTooltip:AddLine(L.ACTIONBAR_APB)
-    if not HasArtifactEquipped() and not C_AzeriteItem_HasActiveAzeriteItem() then
-        GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_NAME, "N/A")
+	GameTooltip:AddLine(" ")
+
+    if IsAzeriteAvailable() then
+		local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
+		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
+		local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
+		local currentLevel = C_AzeriteItem_GetPowerLevel(azeriteItemLocation)
+		azeriteItem:ContinueWithCancelOnItemLoad(function()
+			GameTooltip:AddLine(azeriteItem:GetItemName().." ("..format(SPELLBOOK_AVAILABLE_AT, currentLevel)..")", 0, .6, 1)
+			GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(totalLevelXP).." ("..floor(xp/totalLevelXP*100).."%)", .6, .8, 1, 1, 1, 1)
+		end)
+    elseif HasArtifactEquipped() then
+		local _, _, name, _, totalXP, pointsSpent, _, _, _, _, _, _, artifactTier = C_ArtifactUI_GetEquippedArtifactInfo()
+		local num, xp, xpForNextPoint = ArtifactBarGetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP, artifactTier)
+        
+		if C_ArtifactUI_IsEquippedArtifactDisabled() then
+			GameTooltip:AddLine(name, 0, .6, 1)
+			GameTooltip:AddLine(ARTIFACT_RETIRED, .6, .8, 1, 1)
+		else
+			GameTooltip:AddLine(name.." ("..format(SPELLBOOK_AVAILABLE_AT, pointsSpent)..")", 0,.6,1)
+			local numText = num > 0 and " ("..num..")" or ""
+			GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(totalXP)..numText, .6, .8, 1, 1, 1, 1)
+			if xpForNextPoint ~= 0 then
+				local perc = " ("..floor(xp/xpForNextPoint*100).."%)"
+				GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_UPGRADE, BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(xpForNextPoint)..perc, .6, .8, 1, 1, 1, 1)
+			end
+		end
     else
-        GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_NAME, self.name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1, 1, 1)
-        GameTooltip:AddLine(" ")
-        GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_TOTAL, (self.totalPower or "N/A") .. "|cffffd100|r")
-        GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_UPGRADE, (self.power or "N/A") .. "|cffffd100 /|r" .. (self.powerForNext or "N/A") .. "|cffffd100|r")
-    end
+        GameTooltip:AddDoubleLine(L.ACTIONBAR_AP_NAME, "N/A")
+	end
+
     GameTooltip:Show()
 end
 
