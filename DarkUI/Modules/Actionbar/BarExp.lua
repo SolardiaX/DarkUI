@@ -251,6 +251,8 @@ local function bar_OnEnter()
 
     if E.level ~= MAX_PLAYER_LEVEL then
         GameTooltip:AddLine(L.ACTIONBAR_EXP)
+        GameTooltip:AddLine(" ")
+        
         GameTooltip:AddDoubleLine(
                 COMBAT_XP_GAIN,
                 xp .. "|cffffd100/|r" .. mxp .. " |cffffd100/|r " .. floor((xp / mxp) * 1000) / 10 .. "%",
@@ -292,6 +294,8 @@ local function bar_OnEnter()
         end
 
         GameTooltip:AddLine(L.ACTIONBAR_REP)
+        GameTooltip:AddLine(" ")
+
         GameTooltip:AddDoubleLine(FACTION, name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1, 1, 1)
         GameTooltip:AddDoubleLine(
                 STANDING,
