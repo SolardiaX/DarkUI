@@ -46,10 +46,14 @@ local list = {
         {AuraID = 355333, UnitID = "player"},	-- 回收的聚变增幅器
 		{AuraID = 357185, UnitID = "player"},	-- 忠诚的力量，低语威能碎片
 		{AuraID = 357773, UnitID = "player"},	-- 神圣使命，九武神长柄
-        -- 盟约
-        {AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
-		{AuraID = 354053, UnitID = "player", Flash = true, Text = L["AURA_CRIT"]}, -- 致命缺陷，暴击
-		{AuraID = 354054, UnitID = "player", Flash = true, Text = L["AURA_VERSA"]}, -- 致命缺陷，全能
+
+		{AuraID = 367241, UnitID = "player"},	-- 原初印记
+		{AuraID = 363522, UnitID = "player"},	-- 角斗士的永恒结界
+		{AuraID = 362699, UnitID = "player"},	-- 角斗士的决心
+		-- 盟约
+		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
+		{AuraID = 354053, UnitID = "player", Flash = true, Text = L["Crit"]}, -- 致命缺陷，暴击
+		{AuraID = 354054, UnitID = "player", Flash = true, Text = L["Versa"]}, -- 致命缺陷，全能
 		{AuraID = 323546, UnitID = "player"},	-- 饕餮狂乱
 		{AuraID = 326860, UnitID = "player"},	-- 陨落僧众
 		{AuraID = 310143, UnitID = "player", Combat = true},-- 灵魂变形
@@ -81,6 +85,7 @@ local list = {
 		{AuraID = 345499, UnitID = "player"},	-- 执政官的祝福
 		{AuraID = 339461, UnitID = "player"},	-- 猎手坚韧
 		{AuraID = 325381, UnitID = "player", Flash = true},	-- 争先打击
+		{AuraID = 351414, UnitID = "player", Flash = true},	-- 切肉者之眼
 		{AuraID = 342774, UnitID = "player"},	-- 繁华原野
 		{AuraID = 333218, UnitID = "player"},	-- 废土礼节
 		{AuraID = 336885, UnitID = "player"},	-- 抚慰阴影
@@ -89,6 +94,7 @@ local list = {
 		{AuraID = 333961, UnitID = "player"},	-- 行动的召唤：布隆
 		{AuraID = 333943, UnitID = "player"},	-- 源生重槌
 		{AuraID = 339928, UnitID = "player", Flash = true},	-- 残酷投射
+		{AuraID = 352917, UnitID = "player"},	-- 崭新决心
 		-- S2，心能/统御碎片
 		{AuraID = 357852, UnitID = "player"},	-- 激励
 		{AuraID = 356364, UnitID = "player"},	-- 冰冷的心
@@ -160,6 +166,10 @@ local list = {
 		{AuraID = 306583, UnitID = "player"},	-- 灌铅脚步
 		{AuraID = 313698, UnitID = "player", Flash = true},	-- 泰坦之赐
 		-- 常驻词缀
+		{AuraID = 366288, UnitID = "player"},	-- 解构
+		{AuraID = 368239, UnitID = "player", Flash = true, Text = "CD"},	-- 减CD密文
+		{AuraID = 368240, UnitID = "player", Flash = true, Text = L["Haste"]},	-- 急速密文
+		{AuraID = 368241, UnitID = "player", Flash = true, Text = L["Speed"]},	-- 移速密文
 		{AuraID = 358777, UnitID = "player"},	-- 痛苦之链
 		{AuraID = 355732, UnitID = "player"},	-- 融化灵魂
 		{AuraID = 356667, UnitID = "player"},	-- 刺骨之寒
@@ -235,9 +245,10 @@ local list = {
 		{AuraID = 344655, UnitID = "player"},	-- 震荡易伤，干将
 		{AuraID = 327089, UnitID = "player"},	-- 喂食时间，德纳修斯
 		{AuraID = 327796, UnitID = "player"},	-- 午夜猎手，德纳修斯
-
 		{AuraID = 347283, UnitID = "player"},	-- 捕食者之嚎，塔拉格鲁
 		{AuraID = 347286, UnitID = "player"},	-- 不散之惧，塔拉格鲁
+		{AuraID = 360403, UnitID = "player"},	-- 力场，警戒卫士
+		{AuraID = 361751, UnitID = "player", Flash = true},	-- 衰变光环，道茜歌妮
 	},
 	["Warning"] = { -- 目标重要光环组
 		{AuraID = 355596, UnitID = "target", Flash = true},	-- 橙弓，哀痛箭
@@ -285,6 +296,8 @@ local list = {
 		{AuraID = 347992, UnitID = "target"},	-- 集市，回旋防弹衣
 		{AuraID = 347840, UnitID = "target"},	-- 集市，野性
 		{AuraID = 347015, UnitID = "target", Flash = true},	-- 集市，强化防御
+		{AuraID = 355934, UnitID = "target", Value = true},	-- 集市，强光屏障
+		{AuraID = 349933, UnitID = "target", Flash = true, Value = true},	-- 集市，狂热鞭笞协议
 		-- 团本
 		{AuraID = 345902, UnitID = "target"},	-- 破裂的联结，猎手
 		{AuraID = 334695, UnitID = "target"},	-- 动荡的能量，猎手
@@ -293,6 +306,9 @@ local list = {
 		{AuraID = 341250, UnitID = "target"},	-- 恐怖暴怒，泥拳
 		{AuraID = 329636, UnitID = "target", Flash = true},	-- 坚岩形态，干将
 		{AuraID = 329808, UnitID = "target", Flash = true},	-- 坚岩形态，干将
+		{AuraID = 367573, UnitID = "target", Flash = true},	-- 源生壁垒，圣物匠
+		{AuraID = 368684, UnitID = "target", Value = true},	-- 回收，黑伦度斯
+		{AuraID = 361651, UnitID = "target", Value = true},	-- 虹吸屏障，道茜歌妮
 		-- PVP
 		{AuraID = 498, UnitID = "target"},		-- 圣佑术
 		{AuraID = 642, UnitID = "target"},		-- 圣盾术

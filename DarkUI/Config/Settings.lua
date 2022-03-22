@@ -122,7 +122,7 @@ local bars = {
         fader_combat    = fader_combat
     },
     barextra         = {
-        pos             = { "CENTER", "UIParent", "CENTER", 0, -180 },
+        pos             = { "CENTER", "UIParent", "CENTER", 0, -240 },
         button          = {
             size  = 36,
             space = 6

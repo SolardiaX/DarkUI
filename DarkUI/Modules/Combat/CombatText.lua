@@ -386,14 +386,14 @@ for i = 1, numf do
     if i == 1 then
         f:SetJustifyH(ct.justify_1)
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
-            f:SetPoint("BOTTOMLEFT", "DarkUIPlayerFrame", "TOPLEFT", -5, 80)
+            f:SetPoint("BOTTOMLEFT", "DarkUIPlayerFrame", "TOPLEFT", -5, 140)
         else
             f:SetPoint("CENTER", -192, -32)
         end
     elseif i == 2 then
         f:SetJustifyH(ct.justify_2)
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
-            f:SetPoint("BOTTOMRIGHT", "DarkUIPlayerFrame", "TOPRIGHT", 5, 80)
+            f:SetPoint("BOTTOMRIGHT", "DarkUIPlayerFrame", "TOPRIGHT", 5, 140)
         else
             f:SetPoint("CENTER", 192, -32)
         end
@@ -408,7 +408,7 @@ for i = 1, numf do
             f:SetHeight(150)
         end
         if C.unitframe.enable == true and _G["DarkUITargetFrame"] then
-            f:SetPoint("BOTTOMRIGHT", "DarkUITargetFrame", "TOPRIGHT", 5, 80)
+            f:SetPoint("BOTTOMRIGHT", "DarkUITargetFrame", "TOPRIGHT", 5, 140)
         else
             f:SetPoint("CENTER", 330, 205)
         end
