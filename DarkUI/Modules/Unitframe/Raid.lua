@@ -254,6 +254,7 @@ for i = 1, NUM_RAID_GROUPS do
             ]]):format(cfg.raid.size, cfg.raid.size)
     )
 
+    group:SetScale(cfg.scale)
     groups[i] = group
 
     if i == 1 then
@@ -263,8 +264,8 @@ for i = 1, NUM_RAID_GROUPS do
     end
 end
 
-for _, g in pairs(groups) do
-    if g then
-        g:SetScale(cfg.scale)
-    end
-end
+-- for _, g in pairs(groups) do
+--     if g then
+--         g:SetScale(cfg.scale)
+--     end
+-- end

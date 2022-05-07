@@ -4,7 +4,7 @@ local module = C.aura
 local TIER = 9
 local INSTANCE = 1190 -- 纳斯利亚堡
 local BOSS
--- Credit: Luckyone, ElvUI
+
 BOSS = 2393 -- 啸翼
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 328897) -- 抽干
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 330713) -- 耳鸣之痛

@@ -50,6 +50,8 @@ local list = {
 		{AuraID = 367241, UnitID = "player"},	-- 原初印记
 		{AuraID = 363522, UnitID = "player"},	-- 角斗士的永恒结界
 		{AuraID = 362699, UnitID = "player"},	-- 角斗士的决心
+		{AuraID = 345231, UnitID = "player"},	-- 角斗士的纹章
+		{AuraID = 368641, UnitID = "player"},	-- 最终符文
 		-- 盟约
 		{AuraID = 331937, UnitID = "player", Flash = true},	-- 沉醉
 		{AuraID = 354053, UnitID = "player", Flash = true, Text = L["Crit"]}, -- 致命缺陷，暴击
@@ -94,7 +96,10 @@ local list = {
 		{AuraID = 333961, UnitID = "player"},	-- 行动的召唤：布隆
 		{AuraID = 333943, UnitID = "player"},	-- 源生重槌
 		{AuraID = 339928, UnitID = "player", Flash = true},	-- 残酷投射
+		{AuraID = 358404, UnitID = "player", Flash = true},	-- 疑虑试炼
 		{AuraID = 352917, UnitID = "player"},	-- 崭新决心
+		{AuraID = 356263, UnitID = "player"},	-- 灵魂追踪者之契
+		{AuraID = 352875, UnitID = "player", Flash = true},	-- 虔敬者之路
 		-- S2，心能/统御碎片
 		{AuraID = 357852, UnitID = "player"},	-- 激励
 		{AuraID = 356364, UnitID = "player"},	-- 冰冷的心
@@ -309,6 +314,7 @@ local list = {
 		{AuraID = 367573, UnitID = "target", Flash = true},	-- 源生壁垒，圣物匠
 		{AuraID = 368684, UnitID = "target", Value = true},	-- 回收，黑伦度斯
 		{AuraID = 361651, UnitID = "target", Value = true},	-- 虹吸屏障，道茜歌妮
+		{AuraID = 362505, UnitID = "target", Flash = true},	-- 统御之握，安度因
 		-- PVP
 		{AuraID = 498, UnitID = "target"},		-- 圣佑术
 		{AuraID = 642, UnitID = "target"},		-- 圣盾术
@@ -354,8 +360,10 @@ local list = {
 	},
 	["InternalCD"] = { -- 自定义内置冷却组
 		{IntID = 240447, Duration = 20},	-- 大米，践踏
+		{IntID = 352875, Duration = 30},	-- 格里恩，虔敬者之路
 		{IntID = 114018, Duration = 15, OnSuccess = true, UnitID = "all"},	-- 帷幕
 		{IntID = 316958, Duration = 30, OnSuccess = true, UnitID = "all"},	-- 红土
+		{IntID = 353635, Duration = 27.5, OnSuccess = true, UnitID = "all"},	-- 坍缩之星自爆时间
 	},
 }
 

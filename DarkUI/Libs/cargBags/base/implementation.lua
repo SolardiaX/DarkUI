@@ -257,6 +257,7 @@ function Implementation:Init()
 	end
 
 	self:RegisterEvent("BAG_UPDATE", self, self.BAG_UPDATE)
+	self:RegisterEvent("MERCHANT_SHOW", self, self.BAG_UPDATE)
 	self:RegisterEvent("BAG_UPDATE_COOLDOWN", self, self.BAG_UPDATE_COOLDOWN)
 	self:RegisterEvent("ITEM_LOCK_CHANGED", self, self.ITEM_LOCK_CHANGED)
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED", self, self.PLAYERBANKSLOTS_CHANGED)

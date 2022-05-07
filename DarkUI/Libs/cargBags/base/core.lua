@@ -89,6 +89,7 @@ function cargBags:ReplaceBlizzard(name)
 	OpenBackpack = toggleBag -- Blizz does not provide toggling here
 	CloseAllBags = closeBag
 	CloseBackpack = closeBag
+	OpenBag = toggleBag		-- fixed the loot won alert frame
 
 	BankFrame:UnregisterAllEvents()
 end

@@ -96,7 +96,7 @@ local function UpdateTab(object, name, rank, texture, hat)
 	tab:Show()
 
 	tab.name = name
-	tab.tooltip = rank and rank ~= "" and format("%s (%s)", name, rank) or name
+	tab.tooltip = rank and (rank ~= "" and rank ~= name) and format("%s (%s)", name, rank) or name
 
 	tabs[object][index] = tabs[object][index] or tab
 	tabs[object].index = tabs[object].index + 1
@@ -138,7 +138,7 @@ local function HandleProfession(object, professionID, hat)
 			end
 		end
 
-		if hat and PlayerHasToy(134020) then
+		if hat and PlayerHasToy(134020) and C_ToyBox.IsToyUsable(134020) then
 			UpdateTab(object, GetSpellInfo(67556), nil, 236571, true)
 		end
 	end
@@ -175,7 +175,7 @@ end
 function handler:TRADE_SKILL_SHOW(event)
 	local owner = ATSWFrame or MRTSkillFrame or SkilletFrame or TradeSkillFrame
 
-	if (IsAddOnLoaded("TradeSkillDW") or IsAddOnLoaded("TradeSkillMaster")) and owner == TradeSkillFrame then
+	if IsAddOnLoaded("TradeSkillDW") and owner == TradeSkillFrame then
 		self:UnregisterEvent(event)
 	else
 		HandleTabs(owner)
