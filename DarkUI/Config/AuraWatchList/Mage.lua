@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
+if E.class ~= "MAGE" then return end
+
 -- 法师的法术监控
 local list = {
     ["Player Aura"]    = {        -- 玩家光环组
@@ -71,7 +73,7 @@ local list = {
         { AuraID = 269651, UnitID = "player" }, -- 火焰冲撞
         { AuraID = 190446, UnitID = "player" }, -- 冰冷智慧
         {AuraID = 321363, UnitID = "player"},	-- 专注魔法
-		{AuraID = 324220, UnitID = "player"},	-- 死神之躯
+        {AuraID = 324220, UnitID = "player"},	-- 死神之躯
     },
     ["Focus Aura"]     = {        -- 焦点光环组
         { AuraID = 44457, UnitID = "focus", Caster = "player" }, -- 活动炸弹

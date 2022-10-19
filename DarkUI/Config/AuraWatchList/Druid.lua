@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
+if E.class ~= "DRUID" then return end
+
 -- 德鲁伊的法术监控
 local list = {
     ["Player Aura"]    = {        -- 玩家光环组

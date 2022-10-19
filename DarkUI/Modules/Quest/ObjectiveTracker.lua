@@ -32,11 +32,11 @@ local ScenarioStageBlock = ScenarioStageBlock
 ----------------------------------------------------------------------------------------
 local frame = CreateFrame("Frame", "ObjectiveTrackerAnchor", UIParent)
 frame:SetPoint(unpack(C.quest.quest_tracker_pos))
-frame:SetSize(150, 240)
+frame:SetSize(224, 150)
 
 ObjectiveTrackerFrame:ClearAllPoints()
 ObjectiveTrackerFrame:SetPoint("TOPRIGHT", frame)
-ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
+ObjectiveTrackerFrame:SetHeight(E.screenHeight * 4 / 5)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 

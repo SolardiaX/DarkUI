@@ -795,18 +795,6 @@ local function style(self, unit)
         threatColor(main, true)
     end
 
-    self.NazjatarFollowerXP = CreateFrame("StatusBar", nil, self)
-    self.NazjatarFollowerXP:SetSize(cfg.width * .75, cfg.height)
-    self.NazjatarFollowerXP:SetPoint("TOP", self.Castbar, "BOTTOM", 0, -5)
-    self.NazjatarFollowerXP:SetStatusBarTexture(C.media.texture.status_s)
-    self.NazjatarFollowerXP:SetStatusBarColor(0, .7, 1)
-    self.NazjatarFollowerXP:CreateShadow(2)
-    self.NazjatarFollowerXP.BG = self.NazjatarFollowerXP:CreateTexture(nil, "BACKGROUND")
-    self.NazjatarFollowerXP.BG:SetAllPoints()
-    self.NazjatarFollowerXP.BG:SetTexture(C.media.texture.status_s)
-    self.NazjatarFollowerXP.BG:SetVertexColor(0, 0, 0, .5)
-    self.NazjatarFollowerXP.progressText = DUF.CreateFont(self.NazjatarFollowerXP, STANDARD_TEXT_FONT, 9, "OUTLINE")
-
     if cfg.quest then 
         local qicon = self:CreateTexture(nil, "OVERLAY", nil, 2)
         qicon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)

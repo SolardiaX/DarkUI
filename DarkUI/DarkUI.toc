@@ -1,11 +1,12 @@
-## Interface: 90200
+## Interface: 90207
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Notes-zhCN: 整合插件 DarkUI
 ## Notes: A total UI overhaul for World of Warcraft
 ## Author: SolardiaX
-## Version: 9.2.0-b1.0.1
+## Version: 9.2.7-b1.0.1
 ## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options, ItemRack, Outfitter
+## LoadWith: Blizzard_TradeSkillUI
 ## SavedVariables: SavedStats
 ## SavedVariablesPerCharacter: SavedStatsPerChar
 ## X-Thanks: kaxu@ngacn, silverband@ngacn

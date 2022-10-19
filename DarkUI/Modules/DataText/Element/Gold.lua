@@ -168,8 +168,8 @@ module:Inject("Gold", {
             Currency(1755)	-- Coalescing Visions
             Currency(1803)	-- Echoes of Ny'alotha
             Currency(1813)	-- Reservoir Anima
-                Currency(1828)	-- Soul Ash
-                Currency(1767)	-- Stygia
+            Currency(1828)	-- Soul Ash
+            Currency(1767)	-- Stygia
             Currency(515)	-- Darkmoon Prize Ticket
         end
 

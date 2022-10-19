@@ -7,5 +7,6 @@
 	<Script file="ChatTab.lua" />
 	<Script file="ChatInvite.lua" />
 	<Script file="Filters.lua" />
+	<Script file="MouseScroll.lua" />
 	<Script file="RealLinks.lua" />
 </Ui>

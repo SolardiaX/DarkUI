@@ -42,7 +42,6 @@
     <Script file="modules\RaidDebuffs.lua"/>
     <Script file="modules\Smooth.lua"/>
     <Script file="modules\Fader.lua"/>
-	<Script file="modules\NazjatarFollowerXP.lua"/>
 	<Script file="modules\QuakeTimer.lua"/>
 
 	<Script file="Finalize.lua"/>

@@ -3,6 +3,7 @@
 ----------------------------------------------------------------------------------------
 local _, ns = ...
 local oUF = ns.oUF
+local E, C, L = ns:unpack()
 
 local class = select(2, UnitClass('player'))
 local RaidDebuffsIgnore, invalidPrio = {}, -1

@@ -48,7 +48,7 @@ local function newAuraFormat(value)
     local newTable = {}
     for _, v in pairs(value) do
         local id = v.AuraID or v.SpellID or v.ItemID or v.SlotID or v.TotemID or v.IntID
-        if id then
+        if id and not v.Disabled then
             newTable[id] = v
         end
     end
@@ -64,6 +64,18 @@ function C.aura:AddClassSpells(list)
 end
 
 function C.aura:AddNewAuraWatch(class, list)
+    for _, k in pairs(list) do
+        for _, v in pairs(k) do
+            local spellID = v.AuraID or v.SpellID
+            if spellID then
+                local name = GetSpellInfo(spellID)
+                if not name and not v.Disabled then
+                    wipe(v)
+                end
+            end
+        end
+    end
+
     if class ~= "ALL" and class ~= E.class then return end
     if not C.aura.auraWatch[class] then C.aura.auraWatch[class] = {} end
 
@@ -95,16 +107,12 @@ function C.aura:AddDeprecatedGroup(list)
     end
 end
 
-
 function C.aura:RegisterDebuff(tierID, instID, bossID, spellID, level)
     local instName = EJ_GetInstanceInfo(instID)
 
     if not C.aura.raidDebuffs[instName] then C.aura.raidDebuffs[instName] = {} end
-    if level then
-        if level > 6 then level = 6 end
-    else
-        level = 2
-    end
+    if not level then level = 2 end
+    if level > 6 then level = 6 end
 
     C.aura.raidDebuffs[instName][spellID] = level
 end
