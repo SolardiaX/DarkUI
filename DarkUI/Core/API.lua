@@ -17,6 +17,7 @@ E.UIScale = function()
     if C.general.autoScale then
         C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
         C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
+        if C.general.uiScale < .64 then C.general.uiScale = .64 end
     end
 end
 E.UIScale()

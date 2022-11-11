@@ -884,6 +884,20 @@ local function updatePawnArrow(self, item)
 	end
 end
 
+local function itemColorGradient(perc, ...)
+    if perc >= 1 then
+        return select(select('#', ...) - 2, ...)
+    elseif perc <= 0 then
+        return ...
+    end
+
+    local num = select('#', ...) / 3
+    local segment, relperc = _G.math.modf(perc*(num-1))
+    local r1, g1, b1, r2, g2, b2 = select((segment*3)+1, ...)
+
+    return r1 + (r2-r1)*relperc, g1 + (g2-g1)*relperc, b1 + (b2-b1)*relperc
+end
+
 function MyButton:OnUpdateButton(item)
 	self.IconOverlay:SetVertexColor(1, 1, 1)
 	self.IconOverlay:Hide()
@@ -919,7 +933,7 @@ function MyButton:OnUpdateButton(item)
 	local dCur, dMax = GetContainerItemDurability(item.bagId, item.slotId)
 	if dMax and (dMax > 0) and (dCur < dMax) then
 		local dPer = (dCur / dMax * 100)
-		local r, g, b = ItemColorGradient((dCur/dMax), 1, 0, 0, 1, 1, 0, 0, 1, 0)
+		local r, g, b = itemColorGradient((dCur/dMax), 1, 0, 0, 1, 1, 0, 0, 1, 0)
 		self.durability:SetText(Round(dPer).."%")
 		self.durability:SetTextColor(r, g, b)
 	else

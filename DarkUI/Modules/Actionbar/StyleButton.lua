@@ -155,13 +155,13 @@ local function SetupBackdrop(button, backdrop)
 end
 
 local function updateEquipItemColor(button)
-	if not button.__bg then return end
+    if not button.__bg then return end
 
-	if IsEquippedAction(button.action) then
-		button.__bg:SetBackdropBorderColor(0, .7, .1)
-	else
-		button.__bg:SetBackdropBorderColor(0, 0, 0)
-	end
+    if IsEquippedAction(button.action) then
+        button.__bg:SetBackdropBorderColor(0, .7, .1)
+    else
+        button.__bg:SetBackdropBorderColor(0, 0, 0)
+    end
 end
 
 local function equipItemColor(button)
@@ -174,63 +174,69 @@ local function StyleActionButton(button, cfg)
     if button.__styled then return end
 
     local buttonName = button:GetName()
-    local icon = _G[buttonName .. "Icon"]
-    local flash = _G[buttonName .. "Flash"]
-    local flyoutBorder = _G[buttonName .. "FlyoutBorder"]
-    local flyoutBorderShadow = _G[buttonName .. "FlyoutBorderShadow"]
-    local hotkey = _G[buttonName .. "HotKey"]
-    local count = _G[buttonName .. "Count"]
-    local name = _G[buttonName .. "Name"]
-    local border = _G[buttonName .. "Border"]
-    local autoCastable = _G[buttonName.."AutoCastable"]
-    local cooldown = _G[buttonName .. "Cooldown"]
-    
-    local normalTexture = button:GetNormalTexture()
-    local pushedTexture = button:GetPushedTexture()
-    local highlightTexture = button:GetHighlightTexture()
+	local icon = _G[buttonName.."Icon"]
+	local flash = _G[buttonName.."Flash"]
+	local flyoutBorder = _G[buttonName.."FlyoutBorder"]
+	local flyoutBorderShadow = _G[buttonName.."FlyoutBorderShadow"]
+	local hotkey = _G[buttonName.."HotKey"]
+	local count = _G[buttonName.."Count"]
+	local name = _G[buttonName.."Name"]
+	local border = _G[buttonName.."Border"]
+	local autoCastable = _G[buttonName.."AutoCastable"]
+	local NewActionTexture = button.NewActionTexture
+	local cooldown = _G[buttonName.."Cooldown"]
+	local normalTexture = button:GetNormalTexture()
+	local pushedTexture = button:GetPushedTexture()
+	local highlightTexture = button:GetHighlightTexture()
+	--normal buttons do not have a checked texture, but checkbuttons do and normal actionbuttons are checkbuttons
+	local checkedTexture
+	if button.GetCheckedTexture then checkedTexture = button:GetCheckedTexture() end
+	local floatingBG = _G[buttonName.."FloatingBG"]
+	local NormalTexture = _G[buttonName.."NormalTexture"]
 
-    --normal buttons do not have a checked texture, but checkbuttons do and normal actionbuttons are checkbuttons
-    local checkedTexture
-    if button.GetCheckedTexture then checkedTexture = button:GetCheckedTexture() end
-    local floatingBG = _G[buttonName.."FloatingBG"]
+	--pet stuff
+	local petShine = _G[buttonName.."Shine"]
+	if petShine then petShine:SetInside() end
 
-    --pet stuff
-    local petShine = _G[buttonName.."Shine"]
-    if petShine then petShine:SetInside() end
-    --hide stuff
-    if floatingBG then floatingBG:Hide() end
-    if button.NewActionTexture then button.NewActionTexture:SetTexture(nil) end
-    if button.SlotArt then button.SlotArt:Hide() end
-    if button.RightDivider then button.RightDivider:Hide() end
-    if button.SlotBackground then button.SlotBackground:Hide() end
-    if button.IconMask then button.IconMask:Hide() end
+	--hide stuff
+	if floatingBG then floatingBG:Hide() end
+	if NewActionTexture then NewActionTexture:SetTexture(nil) end
+	if button.SlotArt then button.SlotArt:Hide() end
+	if button.RightDivider then button.RightDivider:Hide() end
+	if button.SlotBackground then button.SlotBackground:Hide() end
+	if button.IconMask then button.IconMask:Hide() end
+	if NormalTexture then NormalTexture:SetAlpha(0) end
+	if button.SpellHighlightTexture then button.SpellHighlightTexture:SetOutside() end
 
-    --backdrop
-    SetupBackdrop(button, cfg.backdrop)
-    --equipItemColor(button)
+	--backdrop
+	SetupBackdrop(icon)
+    equipItemColor(button)
 
     --textures
     SetupTexture(icon, cfg.icon, "SetTexture", icon)
-    SetupTexture(flash, cfg.flash, "SetTexture", flash)
-    SetupTexture(flyoutBorder, cfg.flyoutBorder, "SetTexture", flyoutBorder)
-    SetupTexture(flyoutBorderShadow, cfg.flyoutBorderShadow, "SetTexture", flyoutBorderShadow)
-    SetupTexture(border, cfg.border, "SetTexture", border)
-    SetupTexture(normalTexture, cfg.normalTexture, "SetNormalTexture", button)
-    SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
-    SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
-    highlightTexture:SetColorTexture(1, 1, 1, .25)
-    if checkedTexture then
-    SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
-        checkedTexture:SetColorTexture(1, .8, 0, .35)
-    end
+	SetupTexture(flash, cfg.flash, "SetTexture", flash)
+	SetupTexture(flyoutBorder, cfg.flyoutBorder, "SetTexture", flyoutBorder)
+	SetupTexture(flyoutBorderShadow, cfg.flyoutBorderShadow, "SetTexture", flyoutBorderShadow)
+	SetupTexture(border, cfg.border, "SetTexture", border)
+	SetupTexture(normalTexture, cfg.normalTexture, "SetNormalTexture", button)
+	SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
+	SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
+	highlightTexture:SetColorTexture(1, 1, 1, .25)
+	if checkedTexture then
+		SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
+		checkedTexture:SetColorTexture(1, .8, 0, .35)
+	end
 
     --cooldown
     SetupCooldown(cooldown, cfg.cooldown)
 
     if autoCastable then
-		autoCastable:SetTexCoord(.217, .765, .217, .765)
-		autoCastable:SetInside()
-	end
+        autoCastable:SetTexCoord(.217, .765, .217, .765)
+        autoCastable:SetInside()
+    end
+
+    local overlay = CreateFrame("Frame", nil, button)
+	overlay:SetAllPoints()
 
     --hotkey+count+name
     SetupFontString(hotkey, cfg.hotkey)
@@ -244,37 +250,37 @@ local function StyleExtraActionButton(button, cfg)
     if button.__styled then return end
 
     local buttonName = button:GetName()
+	local icon = _G[buttonName.."Icon"]
+	--local flash = _G[buttonName.."Flash"] --wierd the template has two textures of the same name
+	local hotkey = _G[buttonName.."HotKey"]
+	local count = _G[buttonName.."Count"]
+	local buttonstyle = button.style --artwork around the button
+	local cooldown = _G[buttonName.."Cooldown"]
+	local NormalTexture = _G[buttonName.."NormalTexture"]
 
-    local icon = _G[buttonName .. "Icon"]
-    local hotkey = _G[buttonName .. "HotKey"]
-    local count = _G[buttonName .. "Count"]
-    local buttonstyle = button.style --artwork around the button
-    local cooldown = _G[buttonName .. "Cooldown"]
+	button:SetPushedTexture(C.media.button.pushed) --force it to gain a texture
+	local normalTexture = button:GetNormalTexture()
+	local pushedTexture = button:GetPushedTexture()
+	local highlightTexture = button:GetHighlightTexture()
+	local checkedTexture = button:GetCheckedTexture()
 
-    button:SetPushedTexture(C.media.button.pushed) --force it to gain a texture
-    local normalTexture = button:GetNormalTexture()
-    local pushedTexture = button:GetPushedTexture()
-    local highlightTexture = button:GetHighlightTexture()
-    local checkedTexture = button:GetCheckedTexture()
-
-    --backdrop
-    SetupBackdrop(button, cfg.backdrop)
+	--backdrop
+	SetupBackdrop(icon)
 
     --textures
     SetupTexture(icon, cfg.icon, "SetTexture", icon)
-    SetupTexture(buttonstyle, cfg.buttonstyle, "SetTexture", buttonstyle)
-    SetupTexture(normalTexture, cfg.normalTexture, "SetNormalTexture", button)
-    SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
-    SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
-    SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
-    highlightTexture:SetColorTexture(1, 1, 1, .25)
+	SetupTexture(buttonstyle, cfg.buttonstyle, "SetTexture", buttonstyle)
+	SetupTexture(normalTexture, cfg.normalTexture, "SetNormalTexture", button)
+	SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
+	SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
+	SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
+	highlightTexture:SetColorTexture(1, 1, 1, .25)
+	if NormalTexture then NormalTexture:SetAlpha(0) end
 
     --cooldown
     SetupCooldown(cooldown, cfg.cooldown)
 
     --hotkey, count
-    local overlay = CreateFrame("Frame", nil, button)
-    overlay:SetAllPoints()
     SetupFontString(hotkey, cfg.hotkey)
     SetupFontString(count, cfg.count)
 
@@ -341,9 +347,6 @@ local function StyleAllActionButtons(cfg)
         StyleActionButton(_G["PossessButton" .. i], cfg)
     end
     --spell flyout
-    -- SpellFlyoutBackgroundEnd:SetTexture(nil)
-    -- SpellFlyoutHorizontalBackground:SetTexture(nil)
-    -- SpellFlyoutVerticalBackground:SetTexture(nil)
     SpellFlyout.Background:Hide()
     local function checkForFlyoutButtons()
         local i = 1
