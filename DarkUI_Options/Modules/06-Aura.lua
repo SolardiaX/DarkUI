@@ -10,14 +10,24 @@ ns.Categories[6] = L_CATEGORIES_AURA
 -- type: 1: CheckBox, 3: Slider, 4: Dropdown
 
 ns.OptionList[6] = { -- Aura
-    { 1, 'aura', 'style.enable', L_OPT_AURA_ENABLE, false, nil, function(self)
+    { 1, 'aura', 'enable', L_OPT_AURA_ENABLE, false, nil, function(self)
         self:HookScript('OnClick', function(self)
             ns.opt_widgets['aura:show_caster']:SetEnabled(self:GetChecked())
         end)
     end },
-    { 1, 'aura', 'style.show_caster', L_OPT_AURA_SHOW_CASTER, false, nil, function(self)
+    { 1, 'aura', 'show_caster', L_OPT_AURA_SHOW_CASTER, false, nil, function(self)
         self:HookScript('OnShow', function(self)
-            self:SetEnabled(ns.opt_widgets['aura:style.enable']:GetChecked())
+            self:SetEnabled(ns.opt_widgets['aura:enable']:GetChecked())
+        end)
+    end },
+    { 1, 'aura', 'enable_flash', L_OPT_AURA_ENABLE_FLASH, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['aura:enable']:GetChecked())
+        end)
+    end },
+    { 1, 'aura', 'enable_animation', L_OPT_AURA_ENABLE_ANIMATION, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['aura:enable']:GetChecked())
         end)
     end },
     {}, --blank

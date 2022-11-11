@@ -16,6 +16,7 @@ ns.OptionList[1] = { -- General
     { 1, 'general', 'liteMode', L_OPT_GENERAL_THEME_LITEMODE, false },
     { 1, 'blizzard', 'style', L_OPT_GENERAL_BLIZZARD_STYLE, false },
     { 1, 'blizzard', 'custom_position', L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION, false },
+    { 1, 'blizzard', 'hide_maw_buffs', L_OPT_GENERAL_BLIZZARD_HIDE_MAW_BUFFS, false },
     {}, --blank
     { 1, 'general', 'locale_valueformat', L_OPT_GENERAL_LOCALE_VALUEFORMAT, false },
     {},

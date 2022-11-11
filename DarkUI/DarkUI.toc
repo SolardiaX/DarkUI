@@ -9,7 +9,7 @@
 ## LoadWith: Blizzard_TradeSkillUI
 ## SavedVariables: SavedStats
 ## SavedVariablesPerCharacter: SavedStatsPerChar
-## X-Thanks: kaxu@ngacn, silverband@ngacn, Tuller, zork,
+## X-Thanks: kaxu@ngacn, silverband@ngacn, Tuller, zork, siwai, Elv, Tuz
 ## X-Credits: ElvUI, Tukui, ShestakUI, NDUI, ouf_DD
 
 Init.lua
