@@ -248,7 +248,8 @@ C.announcement = {
 ----------------------------------------------------------------------------------------
 --  Configuration of Aura
 ----------------------------------------------------------------------------------------
-local style = {
+C.aura = {
+    enable           = true,
     show_caster      = true, -- enable/disable show caster of aura when mouse over
     show_timers      = true, -- enable/disable buffs/debuffs timers
     row_num          = 16, -- buffs/debuffs num per row
@@ -266,11 +267,6 @@ local style = {
     flash_timer      = 30,
     dur_font_style   = { STANDARD_TEXT_FONT, 12, "THINOUTLINE" }, -- timer font style
     count_font_style = { STANDARD_TEXT_FONT, 14, "THINOUTLINE" } -- count font style
-}
-
-C.aura = {
-    enable           = true,
-    style            = style
 }
 
 ----------------------------------------------------------------------------------------

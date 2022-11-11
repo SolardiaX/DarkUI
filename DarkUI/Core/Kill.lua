@@ -28,7 +28,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
         SetCVar("showPartyBackground", 0)
     end
 
-    if C.actionbar.enable then
+    if C.actionbar.bars.enable then
         if not InCombatLockdown() then
             SetCVar("multiBarRightVerticalLayout", 0)
         end
@@ -42,7 +42,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
 		SetCVar("minimapTrackingShowAll", 1)
 	end
 
-    if C.bags.enable then
+    if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
         if E.isBeta then
             C_Container.SetSortBagsRightToLeft(true)
 			C_Container.SetInsertItemsLeftToRight(false)

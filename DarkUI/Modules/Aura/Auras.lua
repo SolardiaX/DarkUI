@@ -6,7 +6,7 @@ if not C.aura.enable then return end
 --	Aura styles (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 
-local cfg = C.aura.style
+local cfg = C.aura
 
 local auras = CreateFrame("Frame")
 C.aura.host = auras

@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.aura.style or not C.aura.style.show_caster then return end
+if not C.aura.enable and not C.aura.show_caster then return end
 
 ----------------------------------------------------------------------------------------
 --	Tells you who cast a buff or debuff in its tooltip
