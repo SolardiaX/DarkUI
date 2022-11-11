@@ -7,10 +7,10 @@ if not C.blizzard.custom_position then return end
 local Load = CreateFrame("Frame")
 Load:RegisterEvent("ADDON_LOADED")
 Load:SetScript("OnEvent", function(_, _, addon)
-    if addon == "Blizzard_TalkingHeadUI" or (addon == E.addonName and IsAddOnLoaded("Blizzard_TalkingHeadUI")) then
+    if addon == "Blizzard_TalkingHeadUI" or (addon == E.addonName and TalkingHeadFrame) then
         TalkingHeadFrame.ignoreFramePositionManager = true
         TalkingHeadFrame:ClearAllPoints()
         TalkingHeadFrame:SetPoint(unpack(C.blizzard.talking_head_pos))
-	Load:UnregisterEvent("ADDON_LOADED")
+	    Load:UnregisterEvent("ADDON_LOADED")
     end
 end)

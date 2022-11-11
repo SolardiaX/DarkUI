@@ -558,6 +558,7 @@ C.nameplate = {
     near_color           = { 1, 1, 0 }, -- Near threat color
     bad_color            = { 1, 0, 0 }, -- Bad threat color
     offtank_color        = { 0, 0.5, 1 }, -- Offtank threat color
+    custom_color         = { 0, 0.8, 0.3 }, -- Custom unit color
     track_debuffs        = true, -- Show debuffs (from the list)
     track_buffs          = true, -- Show buffs above player nameplate (from the list)
     player_aura_only     = true, -- Show player aura only (boss cast aura always shown)

@@ -42,7 +42,7 @@ local function GetQuests(unitID)
 		if not text or text == "" then return end
 
 		if UnitIsPlayer(text) then
-			notMyQuest = text ~= T.name
+			notMyQuest = text ~= E.name
 		elseif text and not notMyQuest then
 			local count, percent = CheckTextForQuest(text)
 
@@ -155,8 +155,8 @@ local function Enable(self)
 
 		if element:IsObjectType("Texture") and not element:GetAtlas() then
 			-- element:SetAtlas("SmallQuestBang")
-			-- element:SetAtlas("adventureguide-microbutton-alert")
-			element:SetAtlas("worldquest-tracker-questmarker")
+			element:SetAtlas("adventureguide-microbutton-alert")
+			-- element:SetAtlas("worldquest-tracker-questmarker")
 			-- element:SetTexture([[Interface\TargetingFrame\PortraitQuestBadge]])
 		end
 

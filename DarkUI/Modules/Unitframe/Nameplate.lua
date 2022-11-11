@@ -261,7 +261,7 @@ local AurasPostUpdateIcon = function(_, _, icon, _, _, duration, expiration, deb
 	if duration and duration > 0 and cfg.show_timers then
 		icon.remaining:Show()
 		icon.timeLeft = expiration
-		icon:SetScript("OnUpdate", E.CreateAuraTimer)
+		icon:SetScript("OnUpdate", DUF.CreateAuraTimer)
 	else
 		icon.remaining:Hide()
 		icon.timeLeft = huge
@@ -390,6 +390,12 @@ end
 
 -- Cast color
 local function castColor(self)
+	if C.nameplate.majorSpells[self.spellID] then
+		ShowOverlayGlow(self.Icon.border)
+	else
+		HideOverlayGlow(self.Icon.border)
+	end
+
 	if self.notInterruptible then
         self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
         self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
@@ -399,8 +405,7 @@ local function castColor(self)
     end
 end
 
--- Health color
-
+-- Threat color
 local function threatColor(self, forced)
     if UnitIsPlayer(self.unit) then return end
     local combat = UnitAffectingCombat("player")
@@ -491,6 +496,10 @@ local function HealthPostUpdate(self, unit, min, max)
 		end
 
 		self:SetStatusBarColor(r, g, b)
+	end
+
+	if C.nameplate.customUnits[main.unitName] or C.nameplate.customUnits[main.npcID] then
+		self:SetStatusBarColor(unpack(cfg.custom_color))
 	end
 
 	if UnitIsPlayer(unit) then
@@ -597,6 +606,7 @@ local function style(self, unit)
     self.Power.colorPower = true
     self.Power.PostUpdate = DUF.PreUpdatePower
     self.Power:CreateShadow()
+	CreateBorderFrame(self.Power)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints()
@@ -650,6 +660,7 @@ local function style(self, unit)
     self.Castbar:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -8)
     self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 0, -8 - (cfg.height * E.noscalemult))
     self.Castbar:CreateShadow()
+	CreateBorderFrame(self.Castbar)
 
     self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
     self.Castbar.bg:SetAllPoints()

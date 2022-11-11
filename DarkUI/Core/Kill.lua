@@ -38,7 +38,7 @@ frame:SetScript("OnEvent", function(_, _, addon)
         SetCVar("ShowClassColorInNameplate", 1)
     end
 
-    if C.minimap.enable then
+    if C.map.minimap.enable then
 		SetCVar("minimapTrackingShowAll", 1)
 	end
 
