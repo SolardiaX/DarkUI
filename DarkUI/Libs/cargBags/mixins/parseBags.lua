@@ -31,18 +31,15 @@ DESCRIPTION
 local _, ns = ...
 local cargBags = ns.cargBags
 
-local Implementation = cargBags.classes.Implementation
-local Container = cargBags.classes.Container
-
 local bagStrings = {
 	["backpack"]		= { 0 },
-	["bags"]			= { 1, 2, 3, 4 },
-	["backpack+bags"]	= { 0, 1, 2, 3, 4, },
+	["bags"]		= { 1, 2, 3, 4, 5 },
+	["backpack+bags"]	= { 0, 1, 2, 3, 4, 5 },
 	["bankframe"]		= { -1 },
-	["bankframe+bank"]	= { -1, 5, 6, 7, 8, 9, 10, 11 },
+	["bankframe+bank"]	= { -1, 6, 7, 8, 9, 10, 11, 12 },
 	["bankreagent"]		= { -3 },
-	["bank"]			= { 5, 6, 7, 8, 9, 10, 11 },
-	["keyring"]			= { -2 },
+	["bank"]		= { 6, 7, 8, 9, 10, 11, 12 },
+	["keyring"]		= { -2 },
 }
 cargBags.BagStrings = bagStrings
 
@@ -52,10 +49,10 @@ cargBags.BagStrings = bagStrings
 	@return bags <table>
 ]]
 function cargBags:ParseBags(bags)
-	--print("ParseBags", bags)
+	if not bags then return end
 	if(type(bags) == "table") then return bags end
 	if(bagStrings[bags]) then return bagStrings[bags] end
-	local min, max = bags and bags:match("(%d+)-(%d+)")
+	local min, max = bags:match("(%d+)-(%d+)")
 	if(min) then
 		local t = {}
 		for i=min, max do

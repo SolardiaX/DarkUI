@@ -1,7 +1,5 @@
 ﻿local E, C, L = select(2, ...):unpack()
 
-if not C.automation.auto_sell then return end
-
 ----------------------------------------------------------------------------------------
 --	Auto repair
 ----------------------------------------------------------------------------------------
@@ -20,6 +18,8 @@ local COPPER_AMOUNT_TEXTURE = COPPER_AMOUNT_TEXTURE
 local Event = CreateFrame("Frame")
 Event:RegisterEvent("MERCHANT_SHOW")
 Event:SetScript("OnEvent", function(self)
+    if not C.automation.auto_sell then return end -- for dynamic change with datatext
+
     local Cost = 0
     for BagID = 0, 4 do
         for SlotID = 1, GetContainerNumSlots(BagID) do

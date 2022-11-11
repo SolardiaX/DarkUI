@@ -22,8 +22,8 @@ local enable = function(self)
 	_E = true
 
 	if not hook then
-		LootFrameUpButton:HookScript("OnClick", update)
-		LootFrameDownButton:HookScript("OnClick", update)
+		-- LootFrameUpButton:HookScript("OnClick", update)
+		-- LootFrameDownButton:HookScript("OnClick", update)
 
 		hook = true
 	end

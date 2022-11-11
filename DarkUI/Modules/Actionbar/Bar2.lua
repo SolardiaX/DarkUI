@@ -27,19 +27,23 @@ bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
 bar:SetFrameStrata("LOW")
 
 _G.MultiBarBottomLeft:SetParent(bar)
+_G.MultiBarBottomLeft.QuickKeybindGlow:SetTexture("")
 
-for i = 1, num do
-    local button = _G["MultiBarBottomLeftButton" .. i]
+bar:RegisterEvent("PLAYER_ENTERING_WORLD")
+bar:SetScript("OnEvent", function(self, event)
+    for i = 1, num do
+        local button = _G["MultiBarBottomLeftButton" .. i]
 
-    button:SetSize(cfg.button.size, cfg.button.size)
-    button:ClearAllPoints()
+        button:SetSize(cfg.button.size, cfg.button.size)
+        button:ClearAllPoints()
 
-    if i == 1 then
-        button:SetPoint("BOTTOMLEFT", bar, 3, 0)
-    else
-        local previous = _G["MultiBarBottomLeftButton" .. i - 1]
-        button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+        if i == 1 then
+            button:SetPoint("BOTTOMLEFT", bar, 3, 0)
+        else
+            local previous = _G["MultiBarBottomLeftButton" .. i - 1]
+            button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+        end
     end
-end
 
-RegisterStateDriver(bar, "visibility", "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists] hide; show")
+    RegisterStateDriver(bar, "visibility", "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists] hide; show")
+end)

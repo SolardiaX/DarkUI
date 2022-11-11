@@ -82,15 +82,23 @@ local function BuildBNTable(total)
 end
 
 local clientTags = {
-    [BNET_CLIENT_D3]        = "Diablo 3",
-    [BNET_CLIENT_WTCG]      = "Hearthstone",
-    [BNET_CLIENT_HEROES]    = "Heroes of the Storm",
-    [BNET_CLIENT_OVERWATCH] = "Overwatch",
-    [BNET_CLIENT_SC]        = "StarCraft",
-    [BNET_CLIENT_SC2]       = "StarCraft 2",
-    [BNET_CLIENT_DESTINY2]  = "Destiny 2",
-    [BNET_CLIENT_COD]       = "Call of Duty: Black Ops 4",
-    ["BSAp"]                = COMMUNITIES_PRESENCE_MOBILE_CHAT
+    ["WoW"] = "World of Warcraft",
+	["S2"] = "StarCraft 2",
+	["OSI"] = "Diablo II: Resurrected",
+	["D3"] = "Diablo 3",
+	["WTCG"] = "Hearthstone",
+	["App"] = "Battle.net Desktop App",
+	["BSAp"] = "Battle.net Mobile App",
+	["Hero"] = "Heroes of the Storm",
+	["Pro"] = "Overwatch",
+	["CLNT"] = "Battle.net Desktop App",
+	["S1"] = "StarCraft: Remastered",
+	["DST2"] = "Destiny 2",
+	["VIPR"] = "Call of Duty: Black Ops 4",
+	["ODIN"] = "Call of Duty: Modern Warfare",
+	["LAZR"] = "Call of Duty: Modern Warfare 2",
+	["ZEUS"] = "Call of Duty: Black Ops Cold War",
+	["W3"] = "Warcraft III: Reforged",
 }
 
 module:Inject("Friends", {

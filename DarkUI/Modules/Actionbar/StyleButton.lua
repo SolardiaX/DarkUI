@@ -12,8 +12,8 @@ local unpack = unpack
 local hooksecurefunc = hooksecurefunc
 local NUM_ACTIONBAR_BUTTONS = NUM_ACTIONBAR_BUTTONS
 local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
-local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS
-local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS
+local NUM_POSSESS_SLOTS = NUM_POSSESS_SLOTS or 2
+local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 local ExtraActionButton1 = _G.ExtraActionButton1
 local SpellFlyout = _G.SpellFlyout
@@ -55,7 +55,7 @@ local function ApplyPoints(self, points)
 end
 
 local function ApplyTexCoord(texture, texCoord)
-	if texture.__lockdown or not texCoord then return end
+    if texture.__lockdown or not texCoord then return end
 
     texture:SetTexCoord(unpack(texCoord))
 end
@@ -81,13 +81,15 @@ local function ApplyFont(fontString, font)
 end
 
 local function ApplyHorizontalAlign(fontString, align)
-	if not align then return end
-	fontString:SetJustifyH(align)
+    if not align then return end
+    fontString:SetJustifyH(align)
 end
+
 local function ApplyVerticalAlign(fontString, align)
-	if not align then return end
-	fontString:SetJustifyV(align)
+    if not align then return end
+    fontString:SetJustifyV(align)
 end
+
 local function ApplyTexture(texture, file)
     if not file then return end
 
@@ -152,12 +154,26 @@ local function SetupBackdrop(button, backdrop)
     end
 end
 
+local function updateEquipItemColor(button)
+	if not button.__bg then return end
+
+	if IsEquippedAction(button.action) then
+		button.__bg:SetBackdropBorderColor(0, .7, .1)
+	else
+		button.__bg:SetBackdropBorderColor(0, 0, 0)
+	end
+end
+
+local function equipItemColor(button)
+    if not button.Update then return end
+    hooksecurefunc(button, "Update", updateEquipItemColor)
+end
+
 local function StyleActionButton(button, cfg)
     if not button then return end
     if button.__styled then return end
 
     local buttonName = button:GetName()
-    local newActionTexture = button.NewActionTexture
     local icon = _G[buttonName .. "Icon"]
     local flash = _G[buttonName .. "Flash"]
     local flyoutBorder = _G[buttonName .. "FlyoutBorder"]
@@ -166,8 +182,9 @@ local function StyleActionButton(button, cfg)
     local count = _G[buttonName .. "Count"]
     local name = _G[buttonName .. "Name"]
     local border = _G[buttonName .. "Border"]
+    local autoCastable = _G[buttonName.."AutoCastable"]
     local cooldown = _G[buttonName .. "Cooldown"]
-    local floatingBG = _G[buttonName .. "FloatingBG"]
+    
     local normalTexture = button:GetNormalTexture()
     local pushedTexture = button:GetPushedTexture()
     local highlightTexture = button:GetHighlightTexture()
@@ -175,13 +192,22 @@ local function StyleActionButton(button, cfg)
     --normal buttons do not have a checked texture, but checkbuttons do and normal actionbuttons are checkbuttons
     local checkedTexture
     if button.GetCheckedTexture then checkedTexture = button:GetCheckedTexture() end
+    local floatingBG = _G[buttonName.."FloatingBG"]
 
+    --pet stuff
+    local petShine = _G[buttonName.."Shine"]
+    if petShine then petShine:SetInside() end
     --hide stuff
     if floatingBG then floatingBG:Hide() end
-    if newActionTexture then newActionTexture:SetTexture(nil) end
+    if button.NewActionTexture then button.NewActionTexture:SetTexture(nil) end
+    if button.SlotArt then button.SlotArt:Hide() end
+    if button.RightDivider then button.RightDivider:Hide() end
+    if button.SlotBackground then button.SlotBackground:Hide() end
+    if button.IconMask then button.IconMask:Hide() end
 
     --backdrop
     SetupBackdrop(button, cfg.backdrop)
+    --equipItemColor(button)
 
     --textures
     SetupTexture(icon, cfg.icon, "SetTexture", icon)
@@ -192,11 +218,19 @@ local function StyleActionButton(button, cfg)
     SetupTexture(normalTexture, cfg.normalTexture, "SetNormalTexture", button)
     SetupTexture(pushedTexture, cfg.pushedTexture, "SetPushedTexture", button)
     SetupTexture(highlightTexture, cfg.highlightTexture, "SetHighlightTexture", button)
-    SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
     highlightTexture:SetColorTexture(1, 1, 1, .25)
+    if checkedTexture then
+    SetupTexture(checkedTexture, cfg.checkedTexture, "SetCheckedTexture", button)
+        checkedTexture:SetColorTexture(1, .8, 0, .35)
+    end
 
     --cooldown
     SetupCooldown(cooldown, cfg.cooldown)
+
+    if autoCastable then
+		autoCastable:SetTexCoord(.217, .765, .217, .765)
+		autoCastable:SetInside()
+	end
 
     --hotkey+count+name
     SetupFontString(hotkey, cfg.hotkey)
@@ -285,8 +319,11 @@ local function StyleAllActionButtons(cfg)
         StyleActionButton(_G["ActionButton" .. i], cfg)
         StyleActionButton(_G["MultiBarBottomLeftButton" .. i], cfg)
         StyleActionButton(_G["MultiBarBottomRightButton" .. i], cfg)
-        StyleActionButton(_G["MultiBarRightButton" .. i], cfg)
         StyleActionButton(_G["MultiBarLeftButton" .. i], cfg)
+        StyleActionButton(_G["MultiBarRightButton" .. i], cfg)
+        StyleActionButton(_G["MultiBar5Button" .. i], cfg)
+        StyleActionButton(_G["MultiBar6Button" .. i], cfg)
+        StyleActionButton(_G["MultiBar7Button" .. i], cfg)
     end
     for i = 1, 6 do
         StyleActionButton(_G["OverrideActionBarButton" .. i], cfg)
@@ -304,9 +341,10 @@ local function StyleAllActionButtons(cfg)
         StyleActionButton(_G["PossessButton" .. i], cfg)
     end
     --spell flyout
-    SpellFlyoutBackgroundEnd:SetTexture(nil)
-    SpellFlyoutHorizontalBackground:SetTexture(nil)
-    SpellFlyoutVerticalBackground:SetTexture(nil)
+    -- SpellFlyoutBackgroundEnd:SetTexture(nil)
+    -- SpellFlyoutHorizontalBackground:SetTexture(nil)
+    -- SpellFlyoutVerticalBackground:SetTexture(nil)
+    SpellFlyout.Background:Hide()
     local function checkForFlyoutButtons()
         local i = 1
         local button = _G["SpellFlyoutButton" .. i]
@@ -376,12 +414,30 @@ actionButtonConfig.normalTexture = {
     }
 }
 --flash
-actionButtonConfig.flash = { file = C.media.button.flash }
+actionButtonConfig.flash = { 
+    file = C.media.button.flash,
+    points = {
+        { "TOPLEFT", 0, 0 },
+        { "BOTTOMRIGHT", 0, 0 }
+    }
+}
 --pushedTexture
-actionButtonConfig.pushedTexture = { file = C.media.button.pushed }
+actionButtonConfig.pushedTexture = { 
+    file = C.media.button.pushed,
+    points = {
+        { "TOPLEFT", 0, 0 },
+        { "BOTTOMRIGHT", 0, 0 }
+    }
+}
 --checkedTexture
-actionButtonConfig.checkedTexture = { file = C.media.button.checked }
---checkedTexture
+actionButtonConfig.checkedTexture = { 
+    file = C.media.button.checked,
+    points = {
+        { "TOPLEFT", 0, 0 },
+        { "BOTTOMRIGHT", 0, 0 }
+    }
+}
+--highlightTexture
 actionButtonConfig.highlightTexture = {
     file   = "",
     points = {
@@ -453,50 +509,44 @@ else
     }
 end
 
---rButtonTemplate:StyleAllActionButtons
-StyleAllActionButtons(actionButtonConfig)
-
--- itemButtonConfig
-local itemButtonConfig = {}
-
-itemButtonConfig.backdrop = actionButtonConfig.backdrop
-itemButtonConfig.icon = actionButtonConfig.icon
-itemButtonConfig.count = actionButtonConfig.count
-itemButtonConfig.stock = actionButtonConfig.name
-itemButtonConfig.border = { file = "" }
-itemButtonConfig.normalTexture = actionButtonConfig.normalTexture
-
---rButtonTemplate:StyleItemButton
-local itemButtons = {
-    _G.MainMenuBarBackpackButton,
-    _G.CharacterBag0Slot,
-    _G.CharacterBag1Slot,
-    _G.CharacterBag2Slot,
-    _G.CharacterBag3Slot
-}
-for _, button in next, itemButtons do
-    StyleItemButton(button, itemButtonConfig)
-end
-
--- extraButtonConfig
-local extraButtonConfig = actionButtonConfig
-extraButtonConfig.buttonstyle = { file = "" }
-
---rButtonTemplate:StyleExtraActionButton
-StyleExtraActionButton(ExtraActionButton1, extraButtonConfig)
-
---DarkUI extra buttons
-StyleActionButton(_G["DarkUIExtraButtons_MainLeftButton"], actionButtonConfig)
-StyleActionButton(_G["DarkUIExtraButtons_MainRightButton"], actionButtonConfig)
-StyleActionButton(_G["DarkUIExtraButtons_TopLeftButton"], actionButtonConfig)
-StyleActionButton(_G["DarkUIExtraButtons_TopRightButton"], actionButtonConfig)
-
---[[
 local host = CreateFrame("Frame")
 host:RegisterEvent("PLAYER_LOGIN")
 host:SetScript("OnEvent", function()
-    for i = 1, 4 do
-        StyleActionButton(_G["MagnetButtonFrame" .. i .. "CheckButton"], actionButtonConfig)
+    --rButtonTemplate:StyleAllActionButtons
+    StyleAllActionButtons(actionButtonConfig)
+
+    -- itemButtonConfig
+    local itemButtonConfig = {}
+
+    itemButtonConfig.backdrop = actionButtonConfig.backdrop
+    itemButtonConfig.icon = actionButtonConfig.icon
+    itemButtonConfig.count = actionButtonConfig.count
+    itemButtonConfig.stock = actionButtonConfig.name
+    itemButtonConfig.border = { file = "" }
+    itemButtonConfig.normalTexture = actionButtonConfig.normalTexture
+
+    --rButtonTemplate:StyleItemButton
+    local itemButtons = {
+        _G.MainMenuBarBackpackButton,
+        _G.CharacterBag0Slot,
+        _G.CharacterBag1Slot,
+        _G.CharacterBag2Slot,
+        _G.CharacterBag3Slot
+    }
+    for _, button in next, itemButtons do
+        StyleItemButton(button, itemButtonConfig)
     end
+
+    -- extraButtonConfig
+    local extraButtonConfig = actionButtonConfig
+    extraButtonConfig.buttonstyle = { file = "" }
+
+    --rButtonTemplate:StyleExtraActionButton
+    StyleExtraActionButton(ExtraActionButton1, extraButtonConfig)
+
+    --DarkUI extra buttons
+    StyleActionButton(_G["DarkUIExtraButtons_MainLeftButton"], actionButtonConfig)
+    StyleActionButton(_G["DarkUIExtraButtons_MainRightButton"], actionButtonConfig)
+    StyleActionButton(_G["DarkUIExtraButtons_TopLeftButton"], actionButtonConfig)
+    StyleActionButton(_G["DarkUIExtraButtons_TopRightButton"], actionButtonConfig)
 end)
-]]--

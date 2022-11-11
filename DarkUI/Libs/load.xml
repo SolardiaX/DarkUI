@@ -7,7 +7,7 @@
     <!--Script file="LitePanels\Layout.lua" /-->
 
     <!-- oGlow -->
-    <Include file="oGlow\load.xml" />
+    <!--Include file="oGlow\load.xml" /-->
 
     <!-- oUF -->
     <Include file="oUF\load.xml" />
@@ -17,7 +17,4 @@
 
     <!-- cargBags -->
     <Include file="cargBags\load.xml" />
-
-    <!-- MagnetButtons -->
-    <!--Include file="MagnetButtons\load.xml" /-->
 </Ui>

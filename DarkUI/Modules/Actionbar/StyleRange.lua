@@ -6,16 +6,11 @@ if not C.actionbar.styles.range.enable then return end
 ----------------------------------------------------------------------------------------
 --	Out of range check(tullaRange by Tuller)
 ----------------------------------------------------------------------------------------
-local AddonName = ...
-
 -- the addon event handler
-local Addon = CreateFrame('Frame', AddonName, _G.InterfaceOptionsFrame)
+local Addon = CreateFrame('Frame', "DarkUI_RangeHandler", _G.InterfaceOptionsFrame)
 
 -- how quickly attack actions flash
 local ATTACK_BUTTON_FLASH_TIME = _G.ATTACK_BUTTON_FLASH_TIME
-
--- the name of the database
-local DB_KEY = 'TULLARANGE_COLORS'
 
 -- how frequently we want to update colors, in seconds
 local UPDATE_DELAY = 0.2
@@ -27,6 +22,11 @@ local IsActionInRange = _G.IsActionInRange
 local IsUsableAction = _G.IsUsableAction
 local GetPetActionInfo = _G.GetPetActionInfo
 local GetPetActionSlotUsable = _G.GetPetActionSlotUsable
+local GetActionInfo = _G.GetActionInfo
+local GetMacroInfo = _G.GetMacroInfo
+local GetMacroSpell = _G.GetMacroSpell
+local GetSpellPowerCost = _G.GetSpellPowerCost
+local UnitPower = _G.UnitPower
 
 --------------------------------------------------------------------------------
 -- Event Handlers
@@ -44,7 +44,6 @@ function Addon:OnLoad()
     self.buttonStates = {}
 
     -- setup script handlers
-    self:SetScript('OnShow', self.OnShow)
     self:SetScript('OnEvent', self.OnEvent)
 
     -- register any events we need to watch
@@ -54,16 +53,6 @@ function Addon:OnLoad()
 
     -- drop this method, as we won't need it again
     self.OnLoad = nil
-end
-
--- addon shown (which in this case means that InterfaceOptionsFrame was shown)
--- load the config addon and get rid of this method
-function Addon:OnShow()
-    LoadAddOn(AddonName .. '_Config')
-
-    -- drop this method, as we won't need it again
-    self:SetScript('OnShow', nil)
-    self.OnShow = nil
 end
 
 function Addon:OnEvent(event, ...)
@@ -76,7 +65,7 @@ end
 
 -- when the addon finishes loading...
 function Addon:ADDON_LOADED(event, addonName)
-    if addonName ~= AddonName then
+    if addonName ~= E.addonName then
         return
     end
 
@@ -225,11 +214,11 @@ function Addon:PLAYER_LOGIN(event)
         -- hook any pet button events we need to take care of
         -- register events on update initially, and wipe out their individual on
         -- update handlers.
-        hooksecurefunc('PetActionButton_OnUpdate', petButton_OnUpdate)
-        hooksecurefunc('PetActionBar_Update', petActionBar_Update)
+        -- hooksecurefunc('PetActionButton_OnUpdate', petButton_OnUpdate)
+        -- hooksecurefunc('PetActionBar_Update', petActionBar_Update)
 
         if self:EnableFlashAnimations() then
-            hooksecurefunc('PetActionButton_StartFlash', button_StartFlash)
+            -- hooksecurefunc('PetActionButton_StartFlash', button_StartFlash)
         end
     end
 
@@ -298,27 +287,50 @@ function Addon:UpdateButtonStates(force)
     return updatedButtons
 end
 
--- action button specific methods
 
--- gets the current state of the action button
 function Addon:GetActionButtonState(button)
     local action = button.action
-    local isUsable, notEnoughMana = IsUsableAction(action)
-    local inRange = IsActionInRange(action)
+    local actionType, actionTypeId = GetActionInfo(action)
+    if not actionType then
+        return 'normal'
+    end
+    -- for macros with names that start with a #, we prioritize the OOM check
+    -- using a spell cost strategy over other ones to better clarify if the
+    -- macro is actually usable or not
+    if actionType == 'macro' then
+        local name = GetMacroInfo(actionTypeId)
 
-    -- usable (ignoring target information)
-    if isUsable then
-        -- but out of range
-        if inRange == false then
+        if name and name:sub(1, 1) == '#' then
+            local spellId = GetMacroSpell(actionTypeId)
+            -- only run the check for spell macros
+            if spellId then
+                local costs = GetSpellPowerCost(spellId)
+                for _, cost in ipairs(costs) do
+                    if UnitPower('player', cost.type) < cost.minCost then
+                        return 'oom'
+                    end
+                end
+                if IsActionInRange(action) == false then
             return 'oor'
-        else
+                end
             return 'normal'
         end
-    elseif notEnoughMana then
+        end
+    end
+    local isUsable, notEnoughMana = IsUsableAction(action)
+    if not isUsable then
+        if notEnoughMana then
         return 'oom'
-    else
+        end
         return 'unusable'
     end
+    -- we do == false here because IsActionInRange can return one of true
+    -- (has range, in range), false (has range, out of range), and nil (does
+    -- not have range) and we explicitly want to know about (has range, oor)
+    if IsActionInRange(action) == false then
+        return 'oor'
+    end
+    return 'normal'
 end
 
 function Addon:UpdateActionButtonState(button, force)
@@ -406,9 +418,7 @@ function Addon:StartButtonFlashing(button)
         if self.flashAnimations then
             self.flashAnimations[button] = animation
         else
-            self.flashAnimations = {
-                [button] = animation
-            }
+            self.flashAnimations = {[button] = animation}
         end
     end
 
@@ -465,14 +475,7 @@ local function copyDefaults(tbl, defaults)
 end
 
 function Addon:SetupDatabase()
-    local sets = _G[DB_KEY]
-
-    if not sets then
-        sets = {}
-        _G[DB_KEY] = sets
-    end
-
-    self.sets = copyDefaults(sets, self:GetDatabaseDefaults())
+    self.sets = copyDefaults({}, self:GetDatabaseDefaults())
 end
 
 function Addon:CleanupDatabase()
@@ -484,23 +487,7 @@ function Addon:CleanupDatabase()
 end
 
 function Addon:GetDatabaseDefaults()
-    return {
-        -- enable range coloring on pet actions
-        petActions = true,
-
-        -- enable flash animations,
-        flashAnimations = true,
-        flashDuration = ATTACK_BUTTON_FLASH_TIME * 1.5,
-
-        -- default color (r, g, b, a)
-        normal = {1, 1, 1, 1},
-        -- out of range
-        oor = {1, 0.3, 0.1, 1},
-        -- out of mana
-        oom = {0.1, 0.3, 1, 1},
-        -- unusable action
-        unusable = {0.4, 0.4, 0.4, 1}
-    }
+    return C.actionbar.styles.range
 end
 
 function Addon:ResetDatabase()

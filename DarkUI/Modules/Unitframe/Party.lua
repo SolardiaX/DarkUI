@@ -235,10 +235,10 @@ local createStyle = function(self)
     createTag(self)
     createThreatType(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGH", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "HIGH", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
+    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.LeaderIndicator = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 30)

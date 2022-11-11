@@ -56,6 +56,7 @@ L.ACTIONBAR_BINDING_DISCARDED        = "All newly set keybindings have been disc
 L.ACTIONBAR_BINDING_MODETEXT         = "Hover your mouse over any actionbutton to bind it. Press the escape key or right click to clear the current actionbutton's keybinding"
 L.ACTIONBAR_BINDING_SAVEBTN          = "Save"
 L.ACTIONBAR_BINDING_DISCARDEBTN      = "Discard"
+L.ACTIONBAR_EXP_REP					 = "Exp/Rep"
 L.ACTIONBAR_REP                      = "Rep"
 L.ACTIONBAR_EXP                      = "Exp"
 L.ACTIONBAR_PARAGON_EXP              = "Paragon Exp"

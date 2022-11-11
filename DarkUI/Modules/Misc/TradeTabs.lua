@@ -64,8 +64,7 @@ local function buildSpellList()
 end
 
 function TradeTabs:Initialize()
-	if self.initialized or not IsAddOnLoaded("Blizzard_TradeSkillUI") then return end -- Shouldn't need this, but I'm paranoid
-	local parent = TradeSkillFrame
+	local parent = ProfessionsFrame
 	local tradeSpells = buildSpellList()
 	local i = 1
 	local prev
@@ -80,7 +79,11 @@ function TradeTabs:Initialize()
     local _,_,_,_,cooking = GetProfessions()
 	if cooking then
 		prev = self:CreateTab(i, parent, items)
-		prev:SetPoint("TOPLEFT", parent, "TOPRIGHT", 0, -22)
+		if select(2, UnitClass("player")) == "DEATHKNIGHT" then
+			prev:SetPoint("TOPLEFT", parent, "TOPRIGHT", 0, -68)
+		else
+			prev:SetPoint("TOPLEFT", parent, "TOPRIGHT", 0, -21)
+		end
 		prev:SetAttribute('type1','macro')
 		prev:SetAttribute('macrotext', "/use 大厨的帽子")
 		i = i + 1
@@ -151,12 +154,21 @@ local function IsRecipeEnchanting(self)
 end
 
 function QuickEnchanting()
-	if not TradeSkillFrame then return end
-	local detailsFrame = TradeSkillFrame.DetailsFrame
-	hooksecurefunc(detailsFrame, "RefreshDisplay", IsRecipeEnchanting)
-	local createButton = detailsFrame.CreateButton
-	createButton:RegisterForClicks("AnyUp")
-	createButton:HookScript("OnClick", function(self, btn)
+	if not ProfessionsFrame then return end
+	hooksecurefunc(ProfessionsFrame.CraftingPage, "ValidateControls", function(self)
+		isEnchanting = nil
+		local currentRecipeInfo = self.SchematicForm:GetRecipeInfo()
+		if currentRecipeInfo and currentRecipeInfo.alternateVerb then
+			local professionInfo = ProfessionsFrame:GetProfessionInfo()
+			if professionInfo and professionInfo.parentProfessionID == 333 then
+				isEnchanting = true
+				self.CreateButton.tooltipText = format(tooltipString, "右键：附魔羊皮纸", GetItemCount(ENCHANTING_VELLUM))
+			end
+		end
+	end)
+	local createButton = ProfessionsFrame.CraftingPage.CreateButton
+	createButton:RegisterForClicks("AnyDown", "AnyUp")
+	createButton:HookScript("OnClick", function(_, btn)
 		if btn == "RightButton" and isEnchanting then
 			UseItemByName(ENCHANTING_VELLUM)
 		end
@@ -172,6 +184,7 @@ function TradeTabs:CreateTab(i, parent, spellID)
 	button:Show()
 	button:SetAttribute("type","spell")
 	button:SetAttribute("spell",spellID)
+	button:RegisterForClicks("AnyDown", "AnyUp")
 	button:SetNormalTexture(texture)
 	button:SetScript("OnEvent",updateSelection)
 	button:RegisterEvent("TRADE_SKILL_SHOW")
@@ -198,6 +211,7 @@ local aFrame = CreateFrame("Frame")
 end)
 
 --制造界面添加 [材料齐备] 勾选框 2018.12.20 完成。
+--[[
 local myButtonCheck = CreateFrame("Frame")
       myButtonCheck:RegisterEvent("ADDON_LOADED")
       myButtonCheck:SetScript("onEvent",function(self,event,...)
@@ -213,6 +227,7 @@ local myButtonCheck = CreateFrame("Frame")
             end)  
         end
     end)
+]]
 
 --制造界面添加 [提高技能] 勾选框 2018.12.20 完成。
 --[[
@@ -231,4 +246,4 @@ local myButtonCheck2 = CreateFrame("Frame")
             end)  
         end
     end)
-	]]
+]]

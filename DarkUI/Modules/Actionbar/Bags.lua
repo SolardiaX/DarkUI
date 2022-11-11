@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable and not C.actionbar.bars.bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	PetActionBar (modified from ShestakUI)
+--	PetActionBar (modified from ShestakUI & ElvUI)
 ----------------------------------------------------------------------------------------
 
 local _G = _G
@@ -29,30 +29,47 @@ bar:SetPoint(unpack(cfg.pos))
 bar:SetScale(cfg.scale)
 bar.buttonList = {}
 
---move the buttons into position and reparent them
-local previous
-for i, b in pairs(buttonList) do
-    local button = _G[b]
-    button:SetParent(bar)
-    button.SetParent = E.dummy
-    tinsert(bar.buttonList, button) --add the button object to the list
+bar:RegisterEvent("PLAYER_ENTERING_WORLD")
+bar:SetScript("OnEvent", function(self, event)
+    _G.BagBarExpandToggle:Hide()
 
-    button:SetSize(cfg.button.size, cfg.button.size)
-    button:ClearAllPoints()
+    --move the buttons into position and reparent them
+    local previous
+    for i, b in pairs(buttonList) do
+        local button = _G[b]
+        button:SetParent(bar)
+        button.SetParent = E.dummy
+        tinsert(bar.buttonList, button) --add the button object to the list
 
-    if i == 1 then
-        button:SetPoint("LEFT", bar, "LEFT", 0, 0)
-    else
-        button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+        button:SetSize(cfg.button.size, cfg.button.size)
+        button:ClearAllPoints()
+        button:GetNormalTexture():SetAlpha(0)
+		button:GetPushedTexture():SetAlpha(0)
+		button:GetHighlightTexture():SetAlpha(0)
+		button.SlotHighlightTexture:Kill()
+		button.CircleMask:Hide()
+
+        local icon = button.icon or _G[button:GetName()..'IconTexture']
+        button.oldTex = icon:GetTexture()
+        icon.Show = nil
+		icon:Show()
+        icon:SetInside()
+        icon:SetInside()
+	    icon:SetTexture((not button.oldTex or button.oldTex == 1721259) and C.media.path .. "bag_pack" or button.oldTex)
+
+        if i == 1 then
+            button:SetPoint("LEFT", bar, "LEFT", 0, 0)
+        else
+            button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+        end
+
+        previous = button
     end
 
-    previous = button
-end
+    --show/hide the frame on a given state driver
+    RegisterStateDriver(bar, "visibility", "[petbattle] hide; show")
 
-
---show/hide the frame on a given state driver
-RegisterStateDriver(bar, "visibility", "[petbattle] hide; show")
-
-if cfg.fader_mouseover then
-    E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-end
+    if cfg.fader_mouseover then
+        E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
+    end
+end)

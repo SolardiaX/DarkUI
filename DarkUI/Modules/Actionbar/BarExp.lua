@@ -14,8 +14,8 @@ local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
 local GetNumFactions = GetNumFactions
 local GetFactionInfo = GetFactionInfo
 local GetFactionInfoByID = GetFactionInfoByID
-local GetFriendshipReputation = GetFriendshipReputation
-local GetFriendshipReputationRanks = GetFriendshipReputationRanks
+local C_GossipInfo_GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation
+local C_GossipInfo_GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks
 local GetGuildInfo = GetGuildInfo
 local GetWatchedFactionInfo = GetWatchedFactionInfo
 local IsFactionInactive = IsFactionInactive
@@ -172,7 +172,7 @@ local function updateBar(statusbar, isrep)
 
         if not name then return end
 
-        local friendID, friendRep, _, _, _, _, _, friendThreshold, nextFriendThreshold = GetFriendshipReputation(factionID)
+        local friendID, friendRep, _, _, _, _, _, friendThreshold, nextFriendThreshold = C_GossipInfo_GetFriendshipReputation(factionID)
         if friendID then
             if nextFriendThreshold then
                 min, max, value = friendThreshold, nextFriendThreshold, friendRep
@@ -249,6 +249,9 @@ local function bar_OnEnter()
 
     GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
 
+    GameTooltip:AddLine(L.ACTIONBAR_EXP_REP)
+    GameTooltip:AddLine(" ")
+
     if E.level ~= MAX_PLAYER_LEVEL then
         GameTooltip:AddLine(L.ACTIONBAR_EXP)
         GameTooltip:AddLine(" ")
@@ -273,8 +276,10 @@ local function bar_OnEnter()
     end
 
     if name then
-        local friendID, _, _, _, _, _, friendTextLevel, _, nextFriendThreshold = GetFriendshipReputation(factionID)
-        local currentRank, maxRank = GetFriendshipReputationRanks(friendID)
+        local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
+        local friendID, friendThreshold, nextFriendThreshold, friendTextLevel = repInfo.friendshipFactionID, repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.text
+        local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
+        local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
         local standingtext
 
         if friendID then
@@ -293,6 +298,7 @@ local function bar_OnEnter()
             standingtext = GetText("FACTION_STANDING_LABEL" .. standing, UnitSex("player"))
         end
 
+        GameTooltip:AddLine(" ")
         GameTooltip:AddLine(L.ACTIONBAR_REP)
         GameTooltip:AddLine(" ")
 
@@ -312,13 +318,27 @@ local function bar_OnEnter()
 
         if C_Reputation_IsFactionParagon(factionID) then
             local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+            local paraCount = floor(currentValue/threshold)
+			currentValue = mod(currentValue, threshold)
             GameTooltip:AddDoubleLine(
-                    L.ACTIONBAR_PARAGON_EXP,
+                    L.ACTIONBAR_PARAGON_EXP.." - Lv"..paraCount,
                     currentValue .. "/" .. threshold .. " (" .. floor(currentValue / threshold * 100) .. "%)",
                     .6, .8, 1,
                     1, 1, 1
             )
         end
+
+        if factionID == 2465 then -- 荒猎团
+			local repInfo = C_GossipInfo_GetFriendshipReputation(2463) -- 玛拉斯缪斯
+			local rep, name, reaction, threshold, nextThreshold = repInfo.standing, repInfo.name, repInfo.reaction, repInfo.reactionThreshold, repInfo.nextThreshold
+			if nextThreshold and rep > 0 then
+				local current = rep - threshold
+				local currentMax = nextThreshold - threshold
+				GameTooltip:AddLine(" ")
+				GameTooltip:AddLine(name, 0,.6,1)
+				GameTooltip:AddDoubleLine(reaction, current.." / "..currentMax.." ("..floor(current/currentMax*100).."%)", .6,.8,1, 1,1,1)
+			end
+		end
     end
 
     if IsWatchingHonorAsXP() then
@@ -377,7 +397,7 @@ statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b)
 
 statusbar.rest = CreateFrame("Statusbar", nil, statusbar)
 statusbar.rest:SetAllPoints(statusbar)
-statusbar.rest:SetStatusBarTexture(cfg.texture)
+statusbar.rest:SetStatusBarTexture(cfg.statusbar)
 statusbar.rest:SetStatusBarColor(cfg.restcolor.r, cfg.restcolor.g, cfg.restcolor.b)
 
 statusbar.background = statusbar:CreateTexture(nil, "BACKGROUND", nil, -8)

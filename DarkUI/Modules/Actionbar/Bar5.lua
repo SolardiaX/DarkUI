@@ -21,6 +21,7 @@ local function StyleMerged()
     bar:SetWidth(cfg.button.size * 2 + 4)
 
     _G.MultiBarLeft:SetParent(bar)
+    _G.MultiBarLeft.QuickKeybindGlow:SetTexture("")
 
     for i = 1, num do
         local button = _G["MultiBarLeftButton" .. i]
@@ -63,6 +64,7 @@ local function StyleStandard()
     bar.buttonList = {}
 
     _G.MultiBarLeft:SetParent(bar)
+    _G.MultiBarLeft.QuickKeybindGlow:SetTexture("")
 
     for i = 1, num do
         local button = _G["MultiBarLeftButton" .. i]
@@ -92,8 +94,13 @@ local function StyleStandard()
     end
 end
 
-if C.actionbar.bars.mergebar4andbar5 then
-    StyleMerged()
-else
-    StyleStandard()
-end
+
+local loader = CreateFrame("Frame")
+loader:RegisterEvent("PLAYER_ENTERING_WORLD")
+loader:SetScript("OnEvent", function(self, event)
+    if C.actionbar.bars.mergebar4andbar5 then
+        StyleMerged()
+    else
+        StyleStandard()
+    end
+end)

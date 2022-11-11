@@ -158,13 +158,13 @@ function DUF.FilterAuras(element, unit, icon, name, _, _, _, _, _, caster, isSte
         end
     elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
         return true
-    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and name) then
+    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and name) or isBossDebuff then
         icon.isPlayer = isPlayer
         icon.owner = caster
         return true
-    else
-        return isBossDebuff
     end
+
+    return false
 end
 
 function DUF.PostCastStart(Castbar, unit, _, _)
@@ -262,7 +262,6 @@ function DUF.PostCreateIcon(_, button)
     button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     button.icon:SetDrawLayer("BACKGROUND", -8)
-    button.icon:SetTexCoord(.08, .92, .08, .92)
     
     button.overlay:SetTexture(C.media.texture.border)
     button.overlay:SetTexCoord(0, 1, 0, 1)
@@ -344,6 +343,109 @@ function DUF.SetFader(self, config)
             end
         end
     end
+end
+
+local isInInstance
+local function CheckInstanceStatus()
+	isInInstance = IsInInstance()
+end
+
+function DUF.QuestIconCheck()
+	CheckInstanceStatus()
+	E:RegisterEvent("PLAYER_ENTERING_WORLD", CheckInstanceStatus)
+end
+
+local function isQuestTitle(textLine)
+	local r, g, b = textLine:GetTextColor()
+	if r > .99 and g > .8 and b == 0 then
+		return true
+	end
+end
+
+function DUF.UpdateQuestUnit(_, unit)
+	if not cfg.quest then return end
+
+	if isInInstance then
+		self.questIcon:Hide()
+		self.questCount:SetText("")
+		return
+	end
+
+	unit = unit or self.unit
+
+	local startLooking, isLootQuest, questProgress -- FIXME: isLootQuest in old expansion
+	E.ScanTip:SetOwner(UIParent, "ANCHOR_NONE")
+	E.ScanTip:SetUnit(unit)
+
+	for i = 2, B.ScanTip:NumLines() do
+		local textLine = _G["DarkUI_ScanTooltipTextLeft"..i]
+		local text = textLine and textLine:GetText()
+		if not text then break end
+
+		if text ~= " " then
+			if isInGroup and text == DB.MyName or (not isInGroup and isQuestTitle(textLine)) then
+				startLooking = true
+			elseif startLooking then
+				local current, goal = strmatch(text, "(%d+)/(%d+)")
+				local progress = strmatch(text, "(%d+)%%")
+				if current and goal then
+					local diff = floor(goal - current)
+					if diff > 0 then
+						questProgress = diff
+						break
+					end
+				elseif progress and not strmatch(text, THREAT_TOOLTIP) then
+					if floor(100 - progress) > 0 then
+						questProgress = progress.."%" -- lower priority on progress, keep looking
+					end
+				else
+					break
+				end
+			end
+		end
+	end
+
+	if questProgress then
+		self.QuestsCount:SetText(questProgress)
+		self.questIcon:SetAtlas(DB.objectTex)
+		self.questIcon:Show()
+	else
+		self.questCount:SetText("")
+		if isLootQuest then
+			self.questIcon:SetAtlas(DB.questTex)
+			self.questIcon:Show()
+		else
+			self.questIcon:Hide()
+		end
+	end
+end
+
+E.CreateAuraTimer = function(self, elapsed)
+	if self.timeLeft then
+		self.elapsed = (self.elapsed or 0) + elapsed
+		if self.elapsed >= 0.1 then
+			if not self.first then
+				self.timeLeft = self.timeLeft - self.elapsed
+			else
+				self.timeLeft = self.timeLeft - GetTime()
+				self.first = false
+			end
+			if self.timeLeft > 0 then
+				local time = E:FormatTime(self.timeLeft)
+				self.remaining:SetText(time)
+
+                if floor(self.timeLeft + 0.5) > 5 then
+                    self.remaining:SetTextColor(1, 1, 1)
+                else
+                    self.remaining:SetTextColor(1, 0.2, 0.2)
+                end
+			else
+				self.remaining:Hide()
+				self:SetScript("OnUpdate", nil)
+			end
+			self.elapsed = 0
+		end
+	end
 end
 
 E.unitframe = DUF

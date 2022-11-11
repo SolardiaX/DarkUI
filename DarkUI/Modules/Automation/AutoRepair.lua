@@ -1,7 +1,5 @@
 ﻿local E, C, L = select(2, ...):unpack()
 
-if not C.automation.auto_repair then return end
-
 ----------------------------------------------------------------------------------------
 --	Auto repair
 ----------------------------------------------------------------------------------------
@@ -21,6 +19,8 @@ local COPPER_AMOUNT_TEXTURE = COPPER_AMOUNT_TEXTURE
 local Event = CreateFrame("Frame")
 Event:RegisterEvent("MERCHANT_SHOW")
 Event:SetScript("OnEvent", function(self)
+    if not C.automation.auto_repair then return end -- for dynamic change with datatext
+
     if CanMerchantRepair() then
         local cost, possible = GetRepairAllCost()
         if cost > 0 then

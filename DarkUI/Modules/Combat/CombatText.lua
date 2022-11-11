@@ -64,7 +64,7 @@ local r, g, b, lowMana, lowHealth
 local function OnEvent(_, event, subevent, powerType)
     if event == "COMBAT_TEXT_UPDATE" then
         local arg2, arg3 = GetCurrentCombatTextEventInfo()
-        if SHOW_COMBAT_TEXT == "0" then
+        if not CVarCallbackRegistry:GetCVarValueBool("enableFloatingCombatText") then
             return
         else
             if subevent == "DAMAGE" then
@@ -378,8 +378,7 @@ for i = 1, numf do
     f:SetPoint("CENTER", 0, 0)
     f:SetMovable(true)
     f:SetResizable(true)
-    f:SetMinResize(128, 128)
-    f:SetMaxResize(768, 768)
+    f:SetResizeBounds(128, 128, 768, 768)
     f:SetClampedToScreen(true)
     f:SetClampRectInsets(0, 0, cfg.font.combat_text_font_size, 0)
     f:SetInsertMode(cfg.direction and 2 or 1)
@@ -784,8 +783,13 @@ if cfg.damage then
                         else
                             icon = GetSpellTexture(6603)
                         end
-
+                    end
+                    if icon then
                         msg = " \124T" .. icon .. ":" .. cfg.icon_size .. ":" .. cfg.icon_size .. ":0:0:64:64:5:59:5:59\124t"
+                    elseif cfg.icons then
+                        msg = " \124T"..ct.blank..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+                    else
+                        msg = ""
                     end
                     local color = { 1, 1, 1 }
                     if cfg.merge_aoe_spam and cfg.merge_melee then
@@ -847,6 +851,13 @@ if cfg.damage then
                     if cfg.icons then
                         icon = GetSpellTexture(spellId)
                     end
+                    if icon then
+						msg = " \124T"..icon..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+					elseif cfg.icons then
+						msg = " \124T"..ct.blank..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+					else
+						msg = ""
+					end
                     if cfg.damage_color then
                         if ct.dmgcolor[spellSchool] then
                             color = ct.dmgcolor[spellSchool]
@@ -868,6 +879,10 @@ if cfg.damage then
                         if bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) ~= COMBATLOG_OBJECT_AFFILIATION_MINE then
                             spellId = 6603
                         end
+                        if (sourceGUID == UnitGUID("pet") or sourceFlags == gflags) and not C.aoespam.aoespam[spellId] then
+							C.aoespam.aoespam[spellId] = 3
+							SQ[spellId] = {queue = 0, msg = "", color = {}, count = 0, utime = 0, locked = false}
+						end
                         if C.aoespam.aoespam[spellId] then
                             SQ[spellId]["locked"] = true
                             SQ[spellId]["queue"] = ct.SpamQueue(spellId, rawamount)
@@ -898,7 +913,7 @@ if cfg.damage then
                 xCT4:AddMessage(missType)
             elseif eventType == "SPELL_MISSED" or eventType == "RANGE_MISSED" then
                 local spellId, _, _, missType = select(12, CombatLogGetCurrentEventInfo())
-                if missType == "IMMUNE" and spellId == 118895 then return end
+                if missType == "IMMUNE" and spellId == 204242 then return end
                 if cfg.icons then
                     icon = GetSpellTexture(spellId)
                     missType = misstypes[missType] .. " \124T" .. icon .. ":" .. cfg.icon_size .. ":" .. cfg.icon_size .. ":0:0:64:64:5:59:5:59\124t"

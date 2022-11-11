@@ -174,12 +174,17 @@ module:Inject("Gold", {
         end
 
         GameTooltip:AddLine(" ")
-        GameTooltip:AddDoubleLine(" ", L.DATATEXT_AUTO_SELL .. ": " .. (C.automation.auto_sell and "|cff55ff55" .. L.DATATEXT_ON or "|cffff5555" .. strupper(OFF)), 1, 1, 1, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b)
+        GameTooltip:AddDoubleLine(" ", L.DATATEXT_AUTO_SELL .. ": " .. (C.automation.auto_sell and "|cff55ff55" .. L.DATATEXT_ON or "|cffff5555" .. L.DATATEXT_OFF), 1, 1, 1, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b)
         GameTooltip:Show()
     end,
-    OnClick = function(_, button)
+    OnClick = function(self, button)
         if button == "LeftButton" then
             ToggleCharacter("TokenFrame")
+        elseif button == "RightButton" then
+            C.automation.auto_sell = not C.automation.auto_sell
+            E:SetVariable("automation", "auto_sell", C.automation.auto_sell)
+            
+            self:GetScript("OnEnter")(self)
         end
     end
 })

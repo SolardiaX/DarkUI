@@ -30,10 +30,10 @@ local function addLine(self, id, isItem)
 	self:Show()
 end
 
-GameTooltip:HookScript("OnTooltipSetSpell", function(self)
-	local id = select(2, self:GetSpell())
+local function OnTooltipSetSpell(self)
+	local _, id = self:GetSpell()
 	if id then addLine(self, id) end
-end)
+end
 
 hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
 	local id = select(10, UnitAura(...))
@@ -41,20 +41,34 @@ hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
 	if id and IsModifierKeyDown() then print(UnitAura(...)..": "..id) end
 end)
 
+local function attachByAuraInstanceID(self, ...)
+	local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
+	local id = aura and aura.spellId
+	if id then addLine(self, id) end
+	if debuginfo == true and id and IsModifierKeyDown() then print(UnitAura(...)..": "..id) end
+end
+hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", attachByAuraInstanceID)
+hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", attachByAuraInstanceID)
 hooksecurefunc("SetItemRef", function(link)
 	local id = tonumber(link:match("spell:(%d+)"))
 	if id then addLine(ItemRefTooltip, id) end
 end)
 
 local function attachItemTooltip(self)
-	local link = select(2, self:GetItem())
+	local _, link = self:GetItem()
 	if not link then return end
 	local id = link:match("item:(%d+):")
 	if id then addLine(self, id, true) end
 end
-GameTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
-ItemRefTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
-ItemRefShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
-ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
-ShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
-ShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
+if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, attachItemTooltip)
+else
+	GameTooltip:HookScript("OnTooltipSetSpell", OnTooltipSetSpell)
+	GameTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
+	ItemRefTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
+	ItemRefShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
+	ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
+	ShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
+	ShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
+end

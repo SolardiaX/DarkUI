@@ -193,9 +193,10 @@ title:SetPoint("TOPLEFT", addon, "TOPLEFT", 8, -7)
 addon.title = title
 
 addon:SetScript("OnMouseDown", function(self, button)
-    if IsAltKeyDown() then
+    if IsAltKeyDown() or IsShiftKeyDown() then
         self:StartMoving()
     elseif IsControlKeyDown() and button == "RightButton" then
+	    self:ClearAllPoints()
         self:SetPoint(unpack(cfg.pos))
     end
 end)
@@ -328,6 +329,7 @@ function addon.CreateSlot(id)
     drop:SetAlpha(.5)
     frame.drop = drop
 
+    frame:CreateBackdrop()
     addon.slots[id] = frame
     return frame
 end

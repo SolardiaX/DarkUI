@@ -110,14 +110,14 @@ C.stats.config = {
         subzone      = true, -- Set to false to display the main zone's name instead of the subzone
         truncate     = 0, -- Max number of letters for location text, set to 0 to disable
         anchor_frame = "Minimap", anchor_to = "top", anchor_from = "bottom",
-        x_off        = 0, y_off = -35, tip_frame = "UIParent", tip_anchor = "CURSOR", tip_x = -21, tip_y = 20
+        x_off        = 2, y_off = -24, tip_frame = "UIParent", tip_anchor = "CURSOR", tip_x = -21, tip_y = 20
     },
     Coords     = {
         enable       = stats.coords,
         fmt          = "%d, %d",
         anchor_frame = stats.location and "Location" or "Minimap", anchor_to = "top", anchor_from = "bottom",
-        x_off        = 0,
-        y_off        = stats.location and -6 or -35
+        x_off        = 2,
+        y_off        = stats.location and -4 or -24
     },
 
     -- Bottomright block

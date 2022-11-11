@@ -29,7 +29,7 @@ local enable = function(self)
 	_E = true
 
 	if not hook then
-		hooksecurefunc("ContainerFrame_Update", pipe)
+		hooksecurefunc(ContainerFrameCombinedBags, "UpdateItems", pipe)
 		hook = true
 	end
 end

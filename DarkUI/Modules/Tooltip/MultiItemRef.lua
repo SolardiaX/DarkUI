@@ -18,6 +18,7 @@ local UISpecialFrames = UISpecialFrames
 
 local tips = { [1] = _G["ItemRefTooltip"] }
 local types = { item = true, enchant = true, spell = true, quest = true, unit = true, talent = true, achievement = true, glyph = true, instancelock = true, currency = true }
+local shown
 
 local CreateTip = function(link)
     for _, v in ipairs(tips) do
@@ -49,11 +50,8 @@ local CreateTip = function(link)
     tip:SetScript("OnDragStart", function(self) self:StartMoving() end)
     tip:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
 
-    tip:SetBackdrop(nil)
-    tip.SetBackdrop = E.dummy
-    if tip.BackdropFrame then
-        tip.BackdropFrame:SetBackdrop(nil)
-    end
+    tip.NineSlice:SetAlpha(0)
+
     local bg = CreateFrame("Frame", nil, tip)
     bg:SetPoint("TOPLEFT")
     bg:SetPoint("BOTTOMRIGHT")
@@ -77,19 +75,20 @@ local ShowTip = function(tip, link)
     if not tip:IsShown() then
         tip:SetOwner(UIParent, "ANCHOR_PRESERVE")
     end
+    shown = true
     tip:SetHyperlink(link)
+    shown = nil
 end
 
-local _SetItemRef = SetItemRef
-function SetItemRef(...)
-    local link = ...
+local SetHyperlink = _G.ItemRefTooltip.SetHyperlink
+function _G.ItemRefTooltip:SetHyperlink(link, ...)
     local handled = strsplit(":", link)
-    if not IsModifiedClick() and handled and types[handled] then
+    if not InCombatLockdown() and not IsModifiedClick() and handled and types[handled] and not shown then
         local tip = CreateTip(link)
         if tip then
             ShowTip(tip, link)
         end
-    else
-        return _SetItemRef(...)
+        return
     end
+    SetHyperlink(self, link, ...)
 end

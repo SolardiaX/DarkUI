@@ -26,7 +26,7 @@ local framesToHide = {
 local framesToDisable = {
     MainMenuBar,
     MicroButtonAndBagsBar, MainMenuBarArtFrame, StatusTrackingBarManager,
-    ActionBarDownButton, ActionBarUpButton, MainMenuBarVehicleLeaveButton,
+    ActionBarDownButton, ActionBarUpButton,
     OverrideActionBar,
     OverrideActionBarExpBar, OverrideActionBarHealthBar, OverrideActionBarPowerBar, OverrideActionBarPitchFrame,
 }
@@ -50,43 +50,24 @@ local function buttonShowGrid(name, showgrid)
     end
 end
 
-local toggle = CreateFrame("Frame")
-local updateAfterCombat = false
-local function ToggleButtonGrid()
-    if InCombatLockdown() then
-        updateAfterCombat = true
-        toggle:RegisterEvent("PLAYER_REGEN_ENABLED")
-        toggle:SetScript("OnEvent", ToggleButtonGrid)
-    else
-        local showgrid = tonumber(GetCVar("alwaysShowActionBars"))
-        buttonShowGrid("ActionButton", showgrid)
-        buttonShowGrid("MultiBarLeftButton", showgrid)
-        buttonShowGrid("MultiBarRightButton", showgrid)
-        buttonShowGrid("MultiBarBottomLeftButton", showgrid)
-        buttonShowGrid("MultiBarBottomRightButton", showgrid)
-        if updateAfterCombat then
-            toggle:UnregisterEvent("PLAYER_REGEN_ENABLED")
-            updateAfterCombat = false
-        end
-    end
+local function updateTokenVisibility()
+	TokenFrame_LoadUI()
+	TokenFrame_Update()
 end
 
-for _, frame in next, framesToHide do frame:Kill() end
+MainMenuBar:SetMovable(true)
+MainMenuBar:SetUserPlaced(true)
+MainMenuBar.ignoreFramePositionManager = true
+MainMenuBar:SetAttribute("ignoreFramePositionManager", true)
+for _, frame in next, framesToHide do frame:SetParent(E.FrameHider) end
 
 for _, frame in next, framesToDisable do
     frame:UnregisterAllEvents()
     DisableAllScripts(frame)
 end
 
-hooksecurefunc("MultiActionBar_UpdateGridVisibility", ToggleButtonGrid)
-
-local function updateToken()
-    TokenFrame_LoadUI()
-    TokenFrame_Update()
-    BackpackTokenFrame_Update()
-end
+-- Fix maw block anchor
+MainMenuBarVehicleLeaveButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 -- Update token panel
-local updater = CreateFrame("Frame")
-updater:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-updater:SetScript("OnEvent", updateToken)
+E:RegisterEvent("CURRENCY_DISPLAY_UPDATE", updateTokenVisibility)

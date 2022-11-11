@@ -34,7 +34,7 @@ local config = {
         buttonback     = path .. "btn_background",
         buttonbackflat = path .. "btn_background_flat",
         outer_shadow   = path .. "btn_outer_shadow",
-        vehicleexit    = path .. "btn_vehicleexit",
+        vehicle_exit   = path .. "btn_vehicleexit",
     },
 
     texture         = {
@@ -47,6 +47,7 @@ local config = {
         status_b          = path .. "tex_status_b",
         status_bg         = path .. "tex_status_bg",
         blank             = path .. "tex_blank",
+        empty             = path .. "tex_empty",
         gray              = path .. "tex_gray",
         gradient          = path .. "tex_gradient",
         shadow            = path .. "tex_shadow",
@@ -54,5 +55,16 @@ local config = {
         shadow_lite       = path .. "tex_shadow_lite",
     },
 }
+
+
+config.qualityColors = {}
+local qualityColors = BAG_ITEM_QUALITY_COLORS
+for index, value in pairs(qualityColors) do
+	config.qualityColors[index] = {r = value.r, g = value.g, b = value.b}
+end
+config.qualityColors[-1] = {r = 0, g = 0, b = 0}
+config.qualityColors[Enum.ItemQuality.Poor] = {r = COMMON_GRAY_COLOR.r, g = COMMON_GRAY_COLOR.g, b = COMMON_GRAY_COLOR.b}
+config.qualityColors[Enum.ItemQuality.Common] = {r = 0, g = 0, b = 0}
+config.qualityColors[99] = {r = 1, g = 0, b = 0}
 
 C.media = config

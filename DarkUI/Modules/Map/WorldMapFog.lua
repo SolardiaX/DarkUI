@@ -836,10 +836,11 @@ local function TexturePool_ResetVertexColor(pool, texture)
 end
 
 -- Create checkbox
-local frame = CreateFrame("CheckButton", "FogCheckBox", WorldMapFrame.BorderFrame, "OptionsCheckButtonTemplate")
+local frame = CreateFrame("CheckButton", "FogCheckBox", WorldMapFrame.BorderFrame, "OptionsBaseCheckButtonTemplate")
 frame:SetPoint("TOPRIGHT", -270, -3.5)
 frame:SetSize(18, 18)
-frame:SetFrameLevel(8)
+frame:SetFrameLevel(WorldMapFrame.BorderFrame:GetFrameLevel() + 4)
+frame:SetFrameStrata("DIALOG")
 frame:SkinCheckBox()
 
 frame.f = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")

@@ -54,6 +54,13 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         SetCVar("threatWarning", 3)
         SetCVar("lockActionBars", 1)
         SetCVar("countdownForCooldowns", 0)
+        SetCVar("alwaysShowActionBars", 1)
+        SetCVar("fstack_preferParentKeys", 0)
+        
+        -- force use keyUp to trigger actionbar buttion
+        SetCVar("ActionButtonUseKeyDown", 0)
+        -- Hide blizz options
+	    SetCVar("multiBarRightVerticalLayout", 0)
 
         SetCVar("useUiScale", 1)
         -- Set our uiScale

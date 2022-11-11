@@ -26,10 +26,10 @@ DEPENDENCIES
 	mixins/textFilter.lua
 ]]
 
-local addon, ns = ...
+local _, ns = ...
 local cargBags = ns.cargBags
 
-local function apply(self, container, text, mode)
+local function apply(self, container, text)
 	if(text == "" or not text) then
 		container:ApplyToButtons(self.highlightFunction, true)
 	else
@@ -51,7 +51,7 @@ local function doSearch(self, text)
 	self.currFilters = self.parent.implementation:ParseTextFilter(text, self.currFilters, self.textFilters)
 
 	if(self.isGlobal) then
-		for name, container in pairs(self.parent.implementation.contByName) do
+		for _, container in pairs(self.parent.implementation.contByName) do
 			apply(self, container, text)
 		end
 	else
@@ -80,6 +80,10 @@ end
 local function onEnter(search)
 	search:ClearFocus()
 	if(search.OnEnterPressed) then search:OnEnterPressed() end
+end
+
+local function onHide(self)
+	onEscape(self.Search)
 end
 
 cargBags:RegisterPlugin("SearchBar", function(self, target)
@@ -117,6 +121,7 @@ cargBags:RegisterPlugin("SearchBar", function(self, target)
 	search:SetScript("OnTextChanged", doSearch)
 	search:SetScript("OnEscapePressed", onEscape)
 	search:SetScript("OnEnterPressed", onEnter)
+	self:HookScript("OnHide", onHide)
 
 	if(target) then
 		search:SetAutoFocus(true)

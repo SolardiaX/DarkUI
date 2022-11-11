@@ -15,23 +15,71 @@ local ExtraActionBarFrame = _G.ExtraActionBarFrame
 local ExtraActionButton1 = _G.ExtraActionButton1
 local ZoneAbilityFrame = _G.ZoneAbilityFrame
 
-
 local cfg = C.actionbar.bars.barextra
-local num = 1
 
---create the frame to hold the buttons
-local extraBar = CreateFrame("Frame", "DarkUI_ExtraBarHolder", UIParent, "SecureHandlerStateTemplate")
-extraBar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
-extraBar:SetHeight(cfg.button.size)
+-- extra bar
+local extraBar = CreateFrame("Frame", "DarkUI_ExtraBarHolder", UIParent)
+extraBar:SetSize(cfg.button.size, cfg.button.size)
 extraBar:SetPoint(unpack(cfg.pos))
 extraBar.buttonList = {}
 
---move the buttons into position and reparent them
+RegisterStateDriver(extraBar, "visibility", "[petbattle] hide; show")
+
+-- Prevent reanchor
 ExtraActionBarFrame:EnableMouse(false)
 ExtraAbilityContainer:SetParent(extraBar)
 ExtraAbilityContainer:ClearAllPoints()
-ExtraAbilityContainer:SetPoint("CENTER", extraBar)
+ExtraAbilityContainer:SetAllPoints()
 ExtraAbilityContainer.ignoreFramePositionManager = true
+
+--zone ability
+local zoneBar = CreateFrame("Frame", "DarkUI_ZoneAbilityBarHolder", UIParent)
+zoneBar:SetSize(cfg.button.size, cfg.button.size)
+zoneBar:SetPoint("BOTTOM", extraBar, "TOP", 0, 10)
+
+RegisterStateDriver(zoneBar, "visibility", "[petbattle] hide; show")
+
+-- Prevent reanchor
+ZoneAbilityFrame.ignoreInLayout = true
+ZoneAbilityFrame:SetParent(zoneBar)
+ZoneAbilityFrame:ClearAllPoints()
+ZoneAbilityFrame:SetPoint("CENTER", zoneBar)
+ZoneAbilityFrame.SpellButtonContainer:SetPoint("CENTER", zoneBar)
+ZoneAbilityFrame.SpellButtonContainer:SetSize(cfg.button.size, cfg.button.size)
+ZoneAbilityFrame.SpellButtonContainer.spacing = 0
+ZoneAbilityFrame.Style:SetAlpha(0)
+
+hooksecurefunc("ExtraActionBar_Update", function()
+    if HasExtraActionBar() then
+        zoneBar:SetPoint("BOTTOM", extraBar, "TOP", 0, 10)
+    else
+        zoneBar:SetPoint(unpack(cfg.pos))
+    end
+end)
+
+------------------------------------------------------------------------------------------
+--	Skin ExtraActionBarFrame(by Zork)
+------------------------------------------------------------------------------------------
+local button = ExtraActionButton1
+local icon = ExtraActionButton1Icon
+
+tinsert(extraBar.buttonList, button)
+
+button:SetSize(cfg.button.size, cfg.button.size)
+button:SetAttribute("showgrid", 1)
+button.Count:SetFont(unpack(C.media.standard_font))
+button.Count:SetShadowOffset(1, -1)
+button.Count:SetPoint("BOTTOMRIGHT", 0, 1)
+button.Count:SetJustifyH("RIGHT")
+
+hooksecurefunc("ExtraActionBar_Update", function()
+    local bar = ExtraActionBarFrame
+
+	if (HasExtraActionBar()) then
+		button.style:SetTexture("")
+		icon:SetInside()
+	end
+end)
 
 --create the mouseover functionality
 if cfg.fader_mouseover then
@@ -43,56 +91,40 @@ if cfg.fader_combat then
     E:CombatFrameFader(extraBar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
 end
 
---the extra button
-local button = ExtraActionButton1
-tinsert(extraBar.buttonList, button) --add the button object to the list
-button:SetSize(cfg.button.size, cfg.button.size)
-
---show/hide the frame on a given state driver
-RegisterStateDriver(extraBar, "visibility", "[extrabar] show; hide")
-
---zone ability
-local zoneBar = CreateFrame("Frame", "ZoneAbilityBarHolder", UIParent)
-zoneBar:SetWidth(cfg.button.size)
-zoneBar:SetHeight(cfg.button.size)
-zoneBar:SetPoint("BOTTOM", extraBar, "TOP", 0, 10)
-
-ZoneAbilityFrame:SetParent(zoneBar)
-ZoneAbilityFrame:ClearAllPoints()
-ZoneAbilityFrame:SetPoint("CENTER", 0, 0)
-ZoneAbilityFrame.ignoreFramePositionManager = true
-ZoneAbilityFrame.Style:SetAlpha(0)
-
+-- ------------------------------------------------------------------------------------------
+-- --	Skin ZoneAbilityFrame
+-- ------------------------------------------------------------------------------------------
 hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
-	for spellButton in self.SpellButtonContainer:EnumerateActive() do
-		if spellButton and not spellButton.styled then
-			spellButton.NormalTexture:SetAlpha(0)
-			spellButton:SetPushedTexture(C.media.button.pushed) --force it to gain a texture
-			spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
-			--spellButton:StripTextures()
-			spellButton:SetSize(cfg.button.size, cfg.button.size)
-			spellButton:CreateTextureBorder()
+    local previous = nil
+    for spellButton in self.SpellButtonContainer:EnumerateActive() do
+        if spellButton and not spellButton.styled then
+            --spellButton.NormalTexture:SetAlpha(0)
+            spellButton:SetPushedTexture(C.media.button.pushed) --force it to gain a texture
+            spellButton:GetHighlightTexture():SetColorTexture(1, 1, 1, .25)
+            spellButton:SetSize(cfg.button.size, cfg.button.size)
+            spellButton:CreateTextureBorder()
+            spellButton:CreateBackdrop()
 
-			spellButton.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-			spellButton.Icon:SetPoint("TOPLEFT", spellButton, 2, -2)
-			spellButton.Icon:SetPoint("BOTTOMRIGHT", spellButton, -2, 2)
-			spellButton.Icon:SetDrawLayer("BACKGROUND", 7)
+            spellButton.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+            spellButton.Icon:SetPoint("TOPLEFT", spellButton, 2, -2)
+            spellButton.Icon:SetPoint("BOTTOMRIGHT", spellButton, -2, 2)
+            spellButton.Icon:SetDrawLayer("BACKGROUND", 7)
 
-			spellButton.Count:SetFont(unpack(C.media.standard_font))
-			spellButton.Count:SetShadowOffset(1, -1)
-			spellButton.Count:SetPoint("BOTTOMRIGHT", 0, 1)
-			spellButton.Count:SetJustifyH("RIGHT")
+            spellButton.Count:SetFont(unpack(C.media.standard_font))
+            spellButton.Count:SetShadowOffset(1, -1)
+            spellButton.Count:SetPoint("BOTTOMRIGHT", 0, 1)
+            spellButton.Count:SetJustifyH("RIGHT")
 
-			spellButton.Cooldown:SetAllPoints(spellButton.Icon)
+            spellButton.Cooldown:SetAllPoints(spellButton.Icon)
 
-			spellButton.styled = true
-		end
-	end
-end)
+            spellButton:ClearAllPoints()
+            if previous == nil then
+                spellButton:SetPoint("CENTER", zoneBar, "CENTER")
+            else
+                spellButton:SetPoint("BOTTOM", previous, "TOP", 0, 5)
+            end
 
--- Fix button visibility
-hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
-	if parent == ExtraAbilityContainer then
-		self:SetParent(zoneBar)
-	end
+            spellButton.styled = true
+        end
+    end
 end)

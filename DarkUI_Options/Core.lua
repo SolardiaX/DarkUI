@@ -206,10 +206,13 @@ end
 local function CreateGradient(parent, w, h, o, r, g, b, a1, a2)
     parent:SetSize(w, h)
     parent:SetFrameStrata("BACKGROUND")
+    
+    local gradientFrom, gradientTo = CreateColor(r, g, b, a1), CreateColor(r, g, b, a2)
+
     local gf = parent:CreateTexture(nil, "BACKGROUND")
     gf:SetAllPoints()
     gf:SetTexture(C.media.texture.gradient)
-    gf:SetGradientAlpha(o, r, g, b, a1, r, g, b, a2)
+    gf:SetGradient(o, gradientFrom, gradientTo)
 end
 
 local function CreateCheckBox(parent)
@@ -356,14 +359,14 @@ local function CreateSlider(parent, name, minValue, maxValue, x, y, width)
     slider:SetWidth(width or 200)
     slider:SetMinMaxValues(minValue, maxValue)
     slider:SetHitRectInsets(0, 0, 0, 0)
-    slider:SetBackdrop(nil)
+    --slider:SetBackdrop(nil)
 
     slider.Low:SetText(minValue)
     slider.Low:SetPoint("TOPLEFT", slider, "BOTTOMLEFT", 10, -2)
-    slider.Low:SetTextColor(C.media.text_color)
+    --slider.Low:SetTextColor(C.media.text_color)
     slider.High:SetText(maxValue)
     slider.High:SetPoint("TOPRIGHT", slider, "BOTTOMRIGHT", -10, -2)
-    slider.High:SetTextColor(C.media.text_color)
+    --slider.High:SetTextColor(C.media.text_color)
     slider.Text:ClearAllPoints()
     slider.Text:SetPoint("CENTER", 0, 25)
     slider.Text:SetText(name)
@@ -408,7 +411,7 @@ local function CreateOption(i)
                 line:SetPoint("TOPLEFT", 20, -offset)
                 offset = offset + 35
             end
-            -- Checkbox
+        -- Checkbox
         elseif optType == 1 then
             local cb = CreateCheckBox(parent)
             cb:SetHitRectInsets(-5, -5, -5, -5)

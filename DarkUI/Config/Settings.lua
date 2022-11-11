@@ -52,7 +52,22 @@ local styles = {
         daysFormat       = "|cff6666ff%dd|r"
     },
     range    = {
-        enable = true
+        enable = true,
+        -- enable range coloring on pet actions
+        petActions = true,
+    
+        -- enable flash animations,
+        flashAnimations = true,
+        flashDuration = ATTACK_BUTTON_FLASH_TIME * 1.5,
+
+        -- default color (r, g, b, a)
+        normal = {1, 1, 1, 1},
+        -- out of range
+        oor = {1, 0.3, 0.1, 1},
+        -- out of mana
+        oom = {0.1, 0.3, 1, 1},
+        -- unusable action
+        unusable = {0.4, 0.4, 0.4, 1}
     }
 }
 
@@ -103,6 +118,27 @@ local bars = {
         fader_mouseover = fader_mouseover,
         fader_combat    = fader_combat
     },
+    bar6             = {
+        pos    = { "CENTER", "UIParent", "CENTER", 0, 10 },
+        button = {
+            size  = 28,
+            space = 6
+        }
+    },
+    bar7             = {
+        pos    = { "CENTER", "UIParent", "CENTER", 0, 50 },
+        button = {
+            size  = 28,
+            space = 6
+        }
+    },
+    bar8             = {
+        pos    = { "CENTER", "UIParent", "CENTER", 0, 90 },
+        button = {
+            size  = 28,
+            space = 6
+        }
+    },
     barpet           = {
         pos             = { "BOTTOM", "DarkUI_ActionBar3Holder", "TOP", 0, 10 },
         button          = {
@@ -122,7 +158,7 @@ local bars = {
         fader_combat    = fader_combat
     },
     barextra         = {
-        pos             = { "CENTER", "UIParent", "CENTER", 0, -240 },
+        pos             = { "BOTTOM", "UIParent", "BOTTOM", 0, 220 },
         button          = {
             size  = 36,
             space = 6
@@ -131,9 +167,9 @@ local bars = {
         fader_combat    = nil
     },
     leave_vehicle    = {
-        pos             = { "CENTER", "UIParent", "CENTER", 0, -260 },
+        pos             = { "BOTTOM", "UIParent", "BOTTOM", 0, 340 },
         button          = {
-            size  = 24,
+            size  = 32,
             space = 6
         },
         fader_mouseover = nil,
@@ -141,12 +177,12 @@ local bars = {
     },
     micromenu        = {
         enable          = true,
-        pos             = { "TOP", "UIParent", "TOP", -60, -15 },
+        pos             = { "TOP", "UIParent", "TOP", 0, -15 },
         button          = {
-            size  = 18,
+            size  = 24,
             space = 2
         },
-        scale           = 0.82,
+        scale           = 1,
         fader_mouseover = {
             fadeIn  = { time = 0.4, alpha = 1 },
             fadeOut = { time = 0.3, alpha = 0 }
@@ -208,29 +244,33 @@ C.announcement = {
         channel = 6 -- channels = { 'SAY', 'YELL', 'EMOTE', 'PARTY', 'RAID_ONLY', 'RAID' }
     }
 }
+
 ----------------------------------------------------------------------------------------
 --  Configuration of Aura
 ----------------------------------------------------------------------------------------
 local style = {
-    enable           = true,
     show_caster      = true, -- enable/disable show caster of aura when mouse over
     show_timers      = true, -- enable/disable buffs/debuffs timers
     row_num          = 16, -- buffs/debuffs num per row
     spacing          = 6, -- spacing between icons
     icon_padding     = 2, -- spacing between icon and it's background or shadow
-    buff_pos         = { "TOPRIGHT", "UIParent", -200, -20 }, -- buffs position
-    debuff_pos       = { "TOPRIGHT", "UIParent", -200, -100 }, -- debuffs position
-    dur_pos          = { "BOTTOM", 0, -3 }, -- buffs/debuffs timer position
+    buff_pos         = { "TOPRIGHT", "UIParent", -260, -20 }, -- buffs position
+    debuff_pos       = { "TOPRIGHT", "UIParent", -260, -100 }, -- debuffs position
+    dur_pos          = { "BOTTOM", 0, -5 }, -- buffs/debuffs timer position
     count_pos        = { "TOPRIGHT", 0, 0 }, -- buffs/debuffs counter position
     buff_size        = 28, -- buff icons size
     debuff_size      = 32, -- debuff icons size
     enchant_size     = 28, -- enchant icons size
+    enable_flash     = true, -- enable cooldown flash
+    enable_animation = true, -- enable animiation
+    flash_timer      = 30,
     dur_font_style   = { STANDARD_TEXT_FONT, 12, "THINOUTLINE" }, -- timer font style
     count_font_style = { STANDARD_TEXT_FONT, 14, "THINOUTLINE" } -- count font style
 }
 
 C.aura = {
-    style = style
+    enable           = true,
+    style            = style
 }
 
 ----------------------------------------------------------------------------------------
@@ -255,7 +295,8 @@ C.automation = {
 ----------------------------------------------------------------------------------------
 C.bags = {
     enable       = true,
-    itemSlotSize = 36, -- Size of item slots
+    itemSlotSize = 32, -- Size of item slots
+    font_size    = 14,
     sizes        = {
         bags = {
             columnsSmall   = 8,
@@ -267,23 +308,24 @@ C.bags = {
             columnsLarge   = 14,
             largeItemCount = 96, -- Switch to columnsLarge when >= this number of items in the bank
         },
-    },
-    scrapIcon    = true,
-    upgradeIcon  = true,
+    }
 }
 
 ----------------------------------------------------------------------------------------
 --  Configuration of Blizzard
 ----------------------------------------------------------------------------------------
 C.blizzard = {
-    custom_position   = true,
-    achievement_pos   = { "TOP", UIParent, "TOP", 0, -21 },
-    capturebar_pos    = { "TOP", UIParent, "TOP", 0, -20 },
-    battlescore_pos   = { "TOP", UIParent, "TOP", 0, -25 },
-    talking_head_pos  = { "TOP", UIParent, "TOP", 0, -45 },
-    alt_powerbar_pos  = { "TOP", UIParent, "TOP", 0, -45 },
-    quest_tracker_pos = { "TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", -70, -25 },
-    mirrorbar         = {
+    custom_position     = true,
+    hide_maw_buffs      = false,
+    achievement_pos     = { "TOP", UIParent, "TOP", 0, -21 },
+    capturebar_pos      = { "TOP", UIParent, "TOP", 0, -20 },
+    battlescore_pos     = { "TOP", UIParent, "TOP", 0, -25 },
+    talking_head_pos    = { "TOP", UIParent, "TOP", 0, -45 },
+    alt_powerbar_pos    = { "TOP", UIParent, "TOP", 0, -45 },
+    quest_tracker_pos   = { "TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", -70, -25 },
+    uiwidget_top_pos    = { "TOP", UIParent, "TOP", 0, -21 },
+    uiwidget_below_pos  = { "TOP", UIWidgetTopCenterContainerFrame, "BOTTOM", 0, -15 },
+    mirrorbar           = {
         breath     = {
             pos   = { "TOP", "UIParent", "TOP", 0, -96 },
             color = { 0.31, 0.45, 0.63 }
@@ -303,6 +345,7 @@ C.blizzard = {
     slot_durability   = true,
     shift_mark        = true,
     style             = true,
+    esc_for_gamemenu  = true,
 }
 
 ----------------------------------------------------------------------------------------
@@ -327,7 +370,9 @@ C.chat = {
     bubbles            = true, -- Skin Blizzard chat bubbles
     combatlog          = true, -- Show CombatLog tab
     tabs_mouseover     = true, -- Chat tabs on mouseover
-    sticky             = true, -- Remember last channel
+    sticky             = true, -- Remember last channel,
+    loot_icons         = true, -- Show loot icons in chat,
+    role_icons         = true, -- Show role icons in chat,
 }
 
 ----------------------------------------------------------------------------------------
@@ -411,12 +456,15 @@ C.loot = {
 C.map = {
     minimap  = {
         enable   = true, -- enable/disable minimap modules
-        scale    = 1.0, -- minimap scale
-        position = { "TOPRIGHT", "UIParent", "TOPRIGHT", 0, -15 }, -- minimap position
+        position = { "TOPRIGHT", "UIParent", "TOPRIGHT", -35, -35 }, -- minimap position
         iconSize = 20, -- default icon size on minimap
         iconpos  = {
-            mail  = { "RIGHT", Minimap, "LEFT", 0, 5 }, -- position of mail icon
-            queue = { "CENTER", Minimap, "CENTER", -54, -54 } -- position of queue icon
+            mail  = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -30, -8 }, -- position of mail icon
+            garrison = { "TOPRIGHT", Minimap, "TOPRIGHT", -32, 14 }, -- position of garrison icon
+            queue = { "RIGHT", Minimap, "LEFT", 40, -50  }, -- position of queue icon
+            instance = { "TOPRIGHT", Minimap, "TOPRIGHT", 20, 20 }, -- position of instance difficultye
+            time = { "BOTTOM", Minimap, "BOTTOM", 1, 1 }, -- position of game time
+            clock = { "TOP", Minimap, "BOTTOM", -2, -10 }, -- position of clock
         },
         autoZoom = true, -- enable/disable minimap auto zoom
     },
@@ -425,7 +473,7 @@ C.map = {
         iconSize   = 28, -- party/raid member icon size on worldmap
         removeFog  = true, -- enable/disable remove fog
         rewardIcon = true, -- eanble/disable the Reward Quest Item Icon
-        position   = { "BOTTOM", UIParent, "BOTTOM", 0, 320 } -- worldmap position
+        position   = { "BOTTOM", UIParent, "BOTTOM", 0, 320 }, -- worldmap position
     }
 }
 
@@ -447,6 +495,7 @@ C.misc = {
     already_known      = true,
     profession_tabs    = true,
     lfg_queue_timer    = true,
+    pvp_queue_timer    = true,
     alt_buy_stack      = true,
     merchant_itemlevel = true,
     slot_itemlevel     = true,
@@ -458,7 +507,7 @@ C.misc = {
 C.quest = {
     enable            = true,
     auto_collapse     = true,
-    quest_tracker_pos = { "TOPRIGHT", MinimapCluster, "BOTTOMRIGHT", -70, -25 },
+    quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -60, -90 },
     auto_button       = true,
     auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -20 },
 }
@@ -517,12 +566,12 @@ C.nameplate = {
     track_buffs          = true, -- Show buffs above player nameplate (from the list)
     player_aura_only     = true, -- Show player aura only (boss cast aura always shown)
     show_stealable_buffs = true, -- Show stealable buffs
-    auras_size           = 25, -- Debuffs size
+    auras_size           = 22, -- Debuffs size
     healer_icon          = true, -- Show icon above enemy healers nameplate in battlegrounds
     totem_icons          = true, -- Show icon above enemy totems nameplate
     show_spiral          = true, -- Spiral on aura icons
     show_timers          = true, -- cooldown timer on aura
-    icon_padding         = 4, -- spacing between icons
+    icon_spacing         = 4, -- spacing between icon
     arrow                = true, -- enable/disable show arrow of current target
     quest                = true, -- show quest infomation
 }
@@ -742,74 +791,77 @@ C.unitframe = {
 }
 
 C.autobutton = {
-	-- Daily Quests
-	[32971] = true,		-- Water Bucket
-	[38689] = true,		-- Chicken Net
-	[52507] = true,		-- Stardust No.2
-	[62829] = true,		-- Magnetized Scrap Collector
-	[63351] = true,		-- Tahret Dynasty Mallet
-	[69235] = true,		-- Fang of the Wolf
-	[69240] = true,		-- Enchanted Salve
-	[69981] = true,		-- Ironforge Rations
-	[71978] = true,		-- Darkmoon Bandage
-	[77475] = true,		-- Stack of Mantras
-	[78947] = true,		-- Silken Rope
-	[79885] = true,		-- Barrel of Fireworks
-	[80127] = true,		-- Shadelight Truffle Spores
-	[80403] = true,		-- Angler's Fishing Spear
-	[80599] = true,		-- Goblin Fishing Bomb
-	[82346] = true,		-- Pot of Fire
-	[82381] = true,		-- Yak's Milk Flask
-	[82807] = true,		-- Shado-Pan Dragon Gun
-	[83134] = true,		-- Bronze Claws
-	[84762] = true,		-- Highly Explosive Yaungol Oil
-	[85884] = true,		-- Sonic Emitter
-	[86532] = true,		-- Bag of Shado-Pan Gas Bombs
-	[87394] = true,		-- Sonic Disruption Fork
-	[87841] = true,		-- Korven's Experimental Grenades
-	[92019] = true,		-- The Bilgewater Molotov
-	[93180] = true,		-- Re-Configured Remote
-	[93668] = true,		-- Saur Fetish
-	[93751] = true,		-- Blessed Torch
-	[93761] = true,		-- Arcane Emancipator
-	[93806] = true,		-- Resonance Siphon
-	-- Seaforium
-	[46847] = true,		-- Seaforium Bombs
-	[47030] = true,		-- Huge Seaforium Bombs
-	-- Other
-	[45072] = true,		-- Brightly Colored Egg (Noblegarden)
-	-- Legion
-	[118330] = true,	-- Pile of Weapons
-	[122100] = true,	-- Soul Gem
-	[127030] = true,	-- Granny's Flare Grenades
-	[127295] = true,	-- Blazing Torch
-	[128651] = true,	-- Critter Hand Cannon
-	[128772] = true,	-- Branch of the Runewood
-	[129161] = true,	-- Stormforged Horn
-	[129725] = true,	-- Smoldering Torch
-	[131931] = true,	-- Khadgar's Wand
-	[133756] = true,	-- Fresh Mound of Flesh
-	[133882] = true,	-- Trap Rune
-	[133897] = true,	-- Telemancy Beacon
-	[133925] = true,	-- Fel Lash
-	[133999] = true,	-- Inert Crystal
-	[136605] = true,	-- Solendra's Compassion
-	[137299] = true,	-- Nightborne Spellblad
-	[138146] = true,	-- Rediant Ley Crystal
-	[138965] = true,	-- Wand of Siphoning
-	[140916] = true,	-- Satchel of Locklimb Powder
-	[142509] = true,	-- Withered Targeting Orb
-	[128329] = true,	-- Depleted Leyflame Burner
-	[130260] = true,	-- Thaedris' Elixir
-	[140257] = true,	-- Advanced Telemancy Beacon
-	[142401] = true,	-- Telemancy Orbs
-	-- BfA
-	[166905] = true,	-- Hunting Knife
-	[168183] = true,	-- Rare Metal Collector
-	[168253] = true,	-- Fathom Hook
-	[168482] = true,	-- Plug the Geysers
-	-- Shadowlands
-	[177836] = true,	-- Wingpierce Javelin
-	[180280] = true,	-- Soulforged Core
-	[183045] = true,	-- Korinna's Allaying Crook
+    -- Daily Quests
+    [32971] = true,		-- Water Bucket
+    [38689] = true,		-- Chicken Net
+    [52507] = true,		-- Stardust No.2
+    [62829] = true,		-- Magnetized Scrap Collector
+    [63351] = true,		-- Tahret Dynasty Mallet
+    [69235] = true,		-- Fang of the Wolf
+    [69240] = true,		-- Enchanted Salve
+    [69981] = true,		-- Ironforge Rations
+    [71978] = true,		-- Darkmoon Bandage
+    [77475] = true,		-- Stack of Mantras
+    [78947] = true,		-- Silken Rope
+    [79885] = true,		-- Barrel of Fireworks
+    [80127] = true,		-- Shadelight Truffle Spores
+    [80403] = true,		-- Angler's Fishing Spear
+    [80599] = true,		-- Goblin Fishing Bomb
+    [82346] = true,		-- Pot of Fire
+    [82381] = true,		-- Yak's Milk Flask
+    [82807] = true,		-- Shado-Pan Dragon Gun
+    [83134] = true,		-- Bronze Claws
+    [84762] = true,		-- Highly Explosive Yaungol Oil
+    [85884] = true,		-- Sonic Emitter
+    [86532] = true,		-- Bag of Shado-Pan Gas Bombs
+    [87394] = true,		-- Sonic Disruption Fork
+    [87841] = true,		-- Korven's Experimental Grenades
+    [92019] = true,		-- The Bilgewater Molotov
+    [93180] = true,		-- Re-Configured Remote
+    [93668] = true,		-- Saur Fetish
+    [93751] = true,		-- Blessed Torch
+    [93761] = true,		-- Arcane Emancipator
+    [93806] = true,		-- Resonance Siphon
+    -- Seaforium
+    [46847] = true,		-- Seaforium Bombs
+    [47030] = true,		-- Huge Seaforium Bombs
+    -- Other
+    [45072] = true,		-- Brightly Colored Egg (Noblegarden)
+    -- Legion
+    [118330] = true,	-- Pile of Weapons
+    [122100] = true,	-- Soul Gem
+    [127030] = true,	-- Granny's Flare Grenades
+    [127295] = true,	-- Blazing Torch
+    [128651] = true,	-- Critter Hand Cannon
+    [128772] = true,	-- Branch of the Runewood
+    [129161] = true,	-- Stormforged Horn
+    [129725] = true,	-- Smoldering Torch
+    [131931] = true,	-- Khadgar's Wand
+    [133756] = true,	-- Fresh Mound of Flesh
+    [133882] = true,	-- Trap Rune
+    [133897] = true,	-- Telemancy Beacon
+    [133925] = true,	-- Fel Lash
+    [133999] = true,	-- Inert Crystal
+    [136605] = true,	-- Solendra's Compassion
+    [137299] = true,	-- Nightborne Spellblad
+    [138146] = true,	-- Rediant Ley Crystal
+    [138965] = true,	-- Wand of Siphoning
+    [140916] = true,	-- Satchel of Locklimb Powder
+    [142509] = true,	-- Withered Targeting Orb
+    [128329] = true,	-- Depleted Leyflame Burner
+    [130260] = true,	-- Thaedris' Elixir
+    [140257] = true,	-- Advanced Telemancy Beacon
+    [142401] = true,	-- Telemancy Orbs
+    -- BfA
+    [166905] = true,	-- Hunting Knife
+    [168183] = true,	-- Rare Metal Collector
+    [168253] = true,	-- Fathom Hook
+    [168482] = true,	-- Plug the Geysers
+    -- Shadowlands
+    [177836] = true,	-- Wingpierce Javelin
+    [180280] = true,	-- Soulforged Core
+    [183045] = true,	-- Korinna's Allaying Crook
+    [180170] = true,	-- Pulsing Animacone
+    [180876] = true,	-- Aqueous Material Accumulator
+    [188697] = true,	-- Kinematic Micro-Life Recalibrator
 }

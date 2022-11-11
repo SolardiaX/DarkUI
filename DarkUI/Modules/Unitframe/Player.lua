@@ -203,6 +203,7 @@ local createCastbar = function(self)
     castbar:SetFrameStrata("LOW")
     castbar:SetFrameLevel(3)
     castbar:SetSize(146, 16)
+    castbar:SetReverseFill(true)
     castbar:SetPoint(unpack(cfg.player.castbar.position))
 
     local fg = CreateFrame("Frame", nil, castbar)
@@ -236,7 +237,7 @@ local createCastbar = function(self)
     safe:SetVertexColor(231 / 255, 48 / 255, 78 / 255)
     castbar.SafeZone = safe
 
-    local spark = castbar:CreateTexture(nil, "LOW", nil, -7)
+    local spark = castbar:CreateTexture(nil, "OVERLAY", nil, 7)
     spark:SetBlendMode("ADD")
     spark:SetVertexColor(0.8, 0.6, 0, 1)
     spark:SetSize(15, castbar:GetHeight() * 2)
@@ -297,20 +298,20 @@ end
 
 local createClassModule = function(self)
     local classModule = DUF.classModule
-    classModule.UpdateComboPointsPosition(self, cfg, media)
+    classModule.UpdateClassBarPosition(self, cfg, media)
 
-    -- Totems
-    if cfg.classModule[UNIT_CLASS].showTotems then
-        classModule.UpdateTotems(self, cfg, media)
-    end
+    -- -- Totems
+    -- if cfg.classModule[UNIT_CLASS].showTotems then
+    --     classModule.UpdateTotems(self, cfg, media)
+    -- end
     -- Alternate Mana Bar
-    if cfg.classModule[UNIT_CLASS].showAdditionalPower then
-        classModule.CreateAlternatePowerBar(self, cfg, media)
-    end
-    -- Load Class Modules
-    if classModule[UNIT_CLASS] then
-        self.classPowerBar = classModule[UNIT_CLASS](self, cfg, media)
-    end
+    -- if cfg.classModule[UNIT_CLASS].showAdditionalPower then
+    --     classModule.CreateAlternatePowerBar(self, cfg, media)
+    -- end
+    -- -- Load Class Modules
+    -- if classModule[UNIT_CLASS] then
+    --     self.classPowerBar = classModule[UNIT_CLASS](self, cfg, media)
+    -- end
 end
 
 local createQuakeTimer = function(self)
@@ -395,10 +396,10 @@ local createStyle = function(self)
 
     self.MasterLooter = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "TOPLEFT", "BOTTOMLEFT", 12, 0)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGH", 24, 4, self, "CENTER", "CENTER", 40, 0)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 24, 4, self, "CENTER", "CENTER", 40, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "HIGH", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
+    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     DUF.SetFader(self, cfg.player.fader)

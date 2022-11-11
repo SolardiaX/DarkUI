@@ -202,7 +202,7 @@ end
 local function BuildICON(iconSize)
     iconSize = iconSize * C.aura.auraWatch.iconScale
 
-    local frame = CreateFrame("Frame", nil, T_PetBattleFrameHider)
+    local frame = CreateFrame("Frame", nil, E.PetBattleFrameHider)
     frame:SetSize(iconSize, iconSize)
     frame:CreateTextureBorder(2)
     frame:CreateShadow()
@@ -234,7 +234,7 @@ end
 
 -- Bar mode
 local function BuildBAR(barWidth, iconSize)
-    local frame = CreateFrame("Frame", nil, T_PetBattleFrameHider)
+    local frame = CreateFrame("Frame", nil, E.PetBattleFrameHider)
     frame:SetSize(iconSize, iconSize)
     frame:CreateTextureBorder(2)
     frame:CreateShadow()
@@ -251,19 +251,19 @@ local function BuildBAR(barWidth, iconSize)
     frame.Statusbar:SetMinMaxValues(0, 1)
     frame.Statusbar:SetValue(0)
 
-    frame.Statusbar:SetStatusBarTexture(C.media.status)
+    frame.Statusbar:SetStatusBarTexture(C.media.texture.status)
     frame.Statusbar:SetStatusBarColor(E.color.r, E.color.g, E.color.b)
 
     frame.Statusbar:CreateShadow()
 
     frame.Statusbar.BG = frame.Statusbar:CreateTexture(nil, "BACKGROUND")
     frame.Statusbar.BG:SetAllPoints()
-    frame.Statusbar.BG:SetTexture(C.media.status)
+    frame.Statusbar.BG:SetTexture(C.media.texture.status)
     frame.Statusbar.BG:SetVertexColor(0, 0, 0, .5)
 
     frame.Statusbar.Tex = frame.Statusbar:CreateTexture(nil, "BACKGROUND", nil, 1)
     frame.Statusbar.Tex:SetAllPoints()
-    frame.Statusbar.Tex:SetTexture(C.media.status, true, true)
+    frame.Statusbar.Tex:SetTexture(C.media.texture.status, true, true)
     frame.Statusbar.Tex:SetHorizTile(true)
     frame.Statusbar.Tex:SetVertTile(true)
     frame.Statusbar.Tex:SetBlendMode("ADD")
@@ -570,7 +570,7 @@ function module:AuraWatch_IntTimer(elapsed)
 end
 
 function module:AuraWatch_SetupInt(intID, itemID, duration, unitID, guid, sourceName)
-    if not T_PetBattleFrameHider:IsShown() then return
+    if not E.PetBattleFrameHider:IsShown() then return
     end
     local frame = BuildBAR(IntCD.BarWidth, IntCD.IconSize)
     if frame then

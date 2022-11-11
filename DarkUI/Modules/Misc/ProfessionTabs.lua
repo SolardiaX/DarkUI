@@ -88,6 +88,9 @@ local function UpdateTab(object, name, rank, texture, hat)
 	if hat then
 		tab:SetAttribute("type", "toy")
 		tab:SetAttribute("toy", 134020)
+	elseif texture == 135805 then	-- Cooking Fire
+		tab:SetAttribute("type", "macro")
+		tab:SetAttribute("macrotext", "/cast [@player]"..name)
 	else
 		tab:SetAttribute("type", "spell")
 		tab:SetAttribute("spell", name)

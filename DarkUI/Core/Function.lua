@@ -6,6 +6,7 @@ local E, C, L = select(2, ...):unpack()
 
 local format = string.format
 local tonumber = tonumber
+local modf = math.modf
 
 ----------------------------------------------------------------------------------------
 --  Time format functions
@@ -28,6 +29,35 @@ function E:FormatTime(seconds, raw)
         end
     end
     return str
+end
+
+----------------------------------------------------------------------------------------
+-- Color Gradient
+----------------------------------------------------------------------------------------
+function E:ColorGradient(a, b, ...)
+	local Percent
+
+	if(b == 0) then
+		Percent = 0
+	else
+		Percent = a / b
+	end
+
+	if (Percent >= 1) then
+		local R, G, B = select(select("#", ...) - 2, ...)
+
+		return R, G, B
+	elseif (Percent <= 0) then
+		local R, G, B = ...
+
+		return R, G, B
+	end
+
+	local Num = (select("#", ...) / 3)
+	local Segment, RelPercent = modf(Percent * (Num - 1))
+	local R1, G1, B1, R2, G2, B2 = select((Segment * 3) + 1, ...)
+
+	return R1 + (R2 - R1) * RelPercent, G1 + (G2 - G1) * RelPercent, B1 + (B2 - B1) * RelPercent
 end
 
 ----------------------------------------------------------------------------------------
@@ -125,4 +155,71 @@ function E:CheckChat(warning)
         return "PARTY"
     end
     return "SAY"
+end
+
+----------------------------------------------------------------------------------------
+--	Set Variable in game
+----------------------------------------------------------------------------------------
+function E:SetVariable(group, key, value)
+    if not IsAddOnLoaded("DarkUI_Options") then return end
+    
+    local t = SavedOptions.global and SavedOptions or SavedOptionsPerChar
+    
+    if not t[group] then t[group] = {} end
+
+    t = t[group]
+
+    local deep = select(2, string.gsub(key, "([^.%s]+)", ""))
+    local index = 1
+
+    for k in gmatch(key, "([^.%s]+)") do
+        if index < deep then
+            if t[k] == nil then t[k] = {} end
+            t = t[k]
+        elseif index == deep then
+            t[k] = value
+        end
+
+        index = index + 1
+    end
+end
+
+
+-- Events
+local events = {}
+
+local host = CreateFrame("Frame")
+host:SetScript("OnEvent", function(_, event, ...)
+    for func in pairs(events[event]) do
+        if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+            func(event, CombatLogGetCurrentEventInfo())
+        else
+            func(event, ...)
+        end
+    end
+end)
+
+function E:RegisterEvent(event, func, unit1, unit2)
+    if not events[event] then
+        events[event] = {}
+        if unit1 then
+            host:RegisterUnitEvent(event, unit1, unit2)
+        else
+            host:RegisterEvent(event)
+        end
+    end
+
+    events[event][func] = true
+end
+
+function E:UnregisterEvent(event, func)
+    local funcs = events[event]
+    if funcs and funcs[func] then
+        funcs[func] = nil
+
+        if not next(funcs) then
+            events[event] = nil
+            host:UnregisterEvent(event)
+        end
+    end
 end

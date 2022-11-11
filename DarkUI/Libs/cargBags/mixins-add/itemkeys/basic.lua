@@ -21,7 +21,8 @@ LICENSE
 DESCRIPTION:
 	A few simple item keys, mostly ones resulting through pattern matching
 ]]
-local parent, ns = ...
+
+local _, ns = ...
 local cargBags = ns.cargBags
 
 -- Returns the numeric item id (12345)
@@ -31,7 +32,7 @@ end
 
 --	Returns the type of the parent bag
 cargBags.itemKeys["bagType"] = function(i)
-	return select(2, GetContainerNumFreeSlots(i.bagID))
+	return select(2, GetContainerNumFreeSlots(i.bagId))
 end
 
 -- Returns the item string (12345:0:0:0)

@@ -17,11 +17,10 @@
 	along with cargBags; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
-local addon, ns = ...
+local _, ns = ...
 local cargBags = ns.cargBags
 
-local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
-local isRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+local GetContainerNumSlots = C_Container and C_Container.GetContainerNumSlots or GetContainerNumSlots
 
 --[[!
 	@class Implementation
@@ -33,7 +32,11 @@ Implementation.instances = {}
 Implementation.itemKeys = {}
 
 local toBagSlot = cargBags.ToBagSlot
-local L
+local PET_CAGE = 82800
+local MYTHIC_KEYSTONES = {
+	[180653] = true,
+	[187786] = true, -- Timewarped
+}
 
 --[[!
 	Creates a new instance of the class
@@ -60,7 +63,7 @@ function Implementation:New(name)
 	impl.events = {} -- @property events <table> Holds all event callbacks
 	impl.notInited = true -- @property notInited <bool>
 
-	tinsert(UISpecialFrames, name) 
+	tinsert(UISpecialFrames, name)
 
 	self.instances[name] = impl
 
@@ -199,7 +202,7 @@ local _isEventRegistered = UIParent.IsEventRegistered
 ]]
 function Implementation:RegisterEvent(event, key, func)
 	local events = self.events
-	
+
 	if(not events[event]) then
 		events[event] = {}
 	end
@@ -236,18 +239,12 @@ end
 ]]
 function Implementation:Init()
 	if(not self.notInited) then return end
-	
-	 -- initialization of bags in combat taints the itembuttons within - Lars Norberg
-	if (InCombatLockdown()) then
-		local L = LibStub("gLocale-1.0"):GetLocale(addon, true)
-		if (L) then
-			UIErrorsFrame:AddMessage(L["Can't initialize bags while engaged in combat."], 1.0, 0.82, 0.0, 1.0)
-			UIErrorsFrame:AddMessage(L["Please exit combat then re-open the bags!"], 1.0, 0.82, 0.0, 1.0)
-		end
 
+	-- initialization of bags in combat taints the itembuttons within - Lars Norberg
+	if (InCombatLockdown()) then
 		return
 	end
-	
+
 	self.notInited = nil
 
 	if(self.OnInit) then self:OnInit() end
@@ -261,9 +258,7 @@ function Implementation:Init()
 	self:RegisterEvent("BAG_UPDATE_COOLDOWN", self, self.BAG_UPDATE_COOLDOWN)
 	self:RegisterEvent("ITEM_LOCK_CHANGED", self, self.ITEM_LOCK_CHANGED)
 	self:RegisterEvent("PLAYERBANKSLOTS_CHANGED", self, self.PLAYERBANKSLOTS_CHANGED)
-	if isRetail then
-		self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED", self, self.PLAYERREAGENTBANKSLOTS_CHANGED)
-	end
+	self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED", self, self.PLAYERREAGENTBANKSLOTS_CHANGED)
 	self:RegisterEvent("UNIT_QUEST_LOG_CHANGED", self, self.UNIT_QUEST_LOG_CHANGED)
 	self:RegisterEvent("BAG_CLOSED", self, self.BAG_CLOSED)
 end
@@ -305,103 +300,78 @@ local defaultItem = cargBags:NewItemTable()
 	@param i <table> [optional]
 	@return i <table>
 ]]
-local ilvlTypes = {
-	[GetItemClassInfo(4)] = true,	--Armor
-	[GetItemClassInfo(2)] = true,	--Weapon
-}
-local ilvlSubTypes = {
---	[GetItemSubClassInfo(3,11)] = true	--Artifact Relic
-}
---[[
-local cB_TT_Name = "cargBagsContainerItemTooltip"
-local cB_TT= CreateFrame("GameTooltip", cB_TT_Name, nil, "GameTooltipTemplate")
-local itemLevelString = _G["ITEM_LEVEL"]:gsub("%%d", "")
-local itemDB = {}
-local function GetContainerItemLevel(link, bagID, slotID)
-	if itemDB[link] then return itemDB[link] end
-	cB_TT:SetOwner(UIParent, "ANCHOR_NONE")
-	cB_TT:SetBagItem(bagID, slotID)
- 	for i = 2, 5 do
-		local text = _G[cB_TT_Name.."TextLeft"..i]:GetText() or ""
-		local hasLevel = string.find(text, itemLevelString)
-		if hasLevel then
-			local level = string.match(text, "(%d+)%)?$")
-			itemDB[link] = tonumber(level)
-			break
-		end
-	end
-	return itemDB[link]
-end]]
-
-function Implementation:GetCustomItemInfo(bagID, slotID, i)
+function Implementation:GetItemInfo(bagID, slotID, i)
 	i = i or defaultItem
 	for k in pairs(i) do i[k] = nil end
 
-	i.bagID = bagID
-	i.slotID = slotID
+	i.bagId = bagID
+	i.slotId = slotID
 
-	local clink = GetContainerItemLink(bagID, slotID)
-	
-	if(clink) then
-		local _
-		i.texture, i.count, i.locked, i.quality, i.readable, _, _, _, _, i.id = GetContainerItemInfo(bagID, slotID)
+	local texture, count, locked, quality, _, _, itemLink, _, noValue, itemID = GetContainerItemInfo(bagID, slotID)
+
+	if itemLink then
+		i.texture, i.count, i.locked, i.quality, i.link, i.id = texture, count, locked, quality, itemLink, itemID
+		i.hasPrice = not noValue
+		i.isInSet, i.setName = GetContainerItemEquipmentSetInfo(bagID, slotID)
 		i.cdStart, i.cdFinish, i.cdEnable = GetContainerItemCooldown(bagID, slotID)
-		if isClassic then
-			i.isQuestItem, i.questID, i.questActive = nil, nil, nil
-			i.isInSet, i.setName = nil, nil
-		else
-			i.isQuestItem, i.questID, i.questActive = GetContainerItemQuestInfo(bagID, slotID)
-			i.isInSet, i.setName = GetContainerItemEquipmentSetInfo(bagID, slotID)
-		end
+		i.isQuestItem, i.questID, i.questActive = GetContainerItemQuestInfo(bagID, slotID)
+		i.name, _, _, i.level, _, i.type, i.subType, i.stackCount, i.equipLoc, _, _, i.classID, i.subClassID = GetItemInfo(itemLink)
+		i.equipLoc = _G[i.equipLoc] -- INVTYPE to localized string
 
-		-- *edits by Lars "Goldpaw" Norberg for WoW 5.0.4 (MoP)
-		-- last return value here, "texture", doesn't show for battle pets
-		local texture
-		i.name, i.link, i.rarity, i.level, i.minLevel, i.type, i.subType, i.stackCount, i.equipLoc, texture, i.sellPrice, i.classID, i.subClassID  = GetItemInfo(clink)
-		if isClassic then
-			if i.type == L.BAG_QUEST then
-				i.isQuestItem = true
-			end
+		if itemID == PET_CAGE then
+			local petID, petLevel, petName = strmatch(itemLink, "|H%w+:(%d+):(%d+):.-|h%[(.-)%]|h")
+			i.name = petName
+			i.id = tonumber(petID) or 0
+			i.level = tonumber(petLevel) or 0
+			i.classID = Enum.ItemClass.Miscellaneous
+			i.subClassID = Enum.ItemMiscellaneousSubclass.CompanionPet
+		elseif MYTHIC_KEYSTONES[itemID] then
+			i.level, i.name = strmatch(itemLink, "|H%w+:%d+:%d+:(%d+):.-|h%[(.-)%]|h")
+			i.level = tonumber(i.level) or 0
 		end
-		-- get the first link return because otherwise ilvl for artifacts will bug
-		i.link = clink
-		-- get the actual item level for items we want it to be shown
-		if (i.type and (ilvlTypes[i.type] or i.subType and ilvlSubTypes[i.subType])) and i.level > 0 then
-			if i.rarity == LE_ITEM_QUALITY_ARTIFACT then
-				-- for artifact weapons, GetItemInfo returns the actual ilvl
-			else
-				i.level = GetDetailedItemLevelInfo(clink) or i.level	--GetContainerItemLevel(clink, bagID, slotID) or i.level
-			end
-		end
-		-- get the item spell to determine if the item is an Artifact Power boosting item
-		if IsArtifactPowerItem(i.id) then
-			i.type = ARTIFACT_POWER
-		end
-		-- texture
-		i.texture = i.texture or texture
-		-- battle pet info must be extracted from the itemlink
-		if isRetail then
-			if (clink:find("battlepet")) then
-				if not(L) then
-					L = cargBags:GetLocalizedTypes()
-				end
-				local data, name = strmatch(clink, "|H(.-)|h(.-)|h")
-				local  _, _, level, rarity, _, _, _, id = strmatch(data, "(%w+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
-				i.type = L.ItemClass["Battle Pets"]
-				i.rarity = tonumber(rarity) or 0
-				i.id = tonumber(id) or 0
-				i.name = name
-				i.minLevel = level
-			elseif (clink:find("keystone")) then
-				local data, name = strsplit("[", clink)
-				i.name = strsplit("]", name)
-				if not i.id then i.id = 138019 end
-				_, _, i.rarity, i.level, i.minLevel, i.type, i.subType, i.stackCount, i.equipLoc, texture, i.sellPrice  = GetItemInfo(i.id)
-			end
-		end
-		--print("GetItemInfo:", i.isInSet, i.setName, i.name)
 	end
 	return i
+end
+
+if C_Container and C_Container.GetContainerItemInfo then
+function Implementation:GetItemInfo(bagID, slotID, i)
+	i = i or defaultItem
+	for k in pairs(i) do i[k] = nil end
+
+	i.bagId = bagID
+	i.slotId = slotID
+
+	local texture, count, locked, quality, itemLink, noValue, itemID
+	local info = C_Container.GetContainerItemInfo(bagID, slotID)
+	if info then
+		i.texture, i.count, i.locked, i.quality, i.link, i.id, i.hasPrice = info.iconFileID, info.stackCount, info.isLocked, (info.quality or 1), info.hyperlink, info.itemID, (not info.hasNoValue)
+
+		i.isInSet, i.setName = C_Container.GetContainerItemEquipmentSetInfo(bagID, slotID)
+
+		i.cdStart, i.cdFinish, i.cdEnable = C_Container.GetContainerItemCooldown(bagID, slotID)
+
+		local questInfo = C_Container.GetContainerItemQuestInfo(bagID, slotID)
+		i.isQuestItem, i.questID, i.questActive = questInfo.isQuestItem, questInfo.questID, questInfo.isActive
+
+		i.name, _, _, _, _, i.type, i.subType, _, i.equipLoc, _, _, i.classID, i.subClassID = GetItemInfo(i.link)
+		i.equipLoc = _G[i.equipLoc] -- INVTYPE to localized string
+
+		if i.id == PET_CAGE then
+			local petID, petLevel, petName = strmatch(i.link, "|H%w+:(%d+):(%d+):.-|h%[(.-)%]|h")
+			i.name = petName
+			i.id = tonumber(petID) or 0
+			i.level = tonumber(petLevel) or 0
+			i.classID = Enum.ItemClass.Miscellaneous
+			i.subClassID = Enum.ItemMiscellaneousSubclass.CompanionPet
+		elseif MYTHIC_KEYSTONES[i.id] then
+			i.level, i.name = strmatch(i.link, "|H%w+:%d+:%d+:(%d+):.-|h%[(.-)%]|h")
+			i.level = tonumber(i.level) or 0
+		end
+	end
+
+	return i
+end
+
 end
 
 --[[!
@@ -409,9 +379,8 @@ end
 	@param bagID <number>
 	@param slotID <number>
 ]]
-local function nope() end
 function Implementation:UpdateSlot(bagID, slotID)
-	local item = self:GetCustomItemInfo(bagID, slotID)
+	local item = self:GetItemInfo(bagID, slotID)
 	local button = self:GetButton(bagID, slotID)
 	local container = self:GetContainerForItem(item, button)
 
@@ -427,12 +396,11 @@ function Implementation:UpdateSlot(bagID, slotID)
 			container:AddButton(button)
 		end
 
-		button:Update(item)
+		button:ButtonUpdate(item)
 	elseif(button) then
 		button.container:RemoveButton(button)
 		self:SetButton(bagID, slotID, nil)
 		button:Free()
-
 	end
 end
 
@@ -471,13 +439,15 @@ end
 	@param slotID <number> [optional]
 	@callback Container:OnBagUpdate(bagID, slotID)
 ]]
-function Implementation:BAG_UPDATE(event, bagID, slotID)
+function Implementation:BAG_UPDATE(_, bagID, slotID)
+	if self.isSorting then return end
+
 	if(bagID and slotID) then
 		self:UpdateSlot(bagID, slotID)
 	elseif(bagID) then
 		self:UpdateBag(bagID)
 	else
-		for bagID = -2, 11 do
+		for bagID = -3, 12 do
 			self:UpdateBag(bagID)
 		end
 	end
@@ -496,20 +466,20 @@ end
 	Fired when the item cooldowns need to be updated
 	@param bagID <number> [optional]
 ]]
-function Implementation:BAG_UPDATE_COOLDOWN(event, bagID)
+function Implementation:BAG_UPDATE_COOLDOWN(_, bagID)
 	if(bagID) then
 		for slotID=1, GetContainerNumSlots(bagID) do
 			local button = self:GetButton(bagID, slotID)
 			if(button) then
-				local item = self:GetCustomItemInfo(bagID, slotID)
-				button:UpdateCooldown(item)
+				local item = self:GetItemInfo(bagID, slotID)
+				button:ButtonUpdateCooldown(item)
 			end
 		end
 	else
-		for id, container in pairs(self.contByID) do
-			for i, button in pairs(container.buttons) do
-				local item = self:GetCustomItemInfo(button.bagID, button.slotID)
-				button:UpdateCooldown(item)
+		for _, container in pairs(self.contByID) do
+			for _, button in pairs(container.buttons) do
+				local item = self:GetItemInfo(button.bagId, button.slotId)
+				button:ButtonUpdateCooldown(item)
 			end
 		end
 	end
@@ -520,13 +490,14 @@ end
 	@param bagID <number>
 	@param slotID <number> [optional]
 ]]
-function Implementation:ITEM_LOCK_CHANGED(event, bagID, slotID)
+function Implementation:ITEM_LOCK_CHANGED(_, bagID, slotID)
+	if self.isSorting then return end
 	if(not slotID) then return end
 
 	local button = self:GetButton(bagID, slotID)
 	if(button) then
-		local item = self:GetCustomItemInfo(bagID, slotID)
-		button:UpdateLock(item)
+		local item = self:GetItemInfo(bagID, slotID)
+		button:ButtonUpdateLock(item)
 	end
 end
 
@@ -551,22 +522,20 @@ end
 	@param bagID <number>
 	@param slotID <number> [optional]
 ]]
-if isRetail then
-	function Implementation:PLAYERREAGENTBANKSLOTS_CHANGED(event, slotID)
-		local bagID = -3
+function Implementation:PLAYERREAGENTBANKSLOTS_CHANGED(event, slotID)
+	local bagID = -3
 
-		self:BAG_UPDATE(event, bagID, slotID)
-	end
+	self:BAG_UPDATE(event, bagID, slotID)
 end
 
 --[[
 	Fired when the quest log of a unit changes
 ]]
-function Implementation:UNIT_QUEST_LOG_CHANGED(event)
-	for id, container in pairs(self.contByID) do
-		for i, button in pairs(container.buttons) do
-			local item = self:GetCustomItemInfo(button.bagID, button.slotID)
-			button:UpdateQuest(item)
+function Implementation:UNIT_QUEST_LOG_CHANGED()
+	for _, container in pairs(self.contByID) do
+		for _, button in pairs(container.buttons) do
+			local item = self:GetItemInfo(button.bagId, button.slotId)
+			button:ButtonUpdateQuest(item)
 		end
 	end
 end

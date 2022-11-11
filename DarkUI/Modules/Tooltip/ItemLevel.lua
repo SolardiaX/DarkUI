@@ -166,9 +166,9 @@ local function IsArtifact(itemLink)
     return itemLink:find("|cffe6cc80") -- this is probably a horrible way to find whether it"s an artifact
 end
 
-local function IsLegendary()
-    return false
-end
+-- local function IsLegendary()
+    -- return false
+-- end
 
 local function IsCached(itemLink) -- we can"t get the correct level of an artifact until all of its relics have been cached
     local cached = true
@@ -251,11 +251,9 @@ for _, slot in pairs(InventorySlots) do
         if finished then
             local weaponLevel = 0
             local isDual = false
-            if SlotCache[16] and SlotCache[17] then
-                -- we have 2 weapons
+            if SlotCache[16] and SlotCache[17] then -- we have 2 weapons
                 isDual = true
-                if IsArtifact(ItemCache[16]) or IsArtifact(ItemCache[17]) then
-                    -- take the higher of the 2 weapons and double it
+                if IsArtifact(ItemCache[16]) or IsArtifact(ItemCache[17]) then -- take the higher of the 2 weapons and double it
                     local ilevelMain = SlotCache[16]
                     local ilevelOff = SlotCache[17]
                     weaponLevel = ilevelMain > ilevelOff and ilevelMain or ilevelOff
@@ -270,19 +268,16 @@ for _, slot in pairs(InventorySlots) do
                         weaponLevel = ilevelOff
                     end
                 end
-            elseif SlotCache[16] then
-                -- main hand only
+            elseif SlotCache[16] then -- main hand only
                 local _, _, _, weaponType = GetItemInfoInstant(ItemCache[16])
                 local ilevelMain = SlotCache[16]
                 weaponLevel = ilevelMain
-                if TwoHanders[weaponType] then
-                    -- 2 handed, count it twice
+                if TwoHanders[weaponType] then -- 2 handed, count it twice
                     totalItemLevel = totalItemLevel + (ilevelMain * 2)
                 else
                     totalItemLevel = totalItemLevel + ilevelMain
                 end
-            elseif SlotCache[17] then
-                -- off hand only?
+            elseif SlotCache[17] then -- off hand only?
                 local ilevelOff = SlotCache[17]
                 totalItemLevel = totalItemLevel + ilevelOff
                 weaponLevel = ilevelOff
@@ -409,15 +404,15 @@ local function DecorateTooltip(guid, isInspect)
             levelText = format("|cff%2x%2x%2x%.1f|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel, r2 * 255, g2 * 255, b2 * 255)
         end
 
-	if isInspect and averageItemLevel > 0 then
+        if isInspect and averageItemLevel > 0 then
             InspectFrameiLvL:SetText(levelText)
         end
 
         AddLine(Sekret, STAT_AVERAGE_ITEM_LEVEL .. ": ", levelText, "|cffF9D700", "|cffffffff")
 
-	-- for i, lego in ipairs(cache.legos) do
-		-- AddLine("|Hlego" .. i .. "|h", lego, " ", "|cffffffff", "|cffffffff")
-	-- end
+        -- for i, lego in ipairs(cache.legos) do
+            -- AddLine("|Hlego" .. i .. "|h", lego, " ", "|cffffffff", "|cffffffff")
+        -- end
     end
 end
 
@@ -425,7 +420,7 @@ local function ScanUnit(unitID)
     ScannedGUID = UnitGUID(unitID)
     wipe(SlotCache)
     wipe(ItemCache)
-	-- wipe(GuidCache[ScannedGUID].legos)
+    -- wipe(GuidCache[ScannedGUID].legos)
     local numEquipped = 0
     for _, slot in pairs(InventorySlots) do
         if GetInventoryItemTexture(unitID, slot) then
@@ -454,16 +449,16 @@ function eve:INSPECT_READY(guid)
     ActiveGUID = nil
     local unitID = GetUnitIDFromGUID(guid)
     if unitID then
-	-- local _, class = UnitClass(unitID)
-	-- local colors = class and RAID_CLASS_COLORS[class]
-	-- local specID = GetInspectSpecialization(unitID)
-	-- local specName
-	-- if not specName and specID and specID ~= 0 then
-		-- specID, specName = GetSpecializationInfoByID(specID, UnitSex(unitID))
-		-- if colors then
-			-- specName = "|c" .. colors.colorStr .. specName .. "|r"
-		-- end
-	-- end
+        -- local _, class = UnitClass(unitID)
+        -- local colors = class and RAID_CLASS_COLORS[class]
+        -- local specID = GetInspectSpecialization(unitID)
+        -- local specName
+        -- if not specName and specID and specID ~= 0 then
+            -- specID, specName = GetSpecializationInfoByID(specID, UnitSex(unitID))
+            -- if colors then
+                -- specName = "|c" .. colors.colorStr .. specName .. "|r"
+            -- end
+        -- end
 
         if not GuidCache[guid] then
             GuidCache[guid] = { ilevel = 0, weaponLevel = 0, timestamp = 0, legos = {} }

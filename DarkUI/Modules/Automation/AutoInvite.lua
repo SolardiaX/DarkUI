@@ -11,7 +11,7 @@ local CreateFrame = CreateFrame
 local C_BattleNet_GetAccountInfoByGUID = C_BattleNet.GetAccountInfoByGUID
 local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local C_FriendList_IsFriend = C_FriendList.IsFriend
-local InviteUnit, BNInviteFriend = InviteUnit, BNInviteFriend
+local C_PartyInfo_InviteUnit, BNInviteFriend = C_PartyInfo.InviteUnit, BNInviteFriend
 local IsGuildMember = IsGuildMember
 local QueueStatusMinimapButton = QueueStatusMinimapButton
 local GetNumGroupMembers = GetNumGroupMembers
@@ -62,7 +62,7 @@ autoinvite:RegisterEvent("CHAT_MSG_BN_WHISPER")
 autoinvite:SetScript("OnEvent", function(_, event, arg1, arg2, ...)
     if ((not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) and arg1:lower():match(C.automation.invite_keyword)) and not QueueStatusMinimapButton:IsShown() then
         if event == "CHAT_MSG_WHISPER" then
-            InviteUnit(arg2)
+            C_PartyInfo_InviteUnit(arg2)
         elseif event == "CHAT_MSG_BN_WHISPER" then
             local bnetIDAccount = select(11, ...)
             local accountInfo = C_BattleNet_GetAccountInfoByID(bnetIDAccount)

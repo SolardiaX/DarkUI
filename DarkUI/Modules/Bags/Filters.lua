@@ -23,9 +23,9 @@ cB_filterEnabled = { Armor = true, Gem = true, Quest = true, TradeGoods = true, 
 --------------------
 --Basic filters
 --------------------
-cB_Filters.fBags = function(item) return item.bagID >= 0 and item.bagID <= 4 end
-cB_Filters.fBank = function(item) return item.bagID == -1 or item.bagID >= 5 and item.bagID <= 11 end
-cB_Filters.fBankReagent = function(item) return item.bagID == -3 end
+cB_Filters.fBags = function(item) return item.bagId >= 0 and item.bagId <= 4 end
+cB_Filters.fBank = function(item) return item.bagId == -1 or item.bagId >= 5 and item.bagId <= 11 end
+cB_Filters.fBankReagent = function(item) return item.bagId == -3 end
 cB_Filters.fBankFilter = function() return _G.SavedStats.cBnivCfg.FilterBank end
 cB_Filters.fHideEmpty = function(item) if _G.SavedStats.cBnivCfg.CompressEmpty then return item.link ~= nil else return true end end
 
@@ -34,10 +34,10 @@ cB_Filters.fHideEmpty = function(item) if _G.SavedStats.cBnivCfg.CompressEmpty t
 ------------------------------------
 cB_Filters.fItemClass = function(item, container)
 	if not item.id or not item.name then return false end	-- incomplete data (itemID or itemName missing), return (item that aren't loaded yet will get classified on the next successful call)
-	if not cB_ItemClass[item.id] or item.bagID == -2 then cbNivaya:ClassifyItem(item) end
+	if not cB_ItemClass[item.id] or item.bagId == -2 then cbNivaya:ClassifyItem(item) end
 	
 	local t, bag = cB_ItemClass[item.id]
-	local isBankBag = item.bagID == -1 or (item.bagID >= 5 and item.bagID <= 11)
+	local isBankBag = item.bagId == -1 or (item.bagId >= 5 and item.bagId <= 11)
 	if isBankBag then
 		bag = (cB_existsBankBag[t] and _G.SavedStats.cBnivCfg.FilterBank and cB_filterEnabled[t]) and "Bank"..t or "Bank"
 	else
@@ -49,14 +49,14 @@ end
 
 function cbNivaya:ClassifyItem(item)
 	-- keyring
-	if item.bagID == -2 then cB_ItemClass[item.id] = "Keyring"; return true end
+	if item.bagId == -2 then cB_ItemClass[item.id] = "Keyring"; return true end
 
 	-- user assigned containers
 	local tC = cBniv_CatInfo[item.id]
 	if tC then cB_ItemClass[item.id] = tC; return true end
 
 	-- junk
-	if (item.rarity == 0) then cB_ItemClass[item.id] = "Junk"; return true end
+	if (item.quality == 0) then cB_ItemClass[item.id] = "Junk"; return true end
 
 	-- type based filters
 	if item.type then
@@ -78,7 +78,7 @@ end
 ------------------------------------------
 cB_Filters.fNewItems = function(item)
 	if not _G.SavedStats.cBnivCfg.NewItems then return false end
-	if not ((item.bagID >= 0) and (item.bagID <= 4)) then return false end
+	if not ((item.bagId >= 0) and (item.bagId <= 4)) then return false end
 	if not item.link then return false end
 	if not cB_KnownItems[item.id] then return true end
 	local t = GetItemCount(item.id)	--cbNivaya:getItemCount(item.id)
@@ -100,10 +100,18 @@ cB_Filters.fItemSets = function(item)
 	local tC = cBniv_CatInfo[item.name]
 	if tC then return (tC == "ItemSets") and true or false end
 	-- Check ItemRack sets:
-	if item2setIR[string.match(item.link,"item:(.+):%-?%d+")] then return true end
+	if IR then
+		if item2setIR[ItemRack.GetIRString(item.link)] then return true end
+	end
 	-- Check Outfitter sets:
-	local _,_,itemStr = string.find(item.link, "^|c%x+|H(.+)|h%[.*%]")
-	if item2setOF[itemStr] then return true end
+	if OF then
+		--local _,_,itemStr = string.find(item.link, "^|c%x+|H(.+)|h%[.*%]")
+		--if item2setOF[itemStr] then return true end
+		--if item2setOF[item.link] then return true end
+		if OFisInitialized then
+			if Outfitter:GetOutfitsUsingItem(Outfitter_GetItemInfoFromLink(item.link)) then return true end
+		end
+	end
 	-- Check Equipment Manager sets:
 	if cargBags.itemKeys["setID"](item) then return true end
    return false
@@ -124,15 +132,21 @@ local function cacheSetsIR()
 end
 
 if IR then
+	local hooked = false
 	cacheSetsIR()
 	local function ItemRackOpt_CreateHooks()
-		local IRsaveSet = ItemRackOpt.SaveSet
-		function ItemRackOpt.SaveSet(...) IRsaveSet(...); cacheSetsIR() end
-		local IRdeleteSet = ItemRackOpt.DeleteSet
-		function ItemRackOpt.DeleteSet(...) IRdeleteSet(...); cacheSetsIR() end
+		if hooked then return end
+		--local IRsaveSet = ItemRackOpt.SaveSet
+		--function ItemRackOpt.SaveSet(...) IRsaveSet(...); cacheSetsIR() end
+		--local IRdeleteSet = ItemRackOpt.DeleteSet
+		--function ItemRackOpt.DeleteSet(...) IRdeleteSet(...); cacheSetsIR() end
+		hooksecurefunc(ItemRackOpt, "SaveSet", cacheSetsIR)
+		hooksecurefunc(ItemRackOpt, "DeleteSet", cacheSetsIR)
+		hooked = true
 	end
-	local IRtoggleOpts = ItemRack.ToggleOptions
-	function ItemRack.ToggleOptions(...) IRtoggleOpts(...) ItemRackOpt_CreateHooks() end
+	--local IRtoggleOpts = ItemRack.ToggleOptions
+	--function ItemRack.ToggleOptions(...) IRtoggleOpts(...) ItemRackOpt_CreateHooks() end
+	hooksecurefunc(ItemRack, "ToggleOptions", ItemRackOpt_CreateHooks)
 end
 
 -- Outfitter related
@@ -140,25 +154,36 @@ local pLevel = UnitLevel("player")
 local function createItemString(i) return string.format("item:%d:%d:%d:%d:%d:%d:%d:%d:%d", i.Code, i.EnchantCode or 0, i.JewelCode1 or 0, i.JewelCode2 or 0, i.JewelCode3 or 0, i.JewelCode4 or 0, i.SubCode or 0, i.UniqueID or 0, pLevel) end
 
 local function cacheSetsOF()
+	--[[
 	for k in pairs(item2setOF) do item2setOF[k] = nil end
 	for _,id in ipairs(Outfitter_GetCategoryOrder()) do
 		local OFsets = Outfitter_GetOutfitsByCategoryID(id)
 		for _,vSet in pairs(OFsets) do
 			for _,item in pairs(vSet.Items) do
-				if item then item2setOF[createItemString(item)] = true end
+				if item then
+					--item2setOF[createItemString(item)] = true
+					if item.Link then
+						item2setOF[item.Link] = true
+					end
+				end
 			end
 		end
 	end
+	]]
 	cbNivaya:UpdateBags()
 end
 
+local function checkOFinit()
+	OFisInitialized = Outfitter:IsInitialized()
+end
 if OF then
 	Outfitter_RegisterOutfitEvent("ADD_OUTFIT", cacheSetsOF)
 	Outfitter_RegisterOutfitEvent("DELETE_OUTFIT", cacheSetsOF)
 	Outfitter_RegisterOutfitEvent("EDIT_OUTFIT", cacheSetsOF)
 	if Outfitter:IsInitialized() then
+		checkOFinit()
 		cacheSetsOF()
 	else
-		Outfitter_RegisterOutfitEvent('OUTFITTER_INIT', cacheSetsOF)
+		Outfitter_RegisterOutfitEvent('OUTFITTER_INIT', function() checkOFinit() cacheSetsOF() end)
 	end
 end

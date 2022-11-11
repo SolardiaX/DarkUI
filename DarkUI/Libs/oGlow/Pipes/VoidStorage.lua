@@ -33,16 +33,18 @@ local update = function(self)
 	return updateContents(self)
 end
 
-local function hookCheck(self)
-	if not (IsAddOnLoaded("Blizzard_VoidStorageUI") and oGlow:IsPipeEnabled"voidstore") then return end
+local function hookCheck(self, addon)
+	if addon == "Blizzard_VoidStorageUI" then
+		if oGlow:IsPipeEnabled"voidstore" then return end
 
-	if not hooked then
-		hooksecurefunc("VoidStorage_SetPageNumber", function()
-			updateContents(self)
-		end)
-		hooked = true
+		if not hooked then
+			hooksecurefunc("VoidStorage_SetPageNumber", function()
+				updateContents(self)
+			end)
+			hooked = true
 
-		self:UnregisterEvent("VOID_STORAGE_OPEN", hookCheck)
+			-- self:UnregisterEvent("VOID_STORAGE_OPEN", hookCheck)
+		end
 	end
 end
 
@@ -53,8 +55,9 @@ local enable = function(self)
 	self:RegisterEvent("VOID_STORAGE_DEPOSIT_UPDATE", updateDeposit)
 	self:RegisterEvent("VOID_STORAGE_UPDATE", update)
 	self:RegisterEvent("VOID_TRANSFER_DONE", update)
-	self:RegisterEvent("VOID_STORAGE_OPEN", update)
-	self:RegisterEvent("VOID_STORAGE_OPEN", hookCheck)
+	self:RegisterEvent("ADDON_LOADED", hookCheck)
+	-- self:RegisterEvent("VOID_STORAGE_OPEN", update)
+	-- self:RegisterEvent("VOID_STORAGE_OPEN", hookCheck)
 end
 
 local disable = function(self)
@@ -64,8 +67,9 @@ local disable = function(self)
 	self:UnregisterEvent("VOID_STORAGE_DEPOSIT_UPDATE", updateDeposit)
 	self:UnregisterEvent("VOID_STORAGE_UPDATE", update)
 	self:UnregisterEvent("VOID_TRANSFER_DONE", update)
-	self:UnregisterEvent("VOID_STORAGE_OPEN", update)
-	self:UnregisterEvent("VOID_STORAGE_OPEN", hookCheck)
+	self:UnregisterEvent("ADDON_LOADED", update)
+	-- self:UnregisterEvent("VOID_STORAGE_OPEN", update)
+	-- self:UnregisterEvent("VOID_STORAGE_OPEN", hookCheck)
 end
 
 oGlow:RegisterPipe("voidstore", enable, disable, update, "Void storage frame")

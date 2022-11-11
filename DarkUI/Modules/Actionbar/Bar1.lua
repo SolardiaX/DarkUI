@@ -19,12 +19,13 @@ local bar = CreateFrame("Frame", "DarkUI_ActionBar1Holder", UIParent, "SecureHan
 bar:SetPoint(unpack(cfg.pos))
 bar:SetHeight(cfg.button.size)
 bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
+bar.GetSpellFlyoutDirection = MainMenuBar.GetSpellFlyoutDirection
+bar.flyoutDirection = MainMenuBar.flyoutDirection
 
 for i = 1, num do
     local button = _G["ActionButton" .. i]
     button:SetSize(cfg.button.size, cfg.button.size)
     button:ClearAllPoints()
-    button:SetParent(bar)
     if i == 1 then
         button:SetPoint("BOTTOMLEFT", bar, 0, 0)
     else
@@ -36,7 +37,9 @@ end
 local Page = {
     ["DRUID"]   = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
     ["ROGUE"]   = "[bonusbar:1] 7;",
-    ["DEFAULT"] = "[possessbar] 12; [shapeshift] 13; [overridebar] 14; [vehicleui] 12; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
+    ["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
+    ["PRIEST"]  = "[bonusbar:1] 7;",
+    ["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
 }
 
 local function GetBar()
@@ -58,6 +61,7 @@ bar:SetScript("OnEvent", function(self, event)
         for i = 1, num do
             local button = _G["ActionButton" .. i]
             self:SetFrameRef("ActionButton" .. i, button)
+            button:SetParent(bar)
         end
 
         self:Execute([[

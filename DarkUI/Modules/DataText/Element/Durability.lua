@@ -77,9 +77,7 @@ module:Inject("Durability", {
                 totalcost, nodur = totalcost + select(3, LPDURA:SetInventoryItem("player", slot))
             end
         end
-        if nodur then
-            GameTooltip:AddLine("100%", 0.1, 1, 0.1)
-        else
+        if nodur ~= true then
             GameTooltip:AddDoubleLine(" ", "--------------", 1, 1, 1, 0.5, 0.5, 0.5)
             GameTooltip:AddDoubleLine(REPAIR_COST, module:FormatGold(1, totalcost), module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1, 1, 1)
         end
@@ -87,7 +85,7 @@ module:Inject("Durability", {
         GameTooltip:AddDoubleLine(" ", L.DATATEXT_AUTO_REPAIR .. ": " .. (C.automation.auto_repair and "|cff55ff55" .. L.DATATEXT_ON or "|cffff5555" .. L.DATATEXT_OFF), 1, 1, 1, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b)
         GameTooltip:Show()
     end,
-    OnClick = function(_, button)
+    OnClick = function(self, button)
         if C_EquipmentSet_GetNumEquipmentSets() > 0 and button == "LeftButton" and (IsAltKeyDown() or IsShiftKeyDown()) then
             local menulist = { { isTitle = true, notCheckable = 1, text = format(gsub(EQUIPMENT_SETS, ":", ""), "") } }
             if C_EquipmentSet_GetNumEquipmentSets() == 0 then
@@ -108,6 +106,11 @@ module:Inject("Durability", {
             EasyMenu(menulist, LSMenus, "cursor", 0, 0, "MENU")
         elseif button == "LeftButton" then
             ToggleCharacter("PaperDollFrame")
+        elseif button == "RightButton" then
+            C.automation.auto_repair = not C.automation.auto_repair
+            E:SetVariable("automation", "auto_repair", C.automation.auto_repair)
+            
+            self:GetScript("OnEnter")(self)
         end
     end
 })

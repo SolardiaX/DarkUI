@@ -66,7 +66,7 @@ end
 ]]
 function Container:AddButton(button)
 	button.container = self
-	button:SetParent(self.bags[button.bagID])
+	button:SetParent(self.bags[button.bagId])
 	self:ScheduleContentCallback()
 	table.insert(self.buttons, button)
 	if(button.OnAdd) then button:OnAdd(self) end
@@ -118,7 +118,7 @@ end
 	@param ... Arguments which are passed to the function
 ]]
 function Container:ApplyToButtons(func, ...)
-	for i, button in pairs(self.buttons) do
+	for _, button in pairs(self.buttons) do
 		func(button, ...)
 	end
 end

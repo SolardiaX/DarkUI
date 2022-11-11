@@ -5,6 +5,7 @@
 	<Script file="Bar3.lua" />
 	<Script file="Bar4.lua" />
 	<Script file="Bar5.lua" />
+	<Script file="Bar678.lua" />
 	<Script file="BarExtra.lua" />
 	<Script file="BarPet.lua" />
 	<Script file="BarStance.lua" />

@@ -1,5 +1,6 @@
-﻿local T, C, L, _ = unpack(select(2, ...))
-if C.chat.enable ~= true then return end
+﻿local E, C, L = select(2, ...):unpack()
+
+if not C.chat.enable then return end
 
 ----------------------------------------------------------------------------------------
 --	Chat Scroll Module

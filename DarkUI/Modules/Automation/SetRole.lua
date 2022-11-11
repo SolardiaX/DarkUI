@@ -7,21 +7,21 @@ if C.automation.auto_role ~= true then return end
 ----------------------------------------------------------------------------------------
 local prev = 0
 local function SetRole()
-	if E.level >= 10 and not InCombatLockdown() and IsInGroup() and not IsPartyLFG() then
-		local spec = GetSpecialization()
-		if spec then
-			local role = GetSpecializationRole(spec)
-			if UnitGroupRolesAssigned("player") ~= role then
-				local t = GetTime()
-				if t - prev > 2 then
-					prev = t
-					UnitSetRole("player", role)
-				end
-			end
-		else
-			UnitSetRole("player", "No Role")
-		end
-	end
+    if E.level >= 10 and not InCombatLockdown() and IsInGroup() and not IsPartyLFG() then
+        local spec = GetSpecialization()
+        if spec then
+            local role = GetSpecializationRole(spec)
+            if UnitGroupRolesAssigned("player") ~= role then
+                local t = GetTime()
+                if t - prev > 2 then
+                    prev = t
+                    UnitSetRole("player", role)
+                end
+            end
+        else
+            UnitSetRole("player", "No Role")
+        end
+    end
 end
 
 local frame = CreateFrame("Frame")

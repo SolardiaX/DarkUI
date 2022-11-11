@@ -13,18 +13,20 @@ local UIParent = _G.UIParent
 
 local cfg = C.actionbar.bars.micromenu
 
-local buttonList = { "CharacterMicroButton",
-                     "SpellbookMicroButton",
-                     "TalentMicroButton",
-                     "AchievementMicroButton",
-                     "QuestLogMicroButton",
-                     "GuildMicroButton",
-                     "LFDMicroButton",
-                     "CollectionsMicroButton",
-                     "EJMicroButton",
-                     "StoreMicroButton",
-                     "HelpMicroButton",
-                     "MainMenuMicroButton", }
+local buttonList = { 
+    "CharacterMicroButton",
+    "SpellbookMicroButton",
+    "TalentMicroButton",
+    "AchievementMicroButton",
+    "QuestLogMicroButton",
+    "GuildMicroButton",
+    "LFDMicroButton",
+    "EJMicroButton",
+    "CollectionsMicroButton",
+    "MainMenuMicroButton",
+    --"HelpMicroButton",
+    "StoreMicroButton",
+}
 
 local num = #buttonList
 
@@ -35,22 +37,28 @@ bar:SetPoint(unpack(cfg.pos))
 bar:SetScale(cfg.scale)
 bar.buttonList = {}
 
+UpdateMicroButtonsParent(bar)
+
 --move the buttons into position and reparent them
 local previous
 for i, b in pairs(buttonList) do
     local button = _G[b]
+
+    button:CreateBackdrop()
+    button.backdrop:CreateShadow()
+
     button:SetParent(bar)
     button.SetParent = E.dummy
-    tinsert(bar.buttonList, button) --add the button object to the list
 
     button:ClearAllPoints()
 
     if i == 1 then
         button:SetPoint("LEFT", bar, "LEFT", 0, 0)
     else
-        button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+        button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space + 4, 0)
     end
 
+    tinsert(bar.buttonList, button) --add the button object to the list
     previous = button
 end
 
@@ -61,3 +69,11 @@ RegisterStateDriver(bar, "visibility", "[petbattle] hide; show")
 if cfg.fader_mouseover then
     E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
 end
+
+if not C.blizzard.esc_for_gamemenu then
+    tinsert(UISpecialFrames, "DarkUI_MicroMenuBarHolder")
+end
+
+HelpOpenWebTicketButton:Kill()
+MainMenuMicroButton.MainMenuBarPerformanceBar:Kill()
+MainMenuMicroButton:SetScript("OnUpdate", nil)

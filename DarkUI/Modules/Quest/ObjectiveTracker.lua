@@ -30,27 +30,28 @@ local ScenarioStageBlock = ScenarioStageBlock
 ----------------------------------------------------------------------------------------
 --  Move ObjectiveTrackerFrame
 ----------------------------------------------------------------------------------------
-local frame = CreateFrame("Frame", "ObjectiveTrackerAnchor", UIParent)
+local frame = CreateFrame("Frame", "DarkUI_ObjectiveTrackerAnchor", UIParent)
 frame:SetPoint(unpack(C.quest.quest_tracker_pos))
 frame:SetSize(224, 150)
 
+ObjectiveTrackerFrame:SetParent(frame)
 ObjectiveTrackerFrame:ClearAllPoints()
-ObjectiveTrackerFrame:SetPoint("TOPRIGHT", frame)
-ObjectiveTrackerFrame:SetHeight(E.screenHeight * 4 / 5)
+ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
+ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
 local headers = {
-    ObjectiveTrackerBlocksFrame.ScenarioHeader,
-    ObjectiveTrackerBlocksFrame.CampaignQuestHeader,
-    ObjectiveTrackerBlocksFrame.QuestHeader,
-    ObjectiveTrackerBlocksFrame.AchievementHeader,
-    BONUS_OBJECTIVE_TRACKER_MODULE.Header,
-    WORLD_QUEST_TRACKER_MODULE.Header,
-    ObjectiveTrackerFrame.BlocksFrame.UIWidgetsHeader
+    SCENARIO_CONTENT_TRACKER_MODULE,
+    BONUS_OBJECTIVE_TRACKER_MODULE,
+    UI_WIDGET_TRACKER_MODULE,
+    CAMPAIGN_QUEST_TRACKER_MODULE,
+    QUEST_TRACKER_MODULE,
+    ACHIEVEMENT_TRACKER_MODULE,
+    WORLD_QUEST_TRACKER_MODULE
 }
 for i = 1, #headers do
-    local header = headers[i]
+    local header = headers[i].Header
     if header then
         header.Background:Hide()
     end
@@ -61,12 +62,13 @@ ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
 ----------------------------------------------------------------------------------------
 --	Skin ObjectiveTrackerFrame item buttons
 ----------------------------------------------------------------------------------------
-hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
-    local item = block.itemButton
+hooksecurefunc("QuestObjectiveSetupBlockButton_Item", function(block)
+    local item = block and block.itemButton
     if item and not item.skinned then
         item:SetSize(26, 26)
+        item:StyleButton()
         item:CreateTextureBorder()
-        item:SetNormalTexture(nil)
+        item:SetNormalTexture(0)
 
         item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
         item.icon:SetPoint("TOPLEFT", item, 2, -2)
@@ -85,30 +87,43 @@ hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
     end
 end)
 
-hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", function(_, block)
-    local item = block.itemButton
-    if item and not item.skinned then
-        item:SetSize(26, 26)
-        item:CreateTextureBorder()
-
-        item.skinned = true
-    end
-end)
-
-hooksecurefunc("QuestObjectiveSetupBlockButton_AddRightButton", function(block, button)
-    if button and button.GetPoint then
-        local a, b, c, d, e = button:GetPoint()
-        if block.groupFinderButton and b == block.groupFinderButton and block.itemButton and button == block.itemButton then
-            button:SetPoint(a, b, c, d - 1, e)
-        end
-    end
-end)
-
 hooksecurefunc("QuestObjectiveSetupBlockButton_FindGroup", function(block)
-    if block.hasGroupFinderButton and block.groupFinderButton and not block.groupFinderButton.styled then
-        block.groupFinderButton:SetSize(21, 21)
-        block.groupFinderButton:CreateTextureBorder()
-        block.groupFinderButton.styled = true
+    local icon = block.groupFinderButton
+    if icon and not icon.skinned then
+        icon:SetSize(26, 26)
+        icon:SetNormalTexture(0)
+        icon:SetHighlightTexture(0)
+        icon:SetPushedTexture(0)
+        icon:CreateTextureBorder()
+        
+        icon.b = CreateFrame("Frame", nil, icon)
+        icon.b:SetTemplate("Overlay")
+        icon.b:SetPoint("TOPLEFT", icon, "TOPLEFT", 2, -2)
+        icon.b:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", -2, 2)
+        icon.b:SetFrameLevel(1)
+
+        icon:HookScript("OnEnter", function(self)
+            if self:IsEnabled() then
+                self.b:SetBackdropBorderColor(unpack(C.media.highlight_color))
+                if self.b.overlay then
+                    self.b.overlay:SetVertexColor(C.media.highlight_color[1] * 0.3, C.media.highlight_color[2] * 0.3, C.media.highlight_color[3] * 0.3, 1)
+                end
+            end
+        end)
+
+        icon:HookScript("OnLeave", function(self)
+            self.b:SetBackdropBorderColor(unpack(C.media.border_color))
+            if self.b.overlay then
+                self.b.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+            end
+        end)
+
+        hooksecurefunc(icon, "Show", function(self)
+            self.b:SetFrameLevel(1)
+        end)
+
+
+        icon.skinned = true
     end
 end)
 
@@ -193,18 +208,6 @@ hooksecurefunc("BonusObjectiveTracker_AnimateReward", function()
 end)
 
 ----------------------------------------------------------------------------------------
---	Skin ScenarioStageBlock
-----------------------------------------------------------------------------------------
--- local StageBlock = _G["ScenarioStageBlock"]
--- StageBlock:CreateBackdrop("Blur")
--- StageBlock.backdrop:SetPoint("TOPLEFT", ScenarioStageBlock.NormalBG, 3, -3)
--- StageBlock.backdrop:SetPoint("BOTTOMRIGHT", ScenarioStageBlock.NormalBG, -3, 3)
-
--- StageBlock.NormalBG:SetAlpha(0)
--- StageBlock.FinalBG:SetAlpha(0)
--- StageBlock.GlowTexture:SetTexture("")
-
-----------------------------------------------------------------------------------------
 --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 ----------------------------------------------------------------------------------------
 hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
@@ -216,6 +219,7 @@ hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
         QuestMapQuestOptions_ShareQuest(self.questID)
     end
 end)
+
 hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(_, block)
     if IsControlKeyDown() then
         CloseDropDownMenus()

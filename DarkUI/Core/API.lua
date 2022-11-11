@@ -3,27 +3,31 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 --  Core API Methods
 ----------------------------------------------------------------------------------------
-
 E.UIScale = function()
-    -- if C.general.autoScale then
-    --     C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
-        
-    --     if E.screenHeight >= 2400 then
-    --         C.general.uiScale = C.general.uiScale * 3
-    --     elseif E.screenHeight >= 1600 then
-    --         C.general.uiScale = C.general.uiScale * 2
-    --     end
-    --     C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
-    -- end
     if C.general.autoScale then
         C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+        
+        if E.screenHeight >= 2400 then
+            C.general.uiScale = C.general.uiScale * 3
+        elseif E.screenHeight >= 1600 then
+            C.general.uiScale = C.general.uiScale * 2
+        end
         C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
     end
+    -- if C.general.autoScale then
+    --     C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+    --     C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
+    -- end
 end
 E.UIScale()
 
 E.mult = 768 / E.screenHeight / C.general.uiScale
 E.noscalemult = E.mult * C.general.uiScale
+
+local Mult = E.mult
+if E.screenHeight > 1200 then
+	Mult = E.mult * math.floor(1 / E.mult + 0.5)
+end
 
 ----------------------------------------------------------------------------------------
 --  Dummy object
@@ -37,8 +41,8 @@ end
 --	Position functions
 ----------------------------------------------------------------------------------------
 local function setOutside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or 2
-    yOffset = yOffset or 2
+    xOffset = xOffset or Mult
+    yOffset = yOffset or Mult
     anchor = anchor or obj:GetParent()
 
     if obj:GetPoint() then
@@ -50,8 +54,8 @@ local function setOutside(obj, anchor, xOffset, yOffset)
 end
 
 local function setInside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or 2
-    yOffset = yOffset or 2
+    xOffset = xOffset or Mult
+    yOffset = yOffset or Mult
     anchor = anchor or obj:GetParent()
 
     if obj:GetPoint() then
@@ -63,12 +67,23 @@ local function setInside(obj, anchor, xOffset, yOffset)
 end
 
 ----------------------------------------------------------------------------------------
+--	Frame Hider
+----------------------------------------------------------------------------------------
+E.FrameHider = CreateFrame("Frame")
+E.FrameHider:Hide()
+
+----------------------------------------------------------------------------------------
 --	Pet Battle Hider
 ----------------------------------------------------------------------------------------
-T_PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
-T_PetBattleFrameHider:SetAllPoints()
-T_PetBattleFrameHider:SetFrameStrata("LOW")
-RegisterStateDriver(T_PetBattleFrameHider, "visibility", "[petbattle] hide; show")
+E.PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
+E.PetBattleFrameHider:SetAllPoints()
+E.PetBattleFrameHider:SetFrameStrata("LOW")
+RegisterStateDriver(E.PetBattleFrameHider, "visibility", "[petbattle] hide; show")
+
+----------------------------------------------------------------------------------------
+--	ScanTip
+----------------------------------------------------------------------------------------
+E.ScanTip = CreateFrame("GameTooltip", "DarkUI_ScanTooltip", nil, "GameTooltipTemplate")
 
 ----------------------------------------------------------------------------------------
 --  Kill object function
@@ -80,7 +95,7 @@ local kill = function(object)
         object:UnregisterAllEvents()
         object:SetParent(hiddenFrame)
     else
-        object.Show = E.dummy
+        object.Show = object.Hide
     end
     object:Hide()
 end
@@ -142,7 +157,7 @@ local function createBackground(f, offset)
     if f:GetObjectType() == "Texture" then
         f = f:GetParent()
     end
-    offset = offset or E.mult
+    offset = offset or Mult
     local lvl = f:GetFrameLevel()
 
     f.bg = CreateFrame("Frame", nil, f,  "BackdropTemplate")
@@ -152,7 +167,7 @@ local function createBackground(f, offset)
 end
 
 local function createTextureBorder(f, margin)
-    margin = margin or 2
+    margin = margin or Mult
     local border
     local fn = f:GetName()
 
@@ -263,10 +278,10 @@ local function setTemplate(f, t, edge, insets)
         )
     else
         if not edge then
-            edge = E.mult
+            edge = Mult
         end
         if not insets then
-            insets = E.mult
+            insets = Mult
         end
         f:SetBackdrop(
             {
@@ -300,9 +315,9 @@ local function createOverlay(f, margin)
     if f.overlay then
         return
     end
-    margin = margin or 2
+    margin = margin or Mult
 
-    local overlay = f:CreateTexture("$parentOverlay", "BORDER", f)
+    local overlay = f:CreateTexture("$parentOverlay", "BORDER")
     overlay:SetPoint("TOPLEFT", margin, -margin)
     overlay:SetPoint("BOTTOMRIGHT", -margin, margin)
     overlay:SetTexture(C.media.texture.blank)
@@ -327,7 +342,7 @@ end
 
 local function createBackdrop(f, template, margin)
     template = template or "Default"
-    margin = margin or 2
+    margin = margin or Mult
 
     local backdrop = CreateFrame("Frame", "$parentBackdrop", f)
     backdrop:SetPoint("TOPLEFT", -margin, margin)
@@ -343,7 +358,7 @@ local function createBorder(f, margin, shadow)
         return
     end
 
-    margin = margin or 1
+    margin = margin or Mult
 
     f.border = CreateFrame("Frame", "$parentInnerBorder", f, "BackdropTemplate")
     f.border:ClearAllPoints()
@@ -490,14 +505,15 @@ local function skinCheckBox(frame)
     frame.bg:SetTemplate("Default")
 
     frame.ch = frame:GetCheckedTexture()
+    frame.ch:SetAtlas("checkmark-minimal")
     frame.ch:SetDesaturated(true)
     frame.ch:SetVertexColor(E.color.r, E.color.g, E.color.b)
 
-    if C.blizzard.style then
-        frame.bg:SetBackdropBorderColor(255 / 255, 234 / 255, 100 / 255)
-        frame.hl:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
-        frame.ch:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
-    end
+    -- if C.blizzard.style then
+    --     frame.bg:SetBackdropBorderColor(255 / 255, 234 / 255, 100 / 255)
+    --     frame.hl:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
+    --     frame.ch:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
+    -- end
 end
 
 local function skinCloseButton(f, point)
@@ -650,10 +666,10 @@ local function addapi(object)
 
     -- Core API
     if not object.SetOutside then
-        mt.SetOutside = SetOutside
+        mt.SetOutside = setOutside
     end
     if not object.SetInside then
-        mt.SetInside = SetInside
+        mt.SetInside = setInside
     end
 
     if not object.Kill then
