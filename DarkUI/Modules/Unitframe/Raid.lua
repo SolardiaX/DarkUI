@@ -211,7 +211,7 @@ local createStyle = function(self)
     createTag(self)
     createRaidDebuffs(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 18, 1, self, "CENTER", "CENTER", 0, -2)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "CENTER", 0, -2)
     self.ReadyCheckIndicator = DUF.CreateIcon(self, "OVERLAY", 14, -1, self, "TOPRIGHT", "TOPRIGHT", -10, -8)
     self.LeaderIndicator = DUF.CreateIcon(self, "OVERLAY", 14, -1, self, "TOPLEFT", "TOPLEFT", 12, -8)
     self.AssistantIndicator = DUF.CreateIcon(self, "OVERLAY", 14, -1, self, "TOPLEFT", "TOPLEFT", 12, -8)

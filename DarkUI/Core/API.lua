@@ -4,20 +4,20 @@ local E, C, L = select(2, ...):unpack()
 --  Core API Methods
 ----------------------------------------------------------------------------------------
 E.UIScale = function()
-    if C.general.autoScale then
-        C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
-        
-        if E.screenHeight >= 2400 then
-            C.general.uiScale = C.general.uiScale * 3
-        elseif E.screenHeight >= 1600 then
-            C.general.uiScale = C.general.uiScale * 2
-        end
-        C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
-    end
     -- if C.general.autoScale then
     --     C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+        
+    --     if E.screenHeight >= 2400 then
+    --         C.general.uiScale = C.general.uiScale * 3
+    --     elseif E.screenHeight >= 1600 then
+    --         C.general.uiScale = C.general.uiScale * 2
+    --     end
     --     C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
     -- end
+    if C.general.autoScale then
+        C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+        C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
+    end
 end
 E.UIScale()
 

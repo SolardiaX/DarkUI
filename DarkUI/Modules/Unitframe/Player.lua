@@ -396,10 +396,10 @@ local createStyle = function(self)
 
     self.MasterLooter = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "TOPLEFT", "BOTTOMLEFT", 12, 0)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 24, 4, self, "CENTER", "CENTER", 40, 0)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 24, 4, self, "CENTER", "CENTER", 40, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
+    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     DUF.SetFader(self, cfg.player.fader)

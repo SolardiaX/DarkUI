@@ -378,7 +378,7 @@ local createStyle = function(self)
 
     self.MasterLooter = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMRIGHT", "TOPRIGHT", -12, 25)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 24, 1, self, "CENTER", "CENTER", -40, 0)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 24, 1, self, "CENTER", "CENTER", -40, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.GroupRoleIndicator = DUF.CreateIcon(self, "BACKGROUND", 28, -1, self, "TOPRIGHT", "TOPRIGHT", -45, 22)

@@ -182,7 +182,7 @@ local createStyle = function(self)
     createPortrait(self)
     createTag(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "HIGHLIGHT", 18, -1, self, "CENTER", "CENTER", 20, 0)
+    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 18, -1, self, "CENTER", "CENTER", 20, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     DUF.SetFader(self, cfg.targettarget.fader)

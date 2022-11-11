@@ -1,4 +1,4 @@
-local T, C, L = unpack(select(2, ...))
+local E, C, L = unpack(select(2, ...))
 
 ----------------------------------------------------------------------------------------
 --	Show quest icon on nameplates (based on code from ElvUI)
