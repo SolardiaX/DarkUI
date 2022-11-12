@@ -33,6 +33,10 @@ if cfg.auto_width then
     local holder = _G["DarkUI_ActionBar1HolderBG"]
     local renderScale = tonumber(GetCVar("RenderScale") or 1)
     cfg.width = ((E.screenWidth - (holder and holder:GetWidth() or 1024)) / 2 - 260) * renderScale
+else
+    if cfg.width < E.screenWidth / 4 then
+        cfg.width = E.screenWidth / 4
+    end
 end
 
 local origs = {}
@@ -166,7 +170,6 @@ local function SetChatStyle(frame)
         local function colorize(r, g, b)
             EditBoxBackground:SetBackdropBorderColor(r, g, b)
         end
-
         -- Update border color according where we talk
         hooksecurefunc("ChatEdit_UpdateHeader", function()
             local chatType = _G[chat .. "EditBox"]:GetAttribute("chatType")
