@@ -198,7 +198,7 @@ local function updateBar(statusbar, isrep)
             end
         end
 
-        local color = FACTION_BAR_COLORS[standing]
+        local color = FACTION_BAR_COLORS[standing or 4] or {r=.8, g=.7, b=0}
         statusbar:SetStatusBarColor(color.r, color.g, color.b)
         statusbar:SetMinMaxValues(0, max - min)
         statusbar:SetValue(value - min)
