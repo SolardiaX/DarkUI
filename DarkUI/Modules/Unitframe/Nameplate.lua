@@ -391,9 +391,9 @@ end
 -- Cast color
 local function castColor(self)
 	if C.nameplate.majorSpells[self.spellID] then
-		ShowOverlayGlow(self.Icon.border)
+		ShowOverlayGlow(self.Icon.glowFrame)
 	else
-		HideOverlayGlow(self.Icon.border)
+		HideOverlayGlow(self.Icon.glowFrame)
 	end
 
 	if self.notInterruptible then
@@ -701,6 +701,10 @@ local function style(self, unit)
     self.Castbar.Icon.border:SetTexture(C.media.texture.border)
     self.Castbar.Icon.border:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -6, 6)
     self.Castbar.Icon.border:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", 6, -6)
+
+	self.Castbar.Icon.glowFrame = CreateFrame("Frame", nil, self)
+	self.Castbar.Icon.glowFrame:SetPoint("CENTER")
+	self.Castbar.Icon.glowFrame:SetSize(self.Castbar.Icon:GetWidth()+8, self.Castbar.Icon:GetHeight()+8)
 
 	-- Raid Icon
     self.RaidTargetIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
