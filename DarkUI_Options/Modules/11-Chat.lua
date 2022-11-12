@@ -79,4 +79,14 @@ ns.OptionList[11] = { -- Chat
             self:SetEnabled(ns.opt_widgets['chat:enable']:GetChecked())
         end)
     end },
+    { 1, 'chat', 'loot_icons', L_OPT_CHAT_LOOT_ICONS, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['chat:enable']:GetChecked())
+        end)
+    end },
+    { 1, 'chat', 'role_icons', L_OPT_CHAT_ROLE_ICONS, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['chat:enable']:GetChecked())
+        end)
+    end },
 }

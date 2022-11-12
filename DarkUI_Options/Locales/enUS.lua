@@ -166,6 +166,8 @@ L_OPT_CHAT_CHAT_BUBBLES = 'Beautify chat bubbles'
 L_OPT_CHAT_CHAT_COMBATLOG = 'Show Combat Log Toggle'
 L_OPT_CHAT_CHAT_TABS_MOUSEOVER = 'Hovering to show chat tabs'
 L_OPT_CHAT_CHAT_STICKY = 'Remember the last channel used'
+L_OPT_CHAT_LOOT_ICONS = 'Show loot icons in chat frame'
+L_OPT_CHAT_ROLE_ICONS = 'Show role icons in chat frame'
 
 L_OPT_COMBAT_COMBATTEXT_ENABLE = "Enable combat text module (based on xCT)"
 L_OPT_COMBAT_COMBATTEXT_BLIZZ_HEAD_NUMBERS = "Enable blizzard head numbers"

@@ -166,6 +166,8 @@ L_OPT_CHAT_CHAT_BUBBLES = '美化聊天泡泡'
 L_OPT_CHAT_CHAT_COMBATLOG = '显示战斗记录切换标签'
 L_OPT_CHAT_CHAT_TABS_MOUSEOVER = '鼠标悬停显示频道标签'
 L_OPT_CHAT_CHAT_STICKY = '记住上一次使用的频道'
+L_OPT_CHAT_LOOT_ICONS = '聊天框显示拾取物品图标'
+L_OPT_CHAT_ROLE_ICONS = '聊天框显示团队/小队成员角色'
 
 L_OPT_COMBAT_COMBATTEXT_ENABLE = "启用战斗文字输出模块 (基于xCT)"
 L_OPT_COMBAT_COMBATTEXT_BLIZZ_HEAD_NUMBERS = "启用暴雪默认战斗信息"
