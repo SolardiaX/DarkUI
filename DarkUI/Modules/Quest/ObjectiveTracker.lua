@@ -41,6 +41,12 @@ ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
 
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
+hooksecurefunc('BonusObjectiveTracker_AnimateReward', function(block)
+    local rewardsFrame = _G.ObjectiveTrackerBonusRewardsFrame
+	rewardsFrame:ClearAllPoints()
+	rewardsFrame:Point('TOPRIGHT', block, 'TOPLEFT', 10, -4)
+end)
+
 local headers = {
     SCENARIO_CONTENT_TRACKER_MODULE,
     BONUS_OBJECTIVE_TRACKER_MODULE,
