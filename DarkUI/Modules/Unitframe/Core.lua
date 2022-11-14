@@ -179,7 +179,7 @@ function DUF.PostCastStop(Castbar, unit, spellname, _)
 	Castbar:Show()
 end
 
-function DUF.PostUpdateInterruptible(Castbar, unit)
+function DUF.PostCastInterruptible(Castbar, unit)
 	updateCastBarColor(Castbar, unit)
 end
 

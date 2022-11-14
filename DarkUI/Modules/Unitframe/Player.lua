@@ -257,7 +257,7 @@ local createCastbar = function(self)
 
     castbar.PostCastStart = DUF.PostCastStart
     castbar.PostCastFail = DUF.PostCastFail
-    castbar.PostCastInterruptible = DUF.UpdateCastbarColor
+    castbar.PostCastInterruptible = DUF.PostCastInterruptible
     castbar.PostCastStop = DUF.PostCastStop
 
     self.Castbar = castbar
