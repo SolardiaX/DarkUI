@@ -7,15 +7,34 @@ local frame = CreateFrame("Frame")
 frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent", function(_, _, addon)
     if C.unitframe.enable then
-        if not InCombatLockdown() then
-            CompactRaidFrameManager:Kill()
-            CompactRaidFrameContainer:Kill()
-        end
-        ShowPartyFrame = E.dummy
-        HidePartyFrame = E.dummy
-        CompactUnitFrameProfiles_ApplyProfile = E.dummy
+        -- if not InCombatLockdown() then
+        --     CompactRaidFrameManager:Kill()
+        --     CompactRaidFrameContainer:Kill()
+        -- end
+        -- ShowPartyFrame = E.dummy
+        -- HidePartyFrame = E.dummy
+        -- CompactUnitFrameProfiles_ApplyProfile = E.dummy
         -- CompactRaidFrameManager_UpdateShown = E.dummy
         -- CompactRaidFrameManager_UpdateOptionsFlowContainer = E.dummy
+        if CompactRaidFrameManager then
+            local function HideFrames()
+                CompactRaidFrameManager:UnregisterAllEvents()
+                CompactRaidFrameContainer:UnregisterAllEvents()
+                if not InCombatLockdown() then
+                    CompactRaidFrameManager:Hide()
+                    local shown = CompactRaidFrameManager_GetSetting("IsShown")
+                    if shown and shown ~= "0" then
+                        CompactRaidFrameManager_SetSetting("IsShown", "0")
+                    end
+                end
+            end
+            local hiddenFrame = CreateFrame("Frame")
+            hiddenFrame:Hide()
+            hooksecurefunc("CompactRaidFrameManager_UpdateShown", HideFrames)
+            CompactRaidFrameManager:HookScript("OnShow", HideFrames)
+            CompactRaidFrameContainer:HookScript("OnShow", HideFrames)
+            HideFrames()
+        end
     end
 
     TutorialFrameAlertButton:Kill()
@@ -39,13 +58,13 @@ frame:SetScript("OnEvent", function(_, _, addon)
     end
 
     if C.map.minimap.enable then
-		SetCVar("minimapTrackingShowAll", 1)
-	end
+        SetCVar("minimapTrackingShowAll", 1)
+    end
 
     if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
         if E.isBeta then
             C_Container.SetSortBagsRightToLeft(true)
-			C_Container.SetInsertItemsLeftToRight(false)
+            C_Container.SetInsertItemsLeftToRight(false)
         else
             SetSortBagsRightToLeft(true)
             SetInsertItemsLeftToRight(false)

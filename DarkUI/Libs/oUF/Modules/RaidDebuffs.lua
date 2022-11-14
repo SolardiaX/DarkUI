@@ -23,39 +23,17 @@ local DispellPriority = {
     ["Poison"]  = 1,
 }
 
-local DispellFilter
-do
-    local dispellClasses = {
-        ["DRUID"]   = {
-            ["Magic"]  = false,
-            ["Curse"]  = true,
-            ["Poison"] = true,
-        },
-        ["MONK"]    = {
-            ["Magic"]   = true,
-            ["Poison"]  = true,
-            ["Disease"] = true,
-        },
-        ["PALADIN"] = {
-            ["Magic"]   = false,
-            ["Poison"]  = true,
-            ["Disease"] = true,
-        },
-        ["PRIEST"]  = {
-            ["Magic"]   = false,
-            ["Disease"] = false,
-        },
-        ["SHAMAN"]  = {
-            ["Magic"] = false,
-            ["Curse"] = true,
-        },
-        ["MAGE"]    = {
-            ["Curse"] = true,
-        },
-    }
+local CanDispel = {
+	DRUID = {Magic = false, Curse = true, Poison = true},
+	EVOKER = {Magic = false, Curse = true, Poison = true, Disease = true},
+	MAGE = {Curse = true},
+	MONK = {Magic = false, Poison = true, Disease = true},
+	PALADIN = {Magic = false, Poison = true, Disease = true},
+	PRIEST = {Magic = false, Disease = true},
+	SHAMAN = {Magic = false, Curse = true}
+}
 
-    DispellFilter = dispellClasses[class] or {}
-end
+local DispellFilter = CanDispel[class] or {}
 
 local function checkSpecs()
     local spec = GetSpecialization()

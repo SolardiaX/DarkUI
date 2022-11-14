@@ -6,9 +6,6 @@
     <Script file="LitePanels\LitePanels.lua" />
     <!--Script file="LitePanels\Layout.lua" /-->
 
-    <!-- oGlow -->
-    <!--Include file="oGlow\load.xml" /-->
-
     <!-- oUF -->
     <Include file="oUF\load.xml" />
 

@@ -19,7 +19,6 @@ ns[1].client = GetLocale()
 ns[1].realm = GetRealmName()
 ns[1].version = GetAddOnMetadata(addonName, "Version")
 ns[1].addonName = addonName
-ns[1].isNewPatch = select(4, GetBuildInfo()) >= 100000 -- 10.0
 ns[1].class = select(2, UnitClass('player'))
 ns[1].name = UnitName("player")
 ns[1].race = select(2, UnitRace("player"))

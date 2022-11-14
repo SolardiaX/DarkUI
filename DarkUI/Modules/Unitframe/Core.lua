@@ -174,10 +174,9 @@ end
 
 function DUF.PostCastStop(Castbar, unit, spellname, _)
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
-    --Castbar:SetValue(Castbar.max)
-    if (Castbar.Ticks) then
-        CastingBarFrameTicksSet(Castbar, unit, spellname, true)
-    end
+    Castbar:SetValue(Castbar.max)
+	Castbar.fadeOut = true
+	Castbar:Show()
 end
 
 function DUF.PostUpdateInterruptible(Castbar, unit)

@@ -27,7 +27,6 @@ local list = {
         {AuraID = 260249, UnitID = "player"},	-- 掠食者
         { AuraID = 231390, UnitID = "player", Combat = true }, -- 开拓者
         { AuraID = 164273, UnitID = "player", Combat = true }, -- 独来独往
-        {AuraID = 209997, UnitID = "pet", Flash = true},		-- 装死
     },
     ["Target Aura"]    = {        -- 目标光环组
         { AuraID = 3355, UnitID = "target", Caster = "player" }, -- 冰冻陷阱
@@ -61,7 +60,7 @@ local list = {
         {AuraID = 324149, UnitID = "target", Caster = "player"},	-- 劫掠射击
         {AuraID = 308498, UnitID = "target", Caster = "player"},	-- 共鸣箭
         {AuraID = 333526, UnitID = "target", Caster = "player"},	-- 尖刺果实
-        {AuraID = 375893, UnitID = "target", Caster = "player", Disabled = not E.isNewPatch},	-- 死亡飞轮
+        {AuraID = 375893, UnitID = "target", Caster = "player"},	-- 死亡飞轮
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 19574, UnitID = "player" }, -- 狂野怒火
@@ -75,6 +74,7 @@ local list = {
         { AuraID = 207094, UnitID = "pet" }, -- 泰坦之雷
         { AuraID = 217200, UnitID = "pet" }, -- 凶猛狂暴
         { AuraID = 272790, UnitID = "pet" }, -- 狂暴
+        {AuraID = 209997, UnitID = "pet", Flash = true}, -- 装死
         { AuraID = 193530, UnitID = "player" }, -- 野性守护
         { AuraID = 185791, UnitID = "player" }, -- 荒野呼唤
         { AuraID = 259388, UnitID = "player" }, -- 猫鼬之怒
@@ -105,12 +105,12 @@ local list = {
         { AuraID = 274447, UnitID = "player" }, -- 千里之目
         {AuraID = 260243, UnitID = "player"},	-- 乱射
         {AuraID = 342076, UnitID = "player"},	-- 行云流水
-    {AuraID = 336892, UnitID = "player", Flash = true},	-- 无懈警戒之秘
-        {AuraID = 388035, UnitID = "player", Disabled = not E.isNewPatch},	-- 巨熊之韧
-        {AuraID = 388045, UnitID = "player", Flash = true, Disabled = not E.isNewPatch},	-- 警戒
+        {AuraID = 336892, UnitID = "player", Flash = true},	-- 无懈警戒之秘
+        {AuraID = 388035, UnitID = "player"},	-- 巨熊之韧
+        {AuraID = 388045, UnitID = "player", Flash = true},	-- 警戒
 
-    {AuraID = 363760, UnitID = "player", Flash = true},	-- 杀戮狂乱，兽王4T
-    {AuraID = 363805, UnitID = "player", Flash = true},	-- 疯狂掷弹兵，生存2T
+        {AuraID = 363760, UnitID = "player", Flash = true},	-- 杀戮狂乱，兽王4T
+        {AuraID = 363805, UnitID = "player", Flash = true},	-- 疯狂掷弹兵，生存2T
     },
     ["Focus Aura"]     = {        -- 焦点光环组
         { AuraID = 3355, UnitID = "focus", Caster = "player" }, -- 冰冻陷阱
