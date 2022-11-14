@@ -22,12 +22,12 @@ local groups = {
     ["Target Aura"]    = { "RIGHT", 5, "ICON", 36, TargetAuraPoint },
     ["Special Aura"]   = { "LEFT", 5, "ICON", 36, SpecialAuraPoint },
     ["Focus Aura"]     = { "RIGHT", 5, "ICON", 35, FocusAuraPoint },
-    ["Spell Cooldown"] = { "UP", 5, "BAR", 18, CDPoint, 150 },
+    ["Spell Cooldown"] = { "UP", 5, "BAR", 18, CDPoint, 200 },
     ["Enchant Aura"]   = { "LEFT", 5, "ICON", 36, EnchantAuraPoint },
     ["Raid Buff"]      = { "LEFT", 5, "ICON", 45, RaidDebuffPoint },
     ["Raid Debuff"]    = { "RIGHT", 5, "ICON", 45, RaidDebuffPoint },
     ["Warning"]        = { "RIGHT", 5, "ICON", 42, WarningAuraPoint },
-    ["InternalCD"]     = { "UP", 5, "BAR", 18, InternalPoint, 150 },
+    ["InternalCD"]     = { "UP", 5, "BAR", 18, InternalPoint, 200 },
 }
 
 -- AuraWatch

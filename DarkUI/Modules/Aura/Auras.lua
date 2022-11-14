@@ -41,19 +41,19 @@ end
 local day, hour, minute = 86400, 3600, 60
 function auras:FormatAuraTime(s)
 	if s >= day then
-		return E:FormatTime(s), s%day
+		return E:FormatTime(s, true), s%day
 	elseif s >= 2*hour then
-		return E:FormatTime(s), s%hour
+		return E:FormatTime(s, true), s%hour
 	elseif s >= 10*minute then
-		return E:FormatTime(s), s%minute
+		return E:FormatTime(s, true), s%minute
 	elseif s >= minute then
-		return E:FormatTime(s), s - floor(s)
+		return E:FormatTime(s, true), s - floor(s)
 	elseif s > 10 then
-		return E:FormatTime(s), s - floor(s)
+		return E:FormatTime(s, true), s - floor(s)
 	elseif s > 5 then
-		return E:FormatTime(s), s - format("%.1f", s)
+		return E:FormatTime(s, true), s - format("%.1f", s)
 	else
-		return E:FormatTime(s), s - format("%.1f", s)
+		return E:FormatTime(s, true), s - format("%.1f", s)
 	end
 end
 
@@ -125,7 +125,7 @@ function auras:UpdateAuras(button, index)
             button.auraGrowth:Play()
         end
     else
-        button.timeLeft = 0
+        button.timeLeft = nil
         button.timer:SetText("")
 
         if cfg.enable_flash then

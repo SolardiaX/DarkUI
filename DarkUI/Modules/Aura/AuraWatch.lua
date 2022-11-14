@@ -250,23 +250,10 @@ local function BuildBAR(barWidth, iconSize)
     frame.Statusbar:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 5, 0)
     frame.Statusbar:SetMinMaxValues(0, 1)
     frame.Statusbar:SetValue(0)
-
-    frame.Statusbar:SetStatusBarTexture(C.media.texture.status)
+    frame.Statusbar:SetStatusBarTexture(C.media.texture.gradient)
     frame.Statusbar:SetStatusBarColor(E.color.r, E.color.g, E.color.b)
-
+    frame.Statusbar:SetTemplate("Default")
     frame.Statusbar:CreateShadow()
-
-    frame.Statusbar.BG = frame.Statusbar:CreateTexture(nil, "BACKGROUND")
-    frame.Statusbar.BG:SetAllPoints()
-    frame.Statusbar.BG:SetTexture(C.media.texture.status)
-    frame.Statusbar.BG:SetVertexColor(0, 0, 0, .5)
-
-    frame.Statusbar.Tex = frame.Statusbar:CreateTexture(nil, "BACKGROUND", nil, 1)
-    frame.Statusbar.Tex:SetAllPoints()
-    frame.Statusbar.Tex:SetTexture(C.media.texture.status, true, true)
-    frame.Statusbar.Tex:SetHorizTile(true)
-    frame.Statusbar.Tex:SetVertTile(true)
-    frame.Statusbar.Tex:SetBlendMode("ADD")
 
     frame.Statusbar.Spark = frame.Statusbar:CreateTexture(nil, "OVERLAY")
     frame.Statusbar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")

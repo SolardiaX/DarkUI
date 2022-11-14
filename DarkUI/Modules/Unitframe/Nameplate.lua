@@ -668,9 +668,9 @@ local function style(self, unit)
     self.Castbar.bg:SetColorTexture(1, 0.8, 0, 0.2)
 
     self.Castbar.PostCastStart = castColor
-    self.Castbar.PostChannelStart = castColor
-    self.Castbar.PostCastNotInterruptible = castColor
+    self.Castbar.PostCastFail = castColor
     self.Castbar.PostCastInterruptible = castColor
+    self.Castbar.PostCastStop = castColor
 
     -- Create Cast Time Text
     self.Castbar.Time = self.Castbar:CreateFontString(nil, "ARTWORK")
@@ -703,7 +703,7 @@ local function style(self, unit)
     self.Castbar.Icon.border:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", 6, -6)
 
 	self.Castbar.Icon.glowFrame = CreateFrame("Frame", nil, self)
-	self.Castbar.Icon.glowFrame:SetPoint("CENTER")
+	self.Castbar.Icon.glowFrame:SetPoint("CENTER", self.Castbar.Icon, "CENTER")
 	self.Castbar.Icon.glowFrame:SetSize(self.Castbar.Icon:GetWidth()+8, self.Castbar.Icon:GetHeight()+8)
 
 	-- Raid Icon
