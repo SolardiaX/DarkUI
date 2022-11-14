@@ -68,3 +68,28 @@ if not GuildControlUIRankSettingsFrameRosterLabel then
     GuildControlUIRankSettingsFrameRosterLabel = CreateFrame("frame")
     GuildControlUIRankSettingsFrameRosterLabel:Hide()
 end
+
+
+----------------------------------------------------------------------------------------
+--	Fix taint with Actionbars
+----------------------------------------------------------------------------------------
+local barsToUpdate = { MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight, StanceBar, PetActionBar, PossessActionBar, MultiBarRight, MultiBarLeft, MultiBar5, MultiBar6, MultiBar7 }
+for _, bar in ipairs(barsToUpdate) do
+    hooksecurefunc(bar, "UpdateSpellFlyoutDirection", function(self)
+        if not issecurevariable(self, "flyoutDirection") then
+            self.flyoutDirection = nil
+        end
+        if not issecurevariable(self, "snappedToFrame") then
+            self.snappedToFrame = nil
+        end
+    end)
+end
+
+hooksecurefunc("SetClampedTextureRotation", function(texture)
+    local parent = texture and texture:GetParent()
+    if parent and parent.FlyoutArrowPushed and parent.FlyoutArrowHighlight then
+        if not issecurevariable(texture, "rotationDegrees") then
+            texture.rotationDegrees = nil
+        end
+    end
+end)
