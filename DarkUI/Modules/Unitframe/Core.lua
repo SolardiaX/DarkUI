@@ -23,17 +23,49 @@ local FAILED = FAILED
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 local DebuffTypeColor = DebuffTypeColor
 
-local ignorePetSpells = {
-    115746, -- Felbolt  (Green Imp)
-    3110, -- firebolt (imp)
-    31707, -- waterbolt (water elemental)
-    85692, -- Doom Bolt
+local CastbarCompleteColor = {.1, .8, 0}
+local CastbarFailColor = {1, .1, 0}
+
+local channelingTicks = {
+	[740] = 4,		-- 宁静
+	[755] = 5,		-- 生命通道
+	[5143] = 4, 	-- 奥术飞弹
+	[12051] = 6, 	-- 唤醒
+	[15407] = 6,	-- 精神鞭笞
+	[47757] = 3,	-- 苦修
+	[47758] = 3,	-- 苦修
+	[48045] = 6,	-- 精神灼烧
+	[64843] = 4,	-- 神圣赞美诗
+	[120360] = 15,	-- 弹幕射击
+	[198013] = 10,	-- 眼棱
+	[198590] = 5,	-- 吸取灵魂
+	[205021] = 5,	-- 冰霜射线
+	[205065] = 6,	-- 虚空洪流
+	[206931] = 3,	-- 饮血者
+	[212084] = 10,	-- 邪能毁灭
+	[234153] = 5,	-- 吸取生命
+	[257044] = 7,	-- 急速射击
+	[291944] = 6,	-- 再生，赞达拉巨魔
+	[314791] = 4,	-- 变易幻能
+	[324631] = 8,	-- 血肉铸造，盟约
+	[356995] = 3,	-- 裂解，龙希尔
 }
+
+if E.class == "PRIEST" then
+	local function updateTicks()
+		local numTicks = 3
+		if IsPlayerSpell(193134) then numTicks = 4 end
+		channelingTicks[47757] = numTicks
+		channelingTicks[47758] = numTicks
+	end
+	E:RegisterEvent("PLAYER_LOGIN", updateTicks)
+	E:RegisterEvent("PLAYER_TALENT_UPDATE", updateTicks)
+end
 
 local DUF = {}
 
 ------------------------------------------------------------------
---  enter ui test mode       --
+--  Unitframes test mode                                        --
 ------------------------------------------------------------------
 SlashCmdList["TESTUI"] = function()
     for _, frames in pairs({ "DarkUITargetFrame", "DarkUIToTFrame", "DarkUIPetFrame", "DarkUIFocusFrame", "DarkUIFocusTargetFrame" }) do
@@ -50,186 +82,11 @@ end
 SLASH_TESTUI1 = "/testui"
 
 ------------------------------------------------------------------
---  Channeling ticks, based on Castbars by Xbeeps       --
+--  methods for element                                         --
 ------------------------------------------------------------------
-local CastingBarFrameTicksSet
-do
-    local _, class = UnitClass("player")
-
-    -- Negative means not modified by haste
-    local BaseTickDuration = { }
-    if class == "WARLOCK" then
-        BaseTickDuration[GetSpellInfo(689) or ""] = 1 -- Drain Life
-        BaseTickDuration[GetSpellInfo(1120) or ""] = 2 -- Drain Soul
-        BaseTickDuration[GetSpellInfo(755) or ""] = 1 -- Health Funnel
-        BaseTickDuration[GetSpellInfo(5740) or ""] = 2 -- Rain of Fire
-        BaseTickDuration[GetSpellInfo(1949) or ""] = 1 -- Hellfire
-        BaseTickDuration[GetSpellInfo(103103) or ""] = 1 -- Malefic Grasp
-        BaseTickDuration[GetSpellInfo(108371) or ""] = 1 -- Harvest Life
-    elseif class == "DRUID" then
-        BaseTickDuration[GetSpellInfo(740) or ""] = 2 -- Tranquility
-        BaseTickDuration[GetSpellInfo(16914) or ""] = 1 -- Hurricane
-        BaseTickDuration[GetSpellInfo(106996) or ""] = 1 -- Astral STORM
-        BaseTickDuration[GetSpellInfo(127663) or ""] = -1 -- Astral Communion
-    elseif class == "PRIEST" then
-        local mind_flay_TickTime = 1
-        if IsSpellKnown(157223) then
-            --Enhanced Mind Flay
-            mind_flay_TickTime = 2 / 3
-        end
-        BaseTickDuration[GetSpellInfo(47540) or ""] = 1 -- Penance
-        BaseTickDuration[GetSpellInfo(15407) or ""] = mind_flay_TickTime -- Mind Flay
-        BaseTickDuration[GetSpellInfo(129197) or ""] = mind_flay_TickTime -- Mind Flay (Insanity)
-        BaseTickDuration[GetSpellInfo(48045) or ""] = 1 -- Mind Sear
-        BaseTickDuration[GetSpellInfo(179337) or ""] = 1 -- Searing Insanity
-        BaseTickDuration[GetSpellInfo(64843) or ""] = 2 -- Divine Hymn
-        BaseTickDuration[GetSpellInfo(64901) or ""] = 2 -- Hymn of Hope
-    elseif class == "MAGE" then
-        BaseTickDuration[GetSpellInfo(10) or ""] = 1 -- Blizzard
-        BaseTickDuration[GetSpellInfo(5143) or ""] = 0.4 -- Arcane Missiles
-        BaseTickDuration[GetSpellInfo(12051) or ""] = 2 -- Evocation
-    elseif class == "MONK" then
-        BaseTickDuration[GetSpellInfo(117952) or ""] = 1 -- Crackling Jade Lightning
-        BaseTickDuration[GetSpellInfo(115175) or ""] = 1 -- Soothing Mist
-        BaseTickDuration[GetSpellInfo(113656) or ""] = 1 -- Fists of Fury
-        BaseTickDuration[GetSpellInfo(115294) or ""] = -1 -- Mana Tea
-    end
-
-    function CastingBarFrameTicksSet(Castbar, _, name, stop)
-        Castbar.ticks = Castbar.ticks or {}
-        local function CreateATick()
-            local spark = Castbar:CreateTexture(nil, 'OVERLAY', nil, 1)
-            spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
-            spark:SetVertexColor(1, 1, 1, 1)
-            spark:SetBlendMode('ADD')
-            spark:SetWidth(10)
-            tinsert(Castbar.ticks, spark)
-            return spark
-        end
-        for _, tick in ipairs(Castbar.ticks) do
-            tick:Hide()
-        end
-        if (stop) then return end
-        if (Castbar) then
-            local baseTickDuration = BaseTickDuration[name]
-            local tickDuration
-            if (baseTickDuration) then
-                if (baseTickDuration > 0) then
-                    local castTime = select(7, GetSpellInfo(2060))
-                    if (not castTime or (castTime == 0)) then
-                        castTime = 2500 / (1 + (GetCombatRatingBonus(CR_HASTE_SPELL) or 0) / 100)
-                    end
-                    tickDuration = (castTime / 2500) * baseTickDuration
-                else
-                    tickDuration = -baseTickDuration
-                end
-            end
-            if (tickDuration) then
-                local width = Castbar:GetWidth()
-                local delta = (tickDuration * width / Castbar.max)
-                local i = 1
-                while (delta * i) < width do
-                    if i > #Castbar.ticks then CreateATick() end
-                    local tick = Castbar.ticks[i]
-                    tick:SetHeight(Castbar:GetHeight() * 1.5)
-                    tick:SetPoint("CENTER", Castbar, "LEFT", delta * i, 0)
-                    tick:Show()
-                    i = i + 1
-                end
-            end
-        end
-    end
-end
-
-function DUF.FilterAuras(element, unit, icon, name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff, _, _)
-    local isPlayer
-    local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
-
-    if (caster == 'player' or caster == 'vehicle') then
-        isPlayer = true
-    end
-
-    if isInRaid == "raid" then
-        local auraList = C.aura.raidbuffs[E.class]
-        if auraList and auraList[spellID] and icon.isPlayer then
-            return true
-        elseif C.aura.raidbuffs["ALL"][spellID] then
-            return true
-        end
-    elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
-        return true
-    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and name) or isBossDebuff then
-        icon.isPlayer = isPlayer
-        icon.owner = caster
-        return true
-    end
-
-    return false
-end
-
-function DUF.PostCastStart(Castbar, unit, _, _)
-    if (unit == 'pet') then
-        Castbar:SetAlpha(1)
-        for _, spellID in pairs(ignorePetSpells) do
-            if (UnitCastingInfo('pet') == GetSpellInfo(spellID)) then
-                Castbar:SetAlpha(0)
-            end
-        end
-    end
-    DUF.UpdateCastbarColor(Castbar, unit)
-    if (Castbar.SafeZone) then
-        Castbar.SafeZone:SetDrawLayer("BORDER")
-    end
-end
-
-function DUF.PostCastFailed(Castbar, ...)
-    if (Castbar.Text) then
-        Castbar.Text:SetText(FAILED)
-    end
-    Castbar:SetStatusBarColor(1, 0, 0) -- Red
-    if (Castbar.max) then
-        Castbar:SetValue(Castbar.max)
-    end
-end
-
-function DUF.PostCastInterrupted(Castbar, ...)
-    --Castbar:SetStatusBarColor(1, 0, 0)
-    if (Castbar.max) then
-        -- Some spells got trough without castbar
-        Castbar:SetValue(Castbar.max)
-    end
-end
-
-function DUF.PostStop(Castbar, unit, spellname, _)
-    --Castbar:SetValue(Castbar.max)
-    if (Castbar.Ticks) then
-        CastingBarFrameTicksSet(Castbar, unit, spellname, true)
-    end
-end
-
-function DUF.PostChannelStart(Castbar, unit, name)
-    if (unit == 'pet' and Castbar:GetAlpha() == 0) then
-        Castbar:SetAlpha(1)
-    end
-
-    DUF.UpdateCastbarColor(Castbar, unit)
-    if Castbar.SafeZone then
-        Castbar.SafeZone:SetDrawLayer("BORDER", 1)
-    end
-    if (Castbar.Ticks) then
-        CastingBarFrameTicksSet(Castbar, unit, name)
-    end
-end
-
-function DUF.UpdateCastbarColor(Castbar, _)
-    if Castbar.Shield:IsShown() then
-        --show shield
-        Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
-        Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
-    else
-        --no shield
-        Castbar:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
-        Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
+function DUF.FlipTexture(texture)
+    if (texture and texture.SetTexCoord) then
+        return texture:SetTexCoord(1, 0, 0, 1)
     end
 end
 
@@ -251,12 +108,85 @@ function DUF.CreateIcon(f, layer, size, sublevel, anchorframe, anchorpoint1, anc
     return icon
 end
 
-function DUF.FlipTexture(texture)
-    if (texture and texture.SetTexCoord) then
-        return texture:SetTexCoord(1, 0, 0, 1)
+------------------------------------------------------------------
+--  Methods for castbar                                         --
+------------------------------------------------------------------
+local function setBarTicks(Castbar, ticks, numTicks)
+	for _, v in pairs(ticks) do
+		v:Hide()
+	end
+	if numTicks and numTicks > 0 then
+		local delta = Castbar:GetWidth() / numTicks
+		for i = 1, numTicks do
+			if not ticks[i] then
+                ticks[i] = Castbar:CreateTexture(nil, 'OVERLAY')
+                ticks[i]:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+                ticks[i]:SetVertexColor(1, 1, 1, 1)
+                ticks[i]:SetBlendMode('ADD')
+                ticks[i]:SetWidth(E.mult)
+                ticks[i]:SetHeight(Castbar:GetHeight() * 1.5)
+				-- ticks[i] = Castbar:CreateTexture(nil, "OVERLAY")
+				-- ticks[i]:SetTexture(C.media.texture.tex_border)
+				-- ticks[i]:SetVertexColor(unpack(C.media.border_color))
+				-- ticks[i]:SetWidth(E.mult)
+				-- ticks[i]:SetHeight(Castbar:GetHeight())
+				-- ticks[i]:SetDrawLayer("OVERLAY", 7)
+			end
+			ticks[i]:ClearAllPoints()
+			ticks[i]:SetPoint("CENTER", Castbar, "RIGHT", -delta * i, 0)
+			ticks[i]:Show()
+		end
+	end
+end
+
+local function updateCastbarColor(Castbar, unit)
+    if not UnitIsUnit(unit, "player") and Castbar.notInterruptible then
+        Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
+        Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
+    else
+        Castbar:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
+        Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
     end
 end
 
+function DUF.PostCastStart(Castbar, unit, _, _)
+    if (Castbar.SafeZone) then
+        Castbar.SafeZone:SetDrawLayer("BORDER")
+    end
+
+    if unit == "player" then
+        local numTicks = 0
+		if Castbar.channeling then
+			numTicks = channelingTicks[Castbar.spellID] or 0
+		end
+		setBarTicks(Castbar, Castbar.castTicks, numTicks)
+    end
+
+    updateCastbarColor(Castbar, unit)
+end
+
+function DUF.PostCastFail(Castbar, ...)
+    Castbar:SetStatusBarColor(unpack(CastbarFailColor))
+    Castbar:SetValue(Castbar.max)
+	Castbar.fadeOut = true
+	Castbar:Show()
+end
+
+function DUF.PostCastStop(Castbar, unit, spellname, _)
+    Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
+    --Castbar:SetValue(Castbar.max)
+    if (Castbar.Ticks) then
+        CastingBarFrameTicksSet(Castbar, unit, spellname, true)
+    end
+end
+
+function DUF.PostUpdateInterruptible(Castbar, unit)
+	updateCastBarColor(Castbar, unit)
+end
+
+------------------------------------------------------------------
+--  Methods for icon                                            --
+------------------------------------------------------------------
 function DUF.PostCreateIcon(_, button)
     button.icon:SetTexCoord(unpack(C.media.texCoord))
     button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
@@ -310,41 +240,6 @@ function DUF.PostUpdateIcon(icons, unit, icon, index, ...)
     icon.first = true
 end
 
-function DUF.PostUpdatePower(Power, unit, _, max)
-    if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) or (max == 0) then
-        Power:SetValue(0)
-        if Power.Value then
-            Power.Value:SetText('')
-        end
-
-        return
-    end
-
-    if not Power.Value then return end
-end
-
-function DUF.SetFader(self, config)
-    if config ~= nil then
-
-        local index = 1
-        for k, v in pairs(config) do
-            if k == "NormalAlpha" then
-                self.NormalAlpha = v
-            elseif k == "Range" then
-                self.Range = v
-                self.outsideRangeAlphaPerc = .3
-            else
-                if not self.Fader then self.Fader = {} end
-
-                self.Fader[index] = {}
-                self.Fader[index][k] = v
-
-                index = index + 1
-            end
-        end
-    end
-end
-
 function DUF.CreateAuraTimer(self, elapsed)
 	if self.timeLeft then
 		self.elapsed = (self.elapsed or 0) + elapsed
@@ -372,5 +267,73 @@ function DUF.CreateAuraTimer(self, elapsed)
 		end
 	end
 end
+
+function DUF.FilterAuras(element, unit, icon, name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff, _, _)
+    local isPlayer
+    local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
+
+    if (caster == 'player' or caster == 'vehicle') then
+        isPlayer = true
+    end
+
+    if isInRaid == "raid" then
+        local auraList = C.aura.raidbuffs[E.class]
+        if auraList and auraList[spellID] and icon.isPlayer then
+            return true
+        elseif C.aura.raidbuffs["ALL"][spellID] then
+            return true
+        end
+    elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
+        return true
+    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and name) or isBossDebuff then
+        icon.isPlayer = isPlayer
+        icon.owner = caster
+        return true
+    end
+
+    return false
+end
+
+------------------------------------------------------------------
+--  Methods for powerbar                                        --
+------------------------------------------------------------------
+function DUF.PostUpdatePower(Power, unit, _, max)
+    if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) or (max == 0) then
+        Power:SetValue(0)
+        if Power.Value then
+            Power.Value:SetText('')
+        end
+
+        return
+    end
+
+    if not Power.Value then return end
+end
+
+------------------------------------------------------------------
+--  Methods for fader                                           --
+------------------------------------------------------------------
+function DUF.SetFader(self, config)
+    if config ~= nil then
+
+        local index = 1
+        for k, v in pairs(config) do
+            if k == "NormalAlpha" then
+                self.NormalAlpha = v
+            elseif k == "Range" then
+                self.Range = v
+                self.outsideRangeAlphaPerc = .3
+            else
+                if not self.Fader then self.Fader = {} end
+
+                self.Fader[index] = {}
+                self.Fader[index][k] = v
+
+                index = index + 1
+            end
+        end
+    end
+end
+
 
 E.unitframe = DUF

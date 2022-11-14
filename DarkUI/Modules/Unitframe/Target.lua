@@ -245,14 +245,6 @@ local createCastbar = function(self)
     spark:SetSize(15, castbar:GetHeight() * 2)
     castbar.Spark = spark
 
-    local flash = CreateFrame("Frame", nil, castbar)
-    flash:SetAllPoints(castbar)
-    castbar.Flash = flash
-
-    local shield = castbar:CreateTexture(nil, 'BACKGROUND')
-    shield:SetTexture(0, 0, 0, 0)
-    castbar.Shield = shield
-
     local text = DUF.CreateFont(castbar, STANDARD_TEXT_FONT, 12, "OUTLINE")
     text:SetPoint("BOTTOMRIGHT", castbar, "TOPRIGHT", 0, 10)
     text:SetJustifyH('RIGHT')
@@ -264,14 +256,9 @@ local createCastbar = function(self)
     castbar.Time = time
 
     castbar.PostCastStart = DUF.PostCastStart
-    castbar.PostCastFailed = DUF.PostCastFailed
-    castbar.PostCastInterrupted = DUF.PostCastInterrupted
-    castbar.PostCastInterruptible = DUF.UpdateCastbarColor
-    castbar.PostCastNotInterruptible = DUF.UpdateCastbarColor
-    castbar.PostCastStop = DUF.PostStop
-    castbar.PostChannelStop = DUF.PostStop
-    castbar.PostChannelStart = DUF.PostChannelStart
-    castbar.ticks = true
+    castbar.PostCastFail = DUF.PostCastFail
+    castbar.PostCastInterruptible = DUF.PostUpdateInterruptible
+    castbar.PostCastStop = DUF.PostCastStop
 
     self.Castbar = castbar
 end

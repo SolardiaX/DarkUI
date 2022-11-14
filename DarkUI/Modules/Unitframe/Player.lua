@@ -205,6 +205,8 @@ local createCastbar = function(self)
     castbar:SetSize(146, 16)
     castbar:SetReverseFill(true)
     castbar:SetPoint(unpack(cfg.player.castbar.position))
+    
+    castbar.castTicks = {}
 
     local fg = CreateFrame("Frame", nil, castbar)
     fg:SetPoint("CENTER", 24, 0)
@@ -243,14 +245,6 @@ local createCastbar = function(self)
     spark:SetSize(15, castbar:GetHeight() * 2)
     castbar.Spark = spark
 
-    local flash = CreateFrame("Frame", nil, castbar)
-    flash:SetAllPoints(castbar)
-    castbar.Flash = flash
-
-    local shield = castbar:CreateTexture(nil, 'BACKGROUND')
-    shield:SetTexture(0, 0, 0, 0)
-    castbar.Shield = shield
-
     local text = DUF.CreateFont(castbar, STANDARD_TEXT_FONT, 12, "OUTLINE")
     text:SetPoint("BOTTOMLEFT", castbar, "TOPLEFT", 0, 10)
     text:SetJustifyH('LEFT')
@@ -261,14 +255,10 @@ local createCastbar = function(self)
     time:SetJustifyH("RIGHT")
     castbar.Time = time
 
-    castbar.CastStart = DUF.PostCastStart
-    castbar.PostCastFailed = DUF.PostCastFailed
-    castbar.PostCastInterrupted = DUF.PostCastInterrupted
+    castbar.PostCastStart = DUF.PostCastStart
+    castbar.PostCastFail = DUF.PostCastFail
     castbar.PostCastInterruptible = DUF.UpdateCastbarColor
-    castbar.PostCastNotInterruptible = DUF.UpdateCastbarColor
-    castbar.PostCastStop = DUF.PostStop
-    castbar.PostChannelStop = DUF.PostStop
-    castbar.PostChannelStart = DUF.PostChannelStart
+    castbar.PostCastStop = DUF.PostCastStop
 
     self.Castbar = castbar
 end
