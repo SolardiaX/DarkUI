@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	PetActionBar (modified from Tukui)
+--	PetActionBar (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 
 local _G = _G
@@ -40,6 +40,7 @@ local function updatePetBar()
             petActionButton:SetChecked(true)
             if IsPetAttackAction(i) then
                 petActionButton:StartFlash()
+                petActionButton:GetCheckedTexture():SetAlpha(0.5)
             end
         else
             petActionButton:SetChecked(false)
@@ -104,28 +105,27 @@ bar:SetScript("OnEvent", function(self, event)
         PetActionBar.showgrid = nil
 
         PetActionBar:UnregisterAllEvents()
-
         PetActionBar_Update = updatePetBar
 
         for i = 1, num do
             local button = _G["PetActionButton" .. i]
-            tinsert(bar.buttonList, button) --add the button object to the list
+            tinsert(self.buttonList, button) --add the button object to the list
 
             button:SetSize(cfg.button.size, cfg.button.size)
             button:ClearAllPoints()
-            button:SetParent(bar)
+            button:SetParent(self)
             button:Show()
             
             if i == 1 then
-                button:SetPoint("BOTTOMLEFT", bar, 0, 0)
+                button:SetPoint("BOTTOMLEFT", self, 0, 0)
             else
                 local previous = _G["PetActionButton" .. i - 1]
                 button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
             end
 
-            -- button.SetPoint = function() return end
+            button.SetPoint = function() return end
 
-            bar:SetAttribute("addchild", button)
+            self:SetAttribute("addchild", button)
         end
 
         RegisterStateDriver(bar, "visibility", "[@pet,exists,nopossessbar] show; hide")
