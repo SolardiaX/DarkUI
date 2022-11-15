@@ -62,14 +62,23 @@ frame:SetScript("OnEvent", function(_, _, addon)
     end
 
     if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
-        if E.isBeta then
-            C_Container.SetSortBagsRightToLeft(true)
-            C_Container.SetInsertItemsLeftToRight(false)
-        else
-            SetSortBagsRightToLeft(true)
-            SetInsertItemsLeftToRight(false)
-        end
+        if not E.newPatch then -- BETA
+			SetSortBagsRightToLeft(true)
+			SetInsertItemsLeftToRight(false)
+		else
+			C_Container.SetSortBagsRightToLeft(true)
+			C_Container.SetInsertItemsLeftToRight(false)
+		end
     end
+
+    if C.combat.combattext.enable then
+		--BETA InterfaceOptionsCombatPanelEnableFloatingCombatText:Hide()
+		if C.combat.combattext.incoming then
+			SetCVar("enableFloatingCombatText", 1)
+		else
+			SetCVar("enableFloatingCombatText", 0)
+		end
+	end
 end)
 
 local function AcknowledgeTips()

@@ -51,6 +51,7 @@ ns.OptionList[12] = { -- Chat
     { 1, 'combat', 'combattext.healing', L_OPT_COMBAT_COMBATTEXT_HEALING, false },
     { 1, 'combat', 'combattext.show_hots', L_OPT_COMBAT_COMBATTEXT_SHOW_HOTS, false },
     { 1, 'combat', 'combattext.show_overhealing', L_OPT_COMBAT_COMBATTEXT_SHOW_OVERHEALING, false },
+    { 1, 'combat', 'combattext.incoming', L_OPT_COMBAT_COMBATTEXT_INCOMING, false },
     { 1, 'combat', 'combattext.pet_damage', L_OPT_COMBAT_COMBATTEXT_PET_DAMAGE, false },
     { 1, 'combat', 'combattext.dot_damage', L_OPT_COMBAT_COMBATTEXT_DOT_DAMAGE, false },
     { 1, 'combat', 'combattext.damage_color', L_OPT_COMBAT_COMBATTEXT_DAMAGE_COLOR, false },
