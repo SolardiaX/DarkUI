@@ -732,9 +732,12 @@ local function style(self, unit)
 
 	-- Healer Icon
 	if cfg.healer_icon == true then
-        self.HPHeal = self.Health:CreateFontString(nil, "OVERLAY")
-        self.HPHeal:SetFont(C.media.standard_font[1], 32, C.media.standard_font[2])
-        self.HPHeal:SetText("|cFFD53333+|r")
+        -- self.HPHeal = self.Health:CreateFontString(nil, "OVERLAY")
+        -- self.HPHeal:SetFont(C.media.standard_font[1], 32, C.media.standard_font[2])
+        -- self.HPHeal:SetText("|cFFD53333+|r")
+		self.HPHeal = self.Health:CreateTexture(nil, "OVERLAY")
+		self.HPHeal:SetSize(16, 16)
+		self.HPHeal:SetTexture(C.media.path .. "icon_healer")
         self.HPHeal:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
 	end
 
