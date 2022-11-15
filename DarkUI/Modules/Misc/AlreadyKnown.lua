@@ -38,7 +38,7 @@ local function IsAlreadyKnown(link, index)
 		if not name then return end
 
 		if itemClassID == Enum.ItemClass.Battlepet and index then
-			if E.isBeta then
+			if E.newPatch then
 				local data = C_TooltipInfo.GetGuildBankItem(GetCurrentGuildBankTab(), index)
 				if data then
 					local argVal = data.args and data.args[2]
@@ -54,7 +54,7 @@ local function IsAlreadyKnown(link, index)
 			if knowns[link] then return true end
 			if not knowables[itemClassID] then return end
 
-			if E.isBeta then
+			if E.newPatch then
 				local data = C_TooltipInfo.GetHyperlink(link, nil, nil, true)
 				if data then
 					for i = 1, #data.lines do

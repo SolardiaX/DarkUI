@@ -25,7 +25,7 @@ ns[1].race = select(2, UnitRace("player"))
 ns[1].level = UnitLevel("player")
 ns[1].color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[ns[1].class]
 ns[1].colorString = format('|cff%02x%02x%02x', ns[1].color.r * 255, ns[1].color.g * 255, ns[1].color.b * 255)
-ns[1].isBeta = select(4, GetBuildInfo()) == 100002 -- 10.0.2
+ns[1].newPatch = select(4, GetBuildInfo()) >= 100002 -- 10.0.2
 
 function ns:unpack()
     return self[1], self[2], self[3], self[4]
