@@ -101,7 +101,7 @@ bar:SetScript("OnEvent", function(self, event)
     if event == "PLAYER_ENTERING_WORLD" then
         PetActionBar:EnableMouse(false)
         PetActionBar_ShowGrid = E.dummy
-        PetActionBar.UpdateGridLayout = E.dummy
+        PetActionBar_HideGrid = E.dummy
         PetActionBar.showgrid = nil
 
         PetActionBar:UnregisterAllEvents()
