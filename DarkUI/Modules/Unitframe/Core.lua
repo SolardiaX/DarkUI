@@ -27,39 +27,39 @@ local CastbarCompleteColor = {.1, .8, 0}
 local CastbarFailColor = {1, .1, 0}
 
 local channelingTicks = {
-	[740] = 4,		-- 宁静
-	[755] = 5,		-- 生命通道
-	[5143] = 4, 	-- 奥术飞弹
-	[12051] = 6, 	-- 唤醒
-	[15407] = 6,	-- 精神鞭笞
-	[47757] = 3,	-- 苦修
-	[47758] = 3,	-- 苦修
-	[48045] = 6,	-- 精神灼烧
-	[64843] = 4,	-- 神圣赞美诗
-	[120360] = 15,	-- 弹幕射击
-	[198013] = 10,	-- 眼棱
-	[198590] = 5,	-- 吸取灵魂
-	[205021] = 5,	-- 冰霜射线
-	[205065] = 6,	-- 虚空洪流
-	[206931] = 3,	-- 饮血者
-	[212084] = 10,	-- 邪能毁灭
-	[234153] = 5,	-- 吸取生命
-	[257044] = 7,	-- 急速射击
-	[291944] = 6,	-- 再生，赞达拉巨魔
-	[314791] = 4,	-- 变易幻能
-	[324631] = 8,	-- 血肉铸造，盟约
-	[356995] = 3,	-- 裂解，龙希尔
+    [740] = 4,		-- 宁静
+    [755] = 5,		-- 生命通道
+    [5143] = 4, 	-- 奥术飞弹
+    [12051] = 6, 	-- 唤醒
+    [15407] = 6,	-- 精神鞭笞
+    [47757] = 3,	-- 苦修
+    [47758] = 3,	-- 苦修
+    [48045] = 6,	-- 精神灼烧
+    [64843] = 4,	-- 神圣赞美诗
+    [120360] = 15,	-- 弹幕射击
+    [198013] = 10,	-- 眼棱
+    [198590] = 5,	-- 吸取灵魂
+    [205021] = 5,	-- 冰霜射线
+    [205065] = 6,	-- 虚空洪流
+    [206931] = 3,	-- 饮血者
+    [212084] = 10,	-- 邪能毁灭
+    [234153] = 5,	-- 吸取生命
+    [257044] = 7,	-- 急速射击
+    [291944] = 6,	-- 再生，赞达拉巨魔
+    [314791] = 4,	-- 变易幻能
+    [324631] = 8,	-- 血肉铸造，盟约
+    [356995] = 3,	-- 裂解，龙希尔
 }
 
 if E.class == "PRIEST" then
-	local function updateTicks()
-		local numTicks = 3
-		if IsPlayerSpell(193134) then numTicks = 4 end
-		channelingTicks[47757] = numTicks
-		channelingTicks[47758] = numTicks
-	end
-	E:RegisterEvent("PLAYER_LOGIN", updateTicks)
-	E:RegisterEvent("PLAYER_TALENT_UPDATE", updateTicks)
+    local function updateTicks()
+        local numTicks = 3
+        if IsPlayerSpell(193134) then numTicks = 4 end
+        channelingTicks[47757] = numTicks
+        channelingTicks[47758] = numTicks
+    end
+    E:RegisterEvent("PLAYER_LOGIN", updateTicks)
+    E:RegisterEvent("PLAYER_TALENT_UPDATE", updateTicks)
 end
 
 local DUF = {}
@@ -112,31 +112,25 @@ end
 --  Methods for castbar                                         --
 ------------------------------------------------------------------
 local function setBarTicks(Castbar, ticks, numTicks)
-	for _, v in pairs(ticks) do
-		v:Hide()
-	end
-	if numTicks and numTicks > 0 then
-		local delta = Castbar:GetWidth() / numTicks
-		for i = 1, numTicks do
-			if not ticks[i] then
-                ticks[i] = Castbar:CreateTexture(nil, 'OVERLAY')
-                ticks[i]:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
-                ticks[i]:SetVertexColor(1, 1, 1, 1)
-                ticks[i]:SetBlendMode('ADD')
+    for _, v in pairs(ticks) do
+        v:Hide()
+    end
+    if numTicks and numTicks > 0 then
+        local delta = Castbar:GetWidth() / numTicks
+        for i = 1, numTicks do
+            if not ticks[i] then
+                ticks[i] = Castbar:CreateTexture(nil, "OVERLAY")
+                ticks[i]:SetTexture(C.media.path .. "uf_bartex_compact")
+                ticks[i]:SetVertexColor(unpack(C.media.border_color))
                 ticks[i]:SetWidth(E.mult)
-                ticks[i]:SetHeight(Castbar:GetHeight() * 1.5)
-				-- ticks[i] = Castbar:CreateTexture(nil, "OVERLAY")
-				-- ticks[i]:SetTexture(C.media.texture.tex_border)
-				-- ticks[i]:SetVertexColor(unpack(C.media.border_color))
-				-- ticks[i]:SetWidth(E.mult)
-				-- ticks[i]:SetHeight(Castbar:GetHeight())
-				-- ticks[i]:SetDrawLayer("OVERLAY", 7)
-			end
-			ticks[i]:ClearAllPoints()
-			ticks[i]:SetPoint("CENTER", Castbar, "RIGHT", -delta * i, 0)
-			ticks[i]:Show()
-		end
-	end
+                ticks[i]:SetHeight(Castbar:GetHeight())
+                ticks[i]:SetDrawLayer("OVERLAY", 7)
+            end
+            ticks[i]:ClearAllPoints()
+            ticks[i]:SetPoint("CENTER", Castbar, "RIGHT", -delta * i, 0)
+            ticks[i]:Show()
+        end
+    end
 end
 
 local function updateCastbarColor(Castbar, unit)
@@ -156,10 +150,10 @@ function DUF.PostCastStart(Castbar, unit, _, _)
 
     if unit == "player" then
         local numTicks = 0
-		if Castbar.channeling then
-			numTicks = channelingTicks[Castbar.spellID] or 0
-		end
-		setBarTicks(Castbar, Castbar.castTicks, numTicks)
+        if Castbar.channeling then
+            numTicks = channelingTicks[Castbar.spellID] or 0
+        end
+        setBarTicks(Castbar, Castbar.castTicks, numTicks)
     end
 
     updateCastbarColor(Castbar, unit)
@@ -168,19 +162,19 @@ end
 function DUF.PostCastFail(Castbar, ...)
     Castbar:SetStatusBarColor(unpack(CastbarFailColor))
     Castbar:SetValue(Castbar.max)
-	Castbar.fadeOut = true
-	Castbar:Show()
+    Castbar.fadeOut = true
+    Castbar:Show()
 end
 
 function DUF.PostCastStop(Castbar, unit, spellname, _)
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
     Castbar:SetValue(Castbar.max)
-	Castbar.fadeOut = true
-	Castbar:Show()
+    Castbar.fadeOut = true
+    Castbar:Show()
 end
 
 function DUF.PostCastInterruptible(Castbar, unit)
-	updateCastBarColor(Castbar, unit)
+    updateCastBarColor(Castbar, unit)
 end
 
 ------------------------------------------------------------------
@@ -240,31 +234,31 @@ function DUF.PostUpdateIcon(icons, unit, icon, index, ...)
 end
 
 function DUF.CreateAuraTimer(self, elapsed)
-	if self.timeLeft then
-		self.elapsed = (self.elapsed or 0) + elapsed
-		if self.elapsed >= 0.1 then
-			if not self.first then
-				self.timeLeft = self.timeLeft - self.elapsed
-			else
-				self.timeLeft = self.timeLeft - GetTime()
-				self.first = false
-			end
-			if self.timeLeft > 0 then
-				local time = E:FormatTime(self.timeLeft)
-				self.remaining:SetText(time)
+    if self.timeLeft then
+        self.elapsed = (self.elapsed or 0) + elapsed
+        if self.elapsed >= 0.1 then
+            if not self.first then
+                self.timeLeft = self.timeLeft - self.elapsed
+            else
+                self.timeLeft = self.timeLeft - GetTime()
+                self.first = false
+            end
+            if self.timeLeft > 0 then
+                local time = E:FormatTime(self.timeLeft)
+                self.remaining:SetText(time)
 
                 if floor(self.timeLeft + 0.5) > 5 then
                     self.remaining:SetTextColor(1, 1, 1)
                 else
                     self.remaining:SetTextColor(1, 0.2, 0.2)
                 end
-			else
-				self.remaining:Hide()
-				self:SetScript("OnUpdate", nil)
-			end
-			self.elapsed = 0
-		end
-	end
+            else
+                self.remaining:Hide()
+                self:SetScript("OnUpdate", nil)
+            end
+            self.elapsed = 0
+        end
+    end
 end
 
 function DUF.FilterAuras(element, unit, icon, name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff, _, _)
