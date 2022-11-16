@@ -6,7 +6,7 @@ if not C.blizzard.custom_position then return end
 ------------------------------------------------------------------------------------------
 local Load = CreateFrame("Frame")
 Load:RegisterEvent("PLAYER_ENTERING_WORLD")
-Load:SetScript("OnEvent", function(_, _, addon)
+Load:SetScript("OnEvent", function()
     if not _G.TalkingHeadFrame then
         _G.TalkingHead_LoadUI()
     end
@@ -15,6 +15,7 @@ Load:SetScript("OnEvent", function(_, _, addon)
     TalkingHeadFrame.ignoreFrameLayout = true
     TalkingHeadFrame:ClearAllPoints()
     TalkingHeadFrame:SetPoint(unpack(C.blizzard.talking_head_pos))
+    TalkingHeadFrame.SetPoint = E.dummy
 
     --Iterate through all alert subsystems in order to find the one created for TalkingHeadFrame, and then remove it.
     --We do this to prevent alerts from anchoring to this frame when it is shown.

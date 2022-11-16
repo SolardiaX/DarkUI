@@ -30,7 +30,12 @@ ExtraActionBarFrame:EnableMouse(false)
 ExtraAbilityContainer:SetParent(extraBar)
 ExtraAbilityContainer:ClearAllPoints()
 ExtraAbilityContainer:SetAllPoints()
+ExtraActionBarFrame.ignoreInLayout = true
 ExtraAbilityContainer.ignoreFramePositionManager = true
+
+ExtraAbilityContainer.SetSize = E.dummy
+ExtraAbilityContainer:SetScript("OnShow", nil)
+ExtraAbilityContainer:SetScript("OnHide", nil)
 
 --zone ability
 local zoneBar = CreateFrame("Frame", "DarkUI_ZoneAbilityBarHolder", UIParent)
@@ -46,7 +51,7 @@ ZoneAbilityFrame:ClearAllPoints()
 ZoneAbilityFrame:SetPoint("CENTER", zoneBar)
 ZoneAbilityFrame.SpellButtonContainer:SetPoint("CENTER", zoneBar)
 ZoneAbilityFrame.SpellButtonContainer:SetSize(cfg.button.size, cfg.button.size)
-ZoneAbilityFrame.SpellButtonContainer.spacing = 0
+ZoneAbilityFrame.SpellButtonContainer.spacing = 3
 ZoneAbilityFrame.Style:SetAlpha(0)
 
 hooksecurefunc("ExtraActionBar_Update", function()

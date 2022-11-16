@@ -504,7 +504,7 @@ C.misc = {
 C.quest = {
     enable            = true,
     auto_collapse     = true,
-    quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -60, -90 },
+    quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -60, -60 },
     auto_button       = true,
     auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -20 },
 }

@@ -32,38 +32,41 @@ local ScenarioStageBlock = ScenarioStageBlock
 ----------------------------------------------------------------------------------------
 local frame = CreateFrame("Frame", "DarkUI_ObjectiveTrackerAnchor", UIParent)
 frame:SetPoint(unpack(C.quest.quest_tracker_pos))
-frame:SetSize(224, 150)
+frame:SetSize(240, 150)
 
-ObjectiveTrackerFrame:SetParent(frame)
-ObjectiveTrackerFrame:ClearAllPoints()
-ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
-ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:SetScript("OnEvent", function()
+    ObjectiveTrackerFrame.ignoreFramePositionManager = true
+    ObjectiveTrackerFrame.ignoreFrameLayout = true
+    ObjectiveTrackerFrame:ClearAllPoints()
+    ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
+    -- ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
+    ObjectiveTrackerFrame.SetPoint = E.dummy
 
-ObjectiveTrackerFrame.IsUserPlaced = function() return true end
+    hooksecurefunc('BonusObjectiveTracker_AnimateReward', function(block)
+        local rewardsFrame = _G.ObjectiveTrackerBonusRewardsFrame
+        rewardsFrame:ClearAllPoints()
+        rewardsFrame:Point('TOPRIGHT', block, 'TOPLEFT', 10, -4)
+    end)
 
-hooksecurefunc('BonusObjectiveTracker_AnimateReward', function(block)
-    local rewardsFrame = _G.ObjectiveTrackerBonusRewardsFrame
-	rewardsFrame:ClearAllPoints()
-	rewardsFrame:Point('TOPRIGHT', block, 'TOPLEFT', 10, -4)
-end)
-
-local headers = {
-    SCENARIO_CONTENT_TRACKER_MODULE,
-    BONUS_OBJECTIVE_TRACKER_MODULE,
-    UI_WIDGET_TRACKER_MODULE,
-    CAMPAIGN_QUEST_TRACKER_MODULE,
-    QUEST_TRACKER_MODULE,
-    ACHIEVEMENT_TRACKER_MODULE,
-    WORLD_QUEST_TRACKER_MODULE
-}
-for i = 1, #headers do
-    local header = headers[i].Header
-    if header then
-        header.Background:Hide()
+    local headers = {
+        SCENARIO_CONTENT_TRACKER_MODULE,
+        BONUS_OBJECTIVE_TRACKER_MODULE,
+        UI_WIDGET_TRACKER_MODULE,
+        CAMPAIGN_QUEST_TRACKER_MODULE,
+        QUEST_TRACKER_MODULE,
+        ACHIEVEMENT_TRACKER_MODULE,
+        WORLD_QUEST_TRACKER_MODULE
+    }
+    for i = 1, #headers do
+        local header = headers[i].Header
+        if header then
+            header.Background:Hide()
+        end
     end
-end
 
-ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
+    ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
+end)
 
 ----------------------------------------------------------------------------------------
 --	Skin ObjectiveTrackerFrame item buttons
