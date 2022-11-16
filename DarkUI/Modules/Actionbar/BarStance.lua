@@ -17,41 +17,41 @@ local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 local cfg = C.actionbar.bars.barstance
 
 local shiftBarUpdate = function()
-	local numForms = GetNumShapeshiftForms()
-	local texture, isActive, isCastable
-	local button, icon, cooldown
-	local start, duration, enable
-	for i = 1, NUM_STANCE_SLOTS do
-		button = _G["StanceButton"..i]
-		icon = _G["StanceButton"..i.."Icon"]
-		if i <= numForms then
-			texture, isActive, isCastable = GetShapeshiftFormInfo(i)
-			icon:SetTexture(texture)
+    local numForms = GetNumShapeshiftForms()
+    local texture, isActive, isCastable
+    local button, icon, cooldown
+    local start, duration, enable
+    for i = 1, NUM_STANCE_SLOTS do
+        button = _G["StanceButton"..i]
+        icon = _G["StanceButton"..i.."Icon"]
+        if i <= numForms then
+            texture, isActive, isCastable = GetShapeshiftFormInfo(i)
+            icon:SetTexture(texture)
 
-			cooldown = _G["StanceButton"..i.."Cooldown"]
-			if texture then
-				cooldown:SetAlpha(1)
-			else
-				cooldown:SetAlpha(0)
-			end
+            cooldown = _G["StanceButton"..i.."Cooldown"]
+            if texture then
+                cooldown:SetAlpha(1)
+            else
+                cooldown:SetAlpha(0)
+            end
 
-			start, duration, enable = GetShapeshiftFormCooldown(i)
-			CooldownFrame_Set(cooldown, start, duration, enable)
+            start, duration, enable = GetShapeshiftFormCooldown(i)
+            CooldownFrame_Set(cooldown, start, duration, enable)
 
-			if isActive then
-				--BETA StanceBar.lastSelected = button:GetID()
-				button:SetChecked(true)
-			else
-				button:SetChecked(false)
-			end
+            if isActive then
+                --BETA StanceBar.lastSelected = button:GetID()
+                button:SetChecked(true)
+            else
+                button:SetChecked(false)
+            end
 
-			if isCastable then
-				icon:SetVertexColor(1.0, 1.0, 1.0)
-			else
-				icon:SetVertexColor(0.4, 0.4, 0.4)
-			end
-		end
-	end
+            if isCastable then
+                icon:SetVertexColor(1.0, 1.0, 1.0)
+            else
+                icon:SetVertexColor(0.4, 0.4, 0.4)
+            end
+        end
+    end
 end
 
 local bar = CreateFrame("Frame", "StanceBarHolder", UIParent, "SecureHandlerStateTemplate")
@@ -74,6 +74,7 @@ bar:SetScript("OnEvent", function(self, event)
         StanceBar:ClearAllPoints()
         StanceBar:SetPoint("TOPLEFT", bar, "TOPLEFT", -7, 0)
         StanceBar:EnableMouse(false)
+        StanceBar:UnregisterAllEvents()
 
         for i = 1, NUM_STANCE_SLOTS do
             local button = _G["StanceButton" .. i]
@@ -109,16 +110,16 @@ bar:SetScript("OnEvent", function(self, event)
             E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
         end
     elseif event == "UPDATE_SHAPESHIFT_FORMS" then
-		if InCombatLockdown() then return end
-		for i = 1, NUM_STANCE_SLOTS do
-			local button = _G["StanceButton"..i]
-			local icon = GetShapeshiftFormInfo(i)
-			if icon then
-				button:Show()
-			else
-				button:Hide()
-			end
-		end
+        if InCombatLockdown() then return end
+        for i = 1, NUM_STANCE_SLOTS do
+            local button = _G["StanceButton"..i]
+            local icon = GetShapeshiftFormInfo(i)
+            if icon then
+                button:Show()
+            else
+                button:Hide()
+            end
+        end
     else
         shiftBarUpdate()
     end

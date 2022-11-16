@@ -27,12 +27,12 @@ RegisterStateDriver(extraBar, "visibility", "[petbattle] hide; show")
 
 -- Prevent reanchor
 ExtraActionBarFrame:EnableMouse(false)
-ExtraAbilityContainer:SetParent(extraBar)
-ExtraAbilityContainer:ClearAllPoints()
-ExtraAbilityContainer:SetAllPoints()
 ExtraActionBarFrame.ignoreInLayout = true
-ExtraAbilityContainer.ignoreFramePositionManager = true
+ExtraActionBarFrame:SetParent(extraBar)
+ExtraActionBarFrame:ClearAllPoints()
+ExtraActionBarFrame:SetAllPoints()
 
+ExtraAbilityContainer.ignoreFramePositionManager = true
 ExtraAbilityContainer.SetSize = E.dummy
 ExtraAbilityContainer:SetScript("OnShow", nil)
 ExtraAbilityContainer:SetScript("OnHide", nil)
@@ -66,25 +66,21 @@ end)
 --	Skin ExtraActionBarFrame(by Zork)
 ------------------------------------------------------------------------------------------
 local button = ExtraActionButton1
-local icon = ExtraActionButton1Icon
-
-tinsert(extraBar.buttonList, button)
+local icon = _G[button:GetName().."Icon"]
 
 button:SetSize(cfg.button.size, cfg.button.size)
 button:SetAttribute("showgrid", 1)
+button:CreateTextureBorder()
+button:CreateShadow()
+
 button.Count:SetFont(unpack(C.media.standard_font))
 button.Count:SetShadowOffset(1, -1)
 button.Count:SetPoint("BOTTOMRIGHT", 0, 1)
 button.Count:SetJustifyH("RIGHT")
 
-hooksecurefunc("ExtraActionBar_Update", function()
-    local bar = ExtraActionBarFrame
+icon:SetTexCoord(unpack(C.media.texCoord))
 
-	if (HasExtraActionBar()) then
-		button.style:SetTexture("")
-		icon:SetInside()
-	end
-end)
+tinsert(extraBar.buttonList, button)
 
 --create the mouseover functionality
 if cfg.fader_mouseover then
