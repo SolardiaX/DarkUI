@@ -41,44 +41,44 @@ ttt:Hide()
 --	Gather Talents
 ----------------------------------------------------------------------------------------
 local function GatherTalents(mouseover)
-	if mouseover == 1 then
-		local id = GetInspectSpecialization("mouseover")
-		local currentSpecName = id and select(2, GetSpecializationInfoByID(id)) or L.TOOLTIP_LOADING
-		current.tree = currentSpecName
-	else
-		local currentSpec = GetSpecialization()
-		local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or L.TOOLTIP_NO_TALENT
-		current.tree = currentSpecName
-	end
+    if mouseover == 1 then
+        local id = GetInspectSpecialization("mouseover")
+        local currentSpecName = id and select(2, GetSpecializationInfoByID(id)) or L.TOOLTIP_LOADING
+        current.tree = currentSpecName
+    else
+        local currentSpec = GetSpecialization()
+        local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or L.TOOLTIP_NO_TALENT
+        current.tree = currentSpecName
+    end
 
-	-- Set the tips line output, for inspect, only update if the tip is still showing a unit
-	if mouseover == 0 then
-		GameTooltip:AddLine(TALENTS_PREFIX..current.tree)
-	elseif GameTooltip:GetUnit() then
-		for i = 2, GameTooltip:NumLines() do
-			if (_G["GameTooltipTextLeft"..i]:GetText() or ""):match("^"..TALENTS_PREFIX) then
-				_G["GameTooltipTextLeft"..i]:SetFormattedText("%s%s", TALENTS_PREFIX, current.tree)
-				break
-			end
-		end
-	end
-	-- Organise Cache
-	local cacheSize = CACHE_SIZE
-	for i = #cache, 1, -1 do
-		if current.name == cache[i].name then
-			tremove(cache, i)
-			break
-		end
-	end
-	if #cache > cacheSize then
-		tremove(cache, 1)
-	end
-	-- Cache the new entry
-	if cacheSize > 0 then
-		cache[#cache + 1] = CopyTable(current)
-	end
+    -- Set the tips line output, for inspect, only update if the tip is still showing a unit
+    if mouseover == 0 then
+        GameTooltip:AddLine(TALENTS_PREFIX..current.tree)
+    elseif GameTooltip:GetUnit() then
+        for i = 2, GameTooltip:NumLines() do
+            if (_G["GameTooltipTextLeft"..i]:GetText() or ""):match("^"..TALENTS_PREFIX) then
+                _G["GameTooltipTextLeft"..i]:SetFormattedText("%s%s", TALENTS_PREFIX, current.tree)
+                break
+            end
+        end
+    end
+    -- Organise Cache
+    local cacheSize = CACHE_SIZE
+    for i = #cache, 1, -1 do
+        if current.name == cache[i].name then
+            tremove(cache, i)
+            break
+        end
+    end
+    if #cache > cacheSize then
+        tremove(cache, 1)
+    end
+    -- Cache the new entry
+    if cacheSize > 0 then
+        cache[#cache + 1] = CopyTable(current)
+    end
 
-	GameTooltip:Show()
+    GameTooltip:Show()
 end
 
 ----------------------------------------------------------------------------------------
@@ -86,77 +86,87 @@ end
 ----------------------------------------------------------------------------------------
 -- OnEvent
 ttt:SetScript("OnEvent", function(self, event, guid)
-	self:UnregisterEvent(event)
-	if guid == current.guid then
-		GatherTalents(1)
-	end
+    self:UnregisterEvent(event)
+    if guid == current.guid then
+        GatherTalents(1)
+    end
 end)
 
 -- OnUpdate
 ttt:SetScript("OnUpdate", function(self, elapsed)
-	self.nextUpdate = (self.nextUpdate - elapsed)
-	if self.nextUpdate <= 0 then
-		self:Hide()
-		-- Make sure the mouseover unit is still our unit
-		if UnitGUID("mouseover") == current.guid then
-			if (InspectFrame and InspectFrame:IsVisible()) then return end
-			lastInspectRequest = GetTime()
-			self:RegisterEvent("INSPECT_READY")
-			NotifyInspect(current.unit)
-		end
-	end
+    self.nextUpdate = (self.nextUpdate - elapsed)
+    if self.nextUpdate <= 0 then
+        self:Hide()
+        -- Make sure the mouseover unit is still our unit
+        if UnitGUID("mouseover") == current.guid then
+            if (InspectFrame and InspectFrame:IsVisible()) then return end
+            lastInspectRequest = GetTime()
+            self:RegisterEvent("INSPECT_READY")
+            NotifyInspect(current.unit)
+        end
+    end
 end)
 
 -- HOOK: OnTooltipSetUnit
-GameTooltip:HookScript("OnTooltipSetUnit", function(self)
-	-- Abort any delayed inspect in progress
-	ttt:Hide()
-	-- Get the unit -- Check the UnitFrame unit if this tip is from a concated unit, such as "targettarget".
-	local _, unit = self:GetUnit()
-	if not unit then
-		local mFocus = GetMouseFocus()
-		if mFocus and mFocus.unit then
-			unit = mFocus.unit
-		end
-	end
-	-- No Unit or not a Player
-	if not unit or not UnitIsPlayer(unit) then
-		return
-	end
-	-- Only bother for players over level 9
-	local level = UnitLevel(unit)
-	if level > 9 or level == -1 then
-		-- Wipe Current Record
-		wipe(current)
-		current.unit = unit
-		current.name = UnitName(unit)
-		current.guid = UnitGUID(unit)
-		-- No need for inspection on the player
-		if UnitIsUnit(unit, "player") then
-			GatherTalents(0)
-			return
-		end
-		-- Show Cached Talents, If Available
-		local isInspectOpen = (InspectFrame and InspectFrame:IsShown()) or (Examiner and Examiner:IsShown())
-		local cacheLoaded = false
-		for _, entry in ipairs(cache) do
-			if current.name == entry.name and not isInspectOpen then
-				self:AddLine(TALENTS_PREFIX..entry.tree)
-				current.tree = entry.tree
-				cacheLoaded = true
-				break
-			end
-		end
-		-- Queue an inspect request
-		if CanInspect(unit) and not isInspectOpen then
-			local lastInspectTime = GetTime() - lastInspectRequest
-			ttt.nextUpdate = (lastInspectTime > INSPECT_FREQ) and INSPECT_DELAY or (INSPECT_FREQ - lastInspectTime + INSPECT_DELAY)
-			ttt:Show()
-			if not cacheLoaded then
-				self:AddLine(TALENTS_PREFIX..L.TOOLTIP_LOADING)
-			end
-		elseif isInspectOpen then
-			self:AddLine(TALENTS_PREFIX..L.TOOLTIP_INSPECT_OPEN)
-		end
-	end
-end)
+local function OnTooltipSetUnit(self)
+    -- Abort any delayed inspect in progress
+    ttt:Hide()
+
+    -- Get the unit -- Check the UnitFrame unit if this tip is from a concated unit, such as "targettarget".
+    local _, unit = self:GetUnit()
+    if not unit then
+        local mFocus = GetMouseFocus()
+        if mFocus and mFocus.unit then
+            unit = mFocus.unit
+        end
+    end
+    -- No Unit or not a Player
+    if not unit or not UnitIsPlayer(unit) then
+        return
+    end
+    -- Only bother for players over level 9
+    local level = UnitLevel(unit)
+    if level > 9 or level == -1 then
+        -- Wipe Current Record
+        wipe(current)
+        current.unit = unit
+        current.name = UnitName(unit)
+        current.guid = UnitGUID(unit)
+        -- No need for inspection on the player
+        if UnitIsUnit(unit, "player") then
+            GatherTalents(0)
+            return
+        end
+        -- Show Cached Talents, If Available
+        local isInspectOpen = (InspectFrame and InspectFrame:IsShown()) or (Examiner and Examiner:IsShown())
+        local cacheLoaded = false
+        for _, entry in ipairs(cache) do
+            if current.name == entry.name and not isInspectOpen then
+                self:AddLine(TALENTS_PREFIX..entry.tree)
+                current.tree = entry.tree
+                cacheLoaded = true
+                break
+            end
+        end
+        -- Queue an inspect request
+        if CanInspect(unit) and not isInspectOpen then
+            if C.tooltip.average_lvl then
+                ttt:RegisterEvent("INSPECT_READY")
+            else
+                local lastInspectTime = GetTime() - lastInspectRequest
+                ttt.nextUpdate = (lastInspectTime > INSPECT_FREQ) and INSPECT_DELAY or (INSPECT_FREQ - lastInspectTime + INSPECT_DELAY)
+                ttt:Show()
+            end
+            if not cacheLoaded then
+                self:AddLine(TALENTS_PREFIX..L.TOOLTIP_LOADING)
+            end
+        elseif isInspectOpen then
+            self:AddLine(TALENTS_PREFIX..L.TOOLTIP_INSPECT_OPEN)
+        end
+    end
+end
+if E.newPatch then
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
+else
+    GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
+end

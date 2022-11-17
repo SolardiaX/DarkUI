@@ -44,6 +44,8 @@ local cfg = C.tooltip
 local StoryTooltip = QuestScrollFrame.StoryTooltip
 StoryTooltip:SetFrameLevel(4)
 
+local CampaignTooltip = QuestScrollFrame.CampaignTooltip
+_G.ItemRefTooltip.CloseButton:SkinCloseButton()
 local tooltips = {
     -- Tooltip
     "ChatMenu",
@@ -240,6 +242,7 @@ ricon:SetWidth(18)
 ricon:SetPoint("BOTTOM", GameTooltip, "TOP", 0, 5)
 
 GameTooltip:HookScript("OnHide", function() ricon:SetTexture(nil) end)
+
 -- Add "Targeted By" line
 local targetedList = {}
 local ClassColors = {}
@@ -530,7 +533,7 @@ local OnTooltipSetUnit = function(self)
     end
 end
 
-if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall then
+if E.newPatch then
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
 else
     GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
@@ -562,27 +565,85 @@ if cfg.hidebuttons == true then
 end
 
 ----------------------------------------------------------------------------------------
+--	Fix compare tooltips(by Blizzard)(../FrameXML/GameTooltip.lua)
+----------------------------------------------------------------------------------------
+if not E.newPatch then
+    hooksecurefunc("GameTooltip_AnchorComparisonTooltips", function(_, anchorFrame, shoppingTooltip1, shoppingTooltip2, _, secondaryItemShown)
+        local point = shoppingTooltip1:GetPoint(2)
+        if secondaryItemShown then
+            if point == "TOP" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip2:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPLEFT", anchorFrame, "TOPRIGHT", 3, -10)
+                shoppingTooltip2:SetPoint("TOPLEFT", shoppingTooltip1, "TOPRIGHT", 3, 0)
+            elseif point == "RIGHT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip2:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPRIGHT", anchorFrame, "TOPLEFT", -3, -10)
+                shoppingTooltip2:SetPoint("TOPRIGHT", shoppingTooltip1, "TOPLEFT", -3, 0)
+            end
+        else
+            if point == "LEFT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPLEFT", anchorFrame, "TOPRIGHT", 3, -10)
+            elseif point == "RIGHT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPRIGHT", anchorFrame, "TOPLEFT", -3, -10)
+            end
+        end
+    end)
+else -- BETA
+    hooksecurefunc(TooltipComparisonManager, "AnchorShoppingTooltips", function(self, primaryShown, secondaryItemShown)
+        local tooltip = self.tooltip;
+        local shoppingTooltip1 = tooltip.shoppingTooltips[1];
+        local shoppingTooltip2 = tooltip.shoppingTooltips[2];
+        local point = shoppingTooltip1:GetPoint(2)
+        if secondaryItemShown then
+            if point == "TOP" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip2:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
+                shoppingTooltip2:SetPoint("TOPLEFT", shoppingTooltip1, "TOPRIGHT", 3, 0)
+            elseif point == "RIGHT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip2:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
+                shoppingTooltip2:SetPoint("TOPRIGHT", shoppingTooltip1, "TOPLEFT", -3, 0)
+            end
+        else
+            if point == "LEFT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
+            elseif point == "RIGHT" then
+                shoppingTooltip1:ClearAllPoints()
+                shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
+            end
+        end
+    end)
+end
+
+----------------------------------------------------------------------------------------
 --	Fix GameTooltipMoneyFrame font size
 ----------------------------------------------------------------------------------------
 hooksecurefunc("SetTooltipMoney", function()
-	for i = 1, 2 do
-		if _G["GameTooltipMoneyFrame"..i] then
-			_G["GameTooltipMoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
-			_G["GameTooltipMoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
-			_G["GameTooltipMoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
-			_G["GameTooltipMoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
-			_G["GameTooltipMoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
-		end
-	end
-	for i = 1, 2 do
-		if _G["ShoppingTooltip1MoneyFrame"..i] then
-			_G["ShoppingTooltip1MoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
-			_G["ShoppingTooltip1MoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
-			_G["ShoppingTooltip1MoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
-			_G["ShoppingTooltip1MoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
-			_G["ShoppingTooltip1MoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
-		end
-	end
+    for i = 1, 2 do
+        if _G["GameTooltipMoneyFrame"..i] then
+            _G["GameTooltipMoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
+            _G["GameTooltipMoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
+            _G["GameTooltipMoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
+            _G["GameTooltipMoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
+            _G["GameTooltipMoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
+        end
+    end
+    for i = 1, 2 do
+        if _G["ShoppingTooltip1MoneyFrame"..i] then
+            _G["ShoppingTooltip1MoneyFrame"..i.."PrefixText"]:SetFontObject("GameTooltipText")
+            _G["ShoppingTooltip1MoneyFrame"..i.."SuffixText"]:SetFontObject("GameTooltipText")
+            _G["ShoppingTooltip1MoneyFrame"..i.."GoldButton"]:SetNormalFontObject("GameTooltipText")
+            _G["ShoppingTooltip1MoneyFrame"..i.."SilverButton"]:SetNormalFontObject("GameTooltipText")
+            _G["ShoppingTooltip1MoneyFrame"..i.."CopperButton"]:SetNormalFontObject("GameTooltipText")
+        end
+    end
 end)
 
 -- ----------------------------------------------------------------------------------------

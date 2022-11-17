@@ -473,7 +473,7 @@ Event:RegisterEvent("PLAYER_ENTERING_WORLD")
 Event:SetScript('OnEvent', function(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
         for bagId = -3, 11 do
-            local slots = GetContainerNumSlots(bagId)
+            local slots = C_Container.GetContainerNumSlots(bagId)
             for slotId = 1, slots do
                 local button = cbNivaya.buttonClass:New(bagId, slotId)
                 buttonCollector[#buttonCollector + 1] = button

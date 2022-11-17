@@ -17,47 +17,35 @@ local function setTooltipIcon(self, icon)
     end
 end
 
-local function newTooltipHooker(method, func)
-    return function(tooltip)
-        local modified = false
+local whiteTooltip = {
+    [GameTooltip] = true,
+    [ItemRefTooltip] = true,
+    [ItemRefShoppingTooltip1] = true,
+    [ItemRefShoppingTooltip2] = true,
+    [ShoppingTooltip1] = true,
+    [ShoppingTooltip2] = true,
+}
 
-        tooltip:HookScript("OnTooltipCleared", function()
-            modified = false
-        end)
+local function hookItem(self)
+    if whiteTooltip[self] then
 
-        tooltip:HookScript(method, function(self, ...)
-            if not modified then
-                modified = true
-                func(self, ...)
-            end
-        end)
-    end
-end
-
-local hookItem = newTooltipHooker("OnTooltipSetItem", function(self)
-    local _, link = self:GetItem()
+        local _, link = TooltipUtil.GetDisplayedItem(self)
     if link then
         setTooltipIcon(self, GetItemIcon(link))
     end
-end)
+    end
+end
 
-local hookSpell = newTooltipHooker("OnTooltipSetSpell", function(self)
+local function hookSpell(self)
+    if whiteTooltip[self] then
     local _, id = self:GetSpell()
     if id then
         setTooltipIcon(self, select(3, GetSpellInfo(id)))
     end
-end)
 
-for _, tooltip in pairs { GameTooltip, ItemRefTooltip, ItemRefShoppingTooltip1, ItemRefShoppingTooltip2, ShoppingTooltip1, ShoppingTooltip2 } do
-    hookItem(tooltip)
-    hookSpell(tooltip)
 end
 
--- WorldQuest Tooltip
-hooksecurefunc("EmbeddedItemTooltip_SetItemByQuestReward", function(self)
-    if self.Icon then
-        self.Icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-        self.IconBorder:Hide()
     end
-end)
-BONUS_OBJECTIVE_REWARD_WITH_COUNT_FORMAT = "|T%1$s:16:16:0:0:64:64:5:59:5:59|t |cffffffff%2$d|r %3$s"
+
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hookItem)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, hookSpell)

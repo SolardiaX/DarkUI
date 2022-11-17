@@ -7,7 +7,7 @@ if not C.stats.enable or not C.stats.config.Bags.enable then return end
 --	Bags of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 
-local GetContainerNumFreeSlots, GetContainerNumSlots = GetContainerNumFreeSlots, GetContainerNumSlots
+local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
 local GetBindingKey = GetBindingKey
 local ToggleAllBags = ToggleAllBags
 local format = format

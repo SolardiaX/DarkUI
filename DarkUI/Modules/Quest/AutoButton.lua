@@ -79,8 +79,8 @@ Scanner:SetScript("OnEvent", function()
     AutoButtonHide()
     -- Scan bags for Item matchs
     for b = 0, NUM_BAG_SLOTS do
-        for s = 1, GetContainerNumSlots(b) do
-            local itemID = GetContainerItemID(b, s)
+        for s = 1, C_Container.GetContainerNumSlots(b) do
+            local itemID = C_Container.GetContainerItemID(b, s)
             itemID = tonumber(itemID)
             if C.autobutton[itemID] then
                 local itemName = GetItemInfo(itemID)
@@ -98,7 +98,7 @@ Scanner:SetScript("OnEvent", function()
                 end
 
                 AutoButton:SetScript("OnUpdate", function()
-                    local cd_start, cd_finish, cd_enable = GetContainerItemCooldown(b, s)
+                    local cd_start, cd_finish, cd_enable = C_Container.GetContainerItemCooldown(b, s)
                     CooldownFrame_Set(AutoButton.cd, cd_start, cd_finish, cd_enable)
                 end)
 

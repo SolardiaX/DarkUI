@@ -1,10 +1,10 @@
-## Interface: 100000
+## Interface: 100002
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - Options
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - 配置管理
 ## Notes-zhCN: DarkUI - 配置管理
 ## Notes: DarkUI - Options GUI
 ## Author: SolardiaX
-## Version: 10.0.0-b1.0.4
+## Version: 10.0.2-b1.0.0
 ## RequiredDeps: DarkUI
 ## SavedVariables: SavedOptions
 ## SavedVariablesPerCharacter: SavedOptionsPerChar

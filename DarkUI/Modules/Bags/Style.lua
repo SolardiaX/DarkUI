@@ -15,6 +15,15 @@ local C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID = C_AzeriteEmpoweredItem
 local C_Soulbinds_IsItemConduitByItemInfo = C_Soulbinds.IsItemConduitByItemInfo
 local IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown = IsControlKeyDown, IsAltKeyDown, IsShiftKeyDown
 
+local GetContainerItemID = C_Container.GetContainerItemID
+local GetContainerNumSlots = C_Container.GetContainerNumSlots
+local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+local GetContainerItemDurability = C_Container.GetContainerItemDurability
+local SortBags = C_Container.SortBags
+local SortBankBags = C_Container.SortBankBags
+local SortReagentBankBags = C_Container.SortReagentBankBags
+local PickupContainerItem = C_Container.PickupContainerItem
+
 -- Lua Globals --
 local _G = _G
 local next, ipairs = _G.next, _G.ipairs
@@ -58,21 +67,22 @@ local function GetClassColor(class)
 	local classColors = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class]
 	return {classColors.r, classColors.g, classColors.b}
 end
+
 local GetNumFreeSlots = function(bagType)
 	local free, max = 0, 0
 	if bagType == "bag" then
 		for i = 0, 4 do
-			free = free + _G.GetContainerNumFreeSlots(i)
-			max = max + _G.GetContainerNumSlots(i)
+			free = free + GetContainerNumFreeSlots(i)
+			max = max + GetContainerNumSlots(i)
 		end
 	elseif bagType == "bankReagent" then
-		free = _G.GetContainerNumFreeSlots(-3)
-		max = _G.GetContainerNumSlots(-3)
+		free = GetContainerNumFreeSlots(-3)
+		max = GetContainerNumSlots(-3)
 	else
 		local containerIDs = { -1, 5, 6, 7, 8, 9, 10, 11 }
 		for _, i in next, containerIDs do
-			free = free + _G.GetContainerNumFreeSlots(i)
-			max = max + _G.GetContainerNumSlots(i)
+			free = free + GetContainerNumFreeSlots(i)
+			max = max + GetContainerNumSlots(i)
 		end
 	end
 	return free, max
@@ -240,12 +250,12 @@ local function restackItems(self)
 	local tBag, tBank = (self.name == "cBniv_Bag"), (self.name == "cBniv_Bank")
 	--local loc = tBank and "bank" or "bags"
 	if tBank then
-		_G.SortBankBags()
+		SortBankBags()
 		if _G.IsReagentBankUnlocked() then
-			_G.SortReagentBankBags()
+			SortReagentBankBags()
 		end
 	elseif tBag then
-		_G.SortBags()
+		SortBags()
 	end
 end
 
@@ -682,7 +692,7 @@ function MyContainer:OnCreate(name, settings)
 		local DropTargetProcessItem = function()
 			-- if CursorHasItem() then  -- Commented out to fix Guild Bank -> Bags item dragging
 			local bID, sID = GetFirstFreeSlot((tBag and "bag") or (tBank and "bank") or "bankReagent")
-			if bID then _G.PickupContainerItem(bID, sID) end
+			if bID then PickupContainerItem(bID, sID) end
 			-- end
 		end
 		self.DropTarget:SetScript("OnMouseUp", DropTargetProcessItem)

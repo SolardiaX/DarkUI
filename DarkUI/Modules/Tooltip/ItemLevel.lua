@@ -210,9 +210,10 @@ for _, slot in pairs(InventorySlots) do
     tip:SetOwner(WorldFrame, "ANCHOR_NONE")
     TestTips[slot] = tip
     tip.slot = slot
-    tip:SetScript("OnTooltipSetItem", function(self)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
+        if self ~= tip then return end
         local slot = self.slot
-        local _, itemLink = self:GetItem()
+        local _, itemLink = TooltipUtil.GetDisplayedItem(self)
         local tipName = self:GetName()
         if self.itemLink then itemLink = self.itemLink end
         if itemLink then
@@ -326,7 +327,6 @@ local ShouldInspect = false
 local lastInspectRequest = 0
 local FailTimeout = 1
 f:SetScript("OnUpdate", function()
-    local InspectFrame = InspectFrame
 
     local _, unitID = GameTooltip:GetUnit()
     local guid = unitID and UnitGUID(unitID)
@@ -474,7 +474,6 @@ end
 
 local function InspectLevel()
     if not InspectFrameiLvL then
-        local InspectPaperDollFrame = InspectPaperDollFrame
         local text = InspectModelFrame:CreateFontString("InspectFrameiLvL", "OVERLAY", "SystemFont_Outline_Small")
         text:SetPoint("BOTTOM", 5, 20)
         text:Hide()
@@ -498,7 +497,9 @@ function eve:ItemScanComplete(guid)
     DecorateTooltip(guid)
 end
 
-GameTooltip:HookScript("OnTooltipSetUnit", function(self)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(self)
+    if self ~= GameTooltip then return end
+
     local _, unitID = self:GetUnit()
     local guid = unitID and UnitGUID(unitID)
     if guid and UnitIsPlayer(unitID) then

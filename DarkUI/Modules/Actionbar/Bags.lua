@@ -14,11 +14,14 @@ local UIParent = _G.UIParent
 
 local cfg = C.actionbar.bars.bags
 
-local buttonList = { "MainMenuBarBackpackButton",
-                     "CharacterBag0Slot",
-                     "CharacterBag1Slot",
-                     "CharacterBag2Slot",
-                     "CharacterBag3Slot", }
+local buttonList = {
+    "MainMenuBarBackpackButton",
+    "CharacterBag0Slot",
+    "CharacterBag1Slot",
+    "CharacterBag2Slot",
+    "CharacterBag3Slot",
+    "CharacterReagentBag0Slot"
+}
 
 local num = #buttonList
 

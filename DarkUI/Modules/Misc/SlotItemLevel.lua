@@ -56,27 +56,27 @@ local function _getRealItemLevel(slotId, unit)
 end
 
 local function checkSpecID(unit)
-	local i = 0
-	local specID
-	if unit == "player" then
-		specID = GetSpecializationInfo(GetSpecialization())
-	else
-		specID = GetInspectSpecialization("target")
-	end
-	if specID then
-		if specID == 250 or specID == 251 or specID == 252 or specID == 66 or specID == 70 or specID == 71 or specID == 72 or specID == 73 then
-			i = INVSLOT_HAND
-		elseif specID == 577 or specID == 581 or specID == 103 or specID == 104 or specID == 253 or specID == 254 or specID == 255
-			or specID == 268 or specID == 269 or specID == 259 or specID == 260 or specID == 261 or specID == 263 then
-			i = INVSLOT_FEET
-		else
-			i = INVSLOT_WRIST
-		end
-	end
-	return i
+    local i = 0
+    local specID
+    if unit == "player" then
+        specID = GetSpecializationInfo(GetSpecialization())
+    else
+        specID = GetInspectSpecialization("target")
+    end
+    if specID then
+        if specID == 250 or specID == 251 or specID == 252 or specID == 66 or specID == 70 or specID == 71 or specID == 72 or specID == 73 then
+            i = INVSLOT_HAND
+        elseif specID == 577 or specID == 581 or specID == 103 or specID == 104 or specID == 253 or specID == 254 or specID == 255
+            or specID == 268 or specID == 269 or specID == 259 or specID == 260 or specID == 261 or specID == 263 then
+            i = INVSLOT_FEET
+        else
+            i = INVSLOT_WRIST
+        end
+    end
+    return i
 end
 local function _updateItems(unit, frame)
-	local itemSlot = checkSpecID(unit)
+    local itemSlot = checkSpecID(unit)
     for i = 1, 17 do -- Only check changed player items or items without ilvl text, skip the shirt (4) and always update Inspects
         local itemLink = GetInventoryItemLink(unit, i)
         if i ~= 4 and ((frame == f and (equiped[i] ~= itemLink or frame[i]:GetText() == nil or itemLink == nil and frame[i]:GetText() ~= "")) or frame == g) then
@@ -84,14 +84,13 @@ local function _updateItems(unit, frame)
                 equiped[i] = itemLink
             end
 
-
-                            local realItemLevel = _getRealItemLevel(i, unit)
-                            realItemLevel = realItemLevel or ""
+            local realItemLevel = _getRealItemLevel(i, unit)
+            realItemLevel = realItemLevel or ""
             if realItemLevel and tonumber(realItemLevel) == 1 then
                 realItemLevel = ""
-                    end
+            end
             local color = "|cffFFFF00"
-			if itemLink and (i == 15 or i == 5 or i == 16 or i == 11 or i == 12 or i == itemSlot) and (realItemLevel ~= "" and tonumber(realItemLevel) > 197) then
+            if itemLink and (i == 15 or i == 5 or i == 16 or i == 11 or i == 12 or i == itemSlot) and (realItemLevel ~= "" and tonumber(realItemLevel) > 197) then
                 local _, _, enchant = strsplit(":", itemLink)
                 if enchant and enchant == "" then
                     color = "|cffFF0000"
@@ -200,7 +199,6 @@ local function OnEvent(self, event, ...)
     elseif event == "PLAYER_LOGIN" then
         self:UnregisterEvent(event)
 
-
         _createStrings()
         _createStrings = nil
         _G.PaperDollFrame:HookScript("OnShow", function()
@@ -218,7 +216,7 @@ local function OnEvent(self, event, ...)
             f:UnregisterEvent("COMBAT_RATING_UPDATE")
             f:Hide()
         end)
-	elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "ARTIFACT_UPDATE" or event == "SOCKET_INFO_UPDATE" or event == "COMBAT_RATING_UPDATE" then
+    elseif event == "PLAYER_EQUIPMENT_CHANGED" or event == "ARTIFACT_UPDATE" or event == "SOCKET_INFO_UPDATE" or event == "COMBAT_RATING_UPDATE" then
         if (...) == 16 then
             equiped[16] = nil
             equiped[17] = nil
@@ -229,6 +227,7 @@ local function OnEvent(self, event, ...)
     end
 end
 f:SetScript("OnEvent", OnEvent)
+
 ----------------------------------------------------------------------------------------
 --	Item level on flyout buttons (by Merathilis)
 ----------------------------------------------------------------------------------------
@@ -244,6 +243,7 @@ local function _getRealItemLevel(link, bag, slot)
     ItemDB[link] = tonumber(realItemLevel)
     return realItemLevel
 end
+
 local function SetupFlyoutLevel(button, bag, slot)
     if not button.iLvl then
         button.iLvl = button:CreateFontString(nil, "OVERLAY", "iLvLFont")
@@ -251,7 +251,7 @@ local function SetupFlyoutLevel(button, bag, slot)
     end
     local link, level
     if bag then
-        link = GetContainerItemLink(bag, slot)
+        link = C_Container.GetContainerItemLink(bag, slot)
         level = _getRealItemLevel(link, bag, slot)
     else
         link = GetInventoryItemLink("player", slot)
@@ -261,6 +261,7 @@ local function SetupFlyoutLevel(button, bag, slot)
         button.iLvl:SetText("|cFFFFFF00"..level)
     end
 end
+
 hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)
     local location = button.location
     if not location or location >= EQUIPMENTFLYOUT_FIRST_SPECIAL_LOCATION then
