@@ -19,8 +19,7 @@ local CursorUpdate, ResetCursor, CursorOnUpdate = CursorUpdate, ResetCursor, Cur
 local HandleModifiedItemClick, GetLootSlotLink, LootSlot = HandleModifiedItemClick, GetLootSlotLink, LootSlot
 local unpack, tinsert, pairs, max = unpack, tinsert, pairs, math.max
 local ITEM_QUALITY_COLORS = ITEM_QUALITY_COLORS
-local LOOT_SLOT_MONEY, LOOT = LOOT_SLOT_MONEY, LOOT
-local EMPTY = EMPTY
+local EMPTY, LOOT = EMPTY, LOOT
 local UIParent = UIParent
 local LootFrame = LootFrame
 local GameTooltip = GameTooltip
@@ -86,7 +85,7 @@ function addon:LOOT_OPENED(_, ...)
                 local color = ITEM_QUALITY_COLORS[quality]
                 local r, g, b = color.r, color.g, color.b
 
-                if GetLootSlotType(i) == LOOT_SLOT_MONEY then
+                if GetLootSlotType(i) == Enum.LootSlotType.Money then
                     item = item:gsub("\n", ", ")
                 end
 
@@ -109,7 +108,7 @@ function addon:LOOT_OPENED(_, ...)
                     end
 
                     slot.iconFrame:SetBackdropBorderColor(r, g, b)
-                    --slot.iconFrame:SetBackdropColor(r, g, b)
+                    slot.iconFrame:SetBackdropColor(r, g, b)
                     slot.drop:SetVertexColor(r, g, b)
                 end
                 slot.drop:Show()
