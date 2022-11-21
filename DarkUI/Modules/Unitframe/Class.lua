@@ -26,20 +26,40 @@ module.classModule.UpdateClassBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer.SetPoint = function() end
 end
 
--- override default blizzard event function
+-- override default blizzard event function for Druid class
 if E.class == "DRUID" then
-	local onEvent = ClassPowerBar.OnEvent
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
-	frame:SetScript("OnEvent", function()
-		if ClassPowerBar.OnEvent == E.dummy and GetShapeshiftFormID() == CAT_FORM then
-			ComboPointDruidPlayerFrame:Setup()
-			ComboPointDruidPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
-			ComboPointDruidPlayerFrame:SetPoint("TOP")
+    local comboPointDruidEvent = ComboPointDruidPlayerFrame.OnEvent
+    ComboPointDruidPlayerFrame:SetScript("OnEvent", function(self, event, ...)
+        if self:GetParent() ~= PlayerFrameBottomManagedFramesContainer then
+            self:SetParent(PlayerFrameBottomManagedFramesContainer)
+        end
 
-			ClassPowerBar.OnEvent = onEvent
-		end
-	end)
+        if self.unit ~= "player" then
+            self.unit = "player"
+        end
 
-	ClassPowerBar.OnEvent = E.dummy
+        comboPointDruidEvent(self, event, ...)
+    end)
+
+    local comboPointDruidUpdateMaxPower = ComboPointDruidPlayerFrame.UpdateMaxPower
+    ComboPointDruidPlayerFrame.UpdateMaxPower = function(self)
+        self.classResourceButtonPool:ReleaseAll()
+        self.classResourceButtonTable = { }
+
+        self.unit = "player"
+        self.maxUsablePoints = UnitPowerMax(self.unit, self.powerType);
+        for i = 1, self.maxUsablePoints do
+            local resourcePoint = self.classResourceButtonPool:Acquire()
+            self.classResourceButtonTable[i] = resourcePoint
+            if(self.resourcePointSetupFunc) then
+                self.resourcePointSetupFunc(resourcePoint)
+            end
+            resourcePoint.layoutIndex = i
+            resourcePoint:Show()
+        end
+
+        self:Layout()
+    end
+
+    ClassNameplateBarDruidFrame:Kill()
 end
