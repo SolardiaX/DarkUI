@@ -61,21 +61,12 @@ local function attachItemTooltip(self)
     if id then addLine(self, id, true) end
 end
 
-if E.newPatch then
-    local function attachItemTooltip(self)
-        local _, link = TooltipUtil.GetDisplayedItem(self)
-        if not link then return end
-        local id = link:match("item:(%d+):")
-        if id then addLine(self, id, true) end
-    end
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, attachItemTooltip)
-else
-    GameTooltip:HookScript("OnTooltipSetSpell", OnTooltipSetSpell)
-    GameTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
-    ItemRefTooltip:HookScript("OnTooltipSetItem", attachItemTooltip)
-    ItemRefShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
-    ItemRefShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
-    ShoppingTooltip1:HookScript("OnTooltipSetItem", attachItemTooltip)
-    ShoppingTooltip2:HookScript("OnTooltipSetItem", attachItemTooltip)
+local function attachItemTooltip(self)
+    local _, link = TooltipUtil.GetDisplayedItem(self)
+    if not link then return end
+    local id = link:match("item:(%d+):")
+    if id then addLine(self, id, true) end
 end
+
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, attachItemTooltip)

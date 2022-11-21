@@ -62,13 +62,8 @@ frame:SetScript("OnEvent", function(_, _, addon)
     end
 
     if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
-        if not E.newPatch then -- BETA
-			SetSortBagsRightToLeft(true)
-			SetInsertItemsLeftToRight(false)
-		else
-			C_Container.SetSortBagsRightToLeft(true)
-			C_Container.SetInsertItemsLeftToRight(false)
-		end
+        C_Container.SetSortBagsRightToLeft(true)
+        C_Container.SetInsertItemsLeftToRight(false)
     end
 
     if C.combat.combattext.enable then

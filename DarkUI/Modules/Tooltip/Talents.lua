@@ -165,8 +165,4 @@ local function OnTooltipSetUnit(self)
         end
     end
 end
-if E.newPatch then
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
-else
-    GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipSetUnit)
-end
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)

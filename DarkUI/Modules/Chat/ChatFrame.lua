@@ -33,10 +33,6 @@ if cfg.auto_width then
     local holder = _G["DarkUI_ActionBar1HolderBG"]
     local renderScale = tonumber(GetCVar("RenderScale") or 1)
     cfg.width = ((E.screenWidth - (holder and holder:GetWidth() or 1024)) / 2 - 260) * renderScale
-else
-    if cfg.width < E.screenWidth / 4 then
-        cfg.width = E.screenWidth / 4
-    end
 end
 
 local origs = {}
