@@ -135,6 +135,8 @@ local function switcher_SetFactionIndexByName(faction_name)
 end
 
 local function switcher_OnEvent(_, event, ...)
+    if cfg.autoswitch ~= true then return end
+
     local arg1 = ...
 
     if (event == "COMBAT_TEXT_UPDATE" and arg1 == "FACTION") then
@@ -316,32 +318,6 @@ local function bar_OnEnter()
                 standingtext = _G["FACTION_STANDING_LABEL"..standing] or UNKNOWN
             end
         end
-        -- GameTooltip:AddLine(" ")
-        -- GameTooltip:AddLine(name, 0,.6,1)
-        -- GameTooltip:AddDoubleLine(standingtext, value - barMin.." / "..barMax - barMin.." ("..floor((value - barMin)/(barMax - barMin)*100).."%)", .6,.8,1, 1,1,1)
-
-
-        -- local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
-        -- local friendID, friendThreshold, nextFriendThreshold, friendTextLevel = repInfo.friendshipFactionID, repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.text
-        -- local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
-        -- local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
-        -- local standingtext
-
-        -- if friendID then
-        --     if maxRank > 0 then
-        --         name = name .. " (" .. currentRank .. " / " .. maxRank .. ")"
-        --     end
-        --     if not nextFriendThreshold then
-        --         value = maxrep - 1
-        --     end
-        --     standingtext = friendTextLevel
-        -- else
-        --     if standing == MAX_REPUTATION_REACTION then
-        --         maxrep = minrep + 1e3
-        --         value = maxrep - 1
-        --     end
-        --     standingtext = GetText("FACTION_STANDING_LABEL" .. standing, UnitSex("player"))
-        -- end
 
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(L.ACTIONBAR_REP)
@@ -441,6 +417,8 @@ statusbar:SetStatusBarTexture(cfg.statusbar)
 statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b)
 
 statusbar.rest = CreateFrame("Statusbar", nil, statusbar)
+statusbar.rest:SetFrameStrata(cfg.bfstrata)
+statusbar.rest:SetFrameLevel(cfg.bflevel)
 statusbar.rest:SetAllPoints(statusbar)
 statusbar.rest:SetStatusBarTexture(cfg.statusbar)
 statusbar.rest:SetStatusBarColor(cfg.restcolor.r, cfg.restcolor.g, cfg.restcolor.b)
