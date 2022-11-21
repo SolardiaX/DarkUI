@@ -932,7 +932,8 @@ function MyButton:OnUpdateButton(item)
 
 	-- iLvl
 	self.iLvl:SetText("")
-	local level = item.level -- ilvl for keystone and battlepet
+	local level = item.level
+
 	if level and isItemNeedsLevel(item) then
 		local color = C.media.qualityColors[item.quality]
 		self.iLvl:SetText(level)
