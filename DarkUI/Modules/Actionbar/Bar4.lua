@@ -20,11 +20,11 @@ bar:SetWidth(cfg.button.size)
 bar:SetHeight(num * cfg.button.size + (num - 1) * cfg.button.space)
 bar.buttonList = {}
 
-_G.MultiBarRight:SetParent(bar)
-_G.MultiBarRight.QuickKeybindGlow:SetTexture("")
-
 bar:RegisterEvent("PLAYER_ENTERING_WORLD")
 bar:SetScript("OnEvent", function(self, event)
+    _G.MultiBarRight:SetParent(bar)
+    _G.MultiBarRight.QuickKeybindGlow:SetTexture("")
+
     for i = 1, num do
         local button = _G["MultiBarRightButton" .. i]
         tinsert(bar.buttonList, button) --add the button object to the list
