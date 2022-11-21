@@ -808,7 +808,7 @@ function MyButton:OnCreate()
 	self.Icon:SetTexCoord(unpack(C.media.texCoord))
 
 	self.Count:SetPoint("BOTTOMRIGHT", -1, 1)
-	self.Count:SetFontObject("NumberFont_Outline_Med")
+	self.Count:SetFont(unpack(C.media.standard_font))
 
 	self.Cooldown:SetInside()
 	
@@ -828,12 +828,12 @@ function MyButton:OnCreate()
 	self.iLvl = self:CreateFontString(nil, "OVERLAY")
 	self.iLvl:SetJustifyH("RIGHT")
 	self.iLvl:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1)
-	self.iLvl:SetFontObject("NumberFont_Outline_Med")
+	self.iLvl:SetFont(unpack(C.media.standard_font))
 
 	self.durability = self:CreateFontString(nil, "OVERLAY")
 	self.durability:SetJustifyH("LEFT")
 	self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", -1, 1)
-	self.durability:SetFontObject("NumberFont_Outline_Med")
+	self.durability:SetFont(unpack(C.media.standard_font))
 
 	if IsAddOnLoaded("CanIMogIt") then
 		self.canIMogIt = parentFrame:CreateTexture(nil, "OVERLAY")
