@@ -17,11 +17,12 @@ Load:SetScript("OnEvent", function()
     TalkingHeadFrame:SetPoint(unpack(C.blizzard.talking_head_pos))
     TalkingHeadFrame.SetPoint = E.dummy
 
-    --Iterate through all alert subsystems in order to find the one created for TalkingHeadFrame, and then remove it.
-    --We do this to prevent alerts from anchoring to this frame when it is shown.
-    for index, alertFrameSubSystem in ipairs(_G.AlertFrame.alertFrameSubSystems) do
-        if alertFrameSubSystem.anchorFrame and alertFrameSubSystem.anchorFrame == _G.TalkingHeadFrame then
-            tremove(_G.AlertFrame.alertFrameSubSystems, index)
+    Load:UnregisterEvent("PLAYER_ENTERING_WORLD")
+
+    hooksecurefunc(TalkingHeadFrame, "SetPoint", function(self, _, _, _, _, y)
+        if y ~= C.blizzard.talking_head_pos[5] then
+            self:ClearAllPoints()
+            self:SetPoint(unpack(C.blizzard.talking_head_pos))
         end
-    end
+    end)
 end)
