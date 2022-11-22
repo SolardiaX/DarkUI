@@ -40,13 +40,13 @@ frame:SetScript("OnEvent", function()
     ObjectiveTrackerFrame.ignoreFrameLayout = true
     ObjectiveTrackerFrame:ClearAllPoints()
     ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
-    -- ObjectiveTrackerFrame:SetHeight(E.screenHeight / 1.6)
-    ObjectiveTrackerFrame.SetPoint = E.dummy
+    ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 
-    hooksecurefunc('BonusObjectiveTracker_AnimateReward', function(block)
-        local rewardsFrame = _G.ObjectiveTrackerBonusRewardsFrame
-        rewardsFrame:ClearAllPoints()
-        rewardsFrame:Point('TOPRIGHT', block, 'TOPLEFT', 10, -4)
+    hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(_, _, parent)
+        if parent ~= frame then
+            ObjectiveTrackerFrame:ClearAllPoints()
+            ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
+        end
     end)
 
     local headers = {
