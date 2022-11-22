@@ -108,7 +108,7 @@ function addon:LOOT_OPENED(_, ...)
                     end
 
                     slot.iconFrame:SetBackdropBorderColor(r, g, b)
-                    slot.iconFrame:SetBackdropColor(r, g, b)
+                    -- slot.iconFrame:SetBackdropColor(r, g, b)
                     slot.drop:SetVertexColor(r, g, b)
                 end
                 slot.drop:Show()
