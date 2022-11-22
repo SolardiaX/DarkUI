@@ -287,8 +287,6 @@ local createThreatType = function(self)
 end
 
 local createClassModule = function(self)
-    if not cfg.classModule.classpowerbar.enable then return end
-
     local classModule = DUF.classModule
 
     if cfg.classModule.classpowerbar.diabolic then
