@@ -42,7 +42,7 @@ CALLBACKS
 local _, ns = ...
 local cargBags = ns.cargBags
 
-local GetContainerNumFreeSlots = C_Container and C_Container.GetContainerNumFreeSlots or GetContainerNumFreeSlots
+local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
 
 local tagPool, tagEvents, object = {}, {}
 local function tagger(tag, ...) return object.tags[tag] and object.tags[tag](object, ...) or "" end
@@ -110,6 +110,8 @@ local function GetNumFreeSlots(name)
 		return numFreeSlots
 	elseif name == "Reagent" then
 		return GetContainerNumFreeSlots(-3)
+	elseif name == "BagReagent" then
+		return GetContainerNumFreeSlots(5)
 	end
 end
 
@@ -148,19 +150,6 @@ tagPool["currencies"] = function(self)
 	return str
 end
 tagEvents["currencies"] = tagEvents["currency"]
-
-local atlasCache = {}
-local function createAtlasCoin(coin)
-	local str = atlasCache[coin]
-	if not str then
-		local info = C_Texture.GetAtlasInfo("coin-"..coin)
-		if info then
-			str = B:GetTextureStrByAtlas(info, 16, 16)
-			atlasCache[coin] = str
-		end
-	end
-	return str
-end
 
 tagPool["money"] = function(self)
 	local money = GetMoney() or 0
