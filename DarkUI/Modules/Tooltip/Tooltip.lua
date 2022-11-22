@@ -47,40 +47,41 @@ StoryTooltip:SetFrameLevel(4)
 local CampaignTooltip = QuestScrollFrame.CampaignTooltip
 _G.ItemRefTooltip.CloseButton:SkinCloseButton()
 local tooltips = {
-    -- Tooltip
-    "ChatMenu",
-    "EmoteMenu",
-    "LanguageMenu",
-    "VoiceMacroMenu",
-    "GameTooltip",
-    "EmbeddedItemTooltip",
-    "ItemRefTooltip",
-    "AutoCompleteBox",
-    "FriendsTooltip",
-    "GeneralDockManagerOverflowButtonList",
-    "ReputationParagonTooltip",
-    "NamePlateTooltip",
-    "QueueStatusFrame",
-    "FloatingGarrisonFollowerTooltip",
-    "FloatingGarrisonFollowerAbilityTooltip",
-    "FloatingGarrisonMissionTooltip",
-    "GarrisonFollowerAbilityTooltip",
-    "GarrisonFollowerTooltip",
-    "FloatingGarrisonShipyardFollowerTooltip",
-    "GarrisonShipyardFollowerTooltip",
-    "BattlePetTooltip",
-    "PetBattlePrimaryAbilityTooltip",
-    "PetBattlePrimaryUnitTooltip",
-    "FloatingBattlePetTooltip",
-    "FloatingPetBattleAbilityTooltip",
-    "IMECandidatesFrame",
-    -- Special
+    ChatMenu,
+    EmoteMenu,
+    LanguageMenu,
+    VoiceMacroMenu,
+    GameTooltip,
+    EmbeddedItemTooltip,
+    ItemRefTooltip,
+    ItemRefShoppingTooltip1,
+    ItemRefShoppingTooltip2,
+    ShoppingTooltip1,
+    ShoppingTooltip2,
+    AutoCompleteBox,
+    FriendsTooltip,
     QuestScrollFrame.StoryTooltip,
-    QuestScrollFrame.WarCampaignTooltip,
-    -- Addons
-    "AtlasLootTooltip",
-    "QuestGuru_QuestWatchTooltip",
-    "LibDBIconTooltip"
+    QuestScrollFrame.CampaignTooltip,
+    GeneralDockManagerOverflowButtonList,
+    ReputationParagonTooltip,
+    NamePlateTooltip,
+    QueueStatusFrame,
+    FloatingGarrisonFollowerTooltip,
+    FloatingGarrisonFollowerAbilityTooltip,
+    FloatingGarrisonMissionTooltip,
+    GarrisonFollowerAbilityTooltip,
+    GarrisonFollowerTooltip,
+    FloatingGarrisonShipyardFollowerTooltip,
+    GarrisonShipyardFollowerTooltip,
+    BattlePetTooltip,
+    PetBattlePrimaryAbilityTooltip,
+    PetBattlePrimaryUnitTooltip,
+    FloatingBattlePetTooltip,
+    FloatingPetBattleAbilityTooltip,
+    IMECandidatesFrame,
+    QuickKeybindTooltip,
+    GameSmallHeaderTooltip,
+    SettingsTooltip
 }
 
 local shoppingtips = {
@@ -721,9 +722,9 @@ styler.rTips[E.addonName] = function()
         for _, name in pairs({ "DropDownList", "L_DropDownList", "Lib_DropDownList" }) do
             for i = 1, UIDROPDOWNMENU_MAXLEVELS do
                 local menu = _G[name .. i .. "MenuBackdrop"]
-                if menu and not menu.menustyled then 
+                if menu and not menu.styled then 
                     hook(menu) 
-                    menu.menustyled = true
+                    menu.styled = true
                 end
             end
         end
@@ -782,6 +783,7 @@ end
 
 styler.rTips["Blizzard_Calendar"] = function()
     hook(CalendarContextMenu)
+    hook(CalendarInviteStatusContextMenu)
 end
 
 styler.rTips["Blizzard_IslandsQueueUI"] = function()
