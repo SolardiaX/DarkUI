@@ -54,6 +54,8 @@ L_OPT_UF_ENABLE = '启用单位框体模块'
 L_OPT_UF_PORTRAIT3D = '单位框体显示 3D 头像 (仅限玩家/目标/小队/焦点)'
 --
 L_OPT_UF_PLAYER_COLORHEALTH = '玩家框体按职业着色血条'
+L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC = '启用扩展玩家职业资源条 (连击点/符文/灵魂碎片/...)'
+L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD = '启用系统内置玩家职业资源条 (连击点/符文/灵魂碎片/...)'
 --
 L_OPT_UF_TARGET_COLORHEALTH = '目标框体按职业着色血条'
 L_OPT_UF_TARGET_PLAYER_AURA_ONLY = '目标框体仅显示玩家释放 BUFF/DEBUFF (包含 BOSS 自身 BUFF)'

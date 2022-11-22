@@ -93,6 +93,8 @@ ns.OptionList[4] = { -- UnitFrame
     { 1, 'unitframe', 'portrait3D', L_OPT_UF_PORTRAIT3D, false },
     {},
     { 1, 'unitframe', 'player.colorHealth', L_OPT_UF_PLAYER_COLORHEALTH, false },
+    { 1, 'unitframe', 'classModule.classpowerbar.blizzard', L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD, false },
+    { 1, 'unitframe', 'classModule.classpowerbar.diabolic', L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC, false },
     {},
     { 1, 'unitframe', 'target.colorHealth', L_OPT_UF_TARGET_COLORHEALTH, false },
     { 1, 'unitframe', 'target.aura.player_aura_only', L_OPT_UF_TARGET_PLAYER_AURA_ONLY, false },

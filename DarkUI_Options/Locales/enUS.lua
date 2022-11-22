@@ -54,6 +54,8 @@ L_OPT_UF_ENABLE = 'Enable Unitframe module'
 L_OPT_UF_PORTRAIT3D = 'Shows 3D portrait (excludes raid frames)'
 --
 L_OPT_UF_PLAYER_COLORHEALTH = 'Color health by class with player frame'
+L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC = 'Enable Diabloic class resource bar (Combopoints/Runes/Soul Shards/...)'
+L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD = 'Enable Blizzard class resource bar (Combopoints/Runes/Soul Shards/...)'
 --
 L_OPT_UF_TARGET_COLORHEALTH = 'Color health by class with target frame'
 L_OPT_UF_TARGET_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with target frame (includes boss buff)'

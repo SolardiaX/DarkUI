@@ -54,6 +54,8 @@ L_OPT_UF_ENABLE = '啟用單位框體模塊'
 L_OPT_UF_PORTRAIT3D = '單位框體顯示 3D 頭像 (僅限玩家/目標/小隊/焦點)'
 --
 L_OPT_UF_PLAYER_COLORHEALTH = '玩家框體按職業著色血條'
+L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC = '啟用擴展玩家職業資源條 (連擊點/符文/靈魂碎片/...)'
+L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD = '啟用系統內置玩家職業資源條 (連擊點/符文/靈魂碎片/...)'
 --
 L_OPT_UF_TARGET_COLORHEALTH = '目標框體按職業著色血條'
 L_OPT_UF_TARGET_PLAYER_AURA_ONLY = '目標框體僅顯示玩家釋放 BUFF/DEBUFF (包含 BOSS 自身 BUFF)'

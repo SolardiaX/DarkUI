@@ -287,21 +287,17 @@ local createThreatType = function(self)
 end
 
 local createClassModule = function(self)
-    local classModule = DUF.classModule
-    classModule.UpdateClassBarPosition(self, cfg, media)
+    if not cfg.classModule.classpowerbar.enable then return end
 
-    -- -- Totems
-    -- if cfg.classModule[UNIT_CLASS].showTotems then
-    --     classModule.UpdateTotems(self, cfg, media)
-    -- end
-    -- Alternate Mana Bar
-    -- if cfg.classModule[UNIT_CLASS].showAdditionalPower then
-    --     classModule.CreateAlternatePowerBar(self, cfg, media)
-    -- end
-    -- -- Load Class Modules
-    -- if classModule[UNIT_CLASS] then
-    --     self.classPowerBar = classModule[UNIT_CLASS](self, cfg, media)
-    -- end
+    local classModule = DUF.classModule
+
+    if cfg.classModule.classpowerbar.diabolic then
+        classModule.CreateClassPowerBar(self)
+    end
+
+    if cfg.classModule.classpowerbar.blizzard then
+        classModule.ResetBlizzardClassBarPosition(self)
+    end
 end
 
 local createQuakeTimer = function(self)

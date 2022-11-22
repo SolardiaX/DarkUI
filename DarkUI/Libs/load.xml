@@ -11,10 +11,7 @@
 
     <!-- LibButtonGlow -->
     <Script file="LibButtonGlow.lua" />
-
-    <!-- LibShowUIPanel-1.0 -->
-    <Script file="LibShowUIPanel-1.0.lua" />
-
+    
     <!-- cargBags -->
     <Include file="cargBags\load.xml" />
 </Ui>

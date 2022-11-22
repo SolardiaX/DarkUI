@@ -741,49 +741,10 @@ C.unitframe = {
     },
     -- class stuff
     classModule  = {
-        DEATHKNIGHT = {
-            recolor    = true,
-            showRunes  = true,
-            showTotems = true
-        },
-        DEMONHUNTER = {},
-        DRUID       = {
-            showTotems          = true,
-            showAdditionalPower = true
-        },
-        HUNTER      = {
-            showTotems = true
-        },
-        MAGE        = {
-            showArcaneStacks = true,
-            showTotems       = true
-        },
-        MONK        = {
-            showStagger         = true,
-            showChi             = true,
-            showTotems          = true,
-            showAdditionalPower = true
-        },
-        PALADIN     = {
-            showHolyPower       = true,
-            showTotems          = true,
-            showAdditionalPower = true
-        },
-        PRIEST      = {
-            showInsanity        = true,
-            showAdditionalPower = true
-        },
-        ROGUE       = {},
-        SHAMAN      = {
-            showTotems          = true,
-            showAdditionalPower = true
-        },
-        WARLOCK     = {
-            showShards = true,
-            showTotems = true
-        },
-        WARRIOR     = {
-            showTotems = true
+        classpowerbar = {
+            diabolic = true,
+            blizzard = true,
+            position = { "CENTER", UIParent, "CENTER", 0, -120 }
         }
     }
 }
