@@ -12,4 +12,5 @@ ns.Categories[7] = L_CATEGORIES_LOOT
 ns.OptionList[7] = { -- Aura
     { 1, 'bags', 'enable', L_OPT_LOOT_BAGS_ENABLE, false },
     { 1, 'loot', 'enable', L_OPT_LOOT_LOOT_ENABLE, false },
+    { 1, 'loot', 'faster_loot', L_OPT_LOOT_FASTER_LOOT, false },
 }

@@ -115,6 +115,7 @@ L_OPT_ANNOUNCEMENT_INTERRUPT_CHANNEL_6 = 'Raid'
 
 L_OPT_LOOT_BAGS_ENABLE = 'Enable bag modules'
 L_OPT_LOOT_LOOT_ENABLE = 'Enable loot modules'
+L_OPT_LOOT_FASTER_LOOT = 'Enable fast loot'
 
 L_OPT_DATATEXT_ENABLE = 'Enable datatext modules'
 L_OPT_DATATEXT_LATENCY_ENABLE = 'Enable latency (left-down)'
@@ -153,6 +154,7 @@ L_OPT_TOOLTIP_AVERAGE_LVL = 'Show average equipment level'
 L_OPT_TOOLTIP_ARENA_EXPERIENCE = 'Show arena experience'
 L_OPT_TOOLTIP_SPELL_ID = 'Show spell id'
 L_OPT_TOOLTIP_TALENTS = 'Show talent'
+L_OPT_TOOLTIP_MOUNT = 'Show source of mount'
 L_OPT_TOOLTIP_UNIT_ROLE = 'Show unit role in party/raid'
 
 L_OPT_CHAT_ENABLE = 'Enable chat module'

@@ -119,6 +119,11 @@ ns.OptionList[10] = { -- Tooltip
             self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())
         end)
     end },
+    { 1, 'tooltip', 'mount', L_OPT_TOOLTIP_MOUNT, false, nil, function(self)
+        self:HookScript('OnShow', function(self)
+            self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())
+        end)
+    end },
     { 1, 'tooltip', 'unit_role', L_OPT_TOOLTIP_UNIT_ROLE, false, nil, function(self)
         self:HookScript('OnShow', function(self)
             self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())

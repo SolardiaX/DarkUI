@@ -441,6 +441,7 @@ C.combat = {
 ----------------------------------------------------------------------------------------
 C.loot = {
     enable         = true,
+    faster_loot    = true,
     width          = 220, -- loot window width
     icon_size      = 32, -- icon size in loot window
     pos            = { "TOPLEFT", UIParent, "TOPLEFT", 400, -400 }, -- default loot window position
@@ -535,6 +536,7 @@ C.tooltip = {
     arena_experience  = false, -- Player PvP experience in arena
     spell_id          = true, -- Id number spells
     talents           = true, -- Show tooltip talents
+    mount             = true, -- Show source of mount
     unit_role         = true -- Unit role in tooltip
 }
 
