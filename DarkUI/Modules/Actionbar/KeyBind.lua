@@ -294,20 +294,25 @@ SlashCmdList.MOUSEOVERBIND = function()
         end
         
         ExtraActionButton1:HookScript("OnEnter", function(self) bind:Update(self) end)
-        local function registermacro()
-            for i = 1, MAX_ACCOUNT_MACROS do
-                local b = _G["MacroButton"..i]
-                b:HookScript("OnEnter", function(self) bind:Update(self, "MACRO") end)
-            end
-            MacroFrameTab1:HookScript("OnMouseUp", function() localmacros = 0 end)
-            MacroFrameTab2:HookScript("OnMouseUp", function() localmacros = 1 end)
-        end
 
         DarkUIExtraButtons_MainLeftButton:HookScript("OnEnter", function(self) bind:Update(self) end)
         DarkUIExtraButtons_MainRightButton:HookScript("OnEnter", function(self) bind:Update(self) end)
         DarkUIExtraButtons_TopLeftButton:HookScript("OnEnter", function(self) bind:Update(self) end)
         DarkUIExtraButtons_TopRightButton:HookScript("OnEnter", function(self) bind:Update(self) end)
         
+        local function registermacro()
+            hooksecurefunc(MacroFrame, "Update", function(frame)
+                for _, button in next, {frame.MacroSelector.ScrollBox.ScrollTarget:GetChildren()} do
+                    if button and not button.hook then
+                        button:HookScript("OnEnter", function(self) bind:Update(button, "MACRO") end)
+                        button.hook = true
+                    end
+                end
+            end)
+            MacroFrameTab1:HookScript("OnMouseUp", function() localmacros = 0 end)
+            MacroFrameTab2:HookScript("OnMouseUp", function() localmacros = 1 end)
+        end
+
         if not IsAddOnLoaded("Blizzard_MacroUI") then
             hooksecurefunc("LoadAddOn", function(addon)
                 if addon=="Blizzard_MacroUI" then
