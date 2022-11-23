@@ -5,19 +5,6 @@ if C.tooltip.enable ~= true or C.tooltip.talents ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Target Talents(TipTacTalents by Aezay)
 ----------------------------------------------------------------------------------------
----
-local _G = _G
-local CreateFrame = CreateFrame
-local GetInspectSpecialization, GetSpecializationInfoByID = GetInspectSpecialization, GetSpecializationInfoByID
-local GetSpecialization, GetSpecializationInfo = GetSpecialization, GetSpecializationInfo
-local UnitGUID, UnitName, UnitIsPlayer = UnitGUID, UnitName, UnitIsPlayer
-local UnitLevel, UnitIsUnit = UnitLevel, UnitIsUnit
-local CopyTable, GetTime = CopyTable, GetTime
-local NotifyInspect, CanInspect = NotifyInspect, CanInspect
-local GetMouseFocus = GetMouseFocus
-local tremove, wipe = tremove, wipe
-local GameTooltip = GameTooltip
-
 -- Constants
 local TALENTS_PREFIX = SPECIALIZATION..":|cffffffff "
 local CACHE_SIZE = 25
@@ -109,6 +96,7 @@ end)
 
 -- HOOK: OnTooltipSetUnit
 local function OnTooltipSetUnit(self)
+    if self ~= GameTooltip or self:IsForbidden() then return end
     -- Abort any delayed inspect in progress
     ttt:Hide()
 

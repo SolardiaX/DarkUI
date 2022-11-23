@@ -166,9 +166,6 @@ local function IsArtifact(itemLink)
     return itemLink:find("|cffe6cc80") -- this is probably a horrible way to find whether it"s an artifact
 end
 
--- local function IsLegendary()
-    -- return false
--- end
 
 local function IsCached(itemLink) -- we can"t get the correct level of an artifact until all of its relics have been cached
     local cached = true
@@ -202,20 +199,25 @@ local function AddLine(sekret, leftText, rightText, prefixColor, detailColor, do
     end
 end
 
-local SlotCache = {}
-local ItemCache = {}
+local SlotCache = {} -- [slot] = itemLevel or false
+local ItemCache = {} -- [slot] = itemLink
 local TestTips = {}
 for _, slot in pairs(InventorySlots) do
     local tip = CreateFrame("GameTooltip", "AverageItemLevelTooltip" .. slot, nil, "GameTooltipTemplate")
     tip:SetOwner(WorldFrame, "ANCHOR_NONE")
     TestTips[slot] = tip
     tip.slot = slot
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self)
-        if self ~= tip then return end
+end
+function OnTooltipSetItem(self)
         local slot = self.slot
-        local _, itemLink = TooltipUtil.GetDisplayedItem(self)
+	if(not slot) then
+		return
+	end
+	local _, itemLink = self:GetItem()
         local tipName = self:GetName()
-        if self.itemLink then itemLink = self.itemLink end
+	if self.itemLink then
+		itemLink = self.itemLink
+	end
         if itemLink then
             local isCached = IsCached(itemLink)
             if isCached then
@@ -295,24 +297,20 @@ for _, slot in pairs(InventorySlots) do
 
             local averageItemLevel = totalItemLevel / 16
 
+		-- should we just return the cache for this GUID?
             local guid = ScannedGUID
-            if not GuidCache[guid] then GuidCache[guid] = {} end
+		if not GuidCache[guid] then
+			GuidCache[guid] = {}
+		end
             GuidCache[guid].ilevel = averageItemLevel
             GuidCache[guid].weaponLevel = weaponLevel
-            GuidCache[guid].neckLevel = SlotCache[2]
             GuidCache[guid].timestamp = GetTime()
 
-            -- wipe(GuidCache[guid].legos)
-            -- for _, link in pairs(ItemCache) do
-                -- if IsLegendary(link) then
-                    -- tinsert(GuidCache[guid].legos, link)
-                -- end
-            -- end
 
             eve("ItemScanComplete", guid, GuidCache[guid])
         end
-    end)
 end
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetItem)
 
 local function GetTooltipGUID()
     local _, unitID = GameTooltip:GetUnit()
@@ -376,7 +374,7 @@ hooksecurefunc("ClearInspectPlayer", function()
 end)
 
 local function DoInspect()
-    AddLine(Sekret, SEARCH .. ": ", " ...", "|cff9A9A9A", "|cff9A9A9A")
+    -- AddLine(Sekret, SEARCH .. ": ", " ...", "|cff9A9A9A", "|cff9A9A9A")
     ShouldInspect = true
 end
 
@@ -386,33 +384,21 @@ local function DecorateTooltip(guid, isInspect)
     if GetTooltipGUID() == guid or (isInspect and guid == UnitGUID("target")) then
         local _, ourEquippedItemLevel = GetAverageItemLevel()
         local averageItemLevel = cache.ilevel or 0
-        local neckLevel = cache.neckLevel or 0
-        local ourNeck = GetInventoryItemLink("player", 2)
-        local ourNeckLevel = GetDetailedItemLevelInfo(ourNeck or "") or 0
 
         local r1, g1, b1 = ColorDiff(ourEquippedItemLevel, averageItemLevel)
-        local r2, g2, b2 = ColorDiff(ourNeckLevel, neckLevel)
 
         local _, unitID = GameTooltip:GetUnit()
         if isInspect then
             unitID = "target"
         end
-        local levelText
-        if UnitLevel(unitID) == 120 then
-            levelText = format("|cff%2x%2x%2x%.1f|r |cff%2x%2x%2x(%s)|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel, r2 * 255, g2 * 255, b2 * 255, neckLevel)
-        else
-            levelText = format("|cff%2x%2x%2x%.1f|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel, r2 * 255, g2 * 255, b2 * 255)
-        end
+
+		local levelText = format("|cff%2x%2x%2x%.1f|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel)
 
         if isInspect and averageItemLevel > 0 then
             InspectFrameiLvL:SetText(levelText)
         end
 
         AddLine(Sekret, STAT_AVERAGE_ITEM_LEVEL .. ": ", levelText, "|cffF9D700", "|cffffffff")
-
-        -- for i, lego in ipairs(cache.legos) do
-            -- AddLine("|Hlego" .. i .. "|h", lego, " ", "|cffffffff", "|cffffffff")
-        -- end
     end
 end
 
@@ -420,7 +406,6 @@ local function ScanUnit(unitID)
     ScannedGUID = UnitGUID(unitID)
     wipe(SlotCache)
     wipe(ItemCache)
-    -- wipe(GuidCache[ScannedGUID].legos)
     local numEquipped = 0
     for _, slot in pairs(InventorySlots) do
         if GetInventoryItemTexture(unitID, slot) then
@@ -461,12 +446,17 @@ function eve:INSPECT_READY(guid)
         -- end
 
         if not GuidCache[guid] then
-            GuidCache[guid] = { ilevel = 0, weaponLevel = 0, timestamp = 0, legos = {} }
+			GuidCache[guid] = {
+				ilevel = 0,
+				weaponLevel = 0,
+				timestamp = 0,
+			}
         end
         -- local cache = GuidCache[guid]
         -- cache.specID = specID
         -- cache.class = class
         -- cache.specName = specName
+        -- cache.itemLevel = C_PaperDollInfo.GetInspectItemLevel(unitID)
 
         ScanUnit(unitID)
     end

@@ -14,11 +14,14 @@ local modf = math.modf
 function E:FormatTime(seconds, raw)
     local d, h, m, str = 86400, 3600, 60
     if seconds >= d then
-        str = format("%d" .. E.colorString .. "d", seconds / d + .5)
+        -- str = format("%d" .. E.colorString .. "d", seconds / d + .5)
+        str = format("%dd", seconds / d + .5)
     elseif seconds >= h then
-        str = format("%d" .. E.colorString .. "h", seconds / h + .5)
+        -- str = format("%d" .. E.colorString .. "h", seconds / h + .5)
+        str = format("%dh", seconds / h + .5)
     elseif seconds >= m then
-        str = format("%d" .. E.colorString .. "m", seconds / m + .5)
+        -- str = format("%d" .. E.colorString .. "m", seconds / m + .5)
+        str = format("%dm", seconds / m + .5)
     else
         if seconds <= 5 and raw then
             str = format("|cffff0000%.1f|r", seconds) -- red

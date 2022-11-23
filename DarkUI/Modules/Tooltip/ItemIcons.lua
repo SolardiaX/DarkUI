@@ -5,10 +5,6 @@ if C.tooltip.enable ~= true or C.tooltip.item_icon ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Adds item icons to tooltips(Tipachu by Tuller)
 ----------------------------------------------------------------------------------------
-local _G = _G
-local GetItemIcon = GetItemIcon
-local GetSpellInfo = GetSpellInfo
-local hooksecurefunc = hooksecurefunc
 
 local function setTooltipIcon(self, icon)
     local title = icon and _G[self:GetName() .. "TextLeft1"]
@@ -26,26 +22,32 @@ local whiteTooltip = {
     [ShoppingTooltip2] = true,
 }
 
-local function hookItem(self)
-    if whiteTooltip[self] then
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
+    if whiteTooltip[self] and not self:IsForbidden() then
 
-        local _, link = TooltipUtil.GetDisplayedItem(self)
-    if link then
-        setTooltipIcon(self, GetItemIcon(link))
+        if data and data.id then
+            setTooltipIcon(self, GetItemIcon(data.id))
+        end
     end
+end)
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self, data)
+    if whiteTooltip[self] and not self:IsForbidden() then
+        if data and data.id then
+            setTooltipIcon(self, select(3, GetSpellInfo(data.id)))
+        end
     end
-end
+end)
 
-local function hookSpell(self)
-    if whiteTooltip[self] then
-    local _, id = self:GetSpell()
-    if id then
-        setTooltipIcon(self, select(3, GetSpellInfo(id)))
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Macro, function(self, data)
+    if whiteTooltip[self] and not self:IsForbidden() then
+        local lineData = data.lines and data.lines[1]
+        local tooltipType = lineData and lineData.tooltipType
+        if not tooltipType then return end
+
+        if tooltipType == 0 then -- item
+            setTooltipIcon(self, GetItemIcon(lineData.tooltipID))
+        elseif tooltipType == 1 then -- spell
+            setTooltipIcon(self, select(3, GetSpellInfo(lineData.tooltipID)))
+        end
     end
-
-end
-
-    end
-
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, hookItem)
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, hookSpell)
+end)

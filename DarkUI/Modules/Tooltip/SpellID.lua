@@ -6,15 +6,6 @@ if C.tooltip.enable ~= true or C.tooltip.spell_id ~= true then return end
 --	Spell/Item IDs(idTip by Silverwind)
 ----------------------------------------------------------------------------------------
 
-local _G = _G
-local UnitAura = UnitAura
-local IsModifierKeyDown = IsModifierKeyDown
-local hooksecurefunc = hooksecurefunc
-local GameTooltip = GameTooltip
-local ItemRefTooltip = ItemRefTooltip
-local ItemRefShoppingTooltip1, ItemRefShoppingTooltip2 = ItemRefShoppingTooltip1, ItemRefShoppingTooltip2
-local ShoppingTooltip1, ShoppingTooltip2 = ShoppingTooltip1, ShoppingTooltip2
-
 local function addLine(self, id, isItem)
     for i = 1, self:NumLines() do
         local line = _G[self:GetName().."TextLeft"..i]
@@ -30,11 +21,7 @@ local function addLine(self, id, isItem)
     self:Show()
 end
 
-local function OnTooltipSetSpell(self)
-    local _, id = self:GetSpell()
-    if id then addLine(self, id) end
-end
-
+-- Spells
 hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
     local id = select(10, UnitAura(...))
     if id then addLine(self, id) end
@@ -47,6 +34,7 @@ local function attachByAuraInstanceID(self, ...)
     if id then addLine(self, id) end
     if debuginfo == true and id and IsModifierKeyDown() then print(UnitAura(...)..": "..id) end
 end
+
 hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", attachByAuraInstanceID)
 hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", attachByAuraInstanceID)
 hooksecurefunc("SetItemRef", function(link)
@@ -54,19 +42,48 @@ hooksecurefunc("SetItemRef", function(link)
     if id then addLine(ItemRefTooltip, id) end
 end)
 
-local function attachItemTooltip(self)
-    local _, link = self:GetItem()
-    if not link then return end
-    local id = link:match("item:(%d+):")
-    if id then addLine(self, id, true) end
-end
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self, data)
+    if self ~= GameTooltip or self:IsForbidden() then return end
+    if data and data.id then
+        addLine(self, data.id)
+    end
+end)
 
-local function attachItemTooltip(self)
-    local _, link = TooltipUtil.GetDisplayedItem(self)
-    if not link then return end
-    local id = link:match("item:(%d+):")
-    if id then addLine(self, id, true) end
-end
+-- Items
+local whiteTooltip = {
+    [GameTooltip] = true,
+    [ItemRefTooltip] = true,
+    [ItemRefShoppingTooltip1] = true,
+    [ItemRefShoppingTooltip2] = true,
+    [ShoppingTooltip1] = true,
+    [ShoppingTooltip2] = true,
+}
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
+    if whiteTooltip[self] and not self:IsForbidden() then
+        if data and data.id then
+            addLine(self, data.id, true)
+        end
+    end
+end)
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetSpell)
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, attachItemTooltip)
+-- Macros
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Macro, function(self, data)
+    if self:IsForbidden() then return end
+    local lineData = data.lines and data.lines[1]
+    local tooltipType = lineData and lineData.tooltipType
+    if not tooltipType then return end
+
+    if tooltipType == 0 then -- item
+        addLine(self, lineData.tooltipID, true)
+    elseif tooltipType == 1 then -- spell
+        addLine(self, lineData.tooltipID)
+    end
+end)
+
+-- Toys
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Toy, function(self, data)
+    if self ~= GameTooltip or self:IsForbidden() then return end
+    if data and data.id then
+        addLine(self, data.id, true)
+    end
+end)

@@ -17,36 +17,23 @@ local fontObject = CreateFont("iLvLFont")
 fontObject:SetFontObject("SystemFont_Outline_Small")
 
 -- Tooltip and scanning by Phanx @ http://www.wowinterface.com/forums/showthread.php?p=271406
-local S_ITEM_LEVEL = "^" .. gsub(ITEM_LEVEL, "%%d", "(%%d+)")
-
-local scanner = CreateFrame("GameTooltip", "SlotScanningTooltip", nil, "GameTooltipTemplate")
-scanner:SetOwner(UIParent, "ANCHOR_NONE")
-
-local scannerName = scanner:GetName()
+local itemLevelString = "^"..gsub(ITEM_LEVEL, "%%d", "")
 
 local function _getRealItemLevel(slotId, unit)
-    local hasItem = scanner:SetInventoryItem(unit, slotId)
-    if not hasItem then return nil end -- With this we don't get ilvl for offhand if we equip 2h weapon
+    local data = C_TooltipInfo.GetInventoryItem(unit, slotId)
+    if not data then return nil end -- With this we don't get ilvl for offhand if we equip 2h weapon
     local realItemLevel
 
-    local line = _G[scannerName .. "TextLeft2"]
-    if line then
-        local msg = line:GetText()
-        if msg and string.find(msg, S_ITEM_LEVEL) then
-            local itemLevel = string.match(msg, S_ITEM_LEVEL)
-            if itemLevel and (tonumber(itemLevel) > 0) then
-                realItemLevel = itemLevel
-            end
-        else
-            -- Check line 3, some artifacts have the ilevel there
-            line = _G[scannerName .. "TextLeft3"]
-            if line then
-                local msg = line:GetText()
-                if msg and string.find(msg, S_ITEM_LEVEL) then
-                    local itemLevel = string.match(msg, S_ITEM_LEVEL)
-                    if itemLevel and (tonumber(itemLevel) > 0) then
-                        realItemLevel = itemLevel
-                    end
+    for i = 2, #data.lines do
+        local lineData = data.lines[i]
+        local argVal = lineData and lineData.args
+        if argVal then
+            local text = argVal[2] and argVal[2].stringVal
+            local found = text and strfind(text, itemLevelString)
+            if found then
+                local level = strmatch(text, "(%d+)%)?$")
+                if level and (tonumber(level) > 0) then
+                    realItemLevel = level
                 end
             end
         end
@@ -251,7 +238,7 @@ local function SetupFlyoutLevel(button, bag, slot)
     end
     local link, level
     if bag then
-        link = C_Container.GetContainerItemLink(bag, slot)
+        link = GetContainerItemLink(bag, slot)
         level = _getRealItemLevel(link, bag, slot)
     else
         link = GetInventoryItemLink("player", slot)
