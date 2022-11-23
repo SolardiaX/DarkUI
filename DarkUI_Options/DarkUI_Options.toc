@@ -4,7 +4,7 @@
 ## Notes-zhCN: DarkUI - 配置管理
 ## Notes: DarkUI - Options GUI
 ## Author: SolardiaX
-## Version: 10.0.2-b1.0.2
+## Version: 10.0.2-b1.0.3
 ## RequiredDeps: DarkUI
 ## SavedVariables: SavedOptions
 ## SavedVariablesPerCharacter: SavedOptionsPerChar

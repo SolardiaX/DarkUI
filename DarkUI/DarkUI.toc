@@ -4,7 +4,7 @@
 ## Notes-zhCN: 整合插件 DarkUI
 ## Notes: A total UI overhaul for World of Warcraft
 ## Author: SolardiaX
-## Version: 10.0.2-b1.0.2
+## Version: 10.0.2-b1.0.3
 ## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options, ItemRack, Outfitter
 ## LoadWith: Blizzard_TradeSkillUI
 ## SavedVariables: SavedStats
