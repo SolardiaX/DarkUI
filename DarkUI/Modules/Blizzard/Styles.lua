@@ -3,537 +3,666 @@ local E, C, L = select(2, ...):unpack()
 if not C.blizzard.style then return end
 
 ----------------------------------------------------------------------------------------
--- Skin Blizzard Default Frames (modified from DiabolicUI)
+-- Skin Blizzard Default Frames (modified from FrameColor)
 ----------------------------------------------------------------------------------------
 
--- Lua API
-local _G = _G
-local pairs = pairs
-local select = select
-local string_find = string.find
-local string_split = string.split
-local unpack = unpack
+local r, g, b = unpack(C.media.vertex_color)
 
--- WoW API
-local CreateFrame = CreateFrame
+local FrameColor = CreateFrame("Frame")
+FrameColor.modules = {}
 
--- List of elements to be styled
-local elements = {
-    ["CharacterFrame"]                                                                           = true,
-    ["CharacterFrameInset"]                                                                      = true,
-    ["CharacterFrameInsetRight"]                                                                 = true,
-    ["CharacterModelFrame"]                                                                      = true,
-    ["CharacterFrameTab1"]                                                                       = true,
-    ["CharacterFrameTab2"]                                                                       = true,
-    ["CharacterFrameTab3"]                                                                       = true,
-    ["CharacterFrameTab4"]                                                                       = true,
-    ["CharacterFrameTab5"]                                                                       = true,
-    ["GroupFinderFrame"]                                                                         = true,
-    ["GroupFinderFrameGroupButton1"]                                                             = true,
-    ["GroupFinderFrameGroupButton2"]                                                             = true,
-    ["GroupFinderFrameGroupButton3"]                                                             = true,
-    ["GroupFinderFrameGroupButton4"]                                                             = true,
-    ["LFDParentFrame"]                                                                           = true,
-    ["LFDParentFrameInset"]                                                                      = true,
-    ["LFDQueueFrame"]                                                                            = true,
-    ["LFDQueueFrameFindGroupButton"]                                                             = true,
-    ["LFDQueueFrameTypeDropDown"]                                                                = true,
-    ["LFDQueueFrameRandom"]                                                                      = true,
-    ["LFDQueueFrameSpecificListScrollFrame"]                                                     = true,
-    ["LFDQueueFrameSpecificListScrollFrameScrollBar"]                                            = true,
-    ["LFDQueueFrameSpecificListScrollFrameScrollBarScrollUpButton"]                              = true,
-    ["LFDQueueFrameSpecificListScrollFrameScrollBarScrollDownButton"]                            = true,
-    ["LFGListFrame"]                                                                             = true,
-    ["LFGListFrame.CategorySelection.Inset"]                                                     = true,
-    ["LFGListFrame.CategorySelection.StartGroupButton"]                                          = true,
-    ["LFGListFrame.CategorySelection.FindGroupButton"]                                           = true,
-    ["LFGListFrame.SearchPanel"]                                                                 = true,
-    ["LFGListFrame.SearchPanel.BackButton"]                                                      = true,
-    ["LFGListFrame.SearchPanel.FilterButton"]                                                    = true,
-    ["LFGListFrame.SearchPanel.ResultsInset"]                                                    = true,
-    ["LFGListFrame.SearchPanel.SearchBox"]                                                       = true,
-    ["LFGListFrame.SearchPanel.SignUpButton"]                                                    = true,
-    ["LFGListSearchPanelScrollFrame.StartGroupButton"]                                           = true,
-    ["LFGListSearchPanelScrollFrameScrollBar"]                                                   = true,
-    ["LFGListSearchPanelScrollFrameScrollBarScrollDownButton"]                                   = true,
-    ["LFGListSearchPanelScrollFrameScrollBarScrollUpButton"]                                     = true,
-    ["PaperDollFrame"]                                                                           = true,
-    ["PaperDollEquipmentManagerPaneScrollBar"]                                                   = true,
-    ["PaperDollEquipmentManagerPaneScrollBarScrollDownButton"]                                   = true,
-    ["PaperDollEquipmentManagerPaneScrollBarScrollUpButton"]                                     = true,
-    ["PaperDollTitlesPaneScrollBar"]                                                             = true,
-    ["PaperDollTitlesPaneScrollBarScrollDownButton"]                                             = true,
-    ["PaperDollTitlesPaneScrollBarScrollUpButton"]                                               = true,
-    ["PaperDollItemsFrame"]                                                                      = true,
-    ["PlayerStatFrameLeftDropDown"]                                                              = true,
-    ["PlayerStatFrameLeftDropDownButton"]                                                        = true,
-    ["PlayerStatFrameRightDropDown"]                                                             = true,
-    ["PlayerStatFrameRightDropDownButton"]                                                       = true,
-    ["PlayerTitleFrame"]                                                                         = true,
-    ["PlayerTitleFrameButton"]                                                                   = true,
-    ["PVEFrame"]                                                                                 = true,
-    ["PVEFrame.shadows"]                                                                         = true,
-    ["PVEFrameLeftInset"]                                                                        = true,
-    ["PVEFrameTab1"]                                                                             = true,
-    ["PVEFrameTab2"]                                                                             = true,
-    ["PVEFrameTab3"]                                                                             = true,
-    ["RaidFinderFrame"]                                                                          = true,
-    ["RaidFinderFrameBottomInset"]                                                               = true,
-    ["RaidFinderFrameFindRaidButton"]                                                            = true,
-    ["RaidFinderQueueFrame"]                                                                     = true,
-    ["RaidFinderQueueFrameSelectionDropDown"]                                                    = true,
-    ["RaidFinderFrameRoleInset"]                                                                 = true,
-    ["SpellBookFrame"]                                                                           = true,
-    ["SpellBookSkillLineTab1"]                                                                   = true,
-    ["SpellBookSkillLineTab2"]                                                                   = true,
-    ["SpellBookSkillLineTab3"]                                                                   = true,
-    ["SpellBookSkillLineTab4"]                                                                   = true,
-    ["SpellBookSkillLineTab5"]                                                                   = true,
-    ["SpellBookSkillLineTab6"]                                                                   = true,
-    ["SpellBookSkillLineTab7"]                                                                   = true,
-    ["SpellBookSkillLineTab8"]                                                                   = true,
-    ["WorldMapFrame"]                                                                            = true,
-    ["WorldMapFrame.BorderFrame"]                                                                = true,
-    ["ConquestFrame"]                                                                            = "Blizzard_PVPUI",
-    ["ConquestFrame.Inset"]                                                                      = "Blizzard_PVPUI",
-    ["ConquestFrame.RoleInset"]                                                                  = "Blizzard_PVPUI",
-    ["ConquestJoinButton"]                                                                       = "Blizzard_PVPUI",
-    ["HonorFrame"]                                                                               = "Blizzard_PVPUI",
-    ["HonorFrame.Inset"]                                                                         = "Blizzard_PVPUI",
-    ["HonorFrame.RoleInset"]                                                                     = "Blizzard_PVPUI",
-    ["HonorFrameQueueButton"]                                                                    = "Blizzard_PVPUI",
-    ["HonorFrameTypeDropDown"]                                                                   = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton1"]                                                             = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton2"]                                                             = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton3"]                                                             = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton4"]                                                             = "Blizzard_PVPUI",
-    ["WarGamesFrame"]                                                                            = "Blizzard_PVPUI",
-    ["WarGamesFrame.HorizontalBar"]                                                              = "Blizzard_PVPUI",
-    ["WarGamesFrame.RightInset"]                                                                 = "Blizzard_PVPUI",
-    ["WarGamesFrameInfoScrollFrameScrollBar"]                                                    = "Blizzard_PVPUI",
-    ["WarGamesFrameInfoScrollFrameScrollBarScrollUpButton"]                                      = "Blizzard_PVPUI",
-    ["WarGamesFrameInfoScrollFrameScrollBarScrollDownButton"]                                    = "Blizzard_PVPUI",
-    ["WarGamesFrameScrollFrameScrollBar"]                                                        = "Blizzard_PVPUI",
-    ["WarGamesFrameScrollFrameScrollBarScrollUpButton"]                                          = "Blizzard_PVPUI",
-    ["WarGamesFrameScrollFrameScrollBarScrollDownButton"]                                        = "Blizzard_PVPUI",
-    ["WarGameStartButton"]                                                                       = "Blizzard_PVPUI",
-    ["PlayerTalentFrame"]                                                                        = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTab1"]                                                                    = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTab2"]                                                                    = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTab3"]                                                                    = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTab4"]                                                                    = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTab5"]                                                                    = "Blizzard_TalentUI",
-    ["PlayerTalentFrameInset"]                                                                   = "Blizzard_TalentUI",
-    ["PlayerTalentFramePVPTalents"]                                                              = "Blizzard_TalentUI",
-    ["PlayerTalentFramePVPTalents.Talents"]                                                      = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecialization"]                                                          = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpellScrollFrameScrollChild"]                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton1"]                                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton2"]                                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton3"]                                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton4"]                                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationLearnButton"]                                               = "Blizzard_TalentUI",
-    ["PlayerTalentFrameTalents"]                                                                 = "Blizzard_TalentUI",
-    ["TradeSkillFrame"]                                                                          = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.ResultIcon"]                                         = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent1"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent2"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent3"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent4"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent5"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent6"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent7"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.Contents.Reagent8"]                                           = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateAllButton"]                                             = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateAllButton.LeftSeparator"]                               = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateAllButton.RightSeparator"]                              = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateButton"]                                                = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateButton.LeftSeparator"]                                  = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.CreateMultipleInputBox"]                                      = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.ExitButton"]                                                  = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.ExitButton.LeftSeparator"]                                    = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.ExitButton.RightSeparator"]                                   = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.ScrollBar"]                                                   = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsInset"]                                                             = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.FilterButton"]                                                             = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.LinkToButton"]                                                             = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RecipeInset"]                                                              = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RecipeList"]                                                               = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RecipeList.LearnedTab"]                                                    = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RecipeList.UnlearnedTab"]                                                  = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RecipeList.scrollBar"]                                                     = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.SearchBox"]                                                                = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.RankFrame"]                                                                = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrameScrollDownButton"]                                                          = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrameScrollUpButton"]                                                            = "Blizzard_TradeSkillUI",
-    ["GarrisonCapacitiveDisplayFrame"]                                                           = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrameInset"]                                                      = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.CapacitiveDisplay.ShipmentIconFrame.Follower"]              = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.CapacitiveDisplay.ShipmentIconFrame.Follower.PortraitRing"] = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.CreateAllWorkOrdersButton"]                                 = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.CreateAllWorkOrdersButton.RightSeparator"]                  = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.StartWorkOrderButton"]                                      = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.StartWorkOrderButton.LeftSeparator"]                        = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.Count"]                                                     = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.IncrementButton"]                                           = "Blizzard_GarrisonUI",
-    ["GarrisonCapacitiveDisplayFrame.DecrementButton"]                                           = "Blizzard_GarrisonUI",
-    ["MerchantFrame"]                                                                            = true,
-    ["MerchantFrameInset"]                                                                       = true,
-    ["MerchantFrameLootFilter"]                                                                  = true,
-    ["MerchantItem1"]                                                                            = true,
-    ["MerchantItem1SlotTexture"]                                                                 = true,
-    ["MerchantItem1ItemButton"]                                                                  = true,
-    ["MerchantItem2"]                                                                            = true,
-    ["MerchantItem2SlotTexture"]                                                                 = true,
-    ["MerchantItem2ItemButton"]                                                                  = true,
-    ["MerchantItem3"]                                                                            = true,
-    ["MerchantItem3SlotTexture"]                                                                 = true,
-    ["MerchantItem3ItemButton"]                                                                  = true,
-    ["MerchantItem4"]                                                                            = true,
-    ["MerchantItem4SlotTexture"]                                                                 = true,
-    ["MerchantItem4ItemButton"]                                                                  = true,
-    ["MerchantItem5"]                                                                            = true,
-    ["MerchantItem5SlotTexture"]                                                                 = true,
-    ["MerchantItem5ItemButton"]                                                                  = true,
-    ["MerchantItem6"]                                                                            = true,
-    ["MerchantItem6SlotTexture"]                                                                 = true,
-    ["MerchantItem6ItemButton"]                                                                  = true,
-    ["MerchantItem7"]                                                                            = true,
-    ["MerchantItem7SlotTexture"]                                                                 = true,
-    ["MerchantItem7ItemButton"]                                                                  = true,
-    ["MerchantItem8"]                                                                            = true,
-    ["MerchantItem8SlotTexture"]                                                                 = true,
-    ["MerchantItem8ItemButton"]                                                                  = true,
-    ["MerchantItem9"]                                                                            = true,
-    ["MerchantItem9SlotTexture"]                                                                 = true,
-    ["MerchantItem9ItemButton"]                                                                  = true,
-    ["MerchantItem10"]                                                                           = true,
-    ["MerchantItem10SlotTexture"]                                                                = true,
-    ["MerchantItem10ItemButton"]                                                                 = true,
-    ["MerchantFrameTab1"]                                                                        = true,
-    ["MerchantFrameTab2"]                                                                        = true,
-    ["MerchantRepairItemButton"]                                                                 = true,
-    ["MerchantRepairAllButton"]                                                                  = true,
-    ["MerchantGuildBankRepairButton"]                                                            = true,
-    ["MerchantBuyBackItem"]                                                                      = true,
-    ["MerchantNextPageButton"]                                                                   = true,
-    ["MerchantPrevPageButton"]                                                                   = true,
-    ["FloatingBattlePetTooltip"]                                                                 = true
-}
+--color scaled edges and header
+function FrameColor:NineSlicer(frame, r,g,b)   
+    for i, v in pairs({
+        frame.NineSlice.TopEdge,
+        frame.NineSlice.BottomEdge,
+        frame.NineSlice.TopRightCorner,
+        frame.NineSlice.TopLeftCorner,
+        frame.NineSlice.RightEdge,
+        frame.NineSlice.LeftEdge,
+        frame.NineSlice.BottomRightCorner,
+        frame.NineSlice.BottomLeftCorner,  
+    }) do
+        v:SetVertexColor(r,g,b)
+    end
+end
 
--- Elements we won't skin
-local whiteList = {
-    ["GroupFinderFrameGroupButton1Icon"]                                    = true,
-    ["GroupFinderFrameGroupButton2Icon"]                                    = true,
-    ["GroupFinderFrameGroupButton3Icon"]                                    = true,
-    ["GroupFinderFrameGroupButton4Icon"]                                    = true,
-    ["LFDQueueFrameFindGroupButtonText"]                                    = true,
-    ["LFGListFrameText"]                                                    = true,
-    ["PVEFramePortrait"]                                                    = true,
-    ["RaidFinderFrameFindRaidButtonText"]                                   = true,
-    ["RaidFinderFrameRoleBackground"]                                       = true,
-    ["SpellBookPage1"]                                                      = true,
-    ["SpellBookPage2"]                                                      = true,
-    ["PlayerTalentFramePortrait"]                                           = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationLearnButtonText"]                      = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpellScrollFrameScrollChild.gradient"] = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton1.selectedTex"]              = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton2.selectedTex"]              = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton3.selectedTex"]              = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton4.selectedTex"]              = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton1SpecIcon"]                  = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton2SpecIcon"]                  = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton3SpecIcon"]                  = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton4SpecIcon"]                  = "Blizzard_TalentUI",
-    ["ConquestFrame.RoleInset.Background"]                                  = "Blizzard_PVPUI",
-    ["ConquestJoinButtonText"]                                              = "Blizzard_PVPUI",
-    ["HonorFrame.RoleInset.Background"]                                     = "Blizzard_PVPUI",
-    ["HonorFrameQueueButtonText"]                                           = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton1.Icon"]                                   = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton2.Icon"]                                   = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton3.Icon"]                                   = "Blizzard_PVPUI",
-    ["PVPQueueFrameCategoryButton4.Icon"]                                   = "Blizzard_PVPUI",
-    ["WarGameStartButtonText"]                                              = "Blizzard_PVPUI"
-}
+function FrameColor:NewModule(name)
+    local module = {}
 
--- Elements we'll hide
-local blackList = {
-    ["LFDQueueFrameFindGroupButton_LeftSeparator"]                     = true,
-    ["LFDQueueFrameFindGroupButton_RightSeparator"]                    = true,
-    ["LFGListFrame.CategorySelection.FindGroupButton.LeftSeparator"]   = true,
-    ["LFGListFrame.CategorySelection.StartGroupButton.RightSeparator"] = true,
-    ["LFGListFrame.SearchPanel.BackButton.RightSeparator"]             = true,
-    ["LFGListFrame.SearchPanel.SignUpButton.LeftSeparator"]            = true,
-    ["RaidFinderFrameFindRaidButton_LeftSeparator"]                    = true,
-    ["RaidFinderFrameFindRaidButton_RightSeparator"]                   = true,
-    ["ConquestJoinButton_LeftSeparator"]                               = "Blizzard_PVPUI",
-    ["ConquestJoinButton_RightSeparator"]                              = "Blizzard_PVPUI",
-    ["HonorFrameQueueButton_LeftSeparator"]                            = "Blizzard_PVPUI",
-    ["HonorFrameQueueButton_RightSeparator"]                           = "Blizzard_PVPUI",
-    ["WarGameStartButton_LeftSeparator"]                               = "Blizzard_PVPUI",
-    ["PlayerTalentFrameSpecializationSpecButton1Glow"]                 = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton2Glow"]                 = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton3Glow"]                 = "Blizzard_TalentUI",
-    ["PlayerTalentFrameSpecializationSpecButton4Glow"]                 = "Blizzard_TalentUI",
-    ["TradeSkillFrame.DetailsFrame.CreateButton.LeftSeparator"]        = "Blizzard_TradeSkillUI",
-    ["TradeSkillFrame.DetailsFrame.ExitButton.LeftSeparator"]          = "Blizzard_TradeSkillUI",
-    ["MerchantExtraCurrencyBg"]                                        = true,
-    ["MerchantExtraCurrencyInset"]                                     = true,
-    ["MerchantMoneyBg"]                                                = true,
-    ["MerchantMoneyInset"]                                             = true,
-}
+    module.host = CreateFrame("Frame", nil, FrameColor)
+    module.RegisterEvent = function(self, event, func)
+        self.host:RegisterEvent(event)
+        self.host:SetScript("OnEvent", func)
+    end
 
--- Frames that'll have nameless child elements styled too.
--- Note that these frames aren't currently hooked to addon loading,
--- so a full iteration of this table is run on every frame styling API call.
--- Also, frames here will only be styled if they are listed in the elements table above.
-local iterateNameless = {
-    ["PlayerTalentFrameSpecialization"] = "Blizzard_TalentUI"
-}
+    FrameColor.modules[name] = module
 
--- Character Frame
-do
-    -- The ItemsFrame was added in Cata when the character frame was upgraded to the big one
-    local paperDoll = _G.PaperDollItemsFrame or _G.PaperDollFrame
-    for i = 1, select("#", paperDoll:GetChildren()) do
+    return module
+end
 
-        local child = select(i, paperDoll:GetChildren())
-        local childName = child:GetName()
+--Character Frame
+local Character = FrameColor:NewModule("Character")
+Character:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(CharacterFrame,r,g,b)
+    FrameColor:NineSlicer(CharacterFrameInset,r,g,b)
+    FrameColor:NineSlicer(CharacterFrameInsetRight,r,g,b)
+    for i ,v in pairs({
+        CharacterFrameBg,
+        CharacterStatsPane.ClassBackground,
+        PaperDollInnerBorderTop,
+        PaperDollInnerBorderTopRight,
+        PaperDollInnerBorderRight,
+        PaperDollInnerBorderBottom,
+        PaperDollInnerBorderBottomRight,
+        PaperDollInnerBorderBottomLeft,
+        PaperDollInnerBorderLeft,
+        PaperDollInnerBorderTopLeft,
+        CharacterFrameInset.Bg,
+        CharacterFrameTab1.Left,
+        CharacterFrameTab1.Middle,
+        CharacterFrameTab1.Right,
+        CharacterFrameTab2.Left,
+        CharacterFrameTab2.Middle,
+        CharacterFrameTab2.Right,
+        CharacterFrameTab3.Left,
+        CharacterFrameTab3.Middle,
+        CharacterFrameTab3.Right,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
 
-        if child:GetObjectType() == "Button" and childName and childName:find("Slot") then
-            -- Nothing that belongs on the character frame, remnants of the templates used.
-            if _G[childName .. "Stock"] then
-                blackList[childName .. "Stock"] = true
-            end
+--Combined Bags
+local Bag = FrameColor:NewModule("Bag")
+Bag:RegisterEvent("PLAYER_LOGIN", function()
+    --ContainerFrameCombinedBagsPortrait.CircleMask:SetDesaturated(true)
+    FrameColor:NineSlicer(ContainerFrameCombinedBags,r,g,b)
+    for i ,v in pairs({
+        ContainerFrameCombinedBags.Bg.TopSection,
+        ContainerFrameCombinedBags.Bg.BottomEdge,
+        ContainerFrameCombinedBags.MoneyFrame.Border.Middle,
+        ContainerFrameCombinedBags.MoneyFrame.Border.Left,
+        ContainerFrameCombinedBags.MoneyFrame.Border.Right,
+    }) do
+        v:SetVertexColor(r,g,b)
+    end
+    ContainerFrameCombinedBags.Bg.BottomLeft:SetColorTexture(r,g,b)
+    ContainerFrameCombinedBags.Bg.BottomRight:SetColorTexture(r,g,b)
+end)
 
-            -- Ugly textures surrounding the buttons.
-            if _G[childName .. "Frame"] then
-                blackList[childName .. "Frame"] = true
-            end
+--Spellbook
+local SpellBook = FrameColor:NewModule("SpellBook")
+SpellBook:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(SpellBookFrame,r,g,b)
+    FrameColor:NineSlicer(SpellBookFrameInset,r,g,b)
+    for i ,v in pairs({
+        SpellBookFrameBg,
+        SpellBookFrameTabButton1.Left,
+        SpellBookFrameTabButton1.Middle,
+        SpellBookFrameTabButton1.Right,
+        SpellBookFrameTabButton2.Left,
+        SpellBookFrameTabButton2.Middle,
+        SpellBookFrameTabButton2.Right,
+        SpellBookFrameTabButton3.Left,
+        SpellBookFrameTabButton3.Middle,
+        SpellBookFrameTabButton3.Right,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
 
-            -- Disable the annoying hovering border textures
-            -- of the main hand and secondary hand weapons.
-            if childName:find("HandSlot") then
-                child:DisableDrawLayer("BACKGROUND")
+--Talents
+local Talents = FrameColor:NewModule("Talents")
+Talents:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_ClassTalentUI" or (ClassTalentFrame and not ClassTalentFrame.__styled) then
+        FrameColor:NineSlicer(ClassTalentFrame, r,g,b)
+        for i ,v in pairs({
+            ClassTalentFrameBg,
+            ClassTalentFrame.TalentsTab.BottomBar,
+            ClassTalentFrame.TalentsTab.WarmodeButton.Ring,
+            --ClassTalentFrame.TalentsTab.WarmodeButton.Orb,
+            ClassTalentFrame.SpecTab.BlackBG,
+            ClassTalentFrame.SpecTab.Background,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+
+        for i, v in pairs({ ClassTalentFrame.TabSystem:GetChildren() }) do 
+            for _,k in pairs({
+                v.Left,
+                v.Middle,
+                v.Right,
+            }) do 
+                if k then k:SetVertexColor(r,g,b) end
             end
         end
+
+        ClassTalentFrame.__styled = true
     end
-end
+end)
 
--- Talent Frame
-for row = 1, 7 do
-    elements["PlayerTalentFrameTalentsTalentRow" .. row] = "Blizzard_TalentUI"
-    for talent = 1, 3 do
-        elements["PlayerTalentFrameTalentsTalentRow" .. row .. "Talent" .. talent] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFrameTalentsTalentRow" .. row .. "Talent" .. talent .. "IconTexture"] = "Blizzard_TalentUI"
-        --whiteList["PlayerTalentFrameTalentsTalentRow"..row.."Talent"..talent.."Name"] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFrameTalentsTalentRow" .. row .. "Talent" .. talent .. "Slot"] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFrameTalentsTalentRow" .. row .. "Talent" .. talent .. "Selection"] = "Blizzard_TalentUI"
+--Achievments
+local Achievements = FrameColor:NewModule("Achievements")
+Achievements:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_AchievementUI" or (AchievementFrame and not AchievementFrame.__styled) then
+        for i ,v in pairs({
+            AchievementFrameMetalBorderRight,
+            AchievementFrameMetalBorderBottomRight,
+            AchievementFrameMetalBorderBottom,
+            AchievementFrameMetalBorderBottomBottomLeft,
+            AchievementFrameMetalBorderLeft,
+            AchievementFrameMetalBorderTopLeft,
+            AchievementFrameMetalBorderTop,
+            AchievementFrameMetalBorderTopRight,
+            AchievementFrame.Header.PointBorder,
+            AchievementFrame.Header.Left,
+            AchievementFrame.Header.Right,
+            AchievementFrameCategoriesBG,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+        FrameColor:NineSlicer(AchievementFrameCategories, r,g,b)
+
+        AchievementFrame.__styled = true
     end
-end
+end)
 
--- PvP Talent Frame
-for row = 1, 6 do
-    elements["PlayerTalentFramePVPTalents.Talents.Tier" .. row] = "Blizzard_TalentUI"
-    for talent = 1, 3 do
-        elements["PlayerTalentFramePVPTalents.Talents.Tier" .. row .. ".Talent" .. talent] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFramePVPTalents.Talents.Tier" .. row .. ".Talent" .. talent .. ".Cover"] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFramePVPTalents.Talents.Tier" .. row .. ".Talent" .. talent .. ".Icon"] = "Blizzard_TalentUI"
-        whiteList["PlayerTalentFramePVPTalents.Talents.Tier" .. row .. ".Talent" .. talent .. ".Slot"] = "Blizzard_TalentUI"
+--WorldMap
+local WorldMap = FrameColor:NewModule("WorldMap")
+WorldMap:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(WorldMapFrame.BorderFrame,r,g,b)
+    for i ,v in pairs({
+        WorldMapFrameBg,
+        WorldMapFrame.ScrollContainer.Child.TiledBackground,
+        QuestMapFrame.Background,
+        QuestScrollFrameTop,
+        QuestScrollFrameMiddle,
+        QuestScrollFrameBottom,
+        QuestMapFrame.VerticalSeparator,
+        WorldMapFrame.NavBar.InsetBorderBottom,
+        WorldMapFrame.NavBar.InsetBorderBottomLeft,
+        WorldMapFrame.NavBar.InsetBorderBottomRight,
+        WorldMapFrame.NavBar.InsetBorderTop,
+        WorldMapFrame.NavBar.InsetBorderLeft,
+        WorldMapFrame.NavBar.InsetBorderRight,
+        WorldMapFrame.BlackoutFrame.Blackout,
+    }) 
+        do v:SetVertexColor(r,g,b)
     end
-end
+end)
 
--- WarGames Frame
-for i = 1, 32 do
-    -- overkill
-    elements["WarGamesFrameScrollFrameButton" .. i] = "Blizzard_PVPUI"
-    elements["WarGamesFrameScrollFrameButton" .. i .. ".Entry"] = "Blizzard_PVPUI"
-    whiteList["WarGamesFrameScrollFrameButton" .. i .. ".Entry.Icon"] = "Blizzard_PVPUI"
-end
+--Guild
+local Guild = FrameColor:NewModule("Guild")
+Guild:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_Communities" or (CommunitiesFrame and not CommunitiesFrame.__styled) then
+        FrameColor:NineSlicer(CommunitiesFrame, r,g,b)
+        FrameColor:NineSlicer(CommunitiesFrameInset, r,g,b)
+        FrameColor:NineSlicer(CommunitiesFrame.MemberList.InsetFrame, r,g,b)
+        FrameColor:NineSlicer(CommunitiesFrame.Chat.InsetFrame, r,g,b)
+        FrameColor:NineSlicer(CommunitiesFrameCommunitiesList.InsetFrame, r,g,b)
+        for i ,v in pairs({
+            CommunitiesFrameBg,
+            --CommunitiesFrameMiddle,
+            --CommunitiesFrameRight,
+            --CommunitiesFrameLeft,
+            CommunitiesFrame.ChatEditBox.Left,
+            CommunitiesFrame.ChatEditBox.Mid,
+            CommunitiesFrame.ChatEditBox.Right,
+            CommunitiesFrame.MemberList.ScrollBar.Background,
+            CommunitiesFrame.MemberList.ScrollBar.Backplate,
+            CommunitiesFrameCommunitiesList.ScrollBar.Background,
+            CommunitiesFrameCommunitiesList.ScrollBar.Backplate,
+            CommunitiesFrameCommunitiesList.Bg,
+            CommunitiesFrameInset.Bg,
+            CommunitiesFrame.TopTileStreaks,
+            CommunitiesFrame.MemberList.ColumnDisplay.Background,
+            CommunitiesFrame.MemberList.ColumnDisplay.TopTileStreaks,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderRight,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderLeft,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomLeft,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomRight,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopLeft,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderTopRight,
+            CommunitiesFrame.GuildBenefitsFrame.InsetBorderBottomLeft2,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderRight,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderLeft,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderBottomLeft,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderBottomRight,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderTopLeft,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderTopRight,
+            CommunitiesFrameGuildDetailsFrame.InsetBorderBottomLeft2,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.TopEdge,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.BottomEdge,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.RightEdge,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.LeftEdge,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.BottomLeftCorner,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.BottomRightCorner,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.TopRightCorner,
+            CommunitiesFrame.GuildMemberDetailFrame.Border.TopLeftCorner,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
 
-local styled = {}
-local Module = CreateFrame("Frame")
+        CommunitiesFrame.__styled = true
+    end
+end)  
 
--- Translate strings into keyed children
-Module.GetObject = function(_, objectName)
-    if string_find(objectName, ".") then
-        local tree = { string_split(".", objectName) }
-        local object = _G[tree[1]]
-        if object then
-            for i = 2, #tree do
-                if object[tree[i]] then
-                    object = object[tree[i]]
-                else
-                    return
-                end
+--GroupFinder
+local GroupFinder = FrameColor:NewModule("GroupFinder")
+GroupFinder:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(PVEFrame,r,g,b)
+    FrameColor:NineSlicer(PVEFrameLeftInset,r,g,b)
+    FrameColor:NineSlicer(LFDParentFrameInset,r,g,b)
+    for i ,v in pairs({
+        PVEFrameBg,
+        PVEFrameBRCorner,
+        PVEFrameTRCorner,
+        PVEFrameBLCorner,
+        PVEFrameTLCorner,
+        PVEFrameBottomLine,
+        PVEFrameLLVert,
+        PVEFrameRLVert,
+        PVEFrameTopLine,
+        PVEFrameLeftInset.Bg,
+        PVEFrame.TopTileStreaks,
+        PVEFrameTab1.Left,
+        PVEFrameTab1.Middle,
+        PVEFrameTab1.Right,
+        PVEFrameTab2.Left,
+        PVEFrameTab2.Middle,
+        PVEFrameTab2.Right,
+        PVEFrameTab3.Left,
+        PVEFrameTab3.Middle,
+        PVEFrameTab3.Right,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Collections
+local Collections = FrameColor:NewModule("Collections")
+Collections:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_Collections" or (CollectionsJournal and not CollectionsJournal.__styled) then
+        FrameColor:NineSlicer(CollectionsJournal, r,g,b)
+        for i ,v in pairs({
+            CollectionsJournalBg,
+            CollectionsJournalTab1.Left,
+            CollectionsJournalTab1.Middle,
+            CollectionsJournalTab1.Right,
+            CollectionsJournalTab2.Left,
+            CollectionsJournalTab2.Middle,
+            CollectionsJournalTab2.Right,
+            CollectionsJournalTab3.Left,
+            CollectionsJournalTab3.Middle,
+            CollectionsJournalTab3.Right,
+            CollectionsJournalTab4.Left,
+            CollectionsJournalTab4.Middle,
+            CollectionsJournalTab4.Right,
+            CollectionsJournalTab5.Left,
+            CollectionsJournalTab5.Middle,
+            CollectionsJournalTab5.Right,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+
+        CollectionsJournal.__styled = true
+    end
+end)  
+
+--EncounterJournal
+local AdventureGuide = FrameColor:NewModule("AdventureGuide")
+AdventureGuide:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_EncounterJournal" or (EncounterJournal and not EncounterJournal.__styled) then
+        FrameColor:NineSlicer(EncounterJournal, r,g,b)
+        FrameColor:NineSlicer(EncounterJournalInset, r,g,b)
+        for i ,v in pairs({
+            EncounterJournalBg,
+            EncounterJournalNavBarInsetBottomBorder,
+            EncounterJournalNavBarInsetRightBorder,
+            EncounterJournalNavBarInsetLeftBorder,
+            EncounterJournalNavBarInsetBotRightCorner,
+            EncounterJournalNavBarInsetBotLeftCorner,
+            EncounterJournalSearchBox.Left,
+            EncounterJournalSearchBox.Right,
+            EncounterJournalSearchBox.Middle,
+            EncounterJournalDungeonTab.Middle,
+            EncounterJournalDungeonTab.Right,
+            EncounterJournalDungeonTab.Left,
+            EncounterJournalRaidTab.Middle,
+            EncounterJournalRaidTab.Right,
+            EncounterJournalRaidTab.Left,Raid,
+            EncounterJournalSuggestTab.Middle,
+            EncounterJournalSuggestTab.Right,
+            EncounterJournalSuggestTab.Left,
+            EncounterJournalLootJournalTab.Middle,
+            EncounterJournalLootJournalTab.Right,
+            EncounterJournalLootJournalTab.Left,
+            EncounterJournalInstanceSelectTierDropDownMiddle,
+            EncounterJournalInstanceSelectTierDropDownRight,
+            EncounterJournalInstanceSelectTierDropDownLeft,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+
+        EncounterJournal.__styled = true
+    end
+end)  
+
+--Mail
+local Mail = FrameColor:NewModule("Mail")
+Mail:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(MailFrame,r,g,b)
+    FrameColor:NineSlicer(OpenMailFrame,r,g,b)
+    for i ,v in pairs({
+        MailFrameBg,
+        OpenMailFrameBg,
+        MailFrameTab1.Left,
+        MailFrameTab1.Middle,
+        MailFrameTab1.Right,
+        MailFrameTab2.Left,
+        MailFrameTab2.Middle,
+        MailFrameTab2.Right,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Gossip
+local Gossip = FrameColor:NewModule("Gossip")
+Gossip:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(GossipFrame,r,g,b)
+    for i ,v in pairs({
+        GossipFrameBg
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Settings
+local Settings = FrameColor:NewModule("Settings")
+Settings:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(SettingsPanel,r,g,b)
+    for i ,v in pairs({
+       SettingsPanel.Bg.TopSection,
+       SettingsPanel.Bg.BottomEdge,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+    SettingsPanel.Bg.BottomRight:SetColorTexture(r,g,b)
+    SettingsPanel.Bg.BottomLeft:SetColorTexture(r,g,b)
+end)
+
+--InspectFramce
+local Inspect = FrameColor:NewModule("Inspect")
+Inspect:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_InspectUI" or (InspectFrame and not InspectFrame.__styled) then
+        FrameColor:NineSlicer(InspectFrame, r,g,b)
+        FrameColor:NineSlicer(InspectFrameInset, r,g,b)
+        for i ,v in pairs({
+            InspectFrameBg,
+            InspectModelFrameBorderBottom,
+            InspectModelFrameBorderBottomRight,
+            InspectModelFrameBorderBottomLeft,
+            InspectModelFrameBorderTop,
+            InspectModelFrameBorderTopLeft,
+            InspectModelFrameBorderTopRight,
+            InspectModelFrameBorderLeft,
+            InspectModelFrameBorderRight,
+            InspectFrameInset.Bg,
+            InspectFrameTab1.Left,
+            InspectFrameTab1.Middle,
+            InspectFrameTab1.Right,
+            InspectFrameTab2.Left,
+            InspectFrameTab2.Middle,
+            InspectFrameTab2.Right,
+            InspectFrameTab3.Left,
+            InspectFrameTab3.Middle,
+            InspectFrameTab3.Right,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+        for i, v in pairs({ InspectFrame:GetChildren() }) do 
+            for _,k in pairs({
+                v.Left,
+                v.Middle,
+                v.Right,
+            }) do 
+                k:SetVertexColor(r,g,b)
             end
-            return object
         end
-    else
-        return _G[objectName]
-    end
-end
 
-Module.IsWhiteListed = function(self, object)
-    if not object then
-        return
+        InspectFrame.__styled = true
     end
-    for i in pairs(whiteList) do
-        local white = self:GetObject(i)
-        if white and (white == object) then
-            return true
+end)  
+
+--Friends
+local Friends = FrameColor:NewModule("Friends")
+Friends:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(FriendsFrame,r,g,b)
+    for i ,v in pairs({
+        FriendsFrameBg,
+        RaidInfoFrame.Header.CenterBG,
+        RaidInfoFrame.Header.RightBG,
+        RaidInfoFrame.Header.LeftBG,
+        RaidInfoFrame.Border.TopEdge,
+        RaidInfoFrame.Border.RightEdge,
+        RaidInfoFrame.Border.LeftEdge,
+        RaidInfoFrame.Border.BottomEdge,
+        RaidInfoFrame.Border.TopLeftCorner,
+        RaidInfoFrame.Border.TopRightCorner,
+        RaidInfoFrame.Border.BottomLeftCorner,
+        RaidInfoFrame.Border.BottomRightCorner,
+        RaidInfoDetailHeader,
+        RaidInfoDetailFooter,
+        FriendsFrameTab1.Left,
+        FriendsFrameTab1.Middle,
+        FriendsFrameTab1.Right,
+        FriendsFrameTab2.Left,
+        FriendsFrameTab2.Middle,
+        FriendsFrameTab2.Right,
+        FriendsFrameTab3.Left,
+        FriendsFrameTab3.Middle,
+        FriendsFrameTab3.Right,
+        FriendsFrameTab4.Left,
+        FriendsFrameTab4.Middle,
+        FriendsFrameTab4.Right,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Transmog 
+local Transmog = FrameColor:NewModule("Transmog")
+Transmog:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_Collections" or (WardrobeFrame and not WardrobeFrame.__styled) then
+        FrameColor:NineSlicer(WardrobeFrame, r,g,b)
+        for i ,v in pairs({
+            WardrobeFramBg,
+        }) do
+            v:SetVertexColor(r,g,b)
+        end
+
+        WardrobeFrame.__styled = true
+    end
+end)  
+
+--AuctionHouse 
+local AuctionHouse = FrameColor:NewModule("AuctionHouse")
+AuctionHouse:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_AuctionHouseUI" or (AuctionHouseFrame and not AuctionHouseFrame.__styled) then
+        FrameColor:NineSlicer(AuctionHouseFrame, r,g,b)
+        for i ,v in pairs({
+            AuctionHouseFrameBg,
+            AuctionHouseFrameBuyTab.Left,
+            AuctionHouseFrameBuyTab.Middle,
+            AuctionHouseFrameBuyTab.Right,
+            AuctionHouseFrameSellTab.Left,
+            AuctionHouseFrameSellTab.Middle,
+            AuctionHouseFrameSellTab.Right,
+            AuctionHouseFrameAuctionsTab.Left,
+            AuctionHouseFrameAuctionsTab.Middle,
+            AuctionHouseFrameAuctionsTab.Right,
+            AuctionHouseFrameAuctionsFrameAuctionsTab.Left,
+            AuctionHouseFrameAuctionsFrameAuctionsTab.Middle,
+            AuctionHouseFrameAuctionsFrameAuctionsTab.Right,
+            AuctionHouseFrameAuctionsFrameBidsTab.Left,
+            AuctionHouseFrameAuctionsFrameBidsTab.Middle,
+            AuctionHouseFrameAuctionsFrameBidsTab.Right,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+
+        AuctionHouseFrame.__styled = true
+    end
+end)  
+
+--Macros 
+local Macros = FrameColor:NewModule("Macros")
+Macros:RegisterEvent("ADDON_LOADED", function(self, event)
+    if event == "Blizzard_MacroUI" or (MacroFrame and not MacroFrame.__styled) then
+        FrameColor:NineSlicer(MacroFrame, r,g,b)
+        FrameColor:NineSlicer(MacroFrameTextBackground, r,g,b)
+        for i ,v in pairs({
+            MacroFrameBg,
+        }) do 
+            v:SetVertexColor(r,g,b)
+        end
+
+        MacroFrame.__styled = true
+    end
+end)  
+
+--Quest
+local Quest = FrameColor:NewModule("Quest")
+Quest:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(QuestFrame,r,g,b)
+    for i ,v in pairs({
+        QuestFrameBg
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Merchant
+local Merchant = FrameColor:NewModule("Merchant")
+Merchant:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(MerchantFrame,r,g,b)
+    for i ,v in pairs({
+        MerchantFrameBg
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--Loot
+local Loot = FrameColor:NewModule("Loot")
+Loot:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(LootFrame,r,g,b)
+    for i ,v in pairs({
+        LootFrameBg.TopSection,
+        LootFrameBg.BottomEdge,
+    }) do
+        v:SetVertexColor(r,g,b)
+    end
+    LootFrameBg.BottomRight:SetColorTexture(r,g,b)
+    LootFrameBg.BottomLeft:SetColorTexture(r,g,b)
+end)
+
+--Trade
+local Trade = FrameColor:NewModule("Trade")
+Trade:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(TradeFrame,r,g,b)
+    for i ,v in pairs({
+        TradeFrameBg,
+        TradeRecipientBG,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--DressingRoom
+local DressingRoom = FrameColor:NewModule("Trade")
+DressingRoom:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(DressUpFrame,r,g,b)
+    FrameColor:NineSlicer(DressUpFrameInset,r,g,b)
+    for i ,v in pairs({
+        DressUpFrame.Bg,
+        DressUpFrame.TitleBg,
+        DressUpFrameInset.Bg,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+end)
+
+--CraftingFrame
+local Crafting = FrameColor:NewModule("Crafting")
+Crafting:RegisterEvent("PLAYER_LOGIN", function()
+    FrameColor:NineSlicer(ProfessionsFrame,r,g,b)
+    FrameColor:NineSlicer(ProfessionsFrame.CraftingPage.SchematicForm,r,g,b)
+    for i ,v in pairs({
+        ProfessionsFrameBg,
+        ProfessionsFrame.CraftingPage.RecipeList.Background,
+        ProfessionsFrame.CraftingPage.RecipeList.SearchBox.Middle,
+        ProfessionsFrame.CraftingPage.RecipeList.SearchBox.Left,
+        ProfessionsFrame.CraftingPage.RecipeList.SearchBox.Right,
+        ProfessionsFrameMiddleLeft,
+        ProfessionsFrameMiddleMiddle,
+        ProfessionsFrameMiddleRight,
+        ProfessionsFrameTopLeft,
+        ProfessionsFrameTopRight,
+        ProfessionsFrameTopMiddle,
+        ProfessionsFrameBottomLeft,
+        ProfessionsFrameBottomRight,
+        ProfessionsFrameBottomMiddle,
+        ProfessionsFrameNormalTexture,
+        ProfessionsFrame.CraftingPage.RankBar.Border,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.TopEdge,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.BottomEdge,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.TopRightCorner,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.TopLeftCorner,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.RightEdge,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.LeftEdge,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.BottomRightCorner,
+        ProfessionsFrame.CraftingPage.RecipeList.BackgroundNineSlice.BottomLeftCorner,  
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.Middle,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.Begin,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.End,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.Thumb.Middle,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.Thumb.Begin,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Track.Thumb.End,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Forward.Texture,
+        ProfessionsFrame.CraftingPage.RecipeList.ScrollBar.Back.Texture,
+    }) do 
+        v:SetVertexColor(r,g,b)
+    end
+    for i, v in pairs({ ProfessionsFrame.TabSystem:GetChildren() }) do 
+        for _,k in pairs({
+            v.Left,
+            v.Middle,
+            v.Right,
+        }) do 
+            if k then k:SetVertexColor(r,g,b) end
         end
     end
-end
+end)
 
-Module.StyleRegion = function(_, region)
-    local objectType = region:GetObjectType()
-    if objectType == "Texture" then
-        region:SetVertexColor(unpack(C.media.vertex_color))
-    elseif objectType == "FontString" then
-        region:SetTextColor(unpack(C.media.text_color))
+--ESCMenu
+local ESCMenu = FrameColor:NewModule("ESCMenu")
+ESCMenu:RegisterEvent("PLAYER_LOGIN", function()
+    for i, v in pairs({
+        GameMenuFrame.Border.Bg,
+        GameMenuFrame.Border.TopRightCorner,
+        GameMenuFrame.Border.RightEdge,
+        GameMenuFrame.Border.BottomRightCorner,
+        GameMenuFrame.Border.BottomEdge,
+        GameMenuFrame.Border.BottomLeftCorner,
+        GameMenuFrame.Border.LeftEdge,
+        GameMenuFrame.Border.TopLeftCorner,
+        GameMenuFrame.Header.CenterBG,
+        GameMenuFrame.Header.LeftBG,
+        GameMenuFrame.Header.RightBG,
+    }) do
+        v:SetVertexColor(r,g,b)
     end
-end
-
-Module.StyleFrame = function(self, frame)
-    for i = 1, select("#", frame:GetRegions()) do
-        local region = select(i, frame:GetRegions())
-        if region and not self:IsWhiteListed(region) then
-            self:StyleRegion(region)
-        end
-    end
-
-    -- Iterate nameless children
-    for i in pairs(iterateNameless) do
-        local object = self:GetObject(i)
-        if frame == object then
-            for i = 1, select("#", frame:GetChildren()) do
-                local child = select(i, frame:GetChildren())
-                if child and child.GetName and (not child:GetName()) then
-                    self:StyleFrame(child)
-                end
-            end
-        end
-    end
-end
-
-Module.StyleObject = function(self, object)
-    if object and not styled[object] then
-        if object:IsObjectType("Frame") then
-            self:StyleFrame(object)
-        else
-            self:StyleRegion(object)
-        end
-        styled[object] = true
-    end
-end
-
-Module.OnEvent = function(self, _, ...)
-    local addonName = ...
-
-    for frameName, addon in pairs(elements) do
-        if addonName == addon then
-            local object = self:GetObject(frameName)
-            if object then
-                self:StyleObject(object)
-            end
-
-            -- Deleting the entry regardless of whether or not it was found,
-            -- as it could be a frame not found in the current version of the addon.
-            elements[frameName] = nil
-
-            self.unstyledAddonFrames = self.unstyledAddonFrames - 1
-        end
-    end
-
-    local UIHider = self.UIHider
-    if UIHider then
-        for frameName, addon in pairs(blackList) do
-            if (addonName == addon) then
-                local object = self:GetObject(frameName)
-                if object then
-                    object:SetParent(UIHider)
-                end
-                blackList[frameName] = nil
-                self.unhiddenAddonFrames = self.unhiddenAddonFrames - 1
-            end
-        end
-    end
-
-    if self.unstyledAddonFrames == 0 and self.unhiddenAddonFrames == 0 then
-        self:UnregisterEvent("ADDON_LOADED", "OnEvent")
-    end
-end
-
-Module.OnEnable = function(self)
-    local UIHider -- define this, but don't create it until we need it
-    local unstyledAddonFrames = 0 -- Count how many addon elements we were unable to style
-    local unhiddenAddonFrames = 0 -- Count how many elements we were unable to hide
-
-    for frameName, addonName in pairs(elements) do
-        local object = self:GetObject(frameName)
-        if object then
-            self:StyleObject(object)
-            elements[frameName] = nil
-        else
-            if (addonName == true) then
-                -- is the element from normal frameXML (true) or an addon (string)?
-                elements[frameName] = nil -- remove the entry since it's probably a frameXML reference from another expansion
-            else
-                unstyledAddonFrames = unstyledAddonFrames + 1
-            end
-        end
-    end
-
-    for frameName, addonName in pairs(blackList) do
-        local object = self:GetObject(frameName)
-        if object then
-            if not UIHider then
-                UIHider = CreateFrame("Frame") -- only create it if we need it
-                UIHider:Hide()
-            end
-            object:SetParent(UIHider)
-            blackList[frameName] = nil
-        else
-            if addonName == true then
-                -- is the element from normal frameXML (true) or an addon (string)?
-                blackList[frameName] = nil -- remove the entry since it's probably a frameXML reference from another expansion
-            else
-                unhiddenAddonFrames = unhiddenAddonFrames + 1
-            end
-        end
-    end
-
-    if unhiddenAddonFrames > 0 then
-        if not UIHider then
-            UIHider = CreateFrame("Frame")
-            UIHider:Hide()
-        end
-        self.UIHider = UIHider
-        self.unhiddenAddonFrames = unhiddenAddonFrames
-    end
-
-    if unstyledAddonFrames > 0 then
-        self.unstyledAddonFrames = unstyledAddonFrames
-    end
-
-    if unstyledAddonFrames > 0 or unhiddenAddonFrames > 0 then
-        self:RegisterEvent("ADDON_LOADED")
-        self:SetScript("OnEvent", self.OnEvent)
-    end
-
-    --add shadow for UIParent
-    local shadow = CreateFrame("Frame", nil, UIParent)
-    shadow:SetPoint("TOPLEFT")
-    shadow:SetPoint("BOTTOMRIGHT")
-    shadow:SetFrameLevel(0)
-    shadow:SetFrameStrata("BACKGROUND")
-
-    shadow.tex = shadow:CreateTexture()
-    shadow.tex:SetTexture(C.media.texture.shadow_background)
-    shadow.tex:SetAllPoints()
-    shadow.tex:SetAlpha(.50)
-end
-
-Module:RegisterEvent("PLAYER_LOGIN")
-Module:SetScript("OnEvent", Module.OnEnable)
+end)
