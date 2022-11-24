@@ -118,6 +118,8 @@ local function __GetBackdropBorderColor() return unpack(backdropBorderColor)end
 
 -- style from FreebTip
 local function hook(f)
+    if not f then return end
+    
     f:HookScript("OnShow", function(tt)
         if tt:IsForbidden() then return end
 
