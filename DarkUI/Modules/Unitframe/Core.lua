@@ -180,57 +180,49 @@ end
 ------------------------------------------------------------------
 --  Methods for icon                                            --
 ------------------------------------------------------------------
+local playerUnits = {
+    ["player"]  = true,
+    ["pet"]     = true,
+    ["vehicle"] = true,
+}
+
 function DUF.PostCreateIcon(_, button)
-    button.icon:SetTexCoord(unpack(C.media.texCoord))
-    button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
-    button.icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
-    button.icon:SetDrawLayer("BACKGROUND", -8)
+    button.Icon:SetTexCoord(unpack(C.media.texCoord))
+    button.Icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
+    button.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
+    button.Icon:SetDrawLayer("BACKGROUND", -8)
     
-    button.overlay:SetTexture(C.media.texture.border)
-    button.overlay:SetTexCoord(0, 1, 0, 1)
-    button.overlay:SetDrawLayer("BACKGROUND", -7)
-    button.overlay:ClearAllPoints()
-    button.overlay:SetAllPoints(button)
-    button.overlay:SetVertexColor(0.25, 0.25, 0.25)
+    button.Overlay:SetTexture(C.media.texture.border)
+    button.Overlay:SetTexCoord(0, 1, 0, 1)
+    button.Overlay:SetDrawLayer("BACKGROUND", -7)
+    button.Overlay:ClearAllPoints()
+    button.Overlay:SetAllPoints(button)
+    button.Overlay:SetVertexColor(0.25, 0.25, 0.25)
     
     button:CreateTextureBorder()
     button:CreateShadow()
 
-    button.overlay.Hide = E.dummy
+    button.Overlay.Hide = E.dummy
 end
 
-function DUF.PostUpdateIcon(icons, unit, icon, index, ...)
-    local _, _, _, _, dtype, _, _, _, isStealable = UnitAura(unit, index, icon.filter)
-
-    local playerUnits = {
-        player  = true,
-        pet     = true,
-        vehicle = true,
-    }
-
-    if icon.debuff then
-        if not UnitIsFriend("player", unit) and not playerUnits[icon.owner] then
-            if icons.onlyShowPlayer then
-                icon:Hide()
-            else
-                icon.overlay:SetVertexColor(unpack(C.media.border_color))
-                icon.icon:SetDesaturated(true)
-            end
+function DUF.PostUpdateIcon(element, button, unit, data)
+    if data.isHarmful then
+        if not UnitIsFriend("player", unit) and not playerUnits[data.sourceUnit] then
+            button.Overlay:SetVertexColor(unpack(C.media.border_color))
+            button.Icon:SetDesaturated(true)
         else
-            local color = DebuffTypeColor[dtype] or DebuffTypeColor.none
-            icon.overlay:SetVertexColor(color.r * .6, color.g * .6, color.b * .6)
-            icon.icon:SetDesaturated(false)
+            local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
+            button.Overlay:SetVertexColor(color.r * .6, color.g * .6, color.b * .6)
+            button.Icon:SetDesaturated(false)
         end
     else
-        if (isStealable or ((E.class == "MAGE" or E.class == "PRIEST" or E.class == "SHAMAN" or E.class == "HUNTER") and dtype == "Magic")) and not UnitIsFriend("player", unit) then
-            icon.overlay:SetVertexColor(1, 0.85, 0)
+        if (data.isStealable or ((E.class == "MAGE" or E.class == "PRIEST" or E.class == "SHAMAN" or E.class == "HUNTER") and data.dispelName == "Magic")) and not UnitIsFriend("player", unit) then
+            button.Overlay:SetVertexColor(1, 0.85, 0)
         else
-            icon.overlay:SetVertexColor(unpack(C.media.border_color))
+            button.Overlay:SetVertexColor(unpack(C.media.border_color))
         end
-        icon.icon:SetDesaturated(false)
+        button.Icon:SetDesaturated(false)
     end
-
-    icon.first = true
 end
 
 function DUF.CreateAuraTimer(self, elapsed)
@@ -261,26 +253,20 @@ function DUF.CreateAuraTimer(self, elapsed)
     end
 end
 
-function DUF.FilterAuras(element, unit, icon, name, _, _, _, _, _, caster, isStealable, _, spellID, _, isBossDebuff, _, _)
-    local isPlayer
+function DUF.FilterAuras(element, unit, data)
     local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
-
-    if (caster == 'player' or caster == 'vehicle') then
-        isPlayer = true
-    end
+    local isPlayer = playerUnits[data.sourceUnit]
 
     if isInRaid == "raid" then
         local auraList = C.aura.raidbuffs[E.class]
-        if auraList and auraList[spellID] and icon.isPlayer then
+        if auraList and auraList[data.spellID] and data.isFromPlayerOrPlayerPet then
             return true
-        elseif C.aura.raidbuffs["ALL"][spellID] then
+        elseif C.aura.raidbuffs["ALL"][data.spellID] then
             return true
         end
-    elseif element.showStealableBuffs and isStealable and not UnitIsPlayer(unit) then
+    elseif element.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
         return true
-    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and name) or isBossDebuff then
-        icon.isPlayer = isPlayer
-        icon.owner = caster
+    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and data.name) or data.isBossAura then
         return true
     end
 

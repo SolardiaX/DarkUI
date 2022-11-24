@@ -235,9 +235,9 @@ local createAuraIcon = function(self)
     f:SetSize(h, w)
     f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -20, 10)
 
-    f.PostCreateIcon = DUF.PostCreateIcon
-    f.PostUpdateIcon = DUF.PostUpdateIcon
-    f.CustomFilter = DUF.FilterAuras
+    f.PostCreateButton = DUF.PostCreateIcon
+    f.PostUpdateButton = DUF.PostUpdateIcon
+    f.FilterAura = DUF.FilterAuras
 
     self.Auras = f
 end
