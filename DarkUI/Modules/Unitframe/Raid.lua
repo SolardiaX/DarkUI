@@ -31,7 +31,7 @@ local media = {
 
     barTex_background = mediaPath .. "uf_bartex_raid_slight",
 
-    Incoming_barTex   = mediaPath .. "uf_bartex_raid_main",
+    incoming_barTex   = mediaPath .. "uf_bartex_raid_main",
 }
 
 local backdrop = {
@@ -136,15 +136,15 @@ local createBar = function(self)
 
     --Incoming heal
     local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-    mhpb:SetTexture(media.Incoming_barTex)
+    mhpb:SetTexture(media.incoming_barTex)
     mhpb:SetVertexColor(0, 1, 0.5, 0.2)
 
     local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ohpb:SetTexture(media.Incoming_barTex)
+    ohpb:SetTexture(media.incoming_barTex)
     ohpb:SetVertexColor(0, 1, 0, 0.2)
 
     local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ahpb:SetTexture(media.Incoming_barTex)
+    ahpb:SetTexture(media.incoming_barTex)
     ahpb:SetVertexColor(1, 1, 0, 0.2)
 
     self.HealPrediction = {

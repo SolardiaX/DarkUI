@@ -36,7 +36,10 @@ local media = {
     castbar_foreground = mediaPath .. C.general.style .. "\\" .. "uf_castbar_foreground",
     castbar_background = mediaPath .. C.general.style .. "\\" .. "uf_castbar_background",
 
-    Incoming_barTex    = mediaPath .. "uf_bartex_normal",
+    incoming_barTex    = mediaPath .. "uf_bartex_normal",
+
+    assistant_Tex          = mediaPath .. "uf_icon_assistant",
+    leader_Tex             = mediaPath .. "uf_icon_leader",
 }
 
 local createTexture = function(self)
@@ -116,15 +119,15 @@ local createBar = function(self)
 
     --Incoming heal
     local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-    mhpb:SetTexture(media.Incoming_barTex)
+    mhpb:SetTexture(media.incoming_barTex)
     mhpb:SetVertexColor(0, 1, 0.5, 0.2)
 
     local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ohpb:SetTexture(media.Incoming_barTex)
+    ohpb:SetTexture(media.incoming_barTex)
     ohpb:SetVertexColor(0, 1, 0, 0.2)
 
     local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ahpb:SetTexture(media.Incoming_barTex)
+    ahpb:SetTexture(media.incoming_barTex)
     ahpb:SetVertexColor(1, 1, 0, 0.2)
 
     self.HealPrediction = {
@@ -360,8 +363,10 @@ local createStyle = function(self)
     self.CombatIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.LeaderIndicator = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMRIGHT", "TOPRIGHT", -12, 25)
+    self.LeaderIndicator:SetTexture(media.leader_Tex)
 
     self.AssistantIndicator = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 12, 25)
+    self.AssistantIndicator:SetTexture(media.assistant_Tex)
 
     self.MasterLooter = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMRIGHT", "TOPRIGHT", -12, 25)
 

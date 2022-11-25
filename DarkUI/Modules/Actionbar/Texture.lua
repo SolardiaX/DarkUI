@@ -10,10 +10,13 @@ local _G = _G
 local CreateFrame = CreateFrame
 
 local media = {
-    mainbar_bg = C.media.path .. "bar_mainbar_bg",
-    mainbar    = C.media.path .. C.general.style .. "\\" .. "bar_mainbar" .. (C.general.liteMode and "_lite" or ""),
-    leftbar    = C.media.path .. C.general.style .. "\\" .. "bar_leftbar" .. (C.general.liteMode and "_lite" or ""),
-    rightbar   = C.media.path .. C.general.style .. "\\" .. "bar_rightbar" .. (C.general.liteMode and "_lite" or "")
+    mainbar_bg                      = C.media.path .. "bar_mainbar_bg",
+    mainbar                         = C.media.path .. C.general.style .. "\\" .. "bar_mainbar" .. (C.general.liteMode and "_lite" or ""),
+    leftbar                         = C.media.path .. C.general.style .. "\\" .. "bar_leftbar" .. (C.general.liteMode and "_lite" or ""),
+    rightbar                        = C.media.path .. C.general.style .. "\\" .. "bar_rightbar" .. (C.general.liteMode and "_lite" or ""),
+    mainbar_statusbar_overlay       = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_overlay",
+    mainbar_statusbar_topfill       = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_bottom_fill",
+    mainbar_statusbar_bottomfill    = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_top_fill",
 }
 
 local MainMenuBarBG = CreateFrame("Frame", "DarkUI_ActionBar1HolderBG", _G["DarkUI_ActionBar1Holder"])
@@ -58,7 +61,7 @@ BarBottomRightBG.texture = BarBottomRightBG:CreateTexture(nil, "BACKGROUND")
 BarBottomRightBG.texture:SetTexture(media.rightbar)
 BarBottomRightBG.texture:SetAllPoints(BarBottomRightBG)
 
-local MainMenuBarBGFill = CreateFrame("Frame", "DarkUI_ActionBar1HolderBG", MainMenuBarBG)
+local MainMenuBarBGFill = CreateFrame("Frame", "DarkUI_ActionBarBGFill", MainMenuBarBG)
 MainMenuBarBGFill:SetFrameStrata("BACKGROUND")
 MainMenuBarBGFill:SetFrameLevel(0)
 MainMenuBarBGFill:SetSize(1024, 128)
@@ -67,3 +70,47 @@ MainMenuBarBGFill:SetPoint("BOTTOM", MainMenuBarBG, 0, 0)
 MainMenuBarBGFill.texture = MainMenuBarBGFill:CreateTexture(nil, "BACKGROUND")
 MainMenuBarBGFill.texture:SetTexture(media.mainbar_bg)
 MainMenuBarBGFill.texture:SetAllPoints(MainMenuBarBGFill)
+
+if C.actionbar.bars.exp.enable then
+    local StatusBarTopOverlay = CreateFrame("Frame", "DarkUI_StatusBarTopOverlay", MainMenuBarBG)
+    StatusBarTopOverlay:SetFrameStrata("BACKGROUND")
+    StatusBarTopOverlay:SetFrameLevel(4)
+    StatusBarTopOverlay:SetSize(512, 16)
+    StatusBarTopOverlay:SetPoint("CENTER", DarkUI_XPBar, 1, 0)
+
+    StatusBarTopOverlay.texture = StatusBarTopOverlay:CreateTexture(nil, "BACKGROUND")
+    StatusBarTopOverlay.texture:SetTexture(media.mainbar_statusbar_overlay)
+    StatusBarTopOverlay.texture:SetAllPoints(StatusBarTopOverlay)
+else
+    local StatusBarTopFill = CreateFrame("Frame", "DarkUI_StatusBarTopFill", MainMenuBarBG)
+    StatusBarTopFill:SetFrameStrata("BACKGROUND")
+    StatusBarTopFill:SetFrameLevel(4)
+    StatusBarTopFill:SetSize(512, 16)
+    StatusBarTopFill:SetPoint("BOTTOM", MainMenuBarBG, 4, 32)
+
+    StatusBarTopFill.texture = StatusBarTopFill:CreateTexture(nil, "BACKGROUND")
+    StatusBarTopFill.texture:SetTexture(media.mainbar_statusbar_topfill)
+    StatusBarTopFill.texture:SetAllPoints(StatusBarTopFill)
+end
+
+if C.actionbar.bars.artifact.enable then
+    local MainMenuBarBottomOverlay = CreateFrame("Frame", "DarkUI_ActionBar1HolderBarBottomOverlay", MainMenuBarBG)
+    MainMenuBarBottomOverlay:SetFrameStrata("BACKGROUND")
+    MainMenuBarBottomOverlay:SetFrameLevel(4)
+    MainMenuBarBottomOverlay:SetSize(512, 16)
+    MainMenuBarBottomOverlay:SetPoint("CENTER", DarkUI_ArtifactBar, 1, 0)
+
+    MainMenuBarBottomOverlay.texture = MainMenuBarBottomOverlay:CreateTexture(nil, "BACKGROUND")
+    MainMenuBarBottomOverlay.texture:SetTexture(media.mainbar_statusbar_overlay)
+    MainMenuBarBottomOverlay.texture:SetAllPoints(MainMenuBarBottomOverlay)
+else
+    local MainMenuBarBottomFill = CreateFrame("Frame", "DarkUI_ActionBar1HolderBarBottomFill", MainMenuBarBG)
+    MainMenuBarBottomFill:SetFrameStrata("BACKGROUND")
+    MainMenuBarBottomFill:SetFrameLevel(4)
+    MainMenuBarBottomFill:SetSize(512, 16)
+    MainMenuBarBottomFill:SetPoint("BOTTOM", MainMenuBarBG, 4, 21)
+
+    MainMenuBarBottomFill.texture = MainMenuBarBottomFill:CreateTexture(nil, "BACKGROUND")
+    MainMenuBarBottomFill.texture:SetTexture(media.mainbar_statusbar_bottomfill)
+    MainMenuBarBottomFill.texture:SetAllPoints(MainMenuBarBottomFill)
+end

@@ -666,3 +666,15 @@ ESCMenu:RegisterEvent("PLAYER_LOGIN", function()
         v:SetVertexColor(r,g,b)
     end
 end)
+
+--add shadow for UIParent
+local shadow = CreateFrame("Frame", nil, UIParent)
+shadow:SetPoint("TOPLEFT")
+shadow:SetPoint("BOTTOMRIGHT")
+shadow:SetFrameLevel(0)
+shadow:SetFrameStrata("BACKGROUND")
+
+shadow.tex = shadow:CreateTexture()
+shadow.tex:SetTexture(C.media.texture.shadow_background)
+shadow.tex:SetAllPoints()
+shadow.tex:SetAlpha(.50)
