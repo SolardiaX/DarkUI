@@ -127,7 +127,7 @@ local function setBarTicks(Castbar, ticks, numTicks)
                 ticks[i]:SetDrawLayer("OVERLAY", 7)
             end
             ticks[i]:ClearAllPoints()
-            ticks[i]:SetPoint("CENTER", Castbar, "RIGHT", -delta * i, 0)
+            ticks[i]:SetPoint("RIGHT", bar, "LEFT", delta * i, 0)
             ticks[i]:Show()
         end
     end
