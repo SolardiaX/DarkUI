@@ -41,18 +41,7 @@ local function StyleMerged()
 
     --create the mouseover functionality
     if cfg.fader_mouseover then
-        for _, button in pairs(buttonList) do
-            if button then
-                button:HookScript("OnEnter", function()
-                    local fadeIn = cfg.fader_mouseover.fadeIn
-                    E:UIFrameFadeIn(bar, fadeIn.time, bar:GetAlpha(), fadeIn.alpha)
-                end)
-                button:HookScript("OnLeave", function()
-                    local fadeOut = cfg.fader_mouseover.fadeOut
-                    E:UIFrameFadeOut(bar, fadeOut.time, bar:GetAlpha(), fadeOut.alpha)
-                end)
-            end
-        end
+        E:ButtonBarFader(bar, buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
     end
 end
 

@@ -32,10 +32,15 @@ ExtraActionBarFrame:SetParent(extraBar)
 ExtraActionBarFrame:ClearAllPoints()
 ExtraActionBarFrame:SetAllPoints()
 
-ExtraAbilityContainer.ignoreFramePositionManager = true
-ExtraAbilityContainer.SetSize = E.dummy
-ExtraAbilityContainer:SetScript("OnShow", nil)
-ExtraAbilityContainer:SetScript("OnHide", nil)
+-- ExtraAbilityContainer.ignoreFramePositionManager = true
+-- ExtraAbilityContainer.SetSize = E.dummy
+-- ExtraAbilityContainer:SetScript("OnShow", nil)
+-- ExtraAbilityContainer:SetScript("OnHide", nil)
+hooksecurefunc(ExtraActionBarFrame, "SetParent", function(self, parent)
+    if parent == ExtraAbilityContainer then
+        self:SetParent(extraBar)
+    end
+end)
 
 --zone ability
 local zoneBar = CreateFrame("Frame", "DarkUI_ZoneAbilityBarHolder", UIParent)
