@@ -688,7 +688,7 @@ C.unitframe = {
         }
     },
     boss         = {
-        position = { "TOPRIGHT", UIParent, "TOPRIGHT", -150, -300 },
+        position = { "TOPRIGHT", UIParent, "TOPRIGHT", -150, -360 },
         spacing  = 60,
         aura     = {
             player_aura_only     = true,
@@ -745,7 +745,7 @@ C.unitframe = {
     classModule  = {
         classpowerbar = {
             diabolic = true,
-            blizzard = true,
+            blizzard = false,
             position = { "CENTER", UIParent, "CENTER", 0, -120 }
         }
     }
