@@ -37,8 +37,6 @@ local module = E.datatext
 
 module:Inject("Durability", {
     OnLoad  = function(self)
-        CreateFrame("GameTooltip", "LPDURA", nil, "GameTooltipTemplate")
-        LPDURA:SetOwner(WorldFrame, "ANCHOR_NONE")
         if cfg.man then DurabilityFrame.Show = DurabilityFrame.Hide end
         module:RegEvents(self, "UPDATE_INVENTORY_DURABILITY MERCHANT_SHOW PLAYER_LOGIN")
     end,
@@ -57,15 +55,15 @@ module:Inject("Durability", {
         GameTooltip:ClearAllPoints()
         GameTooltip:SetPoint(cfg.tip_anchor, cfg.tip_frame, cfg.tip_x, cfg.tip_y)
         GameTooltip:ClearLines()
+        GameTooltip:AddLine(DURABILITY, module.tthead.r, module.tthead.g, module.tthead.b)
+        GameTooltip:AddLine(" ")
         if C.tooltip.average_lvl == true then
             local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
             avgItemLevel = floor(avgItemLevel)
             avgItemLevelEquipped = floor(avgItemLevelEquipped)
-            GameTooltip:AddDoubleLine(DURABILITY, STAT_AVERAGE_ITEM_LEVEL .. ": " .. avgItemLevelEquipped .. " / " .. avgItemLevel, module.tthead.r, module.tthead.g, module.tthead.b, module.tthead.r, module.tthead.g, module.tthead.b)
-        else
-            GameTooltip:AddLine(DURABILITY, module.tthead.r, module.tthead.g, module.tthead.b)
+            GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL .. ": " .. avgItemLevelEquipped .. " / " .. avgItemLevel, 1, 1, 1)
+            GameTooltip:AddLine(" ")
         end
-        GameTooltip:AddLine(" ")
         local nodur, totalcost = true, 0
         for slot, string in gmatch("1HEAD3SHOULDER5CHEST6WAIST7LEGS8FEET9WRIST10HANDS16MAINHAND17SECONDARYHAND", "(%d+)([^%d]+)") do
             local dur, dmax = GetInventoryItemDurability(slot)
@@ -74,9 +72,16 @@ module:Inject("Durability", {
                 local perc = dur ~= 0 and dur / dmax or 0
                 local hex = module:Gradient(perc)
                 GameTooltip:AddDoubleLine(cfg.gear_icons and format("|T%s:" .. t_icon .. ":" .. t_icon .. ":0:0:64:64:5:59:5:59:%d|t %s", GetInventoryItemTexture(P, slot), t_icon, str) or str, format("|cffaaaaaa%s/%s | %s%s%%", dur, dmax, hex, floor(perc * 100)), 1, 1, 1)
-                local data = LPDURA:GetTooltipData()
-                repairCost = data and data.repairCost or 0
-                totalcost, nodur = totalcost + repairCost
+                local data = C_TooltipInfo.GetInventoryItem("player", slot)
+                if data then
+                    local argVal = data.args and data.args[7]
+                    if argVal and argVal.field == "repairCost" then
+                        totalcost = totalcost + argVal.intVal
+                        if totalcost > 0 then
+                            nodur = false
+                        end
+                    end
+                end
             end
         end
         if nodur ~= true then
