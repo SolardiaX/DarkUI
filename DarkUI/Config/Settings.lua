@@ -688,7 +688,7 @@ C.unitframe = {
         }
     },
     boss         = {
-        position = { "TOPRIGHT", UIParent, "TOPRIGHT", -150, -360 },
+        position = { "TOPRIGHT", UIParent, "TOPRIGHT", -150, -400 },
         spacing  = 60,
         aura     = {
             player_aura_only     = true,
