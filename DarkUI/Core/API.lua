@@ -41,10 +41,35 @@ end
 ----------------------------------------------------------------------------------------
 --	Position functions
 ----------------------------------------------------------------------------------------
+local function watchPixelSnap(frame, snap)
+    if (frame and not frame:IsForbidden()) and frame.PixelSnapDisabled and snap then
+        frame.PixelSnapDisabled = nil
+    end
+end
+
+local function disablePixelSnap(frame)
+    if (frame and not frame:IsForbidden()) and not frame.PixelSnapDisabled then
+        if frame.SetSnapToPixelGrid then
+            frame:SetSnapToPixelGrid(false)
+            frame:SetTexelSnappingBias(0)
+        elseif frame.GetStatusBarTexture then
+            local texture = frame:GetStatusBarTexture()
+            if texture and texture.SetSnapToPixelGrid then
+                texture:SetSnapToPixelGrid(false)
+                texture:SetTexelSnappingBias(0)
+            end
+        end
+
+        frame.PixelSnapDisabled = true
+    end
+end
+
 local function setOutside(obj, anchor, xOffset, yOffset)
     xOffset = xOffset or Mult
     yOffset = yOffset or Mult
     anchor = anchor or obj:GetParent()
+
+    disablePixelSnap(obj)
 
     if obj:GetPoint() then
         obj:ClearAllPoints()
@@ -58,6 +83,8 @@ local function setInside(obj, anchor, xOffset, yOffset)
     xOffset = xOffset or Mult
     yOffset = yOffset or Mult
     anchor = anchor or obj:GetParent()
+
+    disablePixelSnap(obj)
 
     if obj:GetPoint() then
         obj:ClearAllPoints()
@@ -80,11 +107,6 @@ E.PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIPar
 E.PetBattleFrameHider:SetAllPoints()
 E.PetBattleFrameHider:SetFrameStrata("LOW")
 RegisterStateDriver(E.PetBattleFrameHider, "visibility", "[petbattle] hide; show")
-
-----------------------------------------------------------------------------------------
---	ScanTip
-----------------------------------------------------------------------------------------
-E.ScanTip = CreateFrame("GameTooltip", "DarkUI_ScanTooltip", nil, "GameTooltipTemplate")
 
 ----------------------------------------------------------------------------------------
 --  Kill object function
@@ -494,27 +516,20 @@ local function skinCheckBox(frame)
     frame:SetPushedTexture("")
     frame:SetHighlightTexture(C.media.texture.status)
 
-    frame.hl = frame:GetHighlightTexture()
-    frame.hl:SetPoint("TOPLEFT", 5, -5)
-    frame.hl:SetPoint("BOTTOMRIGHT", -5, 5)
-    frame.hl:SetVertexColor(E.color.r, E.color.g, E.color.b, .2)
-
     frame.bg = CreateFrame("Frame", nil, frame)
-    frame.bg:SetPoint("TOPLEFT", 4, -4)
-    frame.bg:SetPoint("BOTTOMRIGHT", -4, 4)
+    frame.bg:SetInside(self, 4, 4)
     frame.bg:SetFrameLevel(lvl == 0 and 1 or lvl - 1)
-    frame.bg:SetTemplate("Default")
+    frame.bg:SetTemplate("Blur")
+
+    frame.hl = frame:GetHighlightTexture()
+    frame.hl:SetInside(bg)
+    frame.hl:SetVertexColor(E.color.r, E.color.g, E.color.b, .2)
 
     frame.ch = frame:GetCheckedTexture()
     frame.ch:SetAtlas("checkmark-minimal")
     frame.ch:SetDesaturated(true)
+    frame.ch:SetTexCoord(0, 1, 0, 1)
     frame.ch:SetVertexColor(E.color.r, E.color.g, E.color.b)
-
-    -- if C.blizzard.style then
-    --     frame.bg:SetBackdropBorderColor(255 / 255, 234 / 255, 100 / 255)
-    --     frame.hl:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
-    --     frame.ch:SetVertexColor(255 / 255, 234 / 255, 100 / 255)
-    -- end
 end
 
 local function skinCloseButton(f, point)
@@ -671,6 +686,16 @@ local function addapi(object)
     end
     if not object.SetInside then
         mt.SetInside = setInside
+    end
+    if not object.DisabledPixelSnap then
+        if mt.SetTexture then hooksecurefunc(mt, "SetTexture", disablePixelSnap) end
+        if mt.SetTexCoord then hooksecurefunc(mt, "SetTexCoord", disablePixelSnap) end
+        if mt.CreateTexture then hooksecurefunc(mt, "CreateTexture", disablePixelSnap) end
+        if mt.SetVertexColor then hooksecurefunc(mt, "SetVertexColor", disablePixelSnap) end
+        if mt.SetColorTexture then hooksecurefunc(mt, "SetColorTexture", disablePixelSnap) end
+        if mt.SetSnapToPixelGrid then hooksecurefunc(mt, "SetSnapToPixelGrid", watchPixelSnap) end
+        if mt.SetStatusBarTexture then hooksecurefunc(mt, "SetStatusBarTexture", disablePixelSnap) end
+        mt.DisabledPixelSnap = true
     end
 
     if not object.Kill then
