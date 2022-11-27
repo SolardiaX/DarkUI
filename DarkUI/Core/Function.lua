@@ -23,10 +23,10 @@ function E:FormatTime(seconds, raw)
         -- str = format("%d" .. E.colorString .. "m", seconds / m + .5)
         str = format("%dm", seconds / m + .5)
     else
-        if seconds <= 5 and raw then
+        if seconds <= 5 then
             str = format("|cffff0000%.1f|r", seconds) -- red
-        elseif seconds <= 10 and raw then
-            str = format("|cffffff00%.1f|r", seconds) -- yellow
+        elseif seconds <= 10 then
+            str = format(raw and "|cffffff00%.1f|r" or "|cffffff00%d|r", seconds) -- yellow
         else
             str = format("%d", seconds)
         end
