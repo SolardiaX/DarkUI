@@ -735,8 +735,11 @@ end
 
 styler.rTips["Blizzard_DebugTools"] = function()
     hook(FrameStackTooltip)
-    hook(EventTraceTooltip)
     FrameStackTooltip:SetScale(UIParent:GetScale())
+end
+
+styler.rTips["Blizzard_EventTrace"] = function()
+    hook(EventTraceTooltip)
     EventTraceTooltip:SetParent(UIParent)
     EventTraceTooltip:SetFrameStrata("TOOLTIP")
 end
