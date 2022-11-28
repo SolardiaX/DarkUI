@@ -819,7 +819,13 @@ if cfg.damage then
                     end
                     if cfg.icons then
                         icon = GetSpellTexture(spellId)
-                        msg = " \124T" .. icon .. ":" .. cfg.icon_size .. ":" .. cfg.icon_size .. ":0:0:64:64:5:59:5:59\124t"
+                    end
+                    if icon then
+                        msg = " \124T"..icon..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+                    elseif cfg.icons then
+                        msg = " \124T"..ct.blank..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+                    else
+                        msg = ""
                     end
                     if cfg.merge_aoe_spam then
                         spellId = C.aoespam.merge[spellId] or spellId
@@ -852,12 +858,12 @@ if cfg.damage then
                         icon = GetSpellTexture(spellId)
                     end
                     if icon then
-						msg = " \124T"..icon..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
-					elseif cfg.icons then
-						msg = " \124T"..ct.blank..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
-					else
-						msg = ""
-					end
+                        msg = " \124T"..icon..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+                    elseif cfg.icons then
+                        msg = " \124T"..ct.blank..":"..cfg.icon_size..":"..cfg.icon_size..":0:0:64:64:5:59:5:59\124t"
+                    else
+                        msg = ""
+                    end
                     if cfg.damage_color then
                         if ct.dmgcolor[spellSchool] then
                             color = ct.dmgcolor[spellSchool]
@@ -880,9 +886,9 @@ if cfg.damage then
                             spellId = 6603
                         end
                         if (sourceGUID == UnitGUID("pet") or sourceFlags == gflags) and not C.aoespam.aoespam[spellId] then
-							C.aoespam.aoespam[spellId] = 3
-							SQ[spellId] = {queue = 0, msg = "", color = {}, count = 0, utime = 0, locked = false}
-						end
+                            C.aoespam.aoespam[spellId] = 3
+                            SQ[spellId] = {queue = 0, msg = "", color = {}, count = 0, utime = 0, locked = false}
+                        end
                         if C.aoespam.aoespam[spellId] then
                             SQ[spellId]["locked"] = true
                             SQ[spellId]["queue"] = ct.SpamQueue(spellId, rawamount)
