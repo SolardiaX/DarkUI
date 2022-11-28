@@ -20,59 +20,28 @@ local cfg = C.unitframe
 local LibSmoothBar = LibStub("LibSmoothBar-1.0")
 
 module.classModule = {}
+module.classModule.blizzard = {}
+module.classModule.classpowerbar = {}
 
 ------------------------------------------------------------------------
 -- Blizzard classbar
 ------------------------------------------------------------------------
 
 -- override default blizzard event function for Druid
-if E.class == "DRUID" then
-    local comboPointDruidEvent = ComboPointDruidPlayerFrame.OnEvent
-    ComboPointDruidPlayerFrame:SetScript("OnEvent", function(self, event, ...)
-        if self:GetParent() ~= PlayerFrameBottomManagedFramesContainer then
-            self:SetParent(PlayerFrameBottomManagedFramesContainer)
-        end
-
-        if self.unit ~= "player" then
-            self.unit = "player"
-        end
-
-        comboPointDruidEvent(self, event, ...)
-    end)
-
-    local comboPointDruidUpdateMaxPower = ComboPointDruidPlayerFrame.UpdateMaxPower
-    ComboPointDruidPlayerFrame.UpdateMaxPower = function(self)
-        self.classResourceButtonPool:ReleaseAll()
-        self.classResourceButtonTable = { }
-
-        self.unit = "player"
-        self.maxUsablePoints = UnitPowerMax(self.unit, self.powerType);
-        for i = 1, self.maxUsablePoints do
-            local resourcePoint = self.classResourceButtonPool:Acquire()
-            self.classResourceButtonTable[i] = resourcePoint
-            if(self.resourcePointSetupFunc) then
-                self.resourcePointSetupFunc(resourcePoint)
-            end
-            resourcePoint.layoutIndex = i
-            resourcePoint:Show()
-        end
-
-        self:Layout()
-    end
-
-    ComboPointDruidPlayerFrame.unit = "player"
+module.classModule.blizzard["DRUID"] = function(self, ...)
+    ComboPointDruidPlayerFrame:Setup()
     ComboPointDruidPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
-    ComboPointDruidPlayerFrame.SetParent = E.dummy
-    ClassNameplateBarDruidFrame:Kill()
 end
 
-module.classModule.ResetBlizzardClassBarPosition = function(self, ...)
+module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer:ClearAllPoints()
     PlayerFrameBottomManagedFramesContainer:SetParent(self)
     PlayerFrameBottomManagedFramesContainer:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 60, 0)
-    PlayerFrameBottomManagedFramesContainer.SetPoint = E.dummy
     PlayerFrameBottomManagedFramesContainer:Show()
     PlayerFrameBottomManagedFramesContainer:Layout()
+
+    PlayerFrameBottomManagedFramesContainer.SetPoint = E.dummy
+    PlayerFrameBottomManagedFramesContainer.unit = "player"
 end
 
 ------------------------------------------------------------------------
@@ -242,7 +211,7 @@ local UnitFrame_OnEvent = function(self, event)
     end
 end
 
-module.classModule.CreateClassPowerBar = function(self, ...)
+module.classModule.classpowerbar.CreateDiablolicBar = function(self, ...)
     -- Classpowers
     --------------------------------------------
     -- 	Supported class powers:

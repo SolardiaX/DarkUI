@@ -289,11 +289,15 @@ local createClassModule = function(self)
     local classModule = DUF.classModule
 
     if cfg.classModule.classpowerbar.diabolic then
-        classModule.CreateClassPowerBar(self)
+        classModule.classpowerbar.CreateDiablolicBar(self)
     end
 
     if cfg.classModule.classpowerbar.blizzard then
-        classModule.ResetBlizzardClassBarPosition(self)
+        classModule.classpowerbar.ResetBlizzardBarPosition(self)
+        
+        if classModule.blizzard[UNIT_CLASS] then
+            classModule.blizzard[UNIT_CLASS](self)
+        end
     end
 end
 

@@ -546,11 +546,10 @@ local function callback(self, event, unit)
                 self.Castbar:SetAlpha(1)
             end
 
-            local nameplate = C_NamePlate.GetNamePlateForUnit(unit)
-            if nameplate.UnitFrame then
-                if nameplate.UnitFrame.WidgetContainer then
-                    nameplate.UnitFrame.WidgetContainer:SetParent(nameplate)
-                end
+            local blizzPlate = self:GetParent().UnitFrame
+            self.widgetContainer = blizzPlate and blizzPlate.WidgetContainer
+            if self.widgetContainer then
+                self.widgetContainer:SetParent(self)
             end
         end
     end
@@ -809,4 +808,4 @@ end
 
 oUF:RegisterStyle("DarkUI:Nameplates", style)
 oUF:SetActiveStyle("DarkUI:Nameplates")
-oUF:SpawnNamePlates("DarkUI:Nameplates", callback)
+oUF:SpawnNamePlates("DarkUINameplates", callback)
