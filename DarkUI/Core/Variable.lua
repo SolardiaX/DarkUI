@@ -26,7 +26,6 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
 
         if cfgScale > 1.28 then cfgScale = 1.28 end
 
-        -- Don't need to set CVar multiple time
         SetCVar("screenshotQuality", 8)
         SetCVar("cameraDistanceMaxZoomFactor", 2.6)
         SetCVar("showTutorials", 0)
@@ -56,14 +55,15 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         SetCVar("fstack_preferParentKeys", 0)
 
         SetCVar("nameplateShowSelf", 0)
+        SetCVar("nameplateResourceOnTarget", 0)
         SetCVar("nameplateMotion", 1)
-		SetCVar("nameplateShowAll", 1)
-		SetCVar("nameplateShowEnemies", 1)
+        SetCVar("nameplateShowAll", 1)
+        SetCVar("nameplateShowEnemies", 1)
         
         -- force use keyUp to trigger actionbar buttion
         SetCVar("ActionButtonUseKeyDown", 0)
         -- Hide blizz options
-	    SetCVar("multiBarRightVerticalLayout", 0)
+        SetCVar("multiBarRightVerticalLayout", 0)
 
         SetCVar("useUiScale", 1)
         -- Set our uiScale
