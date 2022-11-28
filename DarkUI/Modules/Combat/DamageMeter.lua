@@ -91,7 +91,7 @@ local IsFriendlyUnit = function(uGUID)
 end
 
 local IsUnitInCombat = function(uGUID)
-    unit = units[uGUID]
+    local unit = units[uGUID]
     if unit then
         return UnitAffectingCombat(unit.unit)
     end
@@ -185,19 +185,19 @@ local reportList = {
     {
         text = PLAYER .. "..",
         func = function()
-            StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+            StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                 report("WHISPER", _G[self:GetName() .. "EditBox"]:GetText())
             end
-            StaticPopup_Show(addon_name .. "ReportDialog")
+            StaticPopup_Show(E.addonName .. "ReportDialog")
         end,
     },
     {
         text = CHANNEL .. "..",
         func = function()
-            StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+            StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                 report("CHANNEL", _G[self:GetName() .. "EditBox"]:GetText())
             end
-            StaticPopup_Show(addon_name .. "ReportDialog")
+            StaticPopup_Show(E.addonName .. "ReportDialog")
         end,
     },
 }
@@ -387,7 +387,7 @@ local CreateMenu = function(self, level)
     local info = {}
     if level == 1 then
         info.isTitle = 1
-        info.text = addon_name
+        info.text = E.addonName
         info.notCheckable = 1
         UIDropDownMenu_AddButton(info, level)
         wipe(info)
@@ -467,77 +467,77 @@ local CreateMenu = function(self, level)
         end
         if UIDROPDOWNMENU_MENU_VALUE == "Options" then
             wipe(info)
-            info.text = L.DAMAGEMETER_VISIBLE_BARS
+            info.text = L.DAMAGEMETER_OPTION_VISIBLE_BARS
             info.func = function()
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                     cfg.maxbars = tonumber(_G[self:GetName() .. "EditBox"]:GetText())
                     UpdateWindow()
                 end
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnShow = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnShow = function(self)
                     _G[self:GetName() .. "EditBox"]:SetText(cfg.maxbars)
                 end
-                StaticPopup_Show(addon_name .. "ReportDialog")
+                StaticPopup_Show(E.addonName .. "ReportDialog")
             end
             info.notCheckable = 1
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_BAR_WIDTH
+            info.text = L.DAMAGEMETER_OPTION_BAR_WIDTH
             info.func = function()
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                     cfg.width = tonumber(_G[self:GetName() .. "EditBox"]:GetText())
                     UpdateWindow()
                 end
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnShow = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnShow = function(self)
                     _G[self:GetName() .. "EditBox"]:SetText(cfg.width)
                 end
-                StaticPopup_Show(addon_name .. "ReportDialog")
+                StaticPopup_Show(E.addonName .. "ReportDialog")
             end
             info.notCheckable = 1
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_BAR_HEIGHT
+            info.text = L.DAMAGEMETER_OPTION_BAR_HEIGHT
             info.func = function()
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                     cfg.barheight = tonumber(_G[self:GetName() .. "EditBox"]:GetText())
                     UpdateWindow()
                 end
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnShow = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnShow = function(self)
                     _G[self:GetName() .. "EditBox"]:SetText(cfg.barheight)
                 end
-                StaticPopup_Show(addon_name .. "ReportDialog")
+                StaticPopup_Show(E.addonName .. "ReportDialog")
             end
             info.notCheckable = 1
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_SPACING
+            info.text = L.DAMAGEMETER_OPTION_SPACING
             info.func = function()
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                     cfg.spacing = tonumber(_G[self:GetName() .. "EditBox"]:GetText())
                     UpdateWindow()
                 end
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnShow = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnShow = function(self)
                     _G[self:GetName() .. "EditBox"]:SetText(cfg.spacing)
                 end
-                StaticPopup_Show(addon_name .. "ReportDialog")
+                StaticPopup_Show(E.addonName .. "ReportDialog")
             end
             info.notCheckable = 1
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_FONT_SIZE
+            info.text = L.DAMAGEMETER_OPTION_FONT_SIZE
             info.func = function()
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnAccept = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnAccept = function(self)
                     cfg.font_size = tonumber(_G[self:GetName() .. "EditBox"]:GetText())
                     UpdateWindow()
                 end
-                StaticPopupDialogs[addon_name .. "ReportDialog"].OnShow = function(self)
+                StaticPopupDialogs[E.addonName .. "ReportDialog"].OnShow = function(self)
                     _G[self:GetName() .. "EditBox"]:SetText(cfg.font_size)
                 end
-                StaticPopup_Show(addon_name .. "ReportDialog")
+                StaticPopup_Show(E.addonName .. "ReportDialog")
             end
             info.notCheckable = 1
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_HIDE_TITLE
+            info.text = L.DAMAGEMETER_OPTION_HIDE_TITLE
             info.func = function()
                 cfg.hidetitle = not cfg.hidetitle
                 UpdateWindow()
@@ -545,7 +545,7 @@ local CreateMenu = function(self, level)
             info.checked = cfg.hidetitle
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_CLASS_COLOR_BAR
+            info.text = L.DAMAGEMETER_OPTION_CLASS_COLOR_BAR
             info.func = function()
                 cfg.classcolorbar = not cfg.classcolorbar
                 UpdateWindow()
@@ -553,7 +553,7 @@ local CreateMenu = function(self, level)
             info.checked = cfg.classcolorbar
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_CLASS_COLOR_NAME
+            info.text = L.DAMAGEMETER_OPTION_CLASS_COLOR_NAME
             info.func = function()
                 cfg.classcolorname = not cfg.classcolorname
                 UpdateWindow()
@@ -561,7 +561,7 @@ local CreateMenu = function(self, level)
             info.checked = cfg.classcolorname
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_SAVE_ONLY_BOSS_FIGHTS
+            info.text = L.DAMAGEMETER_OPTION_SAVE_ONLY_BOSS_FIGHTS
             info.func = function()
                 cfg.onlyboss = not cfg.onlyboss
                 UpdateWindow()
@@ -569,7 +569,7 @@ local CreateMenu = function(self, level)
             info.checked = cfg.onlyboss
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_MERGE_HEAL_AND_ABSORBS
+            info.text = L.DAMAGEMETER_OPTION_MERGE_HEAL_AND_ABSORBS
             info.func = function()
                 cfg.mergeHealAbsorbs = not cfg.mergeHealAbsorbs
                 UpdateWindow()
@@ -577,7 +577,7 @@ local CreateMenu = function(self, level)
             info.checked = cfg.mergeHealAbsorbs
             UIDropDownMenu_AddButton(info, level)
             wipe(info)
-            info.text = L.DAMAGEMETER_BAR_COLOR
+            info.text = L.DAMAGEMETER_OPTION_BAR_COLOR
             info.hasColorSwatch = 1
             info.func = UIDropDownMenuButton_OpenColorPicker
             info.r = cfg.barcolor[1]
@@ -595,7 +595,7 @@ local CreateMenu = function(self, level)
             info.notCheckable = 1
             info.keepShownOnClick = false
             UIDropDownMenu_AddButton(info, level)
-            info.text = L.DAMAGEMETER_BACKDROP_COLOR
+            info.text = L.DAMAGEMETER_OPTION_BACKDROP_COLOR
             info.hasColorSwatch = 1
             info.hasOpacity = (cfg.backdrop_color[4] ~= nil)
             info.func = UIDropDownMenuButton_OpenColorPicker
@@ -617,7 +617,7 @@ local CreateMenu = function(self, level)
             info.notCheckable = 1
             info.keepShownOnClick = false
             UIDropDownMenu_AddButton(info, level)
-            info.text = L.DAMAGEMETER_BORDER_COLOR
+            info.text = L.DAMAGEMETER_OPTION_BORDER_COLOR
             info.hasColorSwatch = 1
             info.hasOpacity = 1
             info.func = UIDropDownMenuButton_OpenColorPicker
@@ -708,11 +708,11 @@ local OnUpdate = function(self, elapsed)
                 dataobj.text = string.format("DPS: %.0f", v[DAMAGE].amount / v.combatTime)
             end
         end
-        for i, v in pairs(total) do
-            if IsUnitInCombat(i) then
-                v.combatTime = v.combatTime + timer
-            end
-        end
+        -- for i, v in pairs(total) do
+        --     if IsUnitInCombat(i) then
+        --         v.combatTime = v.combatTime + timer
+        --     end
+        -- end
         UpdateBars()
         if not InCombatLockdown() and not IsRaidInCombat() then
             EndCombat()
