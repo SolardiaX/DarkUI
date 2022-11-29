@@ -64,21 +64,14 @@ local Runes_PostUpdate = function(element, runemap, hasVehicle, allReady)
 end
 
 local Runes_PostUpdateColor = function(element, r, g, b, color, rune)
-    local m = ns.IsWrath and .5 or 1 -- Probably only needed on our current runes
     if (rune) then
-        rune:SetStatusBarColor(r * m, g * m, b * m)
-        rune.fg:SetVertexColor(r * m, g * m, b * m)
+        rune:SetStatusBarColor(r, g, b)
+        rune.fg:SetVertexColor(r, g, b)
     else
-        if (not ns.IsWrath) then
-            color = element.__owner.colors.power.RUNES
-            r, g, b = color[1] * m, color[2] * m, color[3] * m
-        end
+        color = element.__owner.colors.power.RUNES
+        r, g, b = color[1], color[2], color[3]
         for i = 1, #element do
             local rune = element[i]
-            if (ns.IsWrath) then
-                color = element.__owner.colors.runes[rune.runeType]
-                r, g, b = color[1] * m, color[2] * m, color[3] * m
-            end
             rune:SetStatusBarColor(r, g, b)
             rune.fg:SetVertexColor(r, g, b)
         end
