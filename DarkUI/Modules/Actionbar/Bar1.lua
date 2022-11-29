@@ -35,11 +35,10 @@ for i = 1, num do
 end
 
 local Page = {
-    ["DRUID"]   = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
-    ["ROGUE"]   = "[bonusbar:1] 7;",
-    ["WARRIOR"] = "[bonusbar:1] 7; [bonusbar:2] 8; [bonusbar:3] 9;",
-    ["PRIEST"]  = "[bonusbar:1] 7;",
-    ["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6;",
+    ["DRUID"] = "[bonusbar:1,nostealth] 7; [bonusbar:1,stealth] 8; [bonusbar:2] 8; [bonusbar:3] 9; [bonusbar:4] 10;",
+    ["EVOKER"] = "[bonusbar:1] 7;",
+    ["ROGUE"] = "[bonusbar:1] 7;",
+    ["DEFAULT"] = "[possessbar] 16; [shapeshift] 17; [overridebar] 18; [vehicleui] 16; [bar:2] 2; [bar:3] 3; [bar:4] 4; [bar:5] 5; [bar:6] 6; [bonusbar: 5] 11;",
 }
 
 local function GetBar()
@@ -65,17 +64,17 @@ bar:SetScript("OnEvent", function(self, event)
         end
 
         self:Execute([[
-			buttons = table.new()
-			for i = 1, 12 do
-				table.insert(buttons, self:GetFrameRef("ActionButton"..i))
-			end
-		]])
+            buttons = table.new()
+            for i = 1, 12 do
+                table.insert(buttons, self:GetFrameRef("ActionButton"..i))
+            end
+        ]])
 
         self:SetAttribute("_onstate-page", [[
-			for i, button in ipairs(buttons) do
-				button:SetAttribute("actionpage", tonumber(newstate))
-			end
-		]])
+            for i, button in ipairs(buttons) do
+                button:SetAttribute("actionpage", tonumber(newstate))
+            end
+        ]])
 
         RegisterStateDriver(self, "page", GetBar())
     elseif event == "UPDATE_VEHICLE_ACTIONBAR" or event == "UPDATE_OVERRIDE_ACTIONBAR" then
