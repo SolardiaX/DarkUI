@@ -258,15 +258,15 @@ C.aura = {
     buff_pos         = { "TOPRIGHT", "UIParent", -260, -20 }, -- buffs position
     debuff_pos       = { "TOPRIGHT", "UIParent", -260, -100 }, -- debuffs position
     dur_pos          = { "BOTTOM", 0, -6 }, -- buffs/debuffs timer position
-    count_pos        = { "TOPRIGHT", 0, 6 }, -- buffs/debuffs counter position
+    count_pos        = { "TOPRIGHT", 0, 0 }, -- buffs/debuffs counter position
     buff_size        = 28, -- buff icons size
     debuff_size      = 32, -- debuff icons size
     enchant_size     = 28, -- enchant icons size
     enable_flash     = true, -- enable cooldown flash
     enable_animation = true, -- enable animiation
     flash_timer      = 30,
-    dur_font_style   = { STANDARD_TEXT_FONT, 12, "THINOUTLINE" }, -- timer font style
-    count_font_style = { STANDARD_TEXT_FONT, 14, "THINOUTLINE" } -- count font style
+    dur_font_style   = { STANDARD_TEXT_FONT, 14, "THINOUTLINE" }, -- timer font style
+    count_font_style = { STANDARD_TEXT_FONT, 12, "THINOUTLINE" } -- count font style
 }
 
 ----------------------------------------------------------------------------------------
