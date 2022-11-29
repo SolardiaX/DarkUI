@@ -97,6 +97,9 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         ToggleChatColorNamesByClassGroup(true, "CHANNEL4")
         ToggleChatColorNamesByClassGroup(true, "CHANNEL5")
 
+        -- Set to default layout of Blizzard Edit Mode
+        C_EditMode.SetActiveLayout(1)
+
         SavedStatsPerChar.version = E.version
 
         if not SavedStatsPerChar.inited then
