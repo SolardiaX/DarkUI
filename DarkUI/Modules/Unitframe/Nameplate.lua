@@ -534,7 +534,7 @@ local function callback(self, event, unit)
             self.Castbar:SetAlpha(1)
             self.RaidTargetIndicator:SetAlpha(1)
 
-            if UnitWidgetSet(unit) and UnitIsOwnerOrControllerOfUnit("player", unit) then
+            if self.widgetsOnly or UnitWidgetSet(unit) and UnitIsOwnerOrControllerOfUnit("player", unit) then
                 self.Health:SetAlpha(0)
                 self.Level:SetAlpha(0)
                 self.Name:SetAlpha(0)
