@@ -2,7 +2,7 @@
     <Button name="DarkUIAuraTemplate" inherits="SecureActionButtonTemplate, BackdropTemplate" virtual="true" framelevel="4">
         <Size x="30" y="30"/>
         <Attributes>
-            <Attribute name="type" value="cancelaura"/>
+            <Attribute name="type2" value="cancelaura"/>
         </Attributes>
         <Scripts>
             <OnLoad>
