@@ -135,7 +135,7 @@ end
 
 local function CreateRollFrame()
     local frame = CreateFrame("Frame", nil, UIParent)
-    frame:CreateBackdrop()
+    -- frame:CreateBackdrop()
     frame:SetSize(280, 24)
     frame:SetFrameStrata("MEDIUM")
     frame:SetFrameLevel(10)
@@ -151,6 +151,7 @@ local function CreateRollFrame()
     button:SetScript("OnUpdate", ItemOnUpdate)
     button:SetScript("OnClick", LootClick)
     button:CreateBackdrop("Transparent")
+    button:CreateTextureBorder()
     button:CreateShadow()
     frame.button = button
 
@@ -159,20 +160,16 @@ local function CreateRollFrame()
     button.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
     local status = CreateFrame("StatusBar", nil, frame)
-    status:SetSize(326, 6)
+    status:SetSize(280, 6)
     status:SetPoint("BOTTOMLEFT", button, "BOTTOMRIGHT", 4, 0)
     status:SetScript("OnUpdate", StatusUpdate)
     status:SetFrameLevel(status:GetFrameLevel() - 1)
-    status:SetStatusBarTexture(C.media.texture.status_f)
+    status:SetTemplate("Default")
+    status:SetStatusBarTexture(C.media.texture.gradient)
     status:SetStatusBarColor(0.8, 0.8, 0.8, 0.9)
-    status:CreateShadow(6)
+    status:CreateShadow()
     status.parent = frame
     frame.status = status
-
-    status.bg = status:CreateTexture(nil, "BACKGROUND")
-    status.bg:SetAlpha(0.2)
-    status.bg:SetAllPoints()
-    status.bg:SetDrawLayer("BACKGROUND", 2)
 
     local spark = frame:CreateTexture(nil, "OVERLAY")
     spark:SetWidth(14)
@@ -307,13 +304,10 @@ local function START_LOOT_ROLL(rollID, time)
     f.fsloot:SetVertexColor(color.r, color.g, color.b)
 
     f.status:SetStatusBarColor(color.r, color.g, color.b, 0.7)
-    f.status.bg:SetColorTexture(color.r, color.g, color.b)
-
-    f.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
-    f.button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
-
     f.status:SetMinMaxValues(0, time)
     f.status:SetValue(time)
+
+    f.button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
 
     f:SetPoint("CENTER", WorldFrame, "CENTER")
     f:Show()
@@ -357,26 +351,24 @@ LootRollAnchor:SetScript(
 
 SlashCmdList.TESTROLL = function()
     local f = GetFrame()
-    local items = { 32837, 34196, 33820, 84004 }
+    local items =  { 32837, 34196, 33820, 84004 }
     if f:IsShown() then
         f:Hide()
     else
         local item = items[random(1, #items)]
-        local _, _, quality, _, _, _, _, _, _, texture = GetItemInfo(item)
+        local name, _, quality, _, _, _, _, _, _, texture = GetItemInfo(item)
         local r, g, b = GetItemQualityColor(quality or 1)
 
         f.button.icon:SetTexture(texture)
         f.button.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
-        f.fsloot:SetText(GetItemInfo(item))
+        f.fsloot:SetText(name)
         f.fsloot:SetVertexColor(r, g, b)
 
         f.status:SetMinMaxValues(0, 100)
         f.status:SetValue(random(50, 90))
         f.status:SetStatusBarColor(r, g, b, 0.7)
-        f.status.bg:SetColorTexture(r, g, b)
 
-	f.backdrop:SetBackdropBorderColor(r, g, b, 0.7)
         f.button.backdrop:SetBackdropBorderColor(r, g, b, 0.7)
 
         f.need:SetText(0)
