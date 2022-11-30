@@ -302,7 +302,7 @@ function auras:CreateAuraIcon(button)
     button:CreateTextureBorder()
     button:CreateShadow()
 
-    button:RegisterForClicks("RightButtonUp")
+    button:RegisterForClicks("RightButtonDown")
     button:SetScript("OnAttributeChanged", auras.OnAttributeChanged)
     button:SetScript("OnEnter", auras.Button_OnEnter)
     button:SetScript("OnLeave", GameTooltip_Hide)
