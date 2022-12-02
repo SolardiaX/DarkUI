@@ -56,7 +56,7 @@ function Timer.SetNextUpdate(self, duration)
 end
 
 --stops the timer
-function Timer.Stop(self)
+local function Timer_Stop(self)
     self.enabled = nil
     self.start = nil
     self.duration = nil
@@ -64,33 +64,37 @@ function Timer.Stop(self)
     self:Hide()
 end
 
-function Timer.UpdateText(self)
-    local remain = self.enabled and (self.duration - (GetTime() - self.start)) or 0
-
-    if round(remain) > 0 then
-        if (self.fontScale * self:GetEffectiveScale() / UIParent:GetScale()) < cfg.minScale then
-            self.text:SetText("")
-            Timer.SetNextUpdate(self, 1)
-        else
-            local formatStr, time, timeUntilNextUpdate = getTimeText(remain)
-            self.text:SetFormattedText(formatStr, time)
-            Timer.SetNextUpdate(self, timeUntilNextUpdate)
-        end
-    else
-        Timer.Stop(self)
-    end
+local function Timer_OnUpdate(self, elapsed)
+    if self.text:IsShown() then
+		if self.nextUpdate > 0 then
+			self.nextUpdate = self.nextUpdate - elapsed
+		else
+			if (self:GetEffectiveScale() / UIParent:GetEffectiveScale()) < cfg.minScale then
+				self.text:SetText("")
+				self.nextUpdate = 1
+			else
+				local remain = self.duration - (GetTime() - self.start)
+				if floor(remain + 0.5) > 0 then
+					local formatStr, time, timeUntilNextUpdate = getTimeText(remain)
+                    self.text:SetFormattedText(formatStr, time)
+					self.nextUpdate = timeUntilNextUpdate
+				else
+					Timer_Stop(self)
+				end
+			end
+		end
+	end
 end
 
 --forces the given timer to update on the next frame
-function Timer.ForceUpdate(self)
-    Timer.UpdateText(self)
-
+function Timer_ForceUpdate(self)
+    self.nextUpdate = 0
     self:Show()
 end
 
 --adjust font size whenever the timer's parent size changes
 --hide if it gets too tiny
-function Timer.OnSizeChanged(self, width, _)
+local function Timer_OnSizeChanged(self, width)
     local fontScale = round(width) / ICON_SIZE
     if fontScale == self.fontScale then return end
 
@@ -102,13 +106,13 @@ function Timer.OnSizeChanged(self, width, _)
         self.text:SetShadowColor(0, 0, 0, 0.8)
         self.text:SetShadowOffset(1, -1)
         if self.enabled then
-            Timer.ForceUpdate(self)
+            Timer_ForceUpdate(self)
         end
     end
 end
 
 --returns a new timer object
-function Timer.Create(cooldown)
+local function Timer_Create(cooldown)
     --a frame to watch for OnSizeChanged events
     --needed since OnSizeChanged has funny triggering if the frame with the handler is not shown
     local scaler = CreateFrame("Frame", nil, cooldown)
@@ -117,53 +121,66 @@ function Timer.Create(cooldown)
     local timer = CreateFrame("Frame", nil, scaler)
     timer:Hide()
     timer:SetAllPoints(scaler)
-
-    timer.OnTimerDone = function() Timer.UpdateText(timer) end
+    timer:SetScript("OnUpdate", Timer_OnUpdate)
 
     local text = timer:CreateFontString(nil, "OVERLAY")
     text:SetPoint("CENTER", 0, 0)
     text:SetFont(cfg.fontFace, cfg.fontSize, "OUTLINE")
     timer.text = text
 
-    Timer.OnSizeChanged(timer, scaler:GetSize())
-    scaler:SetScript("OnSizeChanged", function(_, ...) Timer.OnSizeChanged(timer, ...) end)
+    Timer_OnSizeChanged(timer, scaler:GetSize())
+    scaler:SetScript("OnSizeChanged", function(_, ...) Timer_OnSizeChanged(timer, ...) end)
 
     -- prevent display of blizzard cooldown text
     cooldown:SetHideCountdownNumbers(true)
 
-    timers[cooldown] = timer
-
+    cooldown.timer = timer
     return timer
 end
 
-function Timer.Start(cooldown, start, duration, ...)
-    --start timer
-    if start > 0 and duration > cfg.minDuration and (not cooldown.noCooldownCount) then
-        --stop timer
-        cooldown:SetDrawBling(cfg.drawBling)
-        cooldown:SetDrawSwipe(cfg.drawSwipe)
-        cooldown:SetDrawEdge(cfg.drawEdge)
+local Cooldown_MT = getmetatable(_G.ActionButton1Cooldown).__index
+local hideNumbers = {}
 
-        local timer = timers[cooldown] or Timer.Create(cooldown)
-
-        timer.enabled = true
-        timer.start = start
-        timer.duration = duration
-        Timer.UpdateText(timer)
-
-        if timer.fontScale >= cfg.minScale then timer:Show() end
-    else
-        local timer = timers[cooldown]
-        if timer then Timer.Stop(timer) end
-    end
+local function deactivateDisplay(cooldown)
+	local timer = cooldown.timer
+	if timer then
+		Timer_Stop(timer)
+	end
 end
 
-local f = CreateFrame('Frame')
-f:RegisterEvent('PLAYER_ENTERING_WORLD')
-f:SetScript('OnEvent', function()
-    for _, timer in pairs(timers) do
-        Timer.ForceUpdate(timer)
-    end
+local function setHideCooldownNumbers(cooldown, hide)
+	if hide then
+		hideNumbers[cooldown] = true
+		deactivateDisplay(cooldown)
+	else
+		hideNumbers[cooldown] = nil
+	end
+end
+
+hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, modRate)
+	if cooldown.noCooldownCount or cooldown:IsForbidden() or hideNumbers[cooldown] then return end
+
+	local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
+
+	if show then
+		local parent = cooldown:GetParent()
+		if parent and parent.chargeCooldown == cooldown then return end
+
+		local timer = cooldown.timer or Timer_Create(cooldown)
+		timer.start = start
+		timer.duration = duration
+		timer.enabled = true
+		timer.nextUpdate = 0
+		if timer.fontScale >= cfg.minScale then timer:Show() end
+	else
+		deactivateDisplay(cooldown)
+	end
 end)
 
-hooksecurefunc(getmetatable(_G["ActionButton1Cooldown"]).__index, "SetCooldown", Timer.Start)
+hooksecurefunc(Cooldown_MT, "Clear", deactivateDisplay)
+
+hooksecurefunc(Cooldown_MT, "SetHideCountdownNumbers", setHideCooldownNumbers)
+
+hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function(cooldown)
+	setHideCooldownNumbers(cooldown, true)
+end)
