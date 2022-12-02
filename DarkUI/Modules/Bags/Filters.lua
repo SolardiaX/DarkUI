@@ -8,9 +8,13 @@ if not C.bags.enable then return end
 --	Filters of Bags (modified from cargBags_Nivaya)
 ----------------------------------------------------------------------------------------
 
+local NumBagContainer = 5
+local BankContainerStartID = NumBagContainer + 1
+local MaxNumContainer = 12
+
 local cbNivaya = cargBags:NewImplementation("Nivaya")
 cbNivaya:RegisterBlizzard()
-function cbNivaya:UpdateBags() for i = -3, 11 do cbNivaya:UpdateBag(i) end end
+function cbNivaya:UpdateBags() for i = -3, MaxNumContainer do cbNivaya:UpdateBag(i) end end
 
 cB_Filters = {}
 cB_KnownItems = {}
@@ -23,8 +27,8 @@ cB_filterEnabled = { Armor = true, Gem = true, Quest = true, TradeGoods = true, 
 --------------------
 --Basic filters
 --------------------
-cB_Filters.fBags = function(item) return item.bagId >= 0 and item.bagId <= 4 end
-cB_Filters.fBank = function(item) return item.bagId == -1 or item.bagId >= 5 and item.bagId <= 11 end
+cB_Filters.fBags = function(item) return item.bagId >= 0 and item.bagId <= NumBagContainer end
+cB_Filters.fBank = function(item) return item.bagId == -1 or item.bagId >= BankContainerStartID and item.bagId <= MaxNumContainer end
 cB_Filters.fBankReagent = function(item) return item.bagId == -3 end
 cB_Filters.fBankFilter = function() return _G.SavedStats.cBnivCfg.FilterBank end
 cB_Filters.fHideEmpty = function(item) if _G.SavedStats.cBnivCfg.CompressEmpty then return item.link ~= nil else return true end end
@@ -37,7 +41,7 @@ cB_Filters.fItemClass = function(item, container)
 	if not cB_ItemClass[item.id] or item.bagId == -2 then cbNivaya:ClassifyItem(item) end
 	
 	local t, bag = cB_ItemClass[item.id]
-	local isBankBag = item.bagId == -1 or (item.bagId >= 5 and item.bagId <= 11)
+	local isBankBag = item.bagId == -1 or (item.bagId >= BankContainerStartID and item.bagId <= MaxNumContainer)
 	if isBankBag then
 		bag = (cB_existsBankBag[t] and _G.SavedStats.cBnivCfg.FilterBank and cB_filterEnabled[t]) and "Bank"..t or "Bank"
 	else
@@ -61,12 +65,12 @@ function cbNivaya:ClassifyItem(item)
 	-- type based filters
 	if item.type then
 		if		(item.type == L.BAG_ARMOR) or (item.type == L.BAG_WEAPON)	then cB_ItemClass[item.id] = "Armor"; return true
-		elseif	(item.type == L.BAG_GEM)								then cB_ItemClass[item.id] = "Gem"; return true
-		elseif	(item.type == L.BAG_QUEST)								then cB_ItemClass[item.id] = "Quest"; return true
-		elseif	(item.type == L.BAG_TRADES)								then cB_ItemClass[item.id] = "TradeGoods"; return true
-		elseif	(item.type == L.BAG_CONSUMABLES)						then cB_ItemClass[item.id] = "Consumables"; return true
-		elseif	(item.type == L.BAG_ARTIFACT_POWER)						then cB_ItemClass[item.id] = "ArtifactPower"; return true
-		elseif	(item.type == L.BAG_BATTLEPET)							then cB_ItemClass[item.id] = "BattlePet"; return true
+		elseif	(item.type == L.BAG_GEM)									then cB_ItemClass[item.id] = "Gem"; return true
+		elseif	(item.type == L.BAG_QUEST)									then cB_ItemClass[item.id] = "Quest"; return true
+		elseif	(item.type == L.BAG_TRADES)									then cB_ItemClass[item.id] = "TradeGoods"; return true
+		elseif	(item.type == L.BAG_CONSUMABLES)							then cB_ItemClass[item.id] = "Consumables"; return true
+		elseif	(item.type == L.BAG_ARTIFACT_POWER)							then cB_ItemClass[item.id] = "ArtifactPower"; return true
+		elseif	(item.type == L.BAG_BATTLEPET)								then cB_ItemClass[item.id] = "BattlePet"; return true
 		end
 	end
 	
@@ -78,7 +82,7 @@ end
 ------------------------------------------
 cB_Filters.fNewItems = function(item)
 	if not _G.SavedStats.cBnivCfg.NewItems then return false end
-	if not ((item.bagId >= 0) and (item.bagId <= 4)) then return false end
+	if not ((item.bagId >= 0) and (item.bagId <= NumBagContainer)) then return false end
 	if not item.link then return false end
 	if not cB_KnownItems[item.id] then return true end
 	local t = GetItemCount(item.id)	--cbNivaya:getItemCount(item.id)
@@ -113,7 +117,7 @@ cB_Filters.fItemSets = function(item)
 		end
 	end
 	-- Check Equipment Manager sets:
-	if cargBags.itemKeys["setID"](item) then return true end
+	if cargBags.itemKeys["isItemSet"](item) then return true end
    return false
 end
 

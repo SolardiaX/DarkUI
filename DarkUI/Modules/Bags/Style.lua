@@ -8,6 +8,9 @@ if not C.bags.enable then return end
 --	Style of Bags (modified from cargBags_Nivaya of RealUI)
 ----------------------------------------------------------------------------------------
 
+local NumBagContainer = 5
+local BankContainerStartID = NumBagContainer + 1
+local MaxNumContainer = 12
 
 local LE_ITEM_CLASS_KEY = LE_ITEM_CLASS_KEY or Enum.ItemClass.Key
 local UseContainerItem = C_Container and C_Container.UseContainerItem or UseContainerItem
@@ -19,6 +22,7 @@ local GetContainerItemID = C_Container.GetContainerItemID
 local GetContainerNumSlots = C_Container.GetContainerNumSlots
 local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
 local GetContainerItemDurability = C_Container.GetContainerItemDurability
+local GetContainerItemLink = C_Container.GetContainerItemLink
 local SortBags = C_Container.SortBags
 local SortBankBags = C_Container.SortBankBags
 local SortReagentBankBags = C_Container.SortReagentBankBags
@@ -79,7 +83,7 @@ local GetNumFreeSlots = function(bagType)
 		free = GetContainerNumFreeSlots(-3)
 		max = GetContainerNumSlots(-3)
 	else
-		local containerIDs = { -1, 5, 6, 7, 8, 9, 10, 11 }
+		local containerIDs = {-1,6,7,8,9,10,11,12}
 		for _, i in next, containerIDs do
 			free = free + GetContainerNumFreeSlots(i)
 			max = max + GetContainerNumSlots(i)
@@ -146,7 +150,7 @@ function MyContainer:OnContentsChanged(forced)
 		if item.link then
 			buttonIDs[i] = { item.id, item.quality, button, item.count }
 		else
-			buttonIDs[i] = { nil, button }
+			buttonIDs[i] = { -1, -2, button, -1 }
 		end
 	end
 	if ((tBank or tReagent) and _G.SavedStats.cBnivCfg.SortBank) or (not (tBank or tReagent) and _G.SavedStats.cBnivCfg.SortBags) then QuickSort(buttonIDs) end
@@ -198,7 +202,7 @@ function MyContainer:OnContentsChanged(forced)
 	local tAS = (tName == "cBniv_Ammo") or (tName == "cBniv_Soulshards")
 	local bankShown = cB_Bags.bank:IsShown()
 	if (not tBankBags and cB_Bags.main:IsShown() and not (t or tAS)) or (tBankBags and bankShown) then 
-		if isEmpty then
+		if isEmpty and (not tReagent) then
 			self:Hide()
 			if bankShown then
 				cB_Bags.bank:Show()
@@ -279,7 +283,7 @@ local resetNewItems = function(self)
 					if cB_KnownItems[item.id] then
 						cB_KnownItems[item.id] = cB_KnownItems[item.id] + (item.stackCount and item.stackCount or 0)
 					else
-						cB_KnownItems[item.id] = item.stackCount and item.stackCount or 1
+						cB_KnownItems[item.id] = item.stackCount and item.stackCount or 0
 					end
 				end
 			end 
@@ -447,7 +451,7 @@ local GetFirstFreeSlot = function(bagtype)
 			end
 		end
 	else
-		local containerIDs = { -1, 5, 6, 7, 8, 9, 10, 11 }
+		local containerIDs = {-1,6,7,8,9,10,11,12}
 		for _,i in next, containerIDs do
 			local t = GetContainerNumFreeSlots(i)
 			if t > 0 then
@@ -598,11 +602,12 @@ function MyContainer:OnCreate(name, settings)
 	end
 
 	local tBtnOffs = 0
-	  if (tBag or tBank) then
+	if (tBag or tBank) then
 		-- Bag bar for changing bags
 		local bagType = tBag and "bags" or "bank"
+		
 		local tS = tBag and "backpack+bags" or "bank"
-		local tI = tBag and 5 or 7
+		local tI = tBag and NumBagContainer or 7
 
 		local bagButtons = self:SpawnPlugin("BagBar", tS)
 		bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))

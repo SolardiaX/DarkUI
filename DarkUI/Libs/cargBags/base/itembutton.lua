@@ -88,6 +88,12 @@ function ItemButton:New(bagID, slotID)
 	else
 		button.UpdateTooltip = ContainerFrameItemButtonMixin.OnUpdate
 	end
+	
+	if not button.GetSlotAndBagID then
+		button.GetSlotAndBagID = function(f)
+			return f.slotId, f.bagId
+		end
+	end
 
 	return button
 end

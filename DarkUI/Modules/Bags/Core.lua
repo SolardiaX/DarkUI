@@ -7,6 +7,7 @@ if not C.bags.enable then return end
 ----------------------------------------------------------------------------------------
 --    Core of Bags (modified from cargBags_Nivaya of RealUI)
 ----------------------------------------------------------------------------------------
+local MaxNumContainer = 12
 
 -- Lua Globals --
 -- luacheck: globals next ipairs
@@ -407,12 +408,12 @@ function cbNivaya:UpdateAnchors(self)
             local h = cB_BagHidden[t.name]
             v:ClearAllPoints()
 
-            if    not h        and u == "Top"        then v:SetPoint("BOTTOM", t, "TOP", 0, 9)
-            elseif    h        and u == "Top"        then v:SetPoint("BOTTOM", t, "BOTTOM")
+            if    not h        and u == "Top"       then v:SetPoint("BOTTOM", t, "TOP", 0, 9)
+            elseif    h        and u == "Top"       then v:SetPoint("BOTTOM", t, "BOTTOM")
             elseif    not h    and u == "Bottom"    then v:SetPoint("TOP", t, "BOTTOM", 0, -9)
             elseif    h        and u == "Bottom"    then v:SetPoint("TOP", t, "TOP")
-            elseif    u == "Left"                    then v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -9, 0)
-            elseif    u == "Right"                then v:SetPoint("TOPLEFT", t, "TOPRIGHT", 9, 0) end
+            elseif    u == "Left"                   then v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -9, 0)
+            elseif    u == "Right"                  then v:SetPoint("TOPLEFT", t, "TOPRIGHT", 9, 0) end
             end
         end
 end
@@ -472,7 +473,7 @@ local Event = _G.CreateFrame('Frame', nil)
 Event:RegisterEvent("PLAYER_ENTERING_WORLD")
 Event:SetScript('OnEvent', function(self, event, ...)
     if event == "PLAYER_ENTERING_WORLD" then
-        for bagId = -3, 11 do
+        for bagId = -3, MaxNumContainer do
             local slots = C_Container.GetContainerNumSlots(bagId)
             for slotId = 1, slots do
                 local button = cbNivaya.buttonClass:New(bagId, slotId)
@@ -495,11 +496,11 @@ Event:SetScript('OnEvent', function(self, event, ...)
             local buyReagent = CreateFrame("Button", nil, NivayacBniv_BankReagent, "UIPanelButtonTemplate")
             buyReagent:SetText(BANKSLOTPURCHASE)
             buyReagent:SetWidth(buyReagent:GetTextWidth() + 20)
-                buyReagent:SetPoint("CENTER", NivayacBniv_BankReagent, 0, 0)
-                buyReagent:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                GameTooltip:AddLine(REAGENT_BANK_HELP, 1, 1, 1, true)
-                GameTooltip:Show()
+            buyReagent:SetPoint("CENTER", NivayacBniv_BankReagent, 0, 0)
+            buyReagent:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:AddLine(REAGENT_BANK_HELP, 1, 1, 1, true)
+            GameTooltip:Show()
             end)
             buyReagent:SetScript("OnLeave", function()
                 GameTooltip:Hide()
