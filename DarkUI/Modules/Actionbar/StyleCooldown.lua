@@ -26,9 +26,6 @@ local MIN_DELAY = 0.01
 
 local cfg = C.actionbar.styles.cooldown
 
-local Timer = {}
-local timers = {}
-
 --returns both what text to display, and how long until the next update
 local function getTimeText(s)
     --format text as seconds when at 90 seconds or below
@@ -49,10 +46,6 @@ local function getTimeText(s)
         local days = round(s / DAY)
         return cfg.daysFormat, days, days > 1 and (s - (days * DAY - HALFDAYISH)) or (s - DAYISH)
     end
-end
-
-function Timer.SetNextUpdate(self, duration)
-    C_Timer_After(max(duration, MIN_DELAY), self.OnTimerDone)
 end
 
 --stops the timer
@@ -157,12 +150,16 @@ local function setHideCooldownNumbers(cooldown, hide)
 	end
 end
 
-hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, modRate)
+hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, ...)
 	if cooldown.noCooldownCount or cooldown:IsForbidden() or hideNumbers[cooldown] then return end
 
-	local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
+	local show = (start and start > 0) and (duration and duration > cfg.minDuration) -- and (modRate == nil or modRate > 0)
 
 	if show then
+        cooldown:SetDrawBling(cfg.drawBling)
+        cooldown:SetDrawSwipe(cfg.drawSwipe)
+        cooldown:SetDrawEdge(cfg.drawEdge)
+        
 		local parent = cooldown:GetParent()
 		if parent and parent.chargeCooldown == cooldown then return end
 

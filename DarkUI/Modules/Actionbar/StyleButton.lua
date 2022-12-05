@@ -207,6 +207,7 @@ local function StyleActionButton(button, cfg)
     if button.IconMask then button.IconMask:Hide() end
     if NormalTexture then NormalTexture:SetAlpha(0) end
     if button.SpellHighlightTexture then button.SpellHighlightTexture:SetOutside() end
+    if button.QuickKeybindHighlightTexture then button.QuickKeybindHighlightTexture:SetTexture("") end
 
     --backdrop
     SetupBackdrop(icon)
