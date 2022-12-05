@@ -124,9 +124,6 @@ local function Timer_Create(cooldown)
     Timer_OnSizeChanged(timer, scaler:GetSize())
     scaler:SetScript("OnSizeChanged", function(_, ...) Timer_OnSizeChanged(timer, ...) end)
 
-    -- prevent display of blizzard cooldown text
-    cooldown:SetHideCountdownNumbers(true)
-
     cooldown.timer = timer
     return timer
 end
@@ -153,7 +150,7 @@ end
 hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, ...)
 	if cooldown.noCooldownCount or cooldown:IsForbidden() or hideNumbers[cooldown] then return end
 
-	local show = (start and start > 0) and (duration and duration > cfg.minDuration) -- and (modRate == nil or modRate > 0)
+	local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
 
 	if show then
         cooldown:SetDrawBling(cfg.drawBling)
