@@ -332,6 +332,8 @@ function Implementation:GetItemInfo(bagID, slotID, i)
 		elseif MYTHIC_KEYSTONES[i.id] then
 			i.level, i.name = strmatch(i.link, "|H%w+:%d+:%d+:(%d+):.-|h%[(.-)%]|h")
 			i.level = tonumber(i.level) or 0
+		else
+			i.level = GetDetailedItemLevelInfo(i.link) or 0
 		end
 	end
 
