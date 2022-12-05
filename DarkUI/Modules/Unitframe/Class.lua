@@ -157,7 +157,7 @@ local CreateClassPoint = function(self, i)
     fg:SetPoint("BOTTOM", 0, 0)
     fg:SetPoint("LEFT", 0, 0)
     fg:SetPoint("RIGHT", 0, 0)
-    fg:SetSize(70,70) -- this is overriden by the points above
+    fg:SetSize(42,42) -- this is overriden by the points above
     fg:SetBlendMode("ADD")
     fg:SetTexture(cfg.mediaPath .. "uf_class_point")
     fg:SetTexCoord((i-1)*128/1024, i*128/1024, 256/512, 384/512)

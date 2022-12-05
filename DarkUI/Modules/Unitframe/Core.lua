@@ -133,7 +133,7 @@ local function setBarTicks(Castbar, ticks, numTicks)
     end
 end
 
-local function updateCastbarColor(Castbar, unit)
+function DUF.updateCastbarColor(Castbar, unit)
     if not UnitIsUnit(unit, "player") and Castbar.notInterruptible then
         Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
         Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
@@ -156,7 +156,7 @@ function DUF.PostCastStart(Castbar, unit, _, _)
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
     end
 
-    updateCastbarColor(Castbar, unit)
+    DUF.updateCastbarColor(Castbar, unit)
 end
 
 function DUF.PostCastFail(Castbar, ...)
@@ -174,7 +174,7 @@ function DUF.PostCastStop(Castbar, unit, spellname, _)
 end
 
 function DUF.PostCastInterruptible(Castbar, unit)
-    updateCastBarColor(Castbar, unit)
+    DUF.updateCastBarColor(Castbar, unit)
 end
 
 ------------------------------------------------------------------
