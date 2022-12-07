@@ -696,8 +696,13 @@ local function style(self, unit)
 
     self.Castbar.Icon.border = self.Castbar:CreateTexture(nil, "BORDER")
     self.Castbar.Icon.border:SetTexture(C.media.texture.border)
-    self.Castbar.Icon.border:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -6, 6)
-    self.Castbar.Icon.border:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", 6, -6)
+    self.Castbar.Icon.border:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -4, 4)
+    self.Castbar.Icon.border:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", 4, -4)
+    -- self.Castbar.Icon.border:SetTexCoord(0, 1, 0, 1)
+    -- self.Castbar.Icon.border:SetDrawLayer("BACKGROUND", -7)
+    -- self.Castbar.Icon.border:ClearAllPoints()
+    -- self.Castbar.Icon.border:SetAllPoints(self.Castbar.Icon)
+    -- self.Castbar.Icon.border:SetVertexColor(0.25, 0.25, 0.25)
 
     self.Castbar.Icon.glowFrame = CreateFrame("Frame", nil, self)
     self.Castbar.Icon.glowFrame:SetPoint("CENTER", self.Castbar.Icon, "CENTER")
@@ -729,9 +734,6 @@ local function style(self, unit)
 
     -- Healer Icon
     if cfg.healer_icon == true then
-        -- self.HPHeal = self.Health:CreateFontString(nil, "OVERLAY")
-        -- self.HPHeal:SetFont(C.media.standard_font[1], 32, C.media.standard_font[2])
-        -- self.HPHeal:SetText("|cFFD53333+|r")
         self.HPHeal = self.Health:CreateTexture(nil, "OVERLAY")
         self.HPHeal:SetSize(16, 16)
         self.HPHeal:SetTexture(C.media.path .. "icon_healer")

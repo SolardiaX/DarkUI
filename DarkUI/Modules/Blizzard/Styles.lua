@@ -669,12 +669,11 @@ end)
 
 --add shadow for UIParent
 local shadow = CreateFrame("Frame", nil, UIParent)
-shadow:SetPoint("TOPLEFT")
-shadow:SetPoint("BOTTOMRIGHT")
+shadow:SetAllPoints(UIParent)
 shadow:SetFrameLevel(0)
 shadow:SetFrameStrata("BACKGROUND")
 
 shadow.tex = shadow:CreateTexture()
 shadow.tex:SetTexture(C.media.texture.shadow_background)
-shadow.tex:SetAllPoints()
+shadow.tex:SetAllPoints(shadow)
 shadow.tex:SetAlpha(.50)

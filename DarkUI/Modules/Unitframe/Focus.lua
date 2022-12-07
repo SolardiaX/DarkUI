@@ -227,16 +227,16 @@ local createAuraIcon = function(self)
     f.size = 28
     f.spacing = 4
     f.gap = true
-    f.initialAnchor = 'LEFT'
+    f.initialAnchor = 'RIGHT'
     f.onlyShowPlayer = cfg.focus.aura.player_aura_only
     f.showStealableBuffs = cfg.focus.aura.show_stealable_buffs
-    f['growth-x'] = 'RIGHT'
+    f['growth-x'] = 'LEFT'
     f['growth-y'] = 'DOWN'
 
     local h = (f.size + f.spacing) * 6
     local w = (f.size + f.spacing) * 4
     f:SetSize(h, w)
-    f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -20, 10)
+    f:SetPoint('RIGHT', self, 'LEFT', -40, 0)
 
     f.PostCreateButton = DUF.PostCreateIcon
     f.PostUpdateButton = DUF.PostUpdateIcon
