@@ -64,7 +64,6 @@ MinimapCluster:EnableMouse(false)
 -- Hide Border
 MinimapCompassTexture:Hide()
 MinimapCluster.BorderTop:StripTextures()
-MinimapBackdrop:Hide()
 -- Hide Zoom Buttons
 Minimap.ZoomIn:Kill()
 Minimap.ZoomOut:Kill()
@@ -140,12 +139,16 @@ frame:SetScript("OnEvent", function(self, event)
     MinimapCluster.MailFrame:SetPoint(unpack(cfg.iconpos.mail))
 
     -- Move Garrison icon
-    hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIconForGarrison", function()
+    local updateGrarrion = function()
         ExpansionLandingPageMinimapButton:SetParent(Minimap)
         ExpansionLandingPageMinimapButton:ClearAllPoints()
         ExpansionLandingPageMinimapButton:SetPoint(unpack(cfg.iconpos.garrison))
         ExpansionLandingPageMinimapButton:SetScale(0.6)
-    end)
+    end
+
+    updateGrarrion()
+    ExpansionLandingPageMinimapButton:HookScript("OnShow", updateGrarrion)
+    hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIconForGarrison", updateGrarrion)
 end)
 
 --create rotating cogwheel texture

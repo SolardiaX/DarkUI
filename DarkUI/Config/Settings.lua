@@ -458,7 +458,7 @@ C.map = {
         iconSize = 20, -- default icon size on minimap
         iconpos  = {
             mail  = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -30, -8 }, -- position of mail icon
-            garrison = { "TOPRIGHT", Minimap, "TOPRIGHT", -32, 14 }, -- position of garrison icon
+            garrison = { "CENTER", Minimap, "TOPRIGHT", -64, -20 }, -- position of garrison icon
             queue = { "RIGHT", Minimap, "LEFT", 40, -50  }, -- position of queue icon
             instance = { "TOPRIGHT", Minimap, "TOPRIGHT", 20, 20 }, -- position of instance difficultye
             time = { "BOTTOM", Minimap, "BOTTOM", 1, 1 }, -- position of game time
@@ -715,8 +715,11 @@ C.unitframe = {
         unitsPerColumn = 5,
         showPlayer     = true,
         showSolo       = false,
+        aura           = {
+            player_aura_only     = true
+        },
         fader          = {
-            Range = {
+            Range  = {
                 insideAlpha  = 1,
                 outsideAlpha = 0.5
             }
