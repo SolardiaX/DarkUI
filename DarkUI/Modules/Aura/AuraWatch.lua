@@ -758,7 +758,7 @@ function module:Active()
                         value[i].Spellname:SetText("")
                     end
                     if value[i].bg then
-                        HideOverlayGlow(value[i].bg)
+                        LBG.HideOverlayGlow(value[i].bg)
                     end
                 end
                 value[1].MoveHandle:Show()
