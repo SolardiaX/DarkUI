@@ -6,6 +6,8 @@ if not C.nameplate.enable then return end
 ----------------------------------------------------------------------------------------
 --	oUF nameplates
 ----------------------------------------------------------------------------------------
+local LBG = LibStub("LibButtonGlow-1.0", true)
+
 local oUF = ns.oUF
 
 local cfg = C.nameplate
@@ -389,9 +391,9 @@ end
 -- Cast color
 local function castColor(self)
     if C.nameplate.majorSpells[self.spellID] then
-        ShowOverlayGlow(self.Icon.glowFrame)
+        LBG.ShowOverlayGlow(self.Icon.glowFrame)
     else
-        HideOverlayGlow(self.Icon.glowFrame)
+        LBG.HideOverlayGlow(self.Icon.glowFrame)
     end
 
     if self.notInterruptible then

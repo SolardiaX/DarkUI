@@ -5,6 +5,7 @@ if not C.aura.auraWatch.enable then return end
 ----------------------------------------------------------------------------------------
 --	AuraWatch (Modified from NDUI)
 ----------------------------------------------------------------------------------------
+local LBG = LibStub("LibButtonGlow-1.0", true)
 
 local CreateFrame = CreateFrame
 local InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
@@ -447,9 +448,9 @@ function module:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, 
     end
     if frame.bg then
         if flash then
-            ShowOverlayGlow(frame.bg)
+            LBG.ShowOverlayGlow(frame.bg)
         else
-            HideOverlayGlow(frame.bg)
+            LBG.HideOverlayGlow(frame.bg)
         end
     end
     frame.type = 4
