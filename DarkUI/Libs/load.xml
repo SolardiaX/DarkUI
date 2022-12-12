@@ -8,9 +8,6 @@
 
     <!-- oUF -->
     <Include file="oUF\load.xml" />
-
-    <!-- LibButtonGlow -->
-    <Script file="LibButtonGlow.lua" />
     
     <!-- cargBags -->
     <Include file="cargBags\load.xml" />

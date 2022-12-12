@@ -87,14 +87,14 @@ local bars = {
         }
     },
     bar2             = {
-        pos    = { "BOTTOM", "DarkUI_ActionBar1Holder", "TOP", -2.5, 22 },
+        pos    = { "BOTTOM", "DarkUI_ActionBar1", "TOP", -2.5, 22 },
         button = {
             size  = 33,
             space = 7.6
         }
     },
     bar3             = {
-        pos    = { "BOTTOM", "DarkUI_ActionBar2Holder", "TOP", 0, 12 },
+        pos    = { "BOTTOM", "DarkUI_ActionBar2", "TOP", 0, 12 },
         button = {
             size  = 33,
             space = 7.6
@@ -140,7 +140,7 @@ local bars = {
         }
     },
     barpet           = {
-        pos             = { "BOTTOM", "DarkUI_ActionBar3Holder", "TOP", 0, 10 },
+        pos             = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
         button          = {
             size  = 24,
             space = 6
@@ -149,7 +149,7 @@ local bars = {
         fader_combat    = fader_combat
     },
     barstance        = {
-        pos             = { "BOTTOM", "DarkUI_ActionBar3Holder", "TOP", 0, 10 },
+        pos             = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
         button          = {
             size  = 24,
             space = 6
@@ -206,7 +206,7 @@ local bars = {
         scale              = 1,
         width              = 408,
         height             = 8,
-        pos                = { "BOTTOM", "DarkUI_ActionBar1Holder", "BOTTOM", 0, -15 },
+        pos                = { "BOTTOM", "DarkUI_ActionBar1", "BOTTOM", 0, -15 },
         autoswitch         = true,
         disable_at_max_lvl = false,
         bflevel            = 1,
@@ -221,7 +221,7 @@ local bars = {
         scale             = 1,
         width             = 408,
         height            = 8,
-        pos               = { "BOTTOM", "DarkUI_ActionBar1Holder", "BOTTOM", 0, -23 },
+        pos               = { "BOTTOM", "DarkUI_ActionBar1", "BOTTOM", 0, -23 },
         only_at_max_level = false,
         bflevel           = 1,
         bfstrata          = "BACKGROUND",

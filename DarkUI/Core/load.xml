@@ -8,5 +8,5 @@
     <Script file="Variable.lua"/>
     <Script file="Options.lua"/>
     <Script file="Align.lua"/>
-    <!--Script file="Module.lua"/-->
+    <Script file="Module.lua"/>
 </Ui>

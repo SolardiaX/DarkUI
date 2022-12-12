@@ -17,7 +17,7 @@ local num = NUM_ACTIONBAR_BUTTONS
 local function StyleMerged()
     local buttonList = {}
 
-    local bar = _G["DarkUI_ActionBar4Holder"]
+    local bar = _G["DarkUI_ActionBar4"]
     bar:SetWidth(cfg.button.size * 2 + 4)
 
     _G.MultiBarLeft:SetParent(bar)

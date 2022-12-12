@@ -15,7 +15,7 @@ local UIParent = _G.UIParent
 local cfg = C.actionbar.bars.bar1
 local num = NUM_ACTIONBAR_BUTTONS
 
-local bar = CreateFrame("Frame", "DarkUI_ActionBar1Holder", UIParent, "SecureHandlerStateTemplate")
+local bar = CreateFrame("Frame", "DarkUI_ActionBar1", UIParent, "SecureHandlerStateTemplate")
 bar:SetPoint(unpack(cfg.pos))
 bar:SetHeight(cfg.button.size)
 bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)

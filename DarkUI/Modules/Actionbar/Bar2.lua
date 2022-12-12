@@ -17,10 +17,10 @@ local num = NUM_ACTIONBAR_BUTTONS
 if C.general.liteMode then
     cfg.button.space = 6.15
     cfg.button.size = 28
-    cfg.pos = { "BOTTOM", "DarkUI_ActionBar1Holder", "TOP", -2.5, 27 }
+    cfg.pos = { "BOTTOM", "DarkUI_ActionBar1", "TOP", -2.5, 27 }
 end
 
-local bar = CreateFrame("Frame", "DarkUI_ActionBar2Holder", UIParent, "SecureHandlerStateTemplate")
+local bar = CreateFrame("Frame", "DarkUI_ActionBar2", UIParent, "SecureHandlerStateTemplate")
 bar:SetPoint(unpack(cfg.pos))
 bar:SetHeight(cfg.button.size)
 bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)

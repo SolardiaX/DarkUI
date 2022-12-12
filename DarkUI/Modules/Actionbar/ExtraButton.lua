@@ -4,25 +4,25 @@ local ExtraButtons_PREFIX = "DarkUIExtraButtons_"
 local ExtraButtons = {
     [1] = {
         name   = "MainLeft",
-        parent = "DarkUI_ActionBar1HolderBG",
+        parent = "DarkUI_ActionBar1BG",
         pos    = { "TOPRIGHT", _G["ActionButton1"], "TOPLEFT", -10, 7 },
         size   = { 56, 56 }
     },
     [2] = {
         name   = "MainRight",
-        parent = "DarkUI_ActionBar1HolderBG",
+        parent = "DarkUI_ActionBar1BG",
         pos    = { "TOPLEFT", _G["ActionButton12"], "TOPRIGHT", 10.5, 7 },
         size   = { 56, 56 }
     },
     [3] = {
         name   = "TopLeft",
-        parent = "DarkUI_ActionBar3HolderBG",
+        parent = "DarkUI_ActionBar3BG",
         pos    = { "TOPRIGHT", _G["MultiBarBottomRightButton1"], "TOPLEFT", -36, -41 },
         size   = { 56, 56 }
     },
     [4] = {
         name   = "TopRight",
-        parent = "DarkUI_ActionBar3HolderBG",
+        parent = "DarkUI_ActionBar3BG",
         pos    = { "TOPLEFT", _G["MultiBarBottomRightButton12"], "TOPRIGHT", 35, -41 },
         size   = { 56, 56 }
     }

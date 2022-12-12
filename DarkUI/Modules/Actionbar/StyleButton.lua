@@ -139,7 +139,7 @@ local function SetupCooldown(cooldown, cfg)
 end
 
 local function SetupBackdrop(button, backdrop)
-    if not backdrop then return end
+    if not backdrop or button.backdrop then return end
 
     button:CreateBackdrop()
     local bg = button.backdrop
@@ -155,12 +155,12 @@ local function SetupBackdrop(button, backdrop)
 end
 
 local function updateEquipItemColor(button)
-    if not button.__bg then return end
+    if not button.backdrop then return end
 
     if IsEquippedAction(button.action) then
-        button.__bg:SetBackdropBorderColor(0, .7, .1)
+        button.backdrop:SetBackdropBorderColor(0, .7, .1)
     else
-        button.__bg:SetBackdropBorderColor(0, 0, 0)
+        button.backdrop:SetBackdropBorderColor(0, 0, 0)
     end
 end
 
@@ -451,7 +451,7 @@ actionButtonConfig.highlightTexture = {
 --cooldown
 if C.actionbar.styles.buttons.showCooldown then
     actionButtonConfig.cooldown = {
-        font   = { STANDARD_TEXT_FONT, 15, "OUTLINE" },
+        font   = { STANDARD_TEXT_FONT, 16, "OUTLINE" },
         points = {
             { "TOPLEFT", 0, 0 },
             { "BOTTOMRIGHT", 0, 0 }

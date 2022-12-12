@@ -128,9 +128,25 @@ end)
 --	Load all Modules
 ----------------------------------------------------------------------------------------
 local Loader = M:Module("Loader")
-Loader:RegisterEvent("ADDON_LOADED PLAYER_ENTERING_WORLD", function(event, addon)
+Loader:RegisterEvent("ADDON_LOADED PLAYER_LOGIN PLAYER_ENTERING_WORLD", function(event, addon)
     if event == "ADDON_LOADED" and addon == E.addonName then
         if not SavedOptionsPerChar then SavedOptionsPerChar = {} end
+    elseif event == "PLAYER_LOGIN" then
+        local function init(module)
+            if module.Init then
+                module:Init()
+            end
+
+            if module.sub then
+                for _, name in ipairs(module.suborders) do
+                    init(module.sub[name])
+                end
+            end
+        end
+
+        for _, module in next, modules do
+            init(module)
+        end
     elseif event == "PLAYER_ENTERING_WORLD" then
         local function active(module)
             if module.Active then
