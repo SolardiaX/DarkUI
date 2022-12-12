@@ -108,6 +108,7 @@ ns.OptionList[4] = { -- UnitFrame
     {},
     { 1, 'unitframe', 'party.showPlayer', L_OPT_UF_PARTY_SHOWPLAYER, false },
     { 1, 'unitframe', 'party.showSolo', L_OPT_UF_PARTY_SHOWSOLO, false },
+    { 1, 'unitframe', 'party.aura.player_aura_only', L_OPT_UF_PARTY_PLAYER_AURA_ONLY, false },
     {},
     { 1, 'unitframe', 'raid.enable', L_OPT_UF_RAID_ENABLE, false },
     { 1, 'unitframe', 'raid.colorHealth', L_OPT_UF_RAID_COLORHEALTH, false },

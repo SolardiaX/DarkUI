@@ -202,7 +202,7 @@ function DUF.PostCreateIcon(_, button)
     button:CreateTextureBorder()
     button:CreateShadow()
 
-    button.Overlay.Hide = E.dummy
+    -- button.Overlay.Hide = E.dummy
 end
 
 function DUF.PostUpdateIcon(element, button, unit, data)

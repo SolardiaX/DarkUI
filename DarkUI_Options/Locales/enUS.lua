@@ -58,17 +58,18 @@ L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC = 'Enable Diabloic class resource bar (Combopo
 L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD = 'Enable Blizzard class resource bar (Combopoints/Runes/Soul Shards/...)'
 --
 L_OPT_UF_TARGET_COLORHEALTH = 'Color health by class with target frame'
-L_OPT_UF_TARGET_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with target frame (includes boss buff)'
+L_OPT_UF_TARGET_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with target frame (includes boss buff/debuff)'
 L_OPT_UF_TARGET_SHOW_STEALABLE_BUFFS = 'Show stealable buff with target frame'
 --
-L_OPT_UF_FOCUS_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with focus frame (includes boss buff)'
+L_OPT_UF_FOCUS_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with focus frame (includes boss buff/debuff)'
 L_OPT_UF_FOCUS_SHOW_STEALABLE_BUFFS = 'Show stealable buff with focus frame'
 --
-L_OPT_UF_BOSS_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with boss frame (includes boss buff)'
+L_OPT_UF_BOSS_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with boss frame (includes boss buff/debuff)'
 L_OPT_UF_BOSS_SHOW_STEALABLE_BUFFS = 'Show stealable buff with boss frame'
 --
 L_OPT_UF_PARTY_SHOWPLAYER = 'Show player in party frames'
 L_OPT_UF_PARTY_SHOWSOLO = 'Show party frames in solo'
+L_OPT_UF_PARTY_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with party frame (includes boss buff/debuff)'
 --
 L_OPT_UF_RAID_ENABLE = 'Enable raid frames'
 L_OPT_UF_RAID_COLORHEALTH = 'Color health by class with raid frames'

@@ -222,6 +222,29 @@ local createThreatType = function(self)
     tinsert(self.__elements, event_handler)
 end
 
+local createAuraIcon = function(self)
+    local f = CreateFrame('Frame', nil, self)
+
+    f.size = 28
+    f.spacing = 4
+    f.gap = true
+    f.initialAnchor = 'LEFT'
+    f.onlyShowPlayer = cfg.party.aura.player_aura_only
+    f['growth-x'] = 'RIGHT'
+    f['growth-y'] = 'DOWN'
+
+    local h = (f.size + f.spacing) * 6
+    local w = (f.size + f.spacing) * 4
+    f:SetSize(h, w)
+    f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -10, -20)
+
+    f.PostCreateButton = DUF.PostCreateIcon
+    f.PostUpdateButton = DUF.PostUpdateIcon
+    f.FilterAura = DUF.FilterAuras
+
+    self.Auras = f
+end
+
 local createStyle = function(self)
     self.colors = C.oUF_colors
     self.cUnit = "party"
@@ -237,6 +260,7 @@ local createStyle = function(self)
     createPortrait(self)
     createTag(self)
     createThreatType(self)
+    createAuraIcon(self)
 
     self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
