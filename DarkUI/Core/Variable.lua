@@ -61,7 +61,7 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         SetCVar("nameplateShowEnemies", 1)
         
         -- force use keyUp to trigger actionbar buttion
-        SetCVar("ActionButtonUseKeyDown", 0)
+        -- SetCVar("ActionButtonUseKeyDown", 0)
         -- Hide blizz options
         SetCVar("multiBarRightVerticalLayout", 0)
 
