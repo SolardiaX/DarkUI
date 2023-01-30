@@ -137,11 +137,11 @@ function addon:LOOT_OPENED(_, ...)
         slot.name:SetText(EMPTY)
         slot.name:SetTextColor(color.r, color.g, color.b)
         slot.icon:SetTexture("Interface\\Icons\\INV_Misc_Herb_AncientLichen")
-
+        slot.quest:Hide()
         slot.count:Hide()
         slot.drop:Hide()
         slot:Disable()
-        slot:Show()
+        slot:Hide()
     end
     self:AnchorSlots()
 

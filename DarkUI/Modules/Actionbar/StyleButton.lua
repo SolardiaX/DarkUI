@@ -210,8 +210,8 @@ local function StyleActionButton(button, cfg)
     if button.QuickKeybindHighlightTexture then button.QuickKeybindHighlightTexture:SetTexture("") end
 
     --backdrop
-    SetupBackdrop(icon)
-    equipItemColor(button)
+    -- SetupBackdrop(icon)
+    -- equipItemColor(button)
 
     --textures
     SetupTexture(icon, cfg.icon, "SetTexture", icon)

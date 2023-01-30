@@ -141,8 +141,8 @@ module:Inject("Gold", {
 
         if C.stats.currency_professions then
             titleName = TRADE_SKILLS
-            Currency(910)    -- Secret of Draenor Alchemy
-            Currency(999)    -- Secret of Draenor Tailoring
+            Currency(910)     -- Secret of Draenor Alchemy
+            Currency(999)     -- Secret of Draenor Tailoring
             Currency(1008)    -- Secret of Draenor Jewelcrafting
             Currency(1017)    -- Secret of Draenor Leatherworking
             Currency(1020)    -- Secret of Draenor Blacksmithing

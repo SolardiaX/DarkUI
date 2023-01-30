@@ -59,9 +59,9 @@ function Extra:CreateButton(index, config)
     local name = ExtraButtons_PREFIX .. config.name
 
     local bar = CreateFrame("Frame", name .. "Bar", _G[config.parent], "SecureHandlerStateTemplate")
+    bar:SetID(0)
     bar:SetFrameStrata("MEDIUM")
     bar:SetSize(unpack(C.general.liteMode and ExtraButtons_Lite_Size[index] or config.size))
-    bar:SetID(0)
     bar:SetPoint(unpack(C.general.liteMode and ExtraButtons_Lite_Pos[index] or config.pos))
 
     local button = CreateFrame("CheckButton", name .. "Button", bar, "ActionBarButtonTemplate")
@@ -72,7 +72,6 @@ function Extra:CreateButton(index, config)
     button:SetScript("OnLeave", Button_OnLeave)
     button:SetAttribute('showgrid', 1)
     button:SetAttribute('type', 'action')
-    --button:SetAttribute("action", 113 + index)
     if E.class == "DRUID" then
         button:SetAttribute('action', index + 92)
     else
