@@ -1,186 +1,138 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
+--	EtraButton
+----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("ExtraButton")
+local actionButton = LibStub("DarkUI-ActionButton")
+local LAB = LibStub("LibActionButton-1.0")
+
+local _G = _G
+local CreateFrame = CreateFrame
+local InCombatLockdown = InCombatLockdown
+local HasAction = HasAction
+local GetCVar = GetCVar
+local C_PetBattles_IsInBattle = C_PetBattles.IsInBattle
+local GameTooltip = _G.GameTooltip
+local hooksecurefunc = hooksecurefunc
+local unpack, pairs, tonumber, tinsert, twipe = unpack, pairs, tonumber, table.insert, table.wipe
+
 local ExtraButtons_PREFIX = "DarkUIExtraButtons_"
 local ExtraButtons = {
     [1] = {
         name   = "MainLeft",
-        parent = "DarkUI_ActionBar1BG",
-        pos    = { "TOPRIGHT", _G["ActionButton1"], "TOPLEFT", -10, 7 },
-        size   = { 56, 56 }
+        bindName = "DarkUIExtraButtonsMainLeftButton", flyout="LEFT",
+        parent = "DarkUI_ActionBar1",
+        pos    = { "TOPRIGHT", "DarkUI_ActionBar1Button1", "TOPLEFT", -10, 7 },
+        size   = 56
     },
     [2] = {
         name   = "MainRight",
-        parent = "DarkUI_ActionBar1BG",
-        pos    = { "TOPLEFT", _G["ActionButton12"], "TOPRIGHT", 10.5, 7 },
-        size   = { 56, 56 }
+        bindName = "DarkUIExtraButtonsMainRightButton", flyout="RIGHT",
+        parent = "DarkUI_ActionBar1",
+        pos    = { "TOPLEFT", "DarkUI_ActionBar1Button12", "TOPRIGHT", 11, 7 },
+        size   = 56
     },
     [3] = {
         name   = "TopLeft",
-        parent = "DarkUI_ActionBar3BG",
-        pos    = { "TOPRIGHT", _G["MultiBarBottomRightButton1"], "TOPLEFT", -36, -41 },
-        size   = { 56, 56 }
+        bindName = "DarkUIExtraButtonsTopLeftButton", flyout="UP",
+        parent = "DarkUI_ActionBar2",
+        pos    = { "BOTTOMRIGHT", "DarkUIExtraButtons_MainLeftBar", "TOPLEFT", -11, -3 },
+        size   = 56
     },
     [4] = {
         name   = "TopRight",
-        parent = "DarkUI_ActionBar3BG",
-        pos    = { "TOPLEFT", _G["MultiBarBottomRightButton12"], "TOPRIGHT", 35, -41 },
-        size   = { 56, 56 }
+        bindName = "DarkUIExtraButtonsTopRightButton", flyout="UP",
+        parent = "DarkUI_ActionBar2",
+        pos    = { "BOTTOMLEFT", "DarkUIExtraButtons_MainRightBar", "TOPRIGHT", 7, -3 },
+        size   = 56
     }
 }
 
 local ExtraButtons_Lite_Pos = {
-    [1] = { "TOPRIGHT", _G["ActionButton1"], "TOPLEFT", -12.5, 4 },
-    [2] = { "TOPLEFT", _G["ActionButton12"], "TOPRIGHT", 14.5, 4 },
-    [3] = { "TOPRIGHT", _G["MultiBarBottomLeftButton1"], "TOPLEFT", -11.5, 8 },
-    [4] = { "TOPLEFT", _G["MultiBarBottomLeftButton12"], "TOPRIGHT", 14.5, 8 },
+    [1] = { "TOPRIGHT", "DarkUI_ActionBar1Button1", "TOPLEFT", -11, 6 },
+    [2] = { "TOPLEFT", "DarkUI_ActionBar1Button12", "TOPRIGHT", 12, 6 },
+    [3] = { "BOTTOM", "DarkUIExtraButtons_MainLeftButton", "TOP", 1, 5 },
+    [4] = { "BOTTOM", "DarkUIExtraButtons_MainRightButton", "TOP", 2, 5 },
 }
 
 local ExtraButtons_Lite_Size = {
-    [1] = { 51, 51 },
-    [2] = { 51, 51 },
-    [3] = { 51, 51 },
-    [4] = { 51, 51 },
+    [1] = 55,
+    [2] = 55,
+    [3] = 50,
+    [4] = 50,
 }
 
-local function Button_OnEnter(self)
-    --ActionButton_SetTooltip(self)
-    self:SetTooltip()
-end
+local function createBar(cfg, index)
+    if not _G[cfg.parent] then return end
 
-local function Button_OnLeave(self)
-    GameTooltip:Hide()
-end
+    local name = ExtraButtons_PREFIX .. cfg.name
+    local bar = CreateFrame("Frame", name .. "Bar", _G[cfg.parent], "SecureHandlerStateTemplate")
 
---[[ Create ]]
-local Extra = CreateFrame("Frame", nil, UIParent, "SecureFrameTemplate")
-Extra.buttons = {}
+    bar.buttons = {}
+    bar.flyoutDirection = cfg.flyout
 
-function Extra:CreateButton(index, config)
-    local name = ExtraButtons_PREFIX .. config.name
+    bar:SetPoint(unpack(cfg.pos))
+    bar:SetSize(cfg.size, cfg.size)
 
-    local bar = CreateFrame("Frame", name .. "Bar", _G[config.parent], "SecureHandlerStateTemplate")
-    bar:SetID(0)
-    bar:SetFrameStrata("MEDIUM")
-    bar:SetSize(unpack(C.general.liteMode and ExtraButtons_Lite_Size[index] or config.size))
-    bar:SetPoint(unpack(C.general.liteMode and ExtraButtons_Lite_Pos[index] or config.pos))
+    local button = actionButton:CreateButton(bar, index, cfg.size, cfg.bindName, name .. "Button")
+    button:SetAllPoints(bar)
+    
+    tinsert(bar.buttons, button)
 
-    local button = CreateFrame("CheckButton", name .. "Button", bar, "ActionBarButtonTemplate")
+    bar:SetAttribute("_onstate-page", [[
+        self:SetAttribute("state", newstate)
+        control:ChildUpdate("state", newstate)
+    ]])
 
-    button:SetID(0)
-    button:SetAllPoints()
-    button:SetScript("OnEnter", Button_OnEnter)
-    button:SetScript("OnLeave", Button_OnLeave)
-    button:SetAttribute('showgrid', 1)
-    button:SetAttribute('type', 'action')
-    if E.class == "DRUID" then
-        button:SetAttribute('action', index + 92)
-    else
-        button:SetAttribute('action', index + 107)
-    end
-
-    Extra.buttons[name] = button
-end
-
-function Extra:Init()
-    for index, config in pairs(ExtraButtons) do
-        Extra:CreateButton(index, config)
-    end
-
-    local cvar = GetCVar("alwaysShowActionBars") or "0"
-    Extra.showgrid = tonumber(cvar)
-
-    -- add events for grid, must after bars initial
-    self:RegisterEvent("ACTIONBAR_SHOWGRID")
-    self:RegisterEvent("ACTIONBAR_HIDEGRID")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    -- hooks for grid
-    hooksecurefunc("MultiActionBar_ShowAllGrids", function()
-        Extra.showgrid = 1
-        Extra:UpdateGrid()
+    LAB.RegisterCallback(bar, "OnButtonUpdate", function(_, button)
+        button:SetAlpha(1)
     end)
-    hooksecurefunc("MultiActionBar_HideAllGrids", function()
-        Extra.showgrid = 0
-        Extra:UpdateGrid()
-    end)
+
+    return bar
 end
 
-function Extra:OnEvent(event, ...)
-    if event == "PLAYER_REGEN_ENABLED" then
-        if InCombatLockdown() then
-        else
-            self:CallAfterCombat()
+function module:OnInit()
+    self.bars = {}
+
+    local locked = GetCVar("lockActionBars")
+    local index = E.myClass == "DRUID" and 92 or 107
+
+    for i = 1, 4 do
+        local cfg = ExtraButtons[i]
+
+        if C.general.liteMode then
+            cfg.pos = ExtraButtons_Lite_Pos[i]
+            cfg.size = ExtraButtons_Lite_Size[i]
         end
-    else
-        self:OnUpdateGridEvent(event)
+        
+        local bar = createBar(cfg, i+index)
+        
+        self.bars[cfg.name] = bar
     end
-end
 
-Extra:SetScript("OnEvent", Extra.OnEvent)
+    actionButton:UpdateBarConfig(self.bars)
 
-function Extra:OnUpdateGridEvent(event, ...)
-    -- event stuff
-    if event == "ACTIONBAR_SHOWGRID" then
-        Extra.showgrid = 1
-    elseif event == "ACTIONBAR_HIDEGRID" then
-        Extra.showgrid = 0
+    if C_PetBattles_IsInBattle() then
+        actionButton:ClearBindings(self.bars)
     else
-        self:SafeCallFunc(self.UpdateGrid)
+        actionButton:ReassignBindings(self.bars)
     end
-end
 
-function Extra:UpdateGrid()
-    -- in combat we can't let it be shown or hidden
-    if InCombatLockdown() then return end
-
-    if GetCVar("alwaysShowActionBars") == "1" then Extra.showgrid = 1 end
-
-    for _, button in pairs(Extra.buttons) do
-        button:SetAttribute("showgrid", Extra.showgrid)
-
-        if Extra.showgrid > 0 then
-            if not button:GetAttribute("statehidden") then
-                button:Show()
-                _G[button:GetName() .. "NormalTexture"]:SetVertexColor(1.0, 1.0, 1.0, 0.5)
+    self:RegisterEvent("CVAR_UPDATE", function(_, _, var, value)
+        if var == "lockActionBars" then
+            if InCombatLockdown() then
+                self:RegisterEventOnce("PLAYER_REGEN_ENABLED", function()
+                    actionButton:UpdateBarConfig(self.bars)
+                    -- toggleLock(value)
+                end)
+            else
+                actionButton:UpdateBarConfig(self.bars)
+                -- toggleLock(value)
             end
-        elseif not HasAction(button.action) then
-            button:Hide()
         end
-    end
+    end)
+
+    self:RegisterEvent("UPDATE_BINDINGS PET_BATTLE_CLOSE", function() actionButton:ReassignBindings(self.bars) end)
+    self:RegisterEvent("PET_BATTLE_OPENING_DONE", function() actionButton:ClearBindings(self.bars) end)
 end
-
-Extra.AfterCombatCallList = {}
-
-function Extra:InitAfterCombat()
-    self:RegisterEvent("PLAYER_REGEN_ENABLED")
-end
-
-function Extra:RegisterSafeCallObj(func, ...)
-    --self.AfterCombatCallList[tostring(func)] = {func, {...}}
-    table.insert(self.AfterCombatCallList, { func, { ... } })
-end
-
-function Extra:SafeCallFunc(func, ...)
-    assert(type(func) == 'function',
-           'Wrong param for Extra.SafeCallFunc, need a function type, got ' .. type(func))
-
-    if InCombatLockdown() then
-        Extra:RegisterSafeCallObj(func, ...)
-    else
-        func(...)
-    end
-end
-
-function Extra:CallAfterCombat()
-    local index, pack
-    for index, pack in pairs(self.AfterCombatCallList) do
-        pack[1](unpack(pack[2]))
-    end
-
-    table.wipe(self.AfterCombatCallList)
-end
-
--- self init
-Extra:Init()
-
--- init AfterCombat Events
-Extra:InitAfterCombat()

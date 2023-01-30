@@ -1,7 +1,8 @@
+local E, C, L = select(2, ...):unpack()
+
 ----------------------------------------------------------------------------------------
 --	Configuration of CombatText AoeSpam
 ----------------------------------------------------------------------------------------
-local E, C, L = select(2, ...):unpack()
 
 local pairs, tinsert, unpack = pairs, tinsert, unpack
 
@@ -57,7 +58,7 @@ end
 
 function C.aura:AddClassSpells(list)
     for class, value in pairs(list) do
-        if class == "ALL" or class == E.class then
+        if class == "ALL" or class == E.myClass then
             C.aura.raidBuffs[class] = value
         end
     end
@@ -76,7 +77,7 @@ function C.aura:AddNewAuraWatch(class, list)
         end
     end
 
-    if class ~= "ALL" and class ~= E.class then return end
+    if class ~= "ALL" and class ~= E.myClass then return end
     if not C.aura.auraWatch[class] then C.aura.auraWatch[class] = {} end
 
     for name, v in pairs(list) do

@@ -378,8 +378,8 @@ local closed
 ]]
 function Implementation:UpdateBag(bagID)
 	local numSlots
-	if(closed) then
-		numSlots, closed = 0
+	if closed then
+		numSlots, closed = 0, false
 	else
 		numSlots = GetContainerNumSlots(bagID)
 	end

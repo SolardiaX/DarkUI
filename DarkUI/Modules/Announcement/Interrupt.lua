@@ -5,8 +5,8 @@ if not C.announcement.interrupt.enable then return end
 ----------------------------------------------------------------------------------------
 --	Announce your interrupts (modified from Elv)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Announcement"):Sub("Interrupt")
 
-local CreateFrame = CreateFrame
 local IsInGroup, IsInRaid, IsPartyLFG = IsInGroup, IsInRaid, IsPartyLFG
 local CombatLogGetCurrentEventInfo = CombatLogGetCurrentEventInfo
 local UnitGUID = UnitGUID
@@ -53,6 +53,4 @@ local function annouce_interrupt()
     end
 end
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-frame:SetScript("OnEvent", annouce_interrupt)
+module:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", annouce_interrupt)

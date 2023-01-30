@@ -1,5 +1,5 @@
 local _, ns = ...
-local E, C, L = ns:unpack()
+local E, C, L, M = ns:unpack()
 local oUF = ns.oUF or oUF
 
 if not C.blizzard.custom_position then return end
@@ -19,7 +19,6 @@ local UIParent, PlayerPowerBarAlt, GameTooltip = UIParent, PlayerPowerBarAlt, Ga
 local ALTERNATE_POWER_INDEX = ALTERNATE_POWER_INDEX
 
 local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
-
 
 -- Get rid of old AltPowerBar
 PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_SHOW")

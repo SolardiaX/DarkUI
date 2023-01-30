@@ -1,0 +1,15 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Active.lua"/>
+
+    <Script file="API.lua"/>
+    <Script file="Cmd.lua"/>
+    <Script file="Fader.lua"/>
+    <Script file="Function.lua"/>
+
+    <Script file="Module.lua"/>
+    <Script file="Style.lua"/>
+
+    <Script file="Variable.lua"/>
+
+    <!-- <Script file="EditMode.lua" /> -->
+</Ui>

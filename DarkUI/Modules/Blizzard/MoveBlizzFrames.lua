@@ -5,6 +5,8 @@ if not C.blizzard.custom_position then return end
 ----------------------------------------------------------------------------------------
 --	Move some Blizzard frames
 ----------------------------------------------------------------------------------------
+local module = E:Module("Blizzard"):Sub("MoveBlizzFrames")
+
 local frames = {
     "CharacterFrame", "SpellBookFrame", "TaxiFrame", "QuestFrame", "PVEFrame", "AddonList",
     "QuestLogPopupDetailFrame", "MerchantFrame", "TradeFrame", "MailFrame", "LootFrame",
@@ -61,9 +63,7 @@ local AddOnFrames = {
     ["Blizzard_VoidStorageUI"] = {"VoidStorageFrame"}
 }
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("ADDON_LOADED")
-frame:SetScript("OnEvent", function(_, _, addon)
+module:RegisterEvent("ADDON_LOADED", function(_, _, addon)
     -- Fix move
 	if addon == "Blizzard_Collections" then
 		local checkbox = _G.WardrobeTransmogFrame.ToggleSecondaryAppearanceCheckbox

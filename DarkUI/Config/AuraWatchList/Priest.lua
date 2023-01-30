@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
-if E.class ~= "PRIEST" then return end
+if E.myClass ~= "PRIEST" then return end
 
 -- 牧师的法术监控
 local list = {

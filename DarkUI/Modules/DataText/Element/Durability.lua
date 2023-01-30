@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Durability.enable then return end
 ----------------------------------------------------------------------------------------
 --	Durability of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local _G = _G
 local CreateFrame = CreateFrame
@@ -33,7 +34,6 @@ local GameTooltip = GameTooltip
 
 local t_icon = C.stats.iconsize or 20
 local cfg = C.stats.config.Durability
-local module = E.datatext
 
 module:Inject("Durability", {
     OnLoad  = function(self)
@@ -57,13 +57,13 @@ module:Inject("Durability", {
         GameTooltip:ClearLines()
         GameTooltip:AddLine(DURABILITY, module.tthead.r, module.tthead.g, module.tthead.b)
         GameTooltip:AddLine(" ")
-        if C.tooltip.average_lvl == true then
-            local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
-            avgItemLevel = floor(avgItemLevel)
-            avgItemLevelEquipped = floor(avgItemLevelEquipped)
-            GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL .. ": " .. avgItemLevelEquipped .. " / " .. avgItemLevel, 1, 1, 1)
-            GameTooltip:AddLine(" ")
-        end
+
+        local avgItemLevel, avgItemLevelEquipped = GetAverageItemLevel()
+        avgItemLevel = floor(avgItemLevel)
+        avgItemLevelEquipped = floor(avgItemLevelEquipped)
+        GameTooltip:AddLine(STAT_AVERAGE_ITEM_LEVEL .. ": " .. avgItemLevelEquipped .. " / " .. avgItemLevel, 1, 1, 1)
+        GameTooltip:AddLine(" ")
+
         local nodur, totalcost = true, 0
         for slot, string in gmatch("1HEAD3SHOULDER5CHEST6WAIST7LEGS8FEET9WRIST10HANDS16MAINHAND17SECONDARYHAND", "(%d+)([^%d]+)") do
             local dur, dmax = GetInventoryItemDurability(slot)

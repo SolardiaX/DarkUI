@@ -6,6 +6,7 @@ if not C.stats.enable or not C.stats.config.Bags.enable then return end
 ----------------------------------------------------------------------------------------
 --	Bags of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local GetContainerNumFreeSlots, GetContainerNumSlots = C_Container.GetContainerNumFreeSlots, C_Container.GetContainerNumSlots
 local GetBindingKey = GetBindingKey
@@ -16,7 +17,6 @@ local BACKPACK_TOOLTIP = BACKPACK_TOOLTIP
 local GameTooltip = GameTooltip
 
 local cfg = C.stats.config.Bags
-local module = E.datatext
 
 module:Inject("Bags", {
     OnLoad  = function(self) module:RegEvents(self, "PLAYER_LOGIN BAG_UPDATE") end,
@@ -50,8 +50,5 @@ module:Inject("Bags", {
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(format(NUM_FREE_SLOTS, free, total), 1, 1, 1)
         GameTooltip:Show()
-    end,
-    OnLeave = function()
-        GameTooltip:Hide()
     end,
 })

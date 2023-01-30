@@ -15,11 +15,6 @@ local FCF_SavePositionAndDimensions, FCF_DockFrame = FCF_SavePositionAndDimensio
 local FCF_GetCurrentChatFrame = FCF_GetCurrentChatFrame
 local ChatFrame_AddMessageEventFilter = ChatFrame_AddMessageEventFilter
 local ChatEdit_AddHistory = ChatEdit_AddHistory
-local hooksecurefunc = hooksecurefunc
-local select, unpack, gsub, strfind, format = select, unpack, gsub, strfind, string.format
-local CHAT_PARTY_LEADER_GET = CHAT_PARTY_LEADER_GET
-local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
-local HELP_TEXT_SIMPLE = HELP_TEXT_SIMPLE
 local QuickJoinToastButton, ChatFrameMenuButton = QuickJoinToastButton, ChatFrameMenuButton
 local ChatFrameChannelButton = ChatFrameChannelButton
 local ChatFrameToggleVoiceDeafenButton = ChatFrameToggleVoiceDeafenButton
@@ -27,12 +22,19 @@ local ChatFrameToggleVoiceMuteButton = ChatFrameToggleVoiceMuteButton
 local ChatFrame1, ChatFrame2Tab, ChatFrame2TabText = ChatFrame1, ChatFrame2Tab, ChatFrame2TabText
 local GeneralDockManagerOverflowButton = GeneralDockManagerOverflowButton
 local GeneralDockManagerScrollFrame = GeneralDockManagerScrollFrame
+local hooksecurefunc = hooksecurefunc
+local select, unpack, gsub, strfind, format = select, unpack, gsub, strfind, string.format
+
+local CHAT_PARTY_LEADER_GET = CHAT_PARTY_LEADER_GET
+local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
+local HELP_TEXT_SIMPLE = HELP_TEXT_SIMPLE
+local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
 
 local cfg = C.chat
 if cfg.auto_width then
     local holder = _G["DarkUI_ActionBar1HolderBG"]
-    local renderScale = tonumber(GetCVar("RenderScale") or 1)
-    cfg.width = ((E.screenWidth - (holder and holder:GetWidth() or 1024)) / 2 - 260) * renderScale
+    local renderScale = UIParent:GetEffectiveScale()
+    cfg.width = ((E.screenWidth - (holder and holder:GetWidth() or 1024)) / 2 - 80) * renderScale
 end
 
 local origs = {}
@@ -128,8 +130,15 @@ local function SetChatStyle(frame)
 
     -- Kill scroll bar
     frame.ScrollBar:Kill()
-    frame.ScrollToBottomButton:Kill()
-
+    frame.ScrollToBottomButton:ClearAllPoints()
+    frame.ScrollToBottomButton:SetPoint("BOTTOMRIGHT", frame, 0, -4)
+    frame:HookScript("OnUpdate", function(self)
+        if not self:AtBottom() then
+            frame.ScrollToBottomButton:Show()
+        else
+            frame.ScrollToBottomButton:Hide()
+        end
+    end)
 
     -- Kill off editbox artwork
     local art1, art2, art3 = select(6, _G[chat .. "EditBox"]:GetRegions())
@@ -188,17 +197,24 @@ local function SetChatStyle(frame)
     -- Rename combat log tab
     if _G[chat] == _G["ChatFrame2"] then
         CombatLogQuickButtonFrame_Custom:StripTextures()
-        CombatLogQuickButtonFrame_Custom:CreateBackdrop(1)
+        CombatLogQuickButtonFrame_Custom:CreateBackdrop()
+
         CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("TOPLEFT", 1, -4)
         CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
-        CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SkinCloseButton(CombatLogQuickButtonFrame_Custom.backdrop)
+
+        E:SkinCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.backdrop)
+
         CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetSize(12, 12)
         CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetHitRectInsets(0, 0, 0, 0)
+
         CombatLogQuickButtonFrame_CustomProgressBar:ClearAllPoints()
         CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.backdrop, 2, -2)
         CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.backdrop, -2, 2)
         CombatLogQuickButtonFrame_CustomProgressBar:SetStatusBarTexture(C.media.texture.status_f)
-        CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
+
+        if CombatLogQuickButtonFrameButton1 then
+            CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
+        end
     end
 
     if _G[chat] ~= _G["ChatFrame2"] then
@@ -277,7 +293,7 @@ local function SetupChatPosAndFont()
                 ChatFrame2Tab:EnableMouse(false)
                 ChatFrame2TabText:Hide()
                 ChatFrame2Tab:SetWidth(0.001)
-                ChatFrame2Tab.SetWidth = E.dummy
+                ChatFrame2Tab.SetWidth = E.Dummy
                 FCF_DockUpdate()
             end
         end
@@ -286,8 +302,8 @@ local function SetupChatPosAndFont()
     -- Reposition Quick Join Toast and battle.net popup
     QuickJoinToastButton:ClearAllPoints()
     QuickJoinToastButton:SetPoint("TOPLEFT", 0, 90)
-    QuickJoinToastButton.ClearAllPoints = E.dummy
-    QuickJoinToastButton.SetPoint = E.dummy
+    QuickJoinToastButton.ClearAllPoints = E.Dummy
+    QuickJoinToastButton.SetPoint = E.Dummy
     QuickJoinToastButton.Toast:ClearAllPoints()
     QuickJoinToastButton.Toast:SetPoint(unpack(cfg.bn_popup))
     QuickJoinToastButton.Toast.Background:SetTexture("")
@@ -330,11 +346,11 @@ UIChat:SetScript("OnEvent", function(self, event, addon)
     if event == "ADDON_LOADED" then
         if addon == "Blizzard_CombatLog" then
             self:UnregisterEvent("ADDON_LOADED")
-            SetupChat(self)
+            SetupChat()
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        SetupChatPosAndFont(self)
+        SetupChatPosAndFont()
     end
 end)
 
@@ -375,6 +391,7 @@ for i = 1, NUM_CHAT_WINDOWS do
         hooksecurefunc(_G["ChatFrame" .. i], "AddMessage", TypoHistory_Posthook_AddMessage)
     end
 end
+
 ----------------------------------------------------------------------------------------
 --	Loot icons
 ----------------------------------------------------------------------------------------
@@ -389,6 +406,7 @@ if cfg.loot_icons == true then
 	end
 	ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)
 end
+
 ----------------------------------------------------------------------------------------
 --	Swith channels by Tab
 ----------------------------------------------------------------------------------------
@@ -400,6 +418,7 @@ local cycles = {
 	{chatType = "GUILD", use = function() return IsInGuild() end},
 	{chatType = "SAY", use = function() return 1 end},
 }
+
 local function UpdateTabChannelSwitch(self)
 	if strsub(tostring(self:GetText()), 1, 1) == "/" then return end
 	local currChatType = self:GetAttribute("chatType")
@@ -418,6 +437,7 @@ local function UpdateTabChannelSwitch(self)
 	end
 end
 hooksecurefunc("ChatEdit_CustomTabPressed", UpdateTabChannelSwitch)
+
 ----------------------------------------------------------------------------------------
 --	Role icons
 ----------------------------------------------------------------------------------------

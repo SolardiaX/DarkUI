@@ -94,7 +94,7 @@ end
 -- Tags
 local function GetNumFreeSlots(name)
 	if name == "Bag" then
-		local totalFree, freeSlots, bagFamily = 0
+		local totalFree, freeSlots, bagFamily = 0, 0, 0
 		for i = 0, 4 do -- reagent bank excluded
 			freeSlots, bagFamily = GetContainerNumFreeSlots(i)
 			if bagFamily == 0 then

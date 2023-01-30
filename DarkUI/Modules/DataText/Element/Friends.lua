@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Friends.enable then return end
 ----------------------------------------------------------------------------------------
 --	Friends of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local BNGetNumFriends = BNGetNumFriends
 local BNInviteFriend = BNInviteFriend
@@ -33,7 +34,6 @@ local WOW_FRIEND, BATTLENET_FRIEND = WOW_FRIEND, BATTLENET_FRIEND
 local GameTooltip = GameTooltip
 
 local cfg = C.stats.config.Friends
-local module = E.datatext
 
 local totalFriendsOnline = 0
 local totalBattleNetOnline = 0
@@ -113,14 +113,14 @@ module:Inject("Friends", {
         end
         if self.hovered then self:GetScript("OnEnter")(self) end
     end,
-    OnUpdate = module.AltUpdate,
+    -- OnUpdate = module.AltUpdate,
     OnClick  = function(self, b)
         if b == "MiddleButton" then
             ToggleIgnorePanel()
         elseif b == "LeftButton" then
             ToggleFriendsFrame(1)
         elseif b == "RightButton" then
-            module.HideTT(self)
+            module:HideTT(self)
 
             local BNTotal = BNGetNumFriends()
             local total = C_FriendList_GetNumFriends()
@@ -329,7 +329,7 @@ module:Inject("Friends", {
             end
             GameTooltip:Show()
         else
-            module.HideTT(self)
+            module:HideTT(self)
         end
     end
 })

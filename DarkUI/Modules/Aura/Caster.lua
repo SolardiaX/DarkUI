@@ -5,6 +5,7 @@ if not C.aura.enable and not C.aura.show_caster then return end
 ----------------------------------------------------------------------------------------
 --	Tells you who cast a buff or debuff in its tooltip
 ----------------------------------------------------------------------------------------
+local module = E:Module("Aura"):Sub("Caster")
 
 local GetUnitName, UnitAura, UnitBuff, UnitDebuff = GetUnitName, UnitAura, UnitBuff, UnitDebuff
 local UnitIsPlayer, UnitClass, UnitReaction = UnitIsPlayer, UnitClass, UnitReaction
@@ -14,19 +15,13 @@ local format, select = format, select
 local hooksecurefunc = hooksecurefunc
 local GameTooltip = GameTooltip
 
-local funcs = {
-    SetUnitAura   = UnitAura,
-    SetUnitBuff   = UnitBuff,
-    SetUnitDebuff = UnitDebuff
-}
-
 local function addAuraSource(self, func, unit, index, filter)
     local srcUnit = select(7, func(unit, index, filter))
     if srcUnit then
         local src = GetUnitName(srcUnit, true)
         if srcUnit == "pet" or srcUnit == "vehicle" then
             src = format("%s (|cff%02x%02x%02x%s|r)", src,
-                         E.color.r * 255, E.color.g * 255, E.color.b * 255, GetUnitName("player", true))
+                         E.myColor.r * 255, E.myColor.g * 255, E.myColor.b * 255, GetUnitName("player", true))
         else
             local partypet = srcUnit:match("^partypet(%d+)$")
             local raidpet = srcUnit:match("^raidpet(%d+)$")
@@ -52,6 +47,14 @@ local function addAuraSource(self, func, unit, index, filter)
     end
 end
 
-for k, v in pairs(funcs) do
-    hooksecurefunc(GameTooltip, k, function(self, unit, index, filter) addAuraSource(self, v, unit, index, filter) end)
+local funcs = {
+    SetUnitAura   = UnitAura,
+    SetUnitBuff   = UnitBuff,
+    SetUnitDebuff = UnitDebuff
+}
+
+function module:OnLogin()
+    for k, v in pairs(funcs) do
+        hooksecurefunc(GameTooltip, k, function(self, unit, index, filter) addAuraSource(self, v, unit, index, filter) end)
+    end
 end

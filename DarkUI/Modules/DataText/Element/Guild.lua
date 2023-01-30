@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Guild.enable then return end
 ----------------------------------------------------------------------------------------
 --	Guild of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local Ambiguate = Ambiguate
 local C_GuildInfo_GuildRoster = C_GuildInfo.GuildRoster
@@ -33,7 +34,6 @@ local NOTE_COLON = NOTE_COLON
 local GameTooltip = GameTooltip
 
 local cfg = C.stats.config.Guild
-local module = E.datatext
 
 local guildTable = {}
 
@@ -58,7 +58,7 @@ local SortGuildRoster = SortGuildRoster
 
 module:Inject("Guild", {
     text     = {
-        string      = function()
+        string = function()
             if IsInGuild() then
                 local total, _, online = GetNumGuildMembers()
                 return format(cfg.fmt, online, total)
@@ -82,14 +82,14 @@ module:Inject("Guild", {
     end,
     OnUpdate = function(self, u)
         if IsInGuild() then
-            module.AltUpdate(self)
+            module:AltUpdate(self)
             if not self.gmotd then
                 if self.elapsed > 1 then
-                    C_GuildInfo_GuildRoster();
+                    C_GuildInfo_GuildRoster()
                     self.elapsed = 0
                 end
                 if GetGuildRosterMOTD() ~= "" then
-                    self.gmotd = true;
+                    self.gmotd = true
                     if self.hovered then self:GetScript("OnEnter")(self) end
                 end
                 self.elapsed = self.elapsed + u
@@ -104,7 +104,7 @@ module:Inject("Guild", {
             SortGuildRoster(IsShiftKeyDown() and s or (IsAltKeyDown() and (s == "rank" and "note" or "rank") or s == "class" and "name" or s == "name" and "level" or s == "level" and "zone" or "class"))
             self:GetScript("OnEnter")(self)
         elseif b == "RightButton" and IsInGuild() then
-            module.HideTT(self)
+            module:HideTT(self)
 
             local grouped
             local menuCountWhispers = 0
@@ -114,7 +114,7 @@ module:Inject("Guild", {
             module.menuList[3].menuList = {}
 
             for i = 1, #guildTable do
-                if (guildTable[i][7] or guildTable[i][10]) and guildTable[i][1] ~= E.name then
+                if (guildTable[i][7] or guildTable[i][10]) and guildTable[i][1] ~= E.myName then
                     local classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[guildTable[i][9]], GetQuestDifficultyColor(guildTable[i][3])
                     if UnitInParty(guildTable[i][1]) or UnitInRaid(guildTable[i][1]) then
                         grouped = "|cffaaaaaa*|r"

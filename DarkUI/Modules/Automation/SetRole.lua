@@ -5,9 +5,20 @@ if C.automation.auto_role ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Automatically sets your role(Auto role setter by iSpawnAtHome)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("SetRole")
+
+local InCombatLockdown = InCombatLockdown
+local IsInGroup, IsPartyLFG = IsInGroup, IsPartyLFG
+local GetSpecialization = GetSpecialization
+local GetSpecializationRole = GetSpecializationRole
+local GetTime = GetTime
+local RolePollPopup = RolePollPopup
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local UnitSetRole = UnitSetRole
+
 local prev = 0
-local function SetRole()
-    if E.level >= 10 and not InCombatLockdown() and IsInGroup() and not IsPartyLFG() then
+local function setRole()
+    if E.myLevel >= 10 and not InCombatLockdown() and IsInGroup() and not IsPartyLFG() then
         local spec = GetSpecialization()
         if spec then
             local role = GetSpecializationRole(spec)
@@ -24,9 +35,10 @@ local function SetRole()
     end
 end
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_TALENT_UPDATE")
-frame:RegisterEvent("GROUP_ROSTER_UPDATE")
-frame:SetScript("OnEvent", SetRole)
-
-RolePollPopup:UnregisterEvent("ROLE_POLL_BEGIN")
+module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE GROUP_ROSTER_UPDATE", function(_, event)
+    if event == "PLAYER_LOGIN" then
+        RolePollPopup:UnregisterEvent("ROLE_POLL_BEGIN")
+    else
+        setRole()
+    end
+end)

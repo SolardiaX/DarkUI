@@ -6,151 +6,42 @@ if not C.nameplate.enable then return end
 ----------------------------------------------------------------------------------------
 --	oUF nameplates
 ----------------------------------------------------------------------------------------
+local module = E:Module("Nameplate")
+local core = E:Module("UFCore")
+
 local LBG = LibStub("LibButtonGlow-1.0", true)
 
 local oUF = ns.oUF
 
+local _G = _G
+local CreateFrame = CreateFrame
+local SetCVar = SetCVar
+local GetSpellCooldown = GetSpellCooldown
+local InCombatLockdown = InCombatLockdown
+local GetSpecializationInfoByID, GetSpecialization = GetSpecializationInfoByID, GetSpecialization
+local GetNumBattlefieldScores, GetBattlefieldScore = GetNumBattlefieldScores, GetBattlefieldScore
+local UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation = UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation
+local UnitIsTapDenied = UnitIsTapDenied
+local GetArenaOpponentSpec = GetArenaOpponentSpec
+local UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass = UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass
+local UnitExists = UnitExists
+local UnitDetailedThreatSituation = UnitDetailedThreatSituation
+local UnitGroupRolesAssigned = UnitGroupRolesAssigned
+local UnitSelectionColor = UnitSelectionColor
+local UnitGUID = UnitGUID
+local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
+local UnitWidgetSet = UnitWidgetSet
+local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
+local IsInInstance, IsInGroup, IsInRaid = IsInInstance, IsInGroup, IsInRaid
+local GetNumGroupMembers = GetNumGroupMembers
+local GetSpellInfo = GetSpellInfo
+local hooksecurefunc = hooksecurefunc
+local unpack = unpack
+
 local cfg = C.nameplate
-local DUF = E.unitframe
 
 local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
-
-local frame = CreateFrame("Frame")
-frame:SetScript("OnEvent", function(self, event, ...) self[event](self, ...) end)
-if cfg.combat == true then
-    frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-    frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-    frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-
-    function frame:PLAYER_REGEN_ENABLED()
-        SetCVar("nameplateShowEnemies", 0)
-    end
-
-    function frame:PLAYER_REGEN_DISABLED()
-        SetCVar("nameplateShowEnemies", 1)
-    end
-
-    function frame:PLAYER_ENTERING_WORLD()
-        if InCombatLockdown() then
-            SetCVar("nameplateShowEnemies", 1)
-        else
-            SetCVar("nameplateShowEnemies", 0)
-        end
-    end
-end
-
-frame:RegisterEvent("PLAYER_LOGIN")
-function frame:PLAYER_LOGIN()
-    if cfg.enhance_threat == true then
-        SetCVar("threatWarning", 3)
-    end
-    SetCVar("nameplateGlobalScale", 1)
-    SetCVar("namePlateMinScale", 1)
-    SetCVar("namePlateMaxScale", 1)
-    SetCVar("nameplateLargerScale", 1)
-    SetCVar("nameplateSelectedScale", 1)
-    SetCVar("nameplateMinAlpha", 1)
-    SetCVar("nameplateMaxAlpha", 1)
-    SetCVar("nameplateSelectedAlpha", 1)
-    SetCVar("nameplateNotSelectedAlpha", 1)
-    SetCVar("nameplateLargeTopInset", 0.08)
-
-    SetCVar("nameplateOtherTopInset", cfg.clamp and 0.08 or -1)
-    SetCVar("nameplateOtherBottomInset", cfg.clamp and 0.1 or -1)
-
-    if cfg.only_name then
-        SetCVar("nameplateShowOnlyNames", 1)
-    end
-
-    local function changeFont(self)
-        self:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
-        self:SetShadowOffset(1, -1)
-    end
-    changeFont(SystemFont_NamePlateFixed)
-    changeFont(SystemFont_LargeNamePlateFixed, 2)
-end
-
-local healList, exClass, healerSpecs = {}, {}, {}
-local testing = false
-
-exClass.DEATHKNIGHT = true
-exClass.MAGE = true
-exClass.ROGUE = true
-exClass.WARLOCK = true
-exClass.WARRIOR = true
-if cfg.healer_icon == true then
-    local t = CreateFrame("Frame")
-    t.factions = {
-        ["Horde"] = 1,
-        ["Alliance"] = 0,
-    }
-    local healerSpecIDs = {
-        105,	-- Druid Restoration
-        270,	-- Monk Mistweaver
-        65,		-- Paladin Holy
-        256,	-- Priest Discipline
-        257,	-- Priest Holy
-        264,	-- Shaman Restoration
-    }
-    for _, specID in pairs(healerSpecIDs) do
-        local _, name = GetSpecializationInfoByID(specID)
-        if name and not healerSpecs[name] then
-            healerSpecs[name] = true
-        end
-    end
-
-    local lastCheck = 20
-    local function CheckHealers(_, elapsed)
-        lastCheck = lastCheck + elapsed
-        if lastCheck > 25 then
-            lastCheck = 0
-            healList = {}
-            for i = 1, GetNumBattlefieldScores() do
-                local name, _, _, _, _, faction, _, _, _, _, _, _, _, _, _, talentSpec = GetBattlefieldScore(i)
-
-                if name and healerSpecs[talentSpec] and t.factions[UnitFactionGroup("player")] == faction then
-                    name = name:match("(.+)%-.+") or name
-                    healList[name] = talentSpec
-                end
-            end
-        end
-    end
-
-    local function CheckArenaHealers(_, elapsed)
-        lastCheck = lastCheck + elapsed
-        if lastCheck > 10 then
-            lastCheck = 0
-            healList = {}
-            for i = 1, 5 do
-                local specID = GetArenaOpponentSpec(i)
-                if specID and specID > 0 then
-                    local name = UnitName(format("arena%d", i))
-                    local _, talentSpec = GetSpecializationInfoByID(specID)
-                    if name and healerSpecs[talentSpec] then
-                        healList[name] = talentSpec
-                    end
-                end
-            end
-        end
-    end
-
-    local function CheckLoc(_, event)
-        if event == "PLAYER_ENTERING_WORLD" then
-            local _, instanceType = IsInInstance()
-            if instanceType == "pvp" then
-                t:SetScript("OnUpdate", CheckHealers)
-            elseif instanceType == "arena" then
-                t:SetScript("OnUpdate", CheckArenaHealers)
-            else
-                healList = {}
-                t:SetScript("OnUpdate", nil)
-            end
-        end
-    end
-
-    t:RegisterEvent("PLAYER_ENTERING_WORLD")
-    t:SetScript("OnEvent", CheckLoc)
-end
+local arrow = C.media.path .. "uf_nameplate_arrow"
 
 local totemData = {
     [GetSpellInfo(192058)] = 136013,	-- Capacitor Totem
@@ -170,7 +61,88 @@ local totemData = {
     [GetSpellInfo(204330)] = 135829,	-- Skyfury Totem
 }
 
-local function CreateBorderFrame(frame, point)
+local kickID = 0
+
+local healList, exClass, healerSpecs = {}, {}, {}
+local testing = false
+
+exClass.DEATHKNIGHT = true
+exClass.DEMONHUNTER = true
+exClass.HUNTER = true
+exClass.MAGE = true
+exClass.ROGUE = true
+exClass.WARLOCK = true
+exClass.WARRIOR = true
+
+local healerFactions = {
+    ["Horde"] = 1,
+    ["Alliance"] = 0,
+}
+
+local healerSpecIDs = {
+    105,	-- Druid Restoration
+    1468,   -- Evoker Preservation
+    270,	-- Monk Mistweaver
+    65,		-- Paladin Holy
+    256,	-- Priest Discipline
+    257,	-- Priest Holy
+    264,	-- Shaman Restoration
+}
+
+local lastCheck = 20
+local function checkBattleFieldHealers(_, elapsed)
+    lastCheck = lastCheck + elapsed
+    if lastCheck > 25 then
+        lastCheck = 0
+        healList = {}
+        for i = 1, GetNumBattlefieldScores() do
+            local name, _, _, _, _, faction, _, _, _, _, _, _, _, _, _, talentSpec = GetBattlefieldScore(i)
+
+            if name and healerSpecs[talentSpec] and healerFactions[UnitFactionGroup("player")] == faction then
+                name = name:match("(.+)%-.+") or name
+                healList[name] = talentSpec
+            end
+        end
+    end
+end
+
+local function checkArenaHealers(_, elapsed)
+    lastCheck = lastCheck + elapsed
+    if lastCheck > 10 then
+        lastCheck = 0
+        healList = {}
+        for i = 1, 5 do
+            local specID = GetArenaOpponentSpec(i)
+            if specID and specID > 0 then
+                local name = UnitName(format("arena%d", i))
+                local _, talentSpec = GetSpecializationInfoByID(specID)
+                if name and healerSpecs[talentSpec] then
+                    healList[name] = talentSpec
+                    local nameplate = C_NamePlate.GetNamePlateForUnit(format("arena%d", i))
+                    if nameplate then
+                        nameplate.unitFrame:UpdateAllElements("UNIT_NAME_UPDATE")
+                    end
+                end
+            end
+        end
+    end
+end
+
+local function checkHealers(_, event)
+    if event == "PLAYER_ENTERING_WORLD" then
+        local _, instanceType = IsInInstance()
+        if instanceType == "pvp" then
+            t:SetScript("OnUpdate", checkBattleFieldHealers)
+        elseif instanceType == "arena" then
+            t:SetScript("OnUpdate", checkArenaHealers)
+        else
+            healList = {}
+            t:SetScript("OnUpdate", nil)
+        end
+    end
+end
+
+local function createBorderFrame(frame, point)
     if point == nil then point = frame end
     if point.backdrop then return end
 
@@ -209,76 +181,14 @@ local function CreateBorderFrame(frame, point)
     frame.borderright:SetDrawLayer("BORDER", -7)
 end
 
-local function SetColorBorder(frame, r, g, b)
+local function setColorBorder(frame, r, g, b)
     frame.bordertop:SetColorTexture(r, g, b)
     frame.borderbottom:SetColorTexture(r, g, b)
     frame.borderleft:SetColorTexture(r, g, b)
     frame.borderright:SetColorTexture(r, g, b)
 end
 
--- Auras functions
-local AurasCustomFilter = function(element, unit, data)
-    if cfg.blackList[spellID] then
-        return false
-    elseif cfg.whiteList[spellID] then
-        return true
-    else
-        return DUF.FilterAuras(element, unit, data)
-    end
-end
-
-local AurasPostCreateIcon = function(element, button)
-    DUF.PostCreateIcon(element, button)
-
-    button:SetSize(cfg.auras_size, cfg.auras_size)
-    button:EnableMouse(false)
-
-    button.remaining = button:CreateFontString(nil, 'OVERLAY')
-    button.remaining:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-    button.remaining:SetPoint("BOTTOM", button, "BOTTOM", 0, -4)
-    button.remaining:SetJustifyH("CENTER")
-
-    button.Cooldown.noCooldownCount = true
-
-    button.Count:SetPoint("BOTTOMRIGHT", button, "TOPRIGHT", -2, -6)
-    button.Count:SetJustifyH("RIGHT")
-    button.Count:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-
-    if cfg.show_spiral == true then
-        element.disableCooldown = false
-        button.Cooldown:SetReverse(true)
-        button.parent = CreateFrame("Frame", nil, button)
-        button.parent:SetFrameLevel(button.Cooldown:GetFrameLevel() + 1)
-        button.Count:SetParent(button.parent)
-        button.remaining:SetParent(button.parent)
-    else
-        element.disableCooldown = true
-    end
-end
-
-local AurasPostUpdateIcon = function(element, button, unit, data)
-    DUF.PostUpdateIcon(element, button, unit, data)
-
-    if data.duration and data.duration > 0 and cfg.show_timers then
-        button.remaining:Show()
-        button.timeLeft = data.expirationTime
-        button:SetScript("OnUpdate", DUF.CreateAuraTimer)
-    else
-        button.remaining:Hide()
-        button.timeLeft = math.huge
-        button:SetScript("OnUpdate", nil)
-    end
-
-    local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
-    if cfg.colorBorder then
-        button.Overlay:SetVertexColor(color.r, color.g, color.b)
-    else
-        button.Overlay:SetVertexColor(0, 0, 0)
-    end
-    button.first = true
-end
-
-local function UpdateTarget(self)
+local function updateTarget(self)
     local isTarget = UnitIsUnit(self.unit, "target")
     local isMe = UnitIsUnit(self.unit, "player")
 
@@ -311,22 +221,18 @@ local function UpdateTarget(self)
     self.Health.border:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
 end
 
-local function UpdateName(self)
+local function updateName(self)
     if cfg.healer_icon == true then
         local name = self.unitName
         if name then
-            if testing then
-                self.HPHeal:Show()
-            else
-                if healList[name] then
-                    if exClass[healList[name]] then
-                        self.HPHeal:Hide()
-                    else
-                        self.HPHeal:Show()
-                    end
+            if healList[name] then
+                if exClass[healList[name]] then
+                    self.HealerIcon:Hide()
                 else
-                    self.HPHeal:Hide()
+                    self.HealerIcon:Show()
                 end
+            else
+                self.HealerIcon:Hide()
             end
         end
     end
@@ -359,38 +265,9 @@ local function UpdateName(self)
     end
 end
 
-local kickID = 0
-if cfg.kick_color then
-    if T.class == "DEATHKNIGHT" then
-        kickID = 47528
-    elseif T.class == "DEMONHUNTER" then
-        kickID = 183752
-    elseif T.class == "DRUID" then
-        kickID = 106839
-    elseif T.class == "HUNTER" then
-        kickID = GetSpecialization() == 3 and 187707 or 147362
-    elseif T.class == "MAGE" then
-        kickID = 2139
-    elseif T.class == "MONK" then
-        kickID = 116705
-    elseif T.class == "PALADIN" then
-        kickID = 96231
-    elseif T.class == "PRIEST" then
-        kickID = 15487
-    elseif T.class == "ROGUE" then
-        kickID = 1766
-    elseif T.class == "SHAMAN" then
-        kickID = 57994
-    elseif T.class == "WARLOCK" then
-        kickID = 119910
-    elseif T.class == "WARRIOR" then
-        kickID = 6552
-    end
-end
-
 -- Cast color
 local function castColor(self)
-    if C.nameplate.majorSpells[self.spellID] then
+    if cfg.majorSpells[self.spellID] then
         LBG.ShowOverlayGlow(self.Icon.glowFrame)
     else
         LBG.HideOverlayGlow(self.Icon.glowFrame)
@@ -399,6 +276,15 @@ local function castColor(self)
     if self.notInterruptible then
         self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
         self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
+    elseif cfg.kick_color then
+        local start = GetSpellCooldown(kickID)
+        if start ~= 0 then
+            self:SetStatusBarColor(1, 0.5, 0)
+            self.bg:SetColorTexture(1, 0.5, 0, 0.2)
+        else
+            self:SetStatusBarColor(1, 0.8, 0)
+            self.bg:SetColorTexture(1, 0.8, 0, 0.2)
+        end
     else
         self:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
         self.bg:SetColorTexture(27 / 255, 147 / 255, 226 / 255, 0.2)
@@ -412,7 +298,7 @@ local function threatColor(self, forced)
     local threatStatus = UnitThreatSituation("player", self.unit)
 
     if cfg.enhance_threat ~= true then
-        SetColorBorder(self.Health, unpack(C.media.border_color))
+        setColorBorder(self.Health, unpack(C.media.border_color))
     end
 
     if UnitIsTapDenied(self.unit) then
@@ -420,17 +306,17 @@ local function threatColor(self, forced)
     elseif combat then
         if threatStatus == 3 then
             -- securely tanking, highest threat
-            if E.role == "Tank" then
+            if E.myRole == "Tank" then
                 if cfg.enhance_threat == true then
                     self.Health:SetStatusBarColor(unpack(cfg.good_color))
                 else
-                    SetColorBorder(self.Health, unpack(cfg.bad_color))
+                    setColorBorder(self.Health, unpack(cfg.bad_color))
                 end
             else
                 if cfg.enhance_threat == true then
                     self.Health:SetStatusBarColor(unpack(cfg.bad_color))
                 else
-                    SetColorBorder(self.Health, unpack(cfg.bad_color))
+                    setColorBorder(self.Health, unpack(cfg.bad_color))
                 end
             end
         elseif threatStatus == 2 then
@@ -438,19 +324,19 @@ local function threatColor(self, forced)
             if cfg.enhance_threat == true then
                 self.Health:SetStatusBarColor(unpack(cfg.near_color))
             else
-                SetColorBorder(self.Health, unpack(cfg.near_color))
+                setColorBorder(self.Health, unpack(cfg.near_color))
             end
         elseif threatStatus == 1 then
             -- not tanking, higher threat than tank
             if cfg.enhance_threat == true then
                 self.Health:SetStatusBarColor(unpack(cfg.near_color))
             else
-                SetColorBorder(self.Health, unpack(cfg.near_color))
+                setColorBorder(self.Health, unpack(cfg.near_color))
             end
         elseif threatStatus == 0 then
             -- not tanking, lower threat than tank
             if cfg.enhance_threat == true then
-                if E.role == "Tank" then
+                if E.myRole == "Tank" then
                     self.Health:SetStatusBarColor(unpack(cfg.bad_color))
                     if IsInGroup() or IsInRaid() then
                         for i = 1, GetNumGroupMembers() do
@@ -472,7 +358,8 @@ local function threatColor(self, forced)
     end
 end
 
-local function HealthPostUpdate(self, unit, min, max)
+--Healthbar color
+local function healthPostUpdate(self, unit, min, max)
     local main = self:GetParent()
 
     local perc = 0
@@ -498,23 +385,85 @@ local function HealthPostUpdate(self, unit, min, max)
         self:SetStatusBarColor(r, g, b)
     end
 
-    if C.nameplate.customUnits[main.unitName] or C.nameplate.customUnits[main.npcID] then
+    if cfg.customUnits[main.unitName] or cfg.customUnits[main.npcID] then
         self:SetStatusBarColor(unpack(cfg.custom_color))
     end
 
     if UnitIsPlayer(unit) then
         if perc <= 0.5 and perc >= 0.2 then
-            SetColorBorder(self, 1, 1, 0)
+            setColorBorder(self, 1, 1, 0)
         elseif perc < 0.2 then
-            SetColorBorder(self, 1, 0, 0)
+            setColorBorder(self, 1, 0, 0)
         else
-            SetColorBorder(self, unpack(C.media.border_color))
+            setColorBorder(self, unpack(C.media.border_color))
         end
     elseif not UnitIsPlayer(unit) and cfg.enhance_threat == true then
-        SetColorBorder(self, unpack(C.media.border_color))
+        setColorBorder(self, unpack(C.media.border_color))
     end
 
     threatColor(main, true)
+end
+
+-- Auras functions
+local AurasCustomFilter = function(element, unit, data)
+    if cfg.blackList[data.spellID] then
+        return false
+    elseif cfg.whiteList[data.spellID] then
+        return true
+    else
+        return core:FilterAuras(unit, data)
+    end
+end
+
+local AurasPostCreateIcon = function(element, button)
+    core:PostCreateIcon(button)
+
+    button:SetSize(cfg.auras_size, cfg.auras_size)
+    button:EnableMouse(false)
+
+    button.remaining = button:CreateFontString(nil, 'OVERLAY')
+    button.remaining:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
+    button.remaining:SetPoint("BOTTOM", button, "BOTTOM", 0, -4)
+    button.remaining:SetJustifyH("CENTER")
+
+    button.Cooldown.noCooldownCount = true
+
+    button.Count:SetPoint("BOTTOMRIGHT", button, "TOPRIGHT", 0, -8)
+    button.Count:SetJustifyH("RIGHT")
+    button.Count:SetFont(STANDARD_TEXT_FONT, 8, "THINOUTLINE")
+
+    if cfg.show_spiral == true then
+        element.disableCooldown = false
+        button.Cooldown:SetReverse(true)
+        button.parent = CreateFrame("Frame", nil, button)
+        button.parent:SetFrameLevel(button.Cooldown:GetFrameLevel() + 1)
+        button.Count:SetParent(button.parent)
+        button.remaining:SetParent(button.parent)
+    else
+        element.disableCooldown = true
+    end
+end
+
+local AurasPostUpdateIcon = function(element, button, unit, data)
+    core:PostUpdateIcon(button, unit, data)
+
+    if data.duration and data.duration > 0 and cfg.show_timers then
+        button.remaining:Show()
+        button.timeLeft = data.expirationTime
+        button:SetScript("OnUpdate", core.CreateAuraTimer)
+    else
+        button.remaining:Hide()
+        button.timeLeft = math.huge
+        button:SetScript("OnUpdate", nil)
+    end
+
+    local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
+    if cfg.colorBorder then
+        button.Overlay:SetVertexColor(color.r, color.g, color.b)
+    else
+        button.Overlay:SetVertexColor(0, 0, 0)
+    end
+    button.first = true
 end
 
 local function callback(self, event, unit)
@@ -575,7 +524,7 @@ local function style(self, unit)
     self.Health.colorClass = true
     self.Health.colorReaction = true
     self.Health.colorHealth = true
-    CreateBorderFrame(self.Health)
+    createBorderFrame(self.Health)
 
     self.Health.bg = self.Health:CreateTexture(nil, "BACKGROUND")
     self.Health.bg:SetAllPoints()
@@ -603,9 +552,9 @@ local function style(self, unit)
     self.Power:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 0, -6 - (cfg.height * E.noscalemult / 2))
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
-    self.Power.PostUpdate = DUF.PreUpdatePower
+    self.Power.PostUpdate = module.PreUpdatePower
     self.Power:CreateShadow()
-    CreateBorderFrame(self.Power)
+    createBorderFrame(self.Power)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints()
@@ -640,7 +589,7 @@ local function style(self, unit)
     if cfg.arrow then
         self.arrow = self:CreateTexture("$parent_Arrow", "OVERLAY")
         self.arrow:SetSize(50, 50)
-        self.arrow:SetTexture(C.media.nameplate.arrow)
+        self.arrow:SetTexture(arrow)
         self.arrow:SetPoint("BOTTOM", self, "TOP", 0, ((cfg.track_auras or cfg.track_buffs) and cfg.auras_size or 0) + 14)
         self.arrow:Hide()
     end
@@ -656,10 +605,10 @@ local function style(self, unit)
     self.Castbar:SetFrameLevel(3)
     self.Castbar:SetStatusBarTexture(C.media.texture.status)
     self.Castbar:SetStatusBarColor(1, 0.8, 0)
-    self.Castbar:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -8)
-    self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 0, -8 - (cfg.height * E.noscalemult))
+    self.Castbar:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", -4, -8)
+    self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 4, -8 - (cfg.height * E.noscalemult))
     self.Castbar:CreateShadow()
-    CreateBorderFrame(self.Castbar)
+    createBorderFrame(self.Castbar)
 
     self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
     self.Castbar.bg:SetAllPoints()
@@ -690,21 +639,16 @@ local function style(self, unit)
     end
 
     -- Create CastBar Icon
+    self.Castbar.IconOverlay = CreateFrame("Frame", nil, self.Castbar)
+    self.Castbar.IconOverlay:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+    self.Castbar.IconOverlay:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", 12, 0)
+
+    E:ApplyOverlayBorder(self.Castbar.IconOverlay)
+
     self.Castbar.Icon = self.Castbar:CreateTexture(nil, "OVERLAY")
     self.Castbar.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
     self.Castbar.Icon:SetDrawLayer("ARTWORK")
-    self.Castbar.Icon:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
-    self.Castbar.Icon:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", 8, 0)
-
-    self.Castbar.Icon.border = self.Castbar:CreateTexture(nil, "BORDER")
-    self.Castbar.Icon.border:SetTexture(C.media.texture.border)
-    self.Castbar.Icon.border:SetPoint("TOPLEFT", self.Castbar.Icon, "TOPLEFT", -4, 4)
-    self.Castbar.Icon.border:SetPoint("BOTTOMRIGHT", self.Castbar.Icon, "BOTTOMRIGHT", 4, -4)
-    -- self.Castbar.Icon.border:SetTexCoord(0, 1, 0, 1)
-    -- self.Castbar.Icon.border:SetDrawLayer("BACKGROUND", -7)
-    -- self.Castbar.Icon.border:ClearAllPoints()
-    -- self.Castbar.Icon.border:SetAllPoints(self.Castbar.Icon)
-    -- self.Castbar.Icon.border:SetVertexColor(0.25, 0.25, 0.25)
+    self.Castbar.Icon:SetAllPoints(self.Castbar.IconOverlay)
 
     self.Castbar.Icon.glowFrame = CreateFrame("Frame", nil, self)
     self.Castbar.Icon.glowFrame:SetPoint("CENTER", self.Castbar.Icon, "CENTER")
@@ -736,10 +680,10 @@ local function style(self, unit)
 
     -- Healer Icon
     if cfg.healer_icon == true then
-        self.HPHeal = self.Health:CreateTexture(nil, "OVERLAY")
-        self.HPHeal:SetSize(16, 16)
-        self.HPHeal:SetTexture(C.media.path .. "icon_healer")
-        self.HPHeal:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
+        self.HealerIcon = self.Health:CreateTexture(nil, "OVERLAY")
+        self.HealerIcon:SetSize(16, 16)
+        self.HealerIcon:SetTexture(C.media.path .. "icon_healer")
+        self.HealerIcon:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
     end
 
     -- Quest Icon
@@ -747,6 +691,7 @@ local function style(self, unit)
         self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
         self.QuestIcon:SetSize((cfg.height * 2 * E.noscalemult), (cfg.height * 2 * E.noscalemult))
         self.QuestIcon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
+        self.QuestIcon:Hide()
 
         self.QuestIcon.Text = self:CreateFontString(nil, "OVERLAY")
         self.QuestIcon.Text:SetPoint("RIGHT", self.QuestIcon, "LEFT", -1, 0)
@@ -767,6 +712,7 @@ local function style(self, unit)
         self.Auras["growth-x"] = "LEFT"
         self.Auras.numDebuffs = cfg.track_debuffs and 6 or 0
         self.Auras.numBuffs = cfg.track_buffs and 4 or 0
+        self.Auras.maxAuras = 6
         self.Auras:SetSize(20 + cfg.width, cfg.auras_size)
         self.Auras.spacing = cfg.icon_spacing
         self.Auras.size = cfg.auras_size
@@ -789,7 +735,7 @@ local function style(self, unit)
         threatColor(main)
     end)
 
-    self.Health.PostUpdate = HealthPostUpdate
+    self.Health.PostUpdate = healthPostUpdate
 
     -- Absorb
     local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
@@ -800,14 +746,108 @@ local function style(self, unit)
         }
 
     -- Every event should be register with this
-    table.insert(self.__elements, UpdateName)
-    self:RegisterEvent("UNIT_NAME_UPDATE", UpdateName)
+    table.insert(self.__elements, updateName)
+    self:RegisterEvent("UNIT_NAME_UPDATE", updateName)
 
-    table.insert(self.__elements, UpdateTarget)
-    self:RegisterEvent("PLAYER_TARGET_CHANGED", UpdateTarget, true)
+    table.insert(self.__elements, updateTarget)
+    self:RegisterEvent("PLAYER_TARGET_CHANGED", updateTarget, true)
 
     -- Disable movement via /moveui
     self.disableMovement = true
+end
+
+function module:PLAYER_REGEN_ENABLED()
+    SetCVar("nameplateShowEnemies", 0)
+end
+
+function module:PLAYER_REGEN_DISABLED()
+    SetCVar("nameplateShowEnemies", 1)
+end
+
+function module:PLAYER_ENTERING_WORLD()
+    if InCombatLockdown() then
+        SetCVar("nameplateShowEnemies", 1)
+    else
+        SetCVar("nameplateShowEnemies", 0)
+    end
+
+    if cfg.healer_icon == true then
+        for _, specID in pairs(healerSpecIDs) do
+            local _, name = GetSpecializationInfoByID(specID)
+            if name and not healerSpecs[name] then
+                healerSpecs[name] = true
+            end
+        end
+
+        checkHealers()
+    end
+end
+
+function module:PLAYER_LOGIN()
+    if cfg.enhance_threat == true then
+        SetCVar("threatWarning", 3)
+    end
+    SetCVar("nameplateGlobalScale", 1)
+    SetCVar("namePlateMinScale", 1)
+    SetCVar("namePlateMaxScale", 1)
+    SetCVar("nameplateLargerScale", 1)
+    SetCVar("nameplateSelectedScale", 1)
+    SetCVar("nameplateMinAlpha", 1)
+    SetCVar("nameplateMaxAlpha", 1)
+    SetCVar("nameplateSelectedAlpha", 1)
+    SetCVar("nameplateNotSelectedAlpha", 1)
+    SetCVar("nameplateLargeTopInset", 0.08)
+
+    SetCVar("nameplateOtherTopInset", cfg.clamp and 0.08 or -1)
+    SetCVar("nameplateOtherBottomInset", cfg.clamp and 0.1 or -1)
+
+    if cfg.only_name then
+        SetCVar("nameplateShowOnlyNames", 1)
+    end
+
+    local function changeFont(self)
+        self:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
+        self:SetShadowOffset(1, -1)
+    end
+    changeFont(SystemFont_NamePlateFixed)
+end
+
+function module:OnInit()
+    if cfg.kick_color then
+        if E.myClass == "DEATHKNIGHT" then
+            kickID = 47528
+        elseif E.myClass == "DEMONHUNTER" then
+            kickID = 183752
+        elseif E.myClass == "DRUID" then
+            kickID = 106839
+        elseif E.myClass == "HUNTER" then
+            kickID = GetSpecialization() == 3 and 187707 or 147362
+        elseif E.myClass == "MAGE" then
+            kickID = 2139
+        elseif E.myClass == "MONK" then
+            kickID = 116705
+        elseif E.myClass == "PALADIN" then
+            kickID = 96231
+        elseif E.myClass == "PRIEST" then
+            kickID = 15487
+        elseif E.myClass == "ROGUE" then
+            kickID = 1766
+        elseif E.myClass == "SHAMAN" then
+            kickID = 57994
+        elseif E.myClass == "WARLOCK" then
+            kickID = 119910
+        elseif E.myClass == "WARRIOR" then
+            kickID = 6552
+        end
+    end
+
+    self:RegisterEvent("PLAYER_LOGIN")
+
+    if cfg.combat == true then
+        self:RegisterEvent("PLAYER_REGEN_ENABLED")
+        self:RegisterEvent("PLAYER_REGEN_DISABLED")
+        self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    end
 end
 
 oUF:RegisterStyle("DarkUI:Nameplates", style)

@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Memory.enable then return end
 ----------------------------------------------------------------------------------------
 --	Memory of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local GetAddOnCPUUsage, GetAddOnInfo, GetAddOnMemoryUsage = GetAddOnCPUUsage, GetAddOnInfo, GetAddOnMemoryUsage
 local GetAvailableBandwidth = GetAvailableBandwidth
@@ -24,7 +25,6 @@ local GameTooltip = GameTooltip
 local AddonList = AddonList
 
 local cfg = C.stats.config.Memory
-local module = E.datatext
 
 local function sortdesc(a, b) return a[2] > b[2] end
 local function formatmem(val, dec)
@@ -122,8 +122,6 @@ module:Inject("Memory", {
         end
         GameTooltip:Show()
     end,
-    --OnUpdate = AltUpdate,
-    OnLeave = function(self) self.hovered = false end,
     OnClick = function(self, button)
         if button == "RightButton" then
             UpdateMemUse()

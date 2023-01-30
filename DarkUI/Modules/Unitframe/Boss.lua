@@ -6,6 +6,7 @@ if not C.unitframe.enable then return end
 ----------------------------------------------------------------------------------------
 -- Boss Frame of DarkUI
 ----------------------------------------------------------------------------------------
+local core = E:Module("UFCore")
 
 local oUF = ns.oUF or oUF
 
@@ -16,7 +17,6 @@ local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES
 
 local cfg = C.unitframe
-local DUF = E.unitframe
 
 local mediaPath = cfg.mediaPath
 
@@ -33,25 +33,23 @@ local createTexture = function(self)
     self.FrameFG = CreateFrame("Frame", nil, self)
     self.FrameFG:SetFrameStrata("HIGH")
     self.FrameFG:SetFrameLevel(7)
+    self.FrameFG:SetSize(256, 128)
+    self.FrameFG:SetPoint("CENTER", self, 0, 0)
 
     self.FrameFG.texture = self.FrameFG:CreateTexture(nil, "BORDER")
     self.FrameFG.texture:SetTexture(media.foreground)
     self.FrameFG.texture:SetAllPoints(self.FrameFG)
 
-    self.FrameFG:SetSize(256, 128)
-    self.FrameFG:SetPoint("CENTER", self, 0, 0)
-
     -- background
     self.FrameBG = CreateFrame("Frame", nil, self)
     self.FrameBG:SetFrameStrata("MEDIUM")
     self.FrameBG:SetFrameLevel(4)
-
+    self.FrameBG:SetSize(256, 128)
+    self.FrameBG:SetPoint("CENTER", self, 0, 0)
+    
     self.FrameBG.texture = self.FrameBG:CreateTexture(nil, "BACKGROUND")
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
-
-    self.FrameBG:SetSize(256, 128)
-    self.FrameBG:SetPoint("CENTER", self, 0, 0)
 end
 
 local createBar = function(self)
@@ -60,7 +58,6 @@ local createBar = function(self)
     self.Health:SetFrameLevel(5)
     self.Health:SetSize(80, 16)
     self.Health:SetPoint("CENTER", self, 25, 4)
-
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -78,17 +75,33 @@ local createBar = function(self)
     self.Power:SetFrameLevel(6)
     self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, 0)
     self.Power:SetSize(80, 4)
-
     self.Power:SetStatusBarTexture(media.mpTex)
-
-    self.Power.frequentUpdates = true
-    self.Power.colorPower = true
-    self.Power.Smooth = true
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg.multiplier = .45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
+
+    self.Power.frequentUpdates = true
+    self.Power.colorPower = true
+    self.Power.Smooth = true
+
+    --alt power bar
+    self.AlternativePower = CreateFrame("StatusBar", nil, self)
+    self.AlternativePower:SetPoint("CENTER")
+    self.AlternativePower:SetFrameStrata("LOW")
+    self.AlternativePower:SetFrameLevel(4)
+    self.AlternativePower:SetPoint('TOP', self.Health, 'TOP', 0, 0)
+    self.AlternativePower:SetSize(94, 4)
+    self.AlternativePower:SetStatusBarTexture(media.mpTex)
+
+    self.AlternativePower.bg = self.AlternativePower:CreateTexture(nil, "BORDER")
+    self.AlternativePower.bg.multiplier = .45
+    self.AlternativePower.bg:SetAllPoints()
+    self.AlternativePower.bg:SetTexture(media.mpTex)
+
+    self.AlternativePower.colorPower = true
+    self.AlternativePower.Smooth = true
 end
 
 local createPortrait = function(self)
@@ -143,9 +156,11 @@ end
 
 local createAuraIcon = function(self)
     local f = CreateFrame('Frame', nil, self)
+    f:SetFrameStrata("HIGH")
+    f:SetFrameLevel(1)
 
     f.size = 24
-    f.spacing = 4
+    f.spacing = 6
     f.gap = true
     f.initialAnchor = 'RIGHT'
     f.onlyShowPlayer = cfg.boss.aura.player_aura_only
@@ -158,9 +173,11 @@ local createAuraIcon = function(self)
     f:SetSize(h, w)
     f:SetPoint('RIGHT', self, 'LEFT', -40, 0)
 
-    f.PostCreateButton = DUF.PostCreateIcon
-    f.PostUpdateButton = DUF.PostUpdateIcon
-    f.FilterAura = DUF.FilterAuras
+    f.reanchorIfVisibleChanged = true
+    f.PostCreateButton = core.PostCreateIcon
+    f.PostUpdateButton = core.PostUpdateIcon
+    f.PostUpdateGapButton = core.PostUpdateGapIcon
+    f.FilterAura = core.FilterAuras
 
     self.Auras = f
 end
@@ -182,10 +199,10 @@ local createStyle = function(self)
     createTag(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self, "BACKGROUND", 18, -1, self, "CENTER", "CENTER", 20, 0)
+    self.RaidTargetIndicator = core:CreateIcon(self, "BACKGROUND", 18, -1, self, "CENTER", "CENTER", 20, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    DUF.SetFader(self, cfg.boss.fader)
+    core:SetFader(self, cfg.boss.fader)
 end
 
 ---------------------------------------------

@@ -1,0 +1,19 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <!-- LibStub -->
+    <Include file="LibStub\_load_.xml" />
+
+    <!-- LibDropDown -->
+    <Include file="LibDropDown\_load_.xml" />
+
+    <!-- LibEditMode -->
+    <Include file="LibEditMode\_load_.xml" />
+
+    <!-- oUF -->
+    <Include file="oUF\_load_.xml" />
+
+    <!-- LitePanels -->
+    <Include file="LitePanels\_load_.xml" />
+    
+    <!-- cargBags -->
+    <Include file="cargBags\_load_.xml" />
+</Ui>

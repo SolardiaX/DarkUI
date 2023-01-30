@@ -5,13 +5,24 @@ if not C.actionbar.bars.enable then return end
 ----------------------------------------------------------------------------------------
 --	PetActionBar (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("BarPet")
 
 local _G = _G
 local CreateFrame = CreateFrame
+local IsPetAttackAction = IsPetAttackAction
+local AutoCastShine_AutoCastStart, AutoCastShine_AutoCastStop = AutoCastShine_AutoCastStart, AutoCastShine_AutoCastStop
+local GetPetActionSlotUsable, GetPetActionInfo = GetPetActionSlotUsable, GetPetActionInfo
+local PetHasActionBar = PetHasActionBar
+local SetDesaturation = SetDesaturation
 local RegisterStateDriver = RegisterStateDriver
+local SharedActionButton_RefreshSpellHighlight = SharedActionButton_RefreshSpellHighlight
+local Spell = Spell
+local hooksecurefunc = hooksecurefunc
 local unpack, tinsert = unpack, tinsert
 local UIParent = _G.UIParent
 local PetActionBar = _G.PetActionBar
+local InCombatLockdown = InCombatLockdown
+local PET_ACTION_HIGHLIGHT_MARKS = _G.PET_ACTION_HIGHLIGHT_MARKS
 
 local cfg = C.actionbar.bars.barpet
 local num = NUM_PET_ACTION_SLOTS
@@ -24,7 +35,7 @@ local function updatePetBar()
         local petAutoCastableTexture = _G[buttonName].AutoCastable or _G[buttonName.."AutoCastable"]
         local petAutoCastShine = _G[buttonName.."Shine"]
 
-        local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled = GetPetActionInfo(i)
+        local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID = GetPetActionInfo(i)
 
         if not isToken then
             petActionIcon:SetTexture(texture)
@@ -36,114 +47,127 @@ local function updatePetBar()
 
         petActionButton.isToken = isToken
 
-        if isActive and name ~= "PET_ACTION_FOLLOW" then
-            petActionButton:SetChecked(true)
-            if IsPetAttackAction(i) then
-                petActionButton:StartFlash()
-                petActionButton:GetCheckedTexture():SetAlpha(0.5)
-            end
-        else
-            petActionButton:SetChecked(false)
-            if IsPetAttackAction(i) then
-                petActionButton:StopFlash()
-                petActionButton:GetCheckedTexture():SetAlpha(1.0)
-            end
-        end
+        if spellID then
+			local spell = Spell:CreateFromSpellID(spellID)
+			petActionButton.spellDataLoadedCancelFunc = spell:ContinueWithCancelOnSpellLoad(function()
+				petActionButton.tooltipSubtext = spell:GetSpellSubtext()
+			end)
+		end
+		if isActive then
+			if IsPetAttackAction(i) then
+				petActionButton:StartFlash()
+				-- the checked texture looks a little confusing at full alpha (looks like you have an extra ability selected)
+				petActionButton:GetCheckedTexture():SetAlpha(0.5)
+			else
+				petActionButton:StopFlash()
+				petActionButton:GetCheckedTexture():SetAlpha(1.0)
+			end
+			petActionButton:SetChecked(true)
+		else
+			petActionButton:StopFlash()
+			petActionButton:SetChecked(false)
+		end
+		if autoCastAllowed then
+			petAutoCastableTexture:Show()
+		else
+			petAutoCastableTexture:Hide()
+		end
+		if autoCastEnabled then
+			AutoCastShine_AutoCastStart(petAutoCastShine)
+		else
+			AutoCastShine_AutoCastStop(petAutoCastShine)
+		end
+		if texture then
+			if GetPetActionSlotUsable(i) then
+				petActionIcon:SetVertexColor(1, 1, 1)
+			else
+				petActionIcon:SetVertexColor(0.4, 0.4, 0.4)
+			end
+			petActionIcon:Show()
+		else
+			petActionIcon:Hide()
+		end
 
-        if autoCastAllowed then
-            petAutoCastableTexture:Show()
-        else
-            petAutoCastableTexture:Hide()
-        end
-
-        if autoCastEnabled then
-            AutoCastShine_AutoCastStart(petAutoCastShine)
-        else
-            AutoCastShine_AutoCastStop(petAutoCastShine)
-        end
-
-        if texture then
-            if GetPetActionSlotUsable(i) then
-                SetDesaturation(petActionIcon, nil)
-            else
-                SetDesaturation(petActionIcon, 1)
-            end
-            petActionIcon:Show()
-        else
-            petActionIcon:Hide()
-        end
-
-        if not PetHasActionBar() and texture and name ~= "PET_ACTION_FOLLOW" then
-            petActionButton:StopFlash()
-            SetDesaturation(petActionIcon, 1)
-            petActionButton:SetChecked(false)
-        end
+		SharedActionButton_RefreshSpellHighlight(petActionButton, PET_ACTION_HIGHLIGHT_MARKS[i])
     end
 end
 
-local bar = CreateFrame("Frame", "DarkUI_PetActionBarHolder", UIParent, "SecureHandlerStateTemplate")
-bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
-bar:SetHeight(cfg.button.size)
-bar:SetPoint(unpack(cfg.pos))
-bar.buttonList = {}
+function module:OnInit()
+    local bar = CreateFrame("Frame", "DarkUI_PetActionBarHolder", UIParent, "SecureHandlerStateTemplate")
+    bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
+    bar:SetHeight(cfg.button.size)
+    bar:SetPoint(unpack(cfg.pos))
+    bar.buttonList = {}
 
-bar:RegisterEvent("PLAYER_ENTERING_WORLD")
-bar:RegisterEvent("PLAYER_CONTROL_LOST")
-bar:RegisterEvent("PLAYER_CONTROL_GAINED")
-bar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
-bar:RegisterEvent("PET_BAR_UPDATE")
-bar:RegisterEvent("PET_BAR_UPDATE_USABLE")
-bar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
-bar:RegisterEvent("UNIT_PET")
-bar:RegisterEvent("UNIT_FLAGS")
-bar:RegisterEvent("UNIT_AURA")
-bar:SetScript("OnEvent", function(self, event)
-    if event == "PLAYER_ENTERING_WORLD" then
-        PetActionBar:EnableMouse(false)
-        PetActionBar_ShowGrid = E.dummy
-        PetActionBar_HideGrid = E.dummy
-        PetActionBar.showgrid = nil
+    PetActionBar:SetParent(bar)
 
-        PetActionBar:UnregisterAllEvents()
-        PetActionBar_Update = updatePetBar
+    bar:RegisterEvent("UNIT_PET")
+    bar:RegisterEvent("UNIT_FLAGS")
+    bar:RegisterEvent("UNIT_AURA")
+    bar:RegisterEvent("PET_UI_UPDATE")
+    bar:RegisterEvent("PET_BAR_UPDATE")
+    bar:RegisterEvent("PET_BAR_UPDATE_USABLE")
+    bar:RegisterEvent("PET_BAR_UPDATE_COOLDOWN")
+    bar:RegisterEvent("PLAYER_ENTERING_WORLD")
+    bar:RegisterEvent("PLAYER_CONTROL_LOST")
+    bar:RegisterEvent("PLAYER_CONTROL_GAINED")
+    bar:RegisterEvent("PLAYER_TARGET_CHANGED")
+    bar:RegisterEvent("PLAYER_FARSIGHT_FOCUS_CHANGED")
+    bar:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED")
+    bar:RegisterEvent("UPDATE_VEHICLE_ACTIONBAR")
 
-        for i = 1, num do
-            local button = _G["PetActionButton" .. i]
-            tinsert(self.buttonList, button) --add the button object to the list
+    bar:SetScript("OnEvent", function(self, event)
+        if event == "PLAYER_ENTERING_WORLD" then
+            for i = 1, num do
+                local button = _G["PetActionButton" .. i]
+                tinsert(self.buttonList, button) --add the button object to the list
 
-            button:SetSize(cfg.button.size, cfg.button.size)
-            button:ClearAllPoints()
-            button:SetParent(self)
-            button:Show()
-            
-            if i == 1 then
-                button:SetPoint("BOTTOMLEFT", self, 0, 0)
-            else
-                local previous = _G["PetActionButton" .. i - 1]
-                button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+                button:SetSize(cfg.button.size, cfg.button.size)
+                button:ClearAllPoints()
+                button:SetParent(self)
+                button:Show()
+                
+                if i == 1 then
+                    button:SetPoint("BOTTOMLEFT", self, 0, 0)
+                else
+                    local previous = _G["PetActionButton" .. i - 1]
+                    button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+                end
             end
 
-            button.SetPoint = function() return end
+            RegisterStateDriver(bar, "visibility", "[petbattle][overridebar][vehicleui][possessbar][shapeshift] hide; [pet] show; hide")
 
-            self:SetAttribute("addchild", button)
+            --create the mouseover functionality
+            if cfg.fader_mouseover then
+                E:ButtonBarFader(self, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
+            end
+
+            --create the combat fader
+            if cfg.fader_combat then
+                E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
+            end
+        elseif event == "PET_BAR_UPDATE_COOLDOWN" then
+            PetActionBar:UpdateCooldowns()
+        else
+            updatePetBar()
         end
+    end)
 
-        RegisterStateDriver(bar, "visibility", "[@pet,exists,nopossessbar] show; hide")
-        hooksecurefunc(PetActionBar, "Update", updatePetBar)
+    hooksecurefunc(_G["PetActionButton10"], "SetPoint", function(_, _, anchor)
+        if InCombatLockdown() then return end
+        if anchor and anchor == PetActionBar then
+            for i = 1, num do
+                local button = _G["PetActionButton" .. i]
+                button:SetParent(bar)
+                button:ClearAllPoints()
 
-        --create the mouseover functionality
-        if cfg.fader_mouseover then
-            E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
+                if i == 1 then
+                    button:SetPoint("BOTTOMLEFT", 0, 0)
+                else
+                    local previous = _G["PetActionButton" .. i - 1]
+                    button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+                end
+            end
         end
-
-        --create the combat fader
-        if cfg.fader_combat then
-            E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-        end
-    elseif event == "PET_BAR_UPDATE" or event == "PLAYER_CONTROL_LOST" or event == "PLAYER_CONTROL_GAINED" or event == "PLAYER_FARSIGHT_FOCUS_CHANGED"
-	or event == "UNIT_FLAGS" or (event == "UNIT_PET" and arg1 == "player") or (event == "UNIT_AURA" and arg1 == "pet") then
-		updatePetBar()
-	elseif event == "PET_BAR_UPDATE_COOLDOWN" then
-		PetActionBar:UpdateCooldowns()
-	end
-end)
+    end)
+end

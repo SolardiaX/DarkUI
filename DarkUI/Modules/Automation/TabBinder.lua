@@ -5,24 +5,16 @@ if not C.automation.tab_binder then return end
 ----------------------------------------------------------------------------------------
 --	Auto change Tab key to only target enemy players(RE/TabBinder by Veev/AcidWeb)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("TabBinder")
 
-local CreateFrame = CreateFrame
 local GetCurrentBindingSet, GetBindingKey = GetCurrentBindingSet, GetBindingKey
 local GetBindingAction, SetBinding, SaveBindings = GetBindingAction, SetBinding, SaveBindings
 local InCombatLockdown, GetZonePVPInfo, IsInInstance = InCombatLockdown, GetZonePVPInfo, IsInInstance
 local ERR_DUEL_REQUESTED = ERR_DUEL_REQUESTED
 
-local TabBinder = CreateFrame("Frame")
-TabBinder:RegisterEvent("PLAYER_ENTERING_WORLD")
-TabBinder:RegisterEvent("ZONE_CHANGED_NEW_AREA")
-TabBinder:RegisterEvent("PLAYER_REGEN_ENABLED")
-TabBinder:RegisterEvent("DUEL_REQUESTED")
-TabBinder:RegisterEvent("DUEL_FINISHED")
-TabBinder:RegisterEvent("CHAT_MSG_SYSTEM")
+local RTB_Fail, RTB_DefaultKey, LastTargetKey, TargetKey, CurrentBind, Success = false, true, nil, nil, nil, false
 
-local RTB_Fail, RTB_DefaultKey, LastTargetKey, TargetKey, CurrentBind, Success = false, true
-
-TabBinder:SetScript("OnEvent", function(_, event, ...)
+module:RegisterEvent("PLAYER_ENTERING_WORLD ZONE_CHANGED_NEW_AREA PLAYER_REGEN_ENABLED DUEL_REQUESTED DUEL_FINISHED CHAT_MSG_SYSTEM", function(_, event, ...)
     if event == "CHAT_MSG_SYSTEM" then
         local RTBChatMessage = ...
         if RTBChatMessage == ERR_DUEL_REQUESTED then

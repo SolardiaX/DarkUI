@@ -12,15 +12,15 @@ local modf = math.modf
 --  Time format functions
 ----------------------------------------------------------------------------------------
 function E:FormatTime(seconds, raw)
-    local d, h, m, str = 86400, 3600, 60
+    local d, h, m, str = 86400, 3600, 60, ""
     if seconds >= d then
-        -- str = format("%d" .. E.colorString .. "d", seconds / d + .5)
+        -- str = format("%d" .. E.myColorString .. "d", seconds / d + .5)
         str = format("%dd", seconds / d + .5)
     elseif seconds >= h then
-        -- str = format("%d" .. E.colorString .. "h", seconds / h + .5)
+        -- str = format("%d" .. E.myColorString .. "h", seconds / h + .5)
         str = format("%dh", seconds / h + .5)
     elseif seconds >= m then
-        -- str = format("%d" .. E.colorString .. "m", seconds / m + .5)
+        -- str = format("%d" .. E.myColorString .. "m", seconds / m + .5)
         str = format("%dm", seconds / m + .5)
     else
         if seconds <= 5 then
@@ -184,45 +184,5 @@ function E:SetVariable(group, key, value)
         end
 
         index = index + 1
-    end
-end
-
-
--- Events
-local events = {}
-
-local host = CreateFrame("Frame")
-host:SetScript("OnEvent", function(_, event, ...)
-    for func in pairs(events[event]) do
-        if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-            func(event, CombatLogGetCurrentEventInfo())
-        else
-            func(event, ...)
-        end
-    end
-end)
-
-function E:RegisterEvent(event, func, unit1, unit2)
-    if not events[event] then
-        events[event] = {}
-        if unit1 then
-            host:RegisterUnitEvent(event, unit1, unit2)
-        else
-            host:RegisterEvent(event)
-        end
-    end
-
-    events[event][func] = true
-end
-
-function E:UnregisterEvent(event, func)
-    local funcs = events[event]
-    if funcs and funcs[func] then
-        funcs[func] = nil
-
-        if not next(funcs) then
-            events[event] = nil
-            host:UnregisterEvent(event)
-        end
     end
 end

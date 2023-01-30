@@ -3,6 +3,7 @@
 ----------------------------------------------------------------------------------------
 --	Auto repair
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("AutoSell")
 
 local CreateFrame = CreateFrame
 local GetContainerNumSlots, GetContainerItemLink = C_Container.GetContainerNumSlots, C_Container.GetContainerItemLink
@@ -14,9 +15,7 @@ local GOLD_AMOUNT_TEXTURE = GOLD_AMOUNT_TEXTURE
 local SILVER_AMOUNT_TEXTURE = SILVER_AMOUNT_TEXTURE
 local COPPER_AMOUNT_TEXTURE = COPPER_AMOUNT_TEXTURE
 
-local Event = CreateFrame("Frame")
-Event:RegisterEvent("MERCHANT_SHOW")
-Event:SetScript("OnEvent", function(self)
+module:RegisterEvent("MERCHANT_SHOW", function(self)
     if not C.automation.auto_sell then return end -- for dynamic change with datatext
 
     local Cost = 0

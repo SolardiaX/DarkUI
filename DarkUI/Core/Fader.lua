@@ -3,7 +3,6 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 --	Core Fader Methods (modified from rLib)
 ----------------------------------------------------------------------------------------
-
 local defaultFadeIn = { time = 0.4, alpha = 1 }
 local defaultFadeOut = { time = 0.3, alpha = 0 }
 

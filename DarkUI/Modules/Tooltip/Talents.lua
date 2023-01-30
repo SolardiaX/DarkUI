@@ -12,7 +12,7 @@ local INSPECT_DELAY = 0.2
 local INSPECT_FREQ = 1.5
 
 -- Variables
-local ttt = CreateFrame("Frame", "TipTacTalents")
+local ttt = CreateFrame("Frame", "DarkUITalents")
 local cache = {}
 local current = {}
 

@@ -6,6 +6,7 @@ if not C.unitframe.enable then return end
 ----------------------------------------------------------------------------------------
 -- TargetOfTarget Frame of DarkUI
 ----------------------------------------------------------------------------------------
+local core = E:Module("UFCore")
 
 local oUF = ns.oUF or oUF
 
@@ -15,7 +16,6 @@ local unpack = unpack
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 
 local cfg = C.unitframe
-local DUF = E.unitframe
 
 local mediaPath = cfg.mediaPath
 
@@ -36,25 +36,23 @@ local createTexture = function(self)
     self.FrameFG = CreateFrame('Frame', nil, self)
     self.FrameFG:SetFrameStrata("LOW")
     self.FrameFG:SetFrameLevel(5)
+    self.FrameFG:SetSize(256, 128)
+    self.FrameFG:SetPoint('CENTER', self, 0, 0)
 
     self.FrameFG.texture = self.FrameFG:CreateTexture(nil, 'BORDER')
     self.FrameFG.texture:SetTexture(media.foreground)
     self.FrameFG.texture:SetAllPoints(self.FrameFG)
 
-    self.FrameFG:SetSize(256, 128)
-    self.FrameFG:SetPoint('CENTER', self, 0, 0)
-
     -- background
     self.FrameBG = CreateFrame('Frame', nil, self)
     self.FrameBG:SetFrameStrata('BACKGROUND')
     self.FrameBG:SetFrameLevel(1)
+    self.FrameBG:SetSize(256, 128)
+    self.FrameBG:SetPoint("CENTER", self, 0, 0)
 
     self.FrameBG.texture = self.FrameBG:CreateTexture(nil, 'BACKGROUND')
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
-
-    self.FrameBG:SetSize(256, 128)
-    self.FrameBG:SetPoint("CENTER", self, 0, 0)
 end
 
 local createBar = function(self)
@@ -63,7 +61,6 @@ local createBar = function(self)
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(80, 16)
     self.Health:SetPoint('CENTER', self, 25, 4)
-
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -81,38 +78,16 @@ local createBar = function(self)
     self.Power:SetFrameLevel(4)
     self.Power:SetPoint('TOP', self.Health, 'BOTTOM', 0, 0)
     self.Power:SetSize(80, 4)
-
     self.Power:SetStatusBarTexture(media.mpTex)
-
-    self.Power.frequentUpdates = true
-    self.Power.colorPower = true
-    self.Power.Smooth = true
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg.multiplier = .45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
-
-    --Incoming heal
-    local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-    mhpb:SetTexture(media.Incoming_barTex)
-    mhpb:SetVertexColor(0, 1, 0.5, 0.2)
-
-    local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ohpb:SetTexture(media.Incoming_barTex)
-    ohpb:SetVertexColor(0, 1, 0, 0.2)
-
-    local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ahpb:SetTexture(media.Incoming_barTex)
-    ahpb:SetVertexColor(1, 1, 0, 0.2)
-
-    self.HealPrediction = {
-        myBar           = mhpb,
-        otherBar        = ohpb,
-        absorbBar       = ahpb,
-        maxOverflow     = 1,
-        frequentUpdates = true
-    }
+    
+    self.Power.frequentUpdates = true
+    self.Power.colorPower = true
+    self.Power.Smooth = true
 end
 
 local createPortrait = function(self)
@@ -182,10 +157,10 @@ local createStyle = function(self)
     createPortrait(self)
     createTag(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 18, -1, self, "CENTER", "CENTER", 20, 0)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, -1, self, "CENTER", "CENTER", 20, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    DUF.SetFader(self, cfg.targettarget.fader)
+    core:SetFader(self, cfg.targettarget.fader)
 end
 
 ---------------------------------------------

@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Location.enable then return end
 ----------------------------------------------------------------------------------------
 --	Location of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local GetSubZoneText, GetZonePVPInfo, GetZoneText = GetSubZoneText, GetZonePVPInfo, GetZoneText
 local IsInInstance = IsInInstance
@@ -24,7 +25,6 @@ local WorldMapFrame = WorldMapFrame
 
 local cfg = C.stats.config.Location
 local font = C.stats.font
-local module = E.datatext
 
 module:Inject("Location", {
     OnLoad   = function(self)

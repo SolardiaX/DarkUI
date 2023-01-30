@@ -149,7 +149,7 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
             hpval = "-" .. E:ShortValue(max - min)
         end
     end
-    return "|cff" .. colorstr .. (hpval or "") .. "|r"
+    return "|cff" .. colorstr .. (hpval or "100%") .. "|r"
 end
 oUF.Tags.Events["dd:misshp"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
 
@@ -160,6 +160,13 @@ oUF.Tags.Methods['dd:pvptimer'] = function(unit)
 
     return E:FormatTime(math.floor(GetPVPTimer() / 1000))
 end
+
+-- AltPower value tag
+oUF.Tags.Methods["dd:altpower"] = function(unit)
+	local cur = UnitPower(unit, ALTERNATE_POWER_INDEX)
+	return cur > 0 and cur
+end
+oUF.Tags.Events["dd:altpower"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER"
 
 local instance, func, proxyfunc, proxy
 
@@ -186,9 +193,8 @@ local function CreateTag(self, region, tagstr, frequentUpdates)
         region, tagstr = self, region
     end
 
-    local fs = region:CreateFontString(nil, 'OVERLAY')
-    fs:SetShadowColor(0, 0, 0)
-    fs:SetShadowOffset(0.85, -0.85)
+    local fs = region:CreateFontText(12, "")
+    fs:ClearAllPoints()
 
     if frequentUpdates then
         if type(frequentUpdates) == 'number' then

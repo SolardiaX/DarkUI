@@ -1,15 +1,15 @@
 local E, C, L = select(2, ...):unpack()
 
-if C.chat.enable ~= true or C.tooltip.enable ~= true or IsAddOnLoaded("tekKompare") then return end
+if C.tooltip.enable ~= true or IsAddOnLoaded("tekKompare") then return end
 
 ----------------------------------------------------------------------------------------
 --	Based on tekKompare(by Tekkub)
 ----------------------------------------------------------------------------------------
 
-local BattlePetToolTip_Show =BattlePetToolTip_Show
-local strsplit = strsplit
+local BattlePetToolTip_Show = BattlePetToolTip_Show
 local GameTooltip = GameTooltip
 local BattlePetTooltip = BattlePetTooltip
+local strsplit, tonumber = strsplit, tonumber
 
 local orig1, orig2 = {}, {}
 local linktypes = {item = true, enchant = true, spell = true, quest = true, unit = true, talent = true, achievement = true, glyph = true, instancelock = true, currency = true}

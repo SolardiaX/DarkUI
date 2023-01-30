@@ -5,6 +5,7 @@ if not C.chat.enable then return end
 ----------------------------------------------------------------------------------------
 --	Colors links in Battle.net whispers(RealLinks by p3lim)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Chat"):Sub("RealLinks")
 
 local CreateFrame = CreateFrame
 local GetItemInfo, GetItemQualityColor, GetCurrencyLink = GetItemInfo, GetItemQualityColor, GetCurrencyLink
@@ -83,16 +84,16 @@ local function MessageFilter(self, event, message, ...)
     return false, message, ...
 end
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-frame:SetScript("OnEvent", function()
-    if #queuedMessages > 0 then
-        for index, data in next, queuedMessages do
-            ChatFrame_MessageEventHandler(unpack(data))
-            queuedMessages[index] = nil
+function module:OnInit()
+    module:RegisterEvent("GET_ITEM_INFO_RECEIVED", function()
+        if #queuedMessages > 0 then
+            for index, data in next, queuedMessages do
+                ChatFrame_MessageEventHandler(unpack(data))
+                queuedMessages[index] = nil
+            end
         end
-    end
-end)
+    end)
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER", MessageFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM", MessageFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER", MessageFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_BN_WHISPER_INFORM", MessageFilter)
+end

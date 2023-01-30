@@ -3,8 +3,8 @@
 ----------------------------------------------------------------------------------------
 --	Auto repair
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("AutoRepair")
 
-local CreateFrame = CreateFrame
 local CanMerchantRepair, GetRepairAllCost = CanMerchantRepair, GetRepairAllCost
 local IsInGuild = IsInGuild
 local GetGuildBankWithdrawMoney, GetGuildBankMoney = GetGuildBankWithdrawMoney, GetGuildBankMoney
@@ -16,9 +16,7 @@ local GOLD_AMOUNT_TEXTURE = GOLD_AMOUNT_TEXTURE
 local SILVER_AMOUNT_TEXTURE = SILVER_AMOUNT_TEXTURE
 local COPPER_AMOUNT_TEXTURE = COPPER_AMOUNT_TEXTURE
 
-local Event = CreateFrame("Frame")
-Event:RegisterEvent("MERCHANT_SHOW")
-Event:SetScript("OnEvent", function(self)
+module:RegisterEvent("MERCHANT_SHOW", function(self)
     if not C.automation.auto_repair then return end -- for dynamic change with datatext
 
     if CanMerchantRepair() then

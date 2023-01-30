@@ -32,9 +32,6 @@ local PickupContainerItem = C_Container.PickupContainerItem
 local _G = _G
 local next, ipairs = _G.next, _G.ipairs
 
-local BackdropTemplate = BackdropTemplateMixin and "BackdropTemplate" or nil
-
-
 local Textures = {
     Search         = C.media.path .. "bag_search",
     BagToggle      = C.media.path .. "bag_toggle",
@@ -42,11 +39,6 @@ local Textures = {
     Restack        = C.media.path .. "bag_restack",
     Deposit        = C.media.path .. "bag_deposit",
     TooltipIcon    = C.media.path .. "bag_tooltip_icon",
-    Up             = C.media.path .. "bag_up",
-    Down           = C.media.path .. "bag_down",
-    Left           = C.media.path .. "bag_left",
-    Right          = C.media.path .. "bag_right",
-    BagUpgradeIcon = C.media.path .. "bag_upgrade_icon",
 }
 
 local cfg = C.bags
@@ -233,21 +225,6 @@ function MyContainer:OnContentsChanged(forced)
         end
     end
 end
-
---[[function MyContainer:OnButtonAdd(button)
-    if not button.Border then return end
-
-    local _,bagType = GetContainerNumFreeSlots(button.bagId)
-    if button.bagId == KEYRING_CONTAINER then
-        button.Border:SetBackdropBorderColor(0, 0, 0)     -- Key ring
-    elseif bagType and bagType > 0 and bagType < 8 then
-        button.Border:SetBackdropBorderColor(1, 1, 0)       -- Ammo bag
-    elseif bagType and bagType > 4 then
-        button.Border:SetBackdropBorderColor(1, 1, 1)       -- Profession bags
-    else
-        button.Border:SetBackdropBorderColor(0, 0, 0)       -- Normal bags
-    end
-end]]--
 
 -- Restack Items
 local function restackItems(self)
@@ -512,8 +489,8 @@ function MyContainer:OnCreate(name, settings)
     background:SetFrameLevel(1)
     background:SetPoint("TOPLEFT", -4, 4)
     background:SetPoint("BOTTOMRIGHT", 4, -4)
-    background:SetTemplate("Blur")
-    background:CreateShadow()
+
+    E:ApplyBackdrop(background, false)
 
     -- Caption, close button
     local caption = background:CreateFontString(nil, "OVERLAY", nil)
@@ -532,8 +509,8 @@ function MyContainer:OnCreate(name, settings)
                 F.ReskinClose(close, "TOPRIGHT", self, "TOPRIGHT", 1, 1)
                 close:SetSize(30,30)
             else
-                close:SkinCloseButton(self)
                 close:SetSize(24, 24)
+                E:SkinCloseButton(close, self)
             end
             close:ClearAllPoints()
             close:SetPoint("TOPRIGHT", 8, 8)
@@ -545,60 +522,6 @@ function MyContainer:OnCreate(name, settings)
                 end
             end)
         end
-    end
-
-    -- mover buttons
-    if settings.isCustomBag then
-        local moveLR = function(dir)
-            local idx = -1
-            for i,v in ipairs(_G.SavedStats.cB_CustomBags) do if v.name == name then idx = i end end
-            if (idx == -1) then return end
-
-            local tcol = (_G.SavedStats.cB_CustomBags[idx].col + ((dir == "left") and 1 or -1)) % 2
-            _G.SavedStats.cB_CustomBags[idx].col = tcol
-            cbNivaya:CreateAnchors()
-        end
-
-        local moveUD = function(dir)
-            local idx = -1
-            for i,v in ipairs(_G.SavedStats.cB_CustomBags) do if v.name == name then idx = i end end
-            if (idx == -1) then return end
-
-            local pos = idx
-            local d = (dir == "up") and 1 or -1
-            repeat
-                pos = pos + d
-            until
-                (not _G.SavedStats.cB_CustomBags[pos]) or (_G.SavedStats.cB_CustomBags[pos].col == _G.SavedStats.cB_CustomBags[idx].col)
-
-            if (_G.SavedStats.cB_CustomBags[pos] ~= nil) then
-                local ele = _G.SavedStats.cB_CustomBags[idx]
-                _G.SavedStats.cB_CustomBags[idx] = _G.SavedStats.cB_CustomBags[pos]
-                _G.SavedStats.cB_CustomBags[pos] = ele
-                cbNivaya:CreateAnchors()
-            end
-        end
-
-        local rightBtn = createMoverButton(self, Textures.Right, "Right")
-        rightBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
-        rightBtn:SetScript("OnClick", function() moveLR("right") end)
-
-        local leftBtn = createMoverButton(self, Textures.Left, "Left")
-        leftBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", -17, 0)
-        leftBtn:SetScript("OnClick", function() moveLR("left") end)
-
-        local downBtn = createMoverButton(self, Textures.Down, "Down")
-        downBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", -34, 0)
-        downBtn:SetScript("OnClick", function() moveUD("down") end)
-
-        local upBtn = createMoverButton(self, Textures.Up, "Up")
-        upBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", -51, 0)
-        upBtn:SetScript("OnClick", function() moveUD("up") end)
-
-        self.rightBtn = rightBtn
-        self.leftBtn = leftBtn
-        self.downBtn = downBtn
-        self.upBtn = upBtn
     end
 
     local tBtnOffs = 0
@@ -807,6 +730,8 @@ function MyButton:OnCreate()
     self:GetHighlightTexture():SetInside()
     self:SetSize(itemSlotSize - 4, itemSlotSize - 4)
     self:CreateBackdrop()
+    
+    self.backdrop:SetOutside()
     self.backdrop:SetBackdropColor(.3, .3, .3, .3)
 
     self.Icon:SetInside()

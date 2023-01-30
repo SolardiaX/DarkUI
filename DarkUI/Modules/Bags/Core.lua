@@ -19,123 +19,9 @@ cargBags_Nivaya:SetScript("OnEvent", function(self, event, ...) self[event](self
 cargBags_Nivaya:RegisterEvent("ADDON_LOADED")
 
 local cbNivaya = cargBags:GetImplementation("Nivaya")
---cbNivCatDropDown = CreateFrame("Frame", "cbNivCatDropDown", UIParent, "UIDropDownMenuTemplate")
-
-do    --Replacement for UIDropDownMenu
-    local frameHeight = 14
-    local defaultWidth = 120
-    local frameInset = 16
-
-    local f = cbNivCatDropDown or CreateFrame("Frame", "cbNivCatDropDown", UIParent, BackdropTemplate)
-    f.ActiveButtons = 0
-    f.Buttons = {}
-
-    f:SetFrameStrata("FULLSCREEN_DIALOG")
-    f:SetSize(defaultWidth+frameInset, 32)
-    f:SetClampedToScreen(true)
-    f:SetFrameStrata("FULLSCREEN_DIALOG")
-    f:SetSize(defaultWidth + frameInset, 32)
-    f:SetClampedToScreen(true)
-    f:SetTemplate("Blur")
-    f:CreateShadow()
-
-    function f:CreateButton()
-        local button = CreateFrame("Button", nil, self)
-        button:SetWidth(defaultWidth)
-        button:SetHeight(frameHeight)
-
-        local fstr = button:CreateFontString()
-        fstr:SetJustifyH("LEFT")
-        fstr:SetJustifyV("MIDDLE")
-        fstr:SetFontObject("SystemFont_Outline_Small")
-        fstr:SetPoint("LEFT", button, "LEFT", 0, 0)
-        button.Text = fstr
-
-        function button:SetText(str)
-            button.Text:SetText(str)
-        end
-
-        button:SetText("test")
-
-        local ntex = button:CreateTexture()
-        ntex:SetColorTexture(1, 1, 1, 0)
-        ntex:SetAllPoints()
-        button:SetNormalTexture(ntex)
-
-        local htex = button:CreateTexture()
-        htex:SetColorTexture(1, 1, 1, 0.2)
-        htex:SetAllPoints()
-        button:SetHighlightTexture(htex)
-
-        local ptex = button:CreateTexture()
-        ptex:SetColorTexture(1, 1, 1, 0.4)
-        ptex:SetAllPoints()
-        button:SetPushedTexture(ptex)
-
-        return button
-    end
-
-    function f:AddButton(text, value, func)
-        local bID = self.ActiveButtons + 1
-
-        local btn = self.Buttons[bID] or self:CreateButton()
-
-        btn:SetText(text or "")
-        btn.value = value
-        btn.func = func or function() end
-
-        btn:SetScript("OnClick", function(self, ...) self:func(...) self:GetParent():Hide() end)
-
-        btn:ClearAllPoints()
-        if bID == 1 then
-            btn:SetPoint("TOP", self, "TOP", 0, -(frameInset/2))
-        else
-            btn:SetPoint("TOP", self.Buttons[bID-1], "BOTTOM", 0, 0)
-        end
-
-        self.Buttons[bID] = btn
-        self.ActiveButtons = bID
-
-        self:UpdateSize()
-    end
-
-    function f:UpdatePosition(frame, point, relativepoint, ofsX, ofsY)
-        point, relativepoint, ofsX, ofsY = point or "TOPLEFT", relativepoint or "BOTTOMLEFT", ofsX or 0, ofsY or 0
-
-        self:ClearAllPoints()
-        self:SetPoint(point, frame, relativepoint, ofsX, ofsY)
-    end
-
-    function f:UpdateSize()
-        local maxButtons = self.ActiveButtons
-        local maxwidth = defaultWidth
-
-        for i = 1, maxButtons do
-            local width = self.Buttons[i].Text:GetWidth()
-            if width > maxwidth then maxwidth = width end
-        
-        end
-
-        for i = 1, maxButtons do
-            self.Buttons[i]:SetWidth(maxwidth)
-        end
-
-        local height = maxButtons * frameHeight
-
-        self:SetSize(maxwidth + frameInset, height + frameInset)
-    end
-
-    function f:Toggle(frame, point, relativepoint, ofsX, ofsY)
-        self:UpdatePosition(frame, point, relativepoint, ofsX, ofsY)
-        self:Show()
-    end
-
-    tinsert(UISpecialFrames,f:GetName())
-end
 
 ---------------------------------------------
 ---------------------------------------------
-local L = L
 cB_Bags = {}
 cB_BagHidden = {}
 cB_CustomBags = {}
@@ -227,27 +113,27 @@ function cargBags_Nivaya:ADDON_LOADED(event, addon)
     -----------------
     -- Frame Spawns
     -----------------
-    local C = cbNivaya:GetContainerClass()
+    local CC = cbNivaya:GetContainerClass()
 
     -- bank bags
-    cB_Bags.bankSets        = C:New("cBniv_BankSets")
+    cB_Bags.bankSets        = CC:New("cBniv_BankSets")
 
     if cBniv.BankCustomBags then
         for _,v in ipairs(cB_CustomBags) do 
-            cB_Bags['Bank'..v.name] = C:New('Bank'..v.name) 
+            cB_Bags['Bank'..v.name] = CC:New('Bank'..v.name) 
             cB_existsBankBag[v.name] = true
         end
     end
 
-    cB_Bags.bankArmor           = C:New("cBniv_BankArmor")
-    cB_Bags.bankGem             = C:New("cBniv_BankGem")
-    cB_Bags.bankConsumables     = C:New("cBniv_BankCons")
-    cB_Bags.bankArtifactPower   = C:New("cBniv_BankArtifactPower")
-    cB_Bags.bankBattlePet       = C:New("cBniv_BankPet")
-    cB_Bags.bankQuest           = C:New("cBniv_BankQuest")
-    cB_Bags.bankTrade           = C:New("cBniv_BankTrade")
-    cB_Bags.bankReagent         = C:New("cBniv_BankReagent")
-    cB_Bags.bank                = C:New("cBniv_Bank")
+    cB_Bags.bankArmor           = CC:New("cBniv_BankArmor")
+    cB_Bags.bankGem             = CC:New("cBniv_BankGem")
+    cB_Bags.bankConsumables     = CC:New("cBniv_BankCons")
+    cB_Bags.bankArtifactPower   = CC:New("cBniv_BankArtifactPower")
+    cB_Bags.bankBattlePet       = CC:New("cBniv_BankPet")
+    cB_Bags.bankQuest           = CC:New("cBniv_BankQuest")
+    cB_Bags.bankTrade           = CC:New("cBniv_BankTrade")
+    cB_Bags.bankReagent         = CC:New("cBniv_BankReagent")
+    cB_Bags.bank                = CC:New("cBniv_Bank")
 
     cB_Bags.bankSets            :SetMultipleFilters(true, cB_Filters.fBank, cB_Filters.fBankFilter, cB_Filters.fItemSets)
     cB_Bags.bankArmor           :SetExtendedFilter(cB_Filters.fItemClass, "BankArmor")
@@ -264,37 +150,37 @@ function cargBags_Nivaya:ADDON_LOADED(event, addon)
     end
 
     -- inventory bags
-    cB_Bags.key            = C:New("cBniv_Keyring")
-    cB_Bags.bagItemSets    = C:New("cBniv_ItemSets")
-    cB_Bags.bagStuff       = C:New("cBniv_Stuff")
+    cB_Bags.key            = CC:New("cBniv_Keyring")
+    cB_Bags.bagItemSets    = CC:New("cBniv_ItemSets")
+    cB_Bags.bagStuff       = CC:New("cBniv_Stuff")
 
     for _,v in ipairs(cB_CustomBags) do 
         if (v.prio > 0) then 
-            cB_Bags[v.name] = C:New(v.name, { isCustomBag = true } )
+            cB_Bags[v.name] = CC:New(v.name, { isCustomBag = true } )
             v.active = true
             cB_filterEnabled[v.name] = true
         end
     end
 
-    cB_Bags.bagJunk        = C:New("cBniv_Junk")
-    cB_Bags.bagNew         = C:New("cBniv_NewItems")
+    cB_Bags.bagJunk        = CC:New("cBniv_Junk")
+    cB_Bags.bagNew         = CC:New("cBniv_NewItems")
 
     for _,v in ipairs(cB_CustomBags) do 
         if (v.prio <= 0) then 
-            cB_Bags[v.name] = C:New(v.name, { isCustomBag = true } )
+            cB_Bags[v.name] = CC:New(v.name, { isCustomBag = true } )
             v.active = true
             cB_filterEnabled[v.name] = true
         end
     end
 
-    cB_Bags.armor           = C:New("cBniv_Armor")
-    cB_Bags.gem             = C:New("cBniv_Gem")
-    cB_Bags.quest           = C:New("cBniv_Quest")
-    cB_Bags.consumables     = C:New("cBniv_Consumables")
-    cB_Bags.artifactpower   = C:New("cBniv_ArtifactPower")
-    cB_Bags.battlepet       = C:New("cBniv_BattlePet")
-    cB_Bags.tradegoods      = C:New("cBniv_TradeGoods")
-    cB_Bags.main            = C:New("cBniv_Bag")
+    cB_Bags.armor           = CC:New("cBniv_Armor")
+    cB_Bags.gem             = CC:New("cBniv_Gem")
+    cB_Bags.quest           = CC:New("cBniv_Quest")
+    cB_Bags.consumables     = CC:New("cBniv_Consumables")
+    cB_Bags.artifactpower   = CC:New("cBniv_ArtifactPower")
+    cB_Bags.battlepet       = CC:New("cBniv_BattlePet")
+    cB_Bags.tradegoods      = CC:New("cBniv_TradeGoods")
+    cB_Bags.main            = CC:New("cBniv_Bag")
 
     cB_Bags.key             :SetExtendedFilter(cB_Filters.fItemClass, "Keyring")
     cB_Bags.bagItemSets     :SetFilter(cB_Filters.fItemSets, true)
@@ -316,22 +202,21 @@ function cargBags_Nivaya:ADDON_LOADED(event, addon)
 
     cbNivaya:CreateAnchors()
     cbNivaya:Init()
-    cbNivaya:ToggleBagPosButtons()
 end
 
 function cbNivaya:CreateAnchors()
------------------------------------------------
--- Store the anchoring order:
--- read: "tar" is anchored to "src" in the direction denoted by "dir".
------------------------------------------------
-local function CreateAnchorInfo(src, tar, dir)
-    tar.AnchorTo = src
-    tar.AnchorDir = dir
-    if src then
-        if not src.AnchorTargets then src.AnchorTargets = {} end
-        src.AnchorTargets[tar] = true
+    -----------------------------------------------
+    -- Store the anchoring order:
+    -- read: "tar" is anchored to "src" in the direction denoted by "dir".
+    -----------------------------------------------
+    local function CreateAnchorInfo(src, tar, dir)
+        tar.AnchorTo = src
+        tar.AnchorDir = dir
+        if src then
+            if not src.AnchorTargets then src.AnchorTargets = {} end
+            src.AnchorTargets[tar] = true
+        end
     end
-end
 
     -- neccessary if this function is used to update the anchors:
     for k,_ in pairs(cB_Bags) do
@@ -356,6 +241,7 @@ end
     CreateAnchorInfo(cB_Bags.bankConsumables, cB_Bags.bankQuest, "Bottom")
     CreateAnchorInfo(cB_Bags.bankQuest, cB_Bags.bankArtifactPower, "Bottom")
     CreateAnchorInfo(cB_Bags.bankArtifactPower, cB_Bags.bankBattlePet, "Bottom")
+
     -- Bank Custom Container Anchors:
     if cBniv.BankCustomBags then
         local ref = { [0] = 0, [1] = 0 }
@@ -400,20 +286,20 @@ end
     for _,v in pairs(cB_Bags) do cbNivaya:UpdateAnchors(v) end
 end
 
-function cbNivaya:UpdateAnchors(self)
-    if not self.AnchorTargets then return end
-    for v,_ in pairs(self.AnchorTargets) do
+function cbNivaya:UpdateAnchors(src)
+    if not src.AnchorTargets then return end
+    for v,_ in pairs(src.AnchorTargets) do
         local t, u = v.AnchorTo, v.AnchorDir
         if t then
             local h = cB_BagHidden[t.name]
             v:ClearAllPoints()
 
-            if    not h        and u == "Top"       then v:SetPoint("BOTTOM", t, "TOP", 0, 9)
+            if        not h    and u == "Top"       then v:SetPoint("BOTTOM", t, "TOP", 0, 8)
             elseif    h        and u == "Top"       then v:SetPoint("BOTTOM", t, "BOTTOM")
-            elseif    not h    and u == "Bottom"    then v:SetPoint("TOP", t, "BOTTOM", 0, -9)
+            elseif    not h    and u == "Bottom"    then v:SetPoint("TOP", t, "BOTTOM", 0, -8)
             elseif    h        and u == "Bottom"    then v:SetPoint("TOP", t, "TOP")
-            elseif    u == "Left"                   then v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -9, 0)
-            elseif    u == "Right"                  then v:SetPoint("TOPLEFT", t, "TOPRIGHT", 9, 0) end
+            elseif    u == "Left"                   then v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -8, 0)
+            elseif    u == "Right"                  then v:SetPoint("TOPLEFT", t, "TOPRIGHT", 8, 0) end
             end
         end
 end
@@ -446,26 +332,6 @@ function cbNivaya:OnBankClosed()
     if cBniv.BankCustomBags then
         for _,v in ipairs(cB_CustomBags) do if v.active then cbNivaya:HideBags(cB_Bags['Bank'..v.name]) end end
     end
-end
-
-function cbNivaya:ToggleBagPosButtons()
-    for _,v in ipairs(cB_CustomBags) do 
-        if v.active then 
-            local b = cB_Bags[v.name]
-            if cBniv.BagPos then
-                b.rightBtn:Hide()
-                b.leftBtn:Hide()
-                b.downBtn:Hide()
-                b.upBtn:Hide()
-            else
-                b.rightBtn:Show()
-                b.leftBtn:Show()
-                b.downBtn:Show()
-                b.upBtn:Show()
-            end
-        end
-    end
-    cBniv.BagPos = not cBniv.BagPos
 end
 
 local buttonCollector = {}

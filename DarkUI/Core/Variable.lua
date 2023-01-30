@@ -3,15 +3,66 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 --  Variable of DarkUI
 ----------------------------------------------------------------------------------------
+local module = E:Module("Variable")
 
+local _G = _G
 local SetCVar = SetCVar
 local SetCVarBitfield = SetCVarBitfield
+local InCombatLockdown = InCombatLockdown
 local StaticPopup_Show = StaticPopup_Show
 local ToggleChatColorNamesByClassGroup = ToggleChatColorNamesByClassGroup
-local OnLogon = CreateFrame("Frame")
+local hooksecurefunc = hooksecurefunc
 
-OnLogon:RegisterEvent("ADDON_LOADED")
-OnLogon:SetScript("OnEvent", function(self, _, name)
+local function disableTutorial()
+    TutorialFrameAlertButton:Kill()
+    local function AcknowledgeTips()
+        if InCombatLockdown() then return end
+        for frame in _G.HelpTip.framePool:EnumerateActive() do
+            frame:Acknowledge()
+        end
+    end
+    AcknowledgeTips()
+    hooksecurefunc(_G.HelpTip, "Show", AcknowledgeTips)
+end
+
+local function applyCVar()
+    if C.chat.enable then
+        SetCVar("chatStyle", "im")
+    end
+
+    if C.unitframe.enable then
+        SetCVar("showPartyBackground", 0)
+    end
+
+    if C.actionbar.bars.enable then
+        if not InCombatLockdown() then
+            SetCVar("multiBarRightVerticalLayout", 0)
+        end
+    end
+
+    if C.nameplate.enable then
+        SetCVar("ShowClassColorInNameplate", 1)
+    end
+
+    if C.map.minimap.enable then
+        SetCVar("minimapTrackingShowAll", 1)
+    end
+
+    if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
+        C_Container.SetSortBagsRightToLeft(true)
+        C_Container.SetInsertItemsLeftToRight(false)
+    end
+
+    if C.combat.combattext.enable then
+		if C.combat.combattext.incoming then
+			SetCVar("enableFloatingCombatText", 1)
+		else
+			SetCVar("enableFloatingCombatText", 0)
+		end
+	end
+end
+
+module:RegisterEvent("ADDON_LOADED", function(self, event, name)
     if name ~= E.addonName then return end
 
     self:UnregisterEvent("ADDON_LOADED")
@@ -68,7 +119,6 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         SetCVar("useUiScale", 1)
         -- Set our uiScale
         if tonumber(GetCVar("uiScale")) ~= tonumber(cfgScale) then SetCVar("uiScale", cfgScale) end
-        -- Hack for 4K and WQHD Resolution
         if cfgScale then UIParent:SetScale(cfgScale) end
 
         SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WORLD_MAP_FRAME, true)
@@ -98,7 +148,7 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         ToggleChatColorNamesByClassGroup(true, "CHANNEL5")
 
         -- Set to default layout of Blizzard Edit Mode
-        C_EditMode.SetActiveLayout(1)
+        -- C_EditMode.SetActiveLayout(1)
 
         SavedStatsPerChar.version = E.version
 
@@ -107,7 +157,10 @@ OnLogon:SetScript("OnEvent", function(self, _, name)
         end
     end
 
-    print("|cffffff00" .. L.WELCOME_LINE .. E.version .. " " .. E.client .. ", " .. E.name .. ".|r")
+    disableTutorial()
+    applyCVar()
+
+    print("|cffffff00" .. L.WELCOME_LINE .. E.version .. " " .. E.locale .. ", " .. E.myName .. ".|r")
 end)
 
 StaticPopupDialogs["INSTALLUI_CONFIRM"] = {

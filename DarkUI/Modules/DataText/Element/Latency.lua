@@ -5,6 +5,7 @@ if not C.stats.enable or not C.stats.config.Latency.enable then return end
 ----------------------------------------------------------------------------------------
 --	Latency of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("DataText")
 
 local GetNetStats = GetNetStats
 local format, gsub, max = format, gsub, math.max
@@ -12,7 +13,6 @@ local MAINMENUBAR_LATENCY_LABEL = MAINMENUBAR_LATENCY_LABEL
 local GameTooltip = GameTooltip
 
 local cfg = C.stats.config.Latency
-local module = E.datatext
 
 module:Inject("Latency", {
     text    = {

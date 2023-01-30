@@ -5,6 +5,7 @@ if not C.actionbar.styles.cooldown.enable then return end
 ----------------------------------------------------------------------------------------
 --	Cooldown count (modified from tullaCC)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("StyleCooldown")
 
 local _G = _G
 local CreateFrame = CreateFrame
@@ -18,13 +19,15 @@ local round = function(x) return floor(x + 0.5) end
 local UIParent = UIParent
 
 --sexy constants!
-local ICON_SIZE = 36 --the normal size for an icon (don't change this)
+local ICON_SIZE = 26 --the normal size for an icon (don't change this)
 local DAY, HOUR, MINUTE = 86400, 3600, 60 --used for formatting text
 local DAYISH, HOURISH, MINUTEISH = 3600 * 23.5, 60 * 59.5, 59.5 --used for formatting text at transition points
 local HALFDAYISH, HALFHOURISH, HALFMINUTEISH = DAY / 2 + 0.5, HOUR / 2 + 0.5, MINUTE / 2 + 0.5 --used for calculating next update times
 local MIN_DELAY = 0.01
 
 local cfg = C.actionbar.styles.cooldown
+
+module.hideNumbers = {}
 
 --returns both what text to display, and how long until the next update
 local function getTimeText(s)
@@ -80,7 +83,7 @@ local function Timer_OnUpdate(self, elapsed)
 end
 
 --forces the given timer to update on the next frame
-function Timer_ForceUpdate(self)
+local function Timer_ForceUpdate(self)
     self.nextUpdate = 0
     self:Show()
 end
@@ -128,9 +131,6 @@ local function Timer_Create(cooldown)
     return timer
 end
 
-local Cooldown_MT = getmetatable(_G.ActionButton1Cooldown).__index
-local hideNumbers = {}
-
 local function deactivateDisplay(cooldown)
 	local timer = cooldown.timer
 	if timer then
@@ -140,41 +140,45 @@ end
 
 local function setHideCooldownNumbers(cooldown, hide)
 	if hide then
-		hideNumbers[cooldown] = true
+		module.hideNumbers[cooldown] = true
 		deactivateDisplay(cooldown)
 	else
-		hideNumbers[cooldown] = nil
+		module.hideNumbers[cooldown] = nil
 	end
 end
 
-hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, ...)
-	if cooldown.noCooldownCount or cooldown:IsForbidden() or hideNumbers[cooldown] then return end
+function module:OnActive()
+    local Cooldown_MT = getmetatable(_G.ActionButton1Cooldown).__index
 
-	local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
+    hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, modRate)
+        if cooldown.noCooldownCount or cooldown:IsForbidden() or module.hideNumbers[cooldown] then return end
 
-	if show then
-        cooldown:SetDrawBling(cfg.drawBling)
-        cooldown:SetDrawSwipe(cfg.drawSwipe)
-        cooldown:SetDrawEdge(cfg.drawEdge)
-        
-		local parent = cooldown:GetParent()
-		if parent and parent.chargeCooldown == cooldown then return end
+        local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
 
-		local timer = cooldown.timer or Timer_Create(cooldown)
-		timer.start = start
-		timer.duration = duration
-		timer.enabled = true
-		timer.nextUpdate = 0
-		if timer.fontScale >= cfg.minScale then timer:Show() end
-	else
-		deactivateDisplay(cooldown)
-	end
-end)
+        if show then
+            cooldown:SetDrawBling(cfg.drawBling)
+            cooldown:SetDrawSwipe(cfg.drawSwipe)
+            cooldown:SetDrawEdge(cfg.drawEdge)
+            
+            local parent = cooldown:GetParent()
+            if parent and parent.chargeCooldown == cooldown then return end
 
-hooksecurefunc(Cooldown_MT, "Clear", deactivateDisplay)
+            local timer = cooldown.timer or Timer_Create(cooldown)
+            timer.start = start
+            timer.duration = duration
+            timer.enabled = true
+            timer.nextUpdate = 0
+            if timer.fontScale >= cfg.minScale then timer:Show() end
+        else
+            deactivateDisplay(cooldown)
+        end
+    end)
 
-hooksecurefunc(Cooldown_MT, "SetHideCountdownNumbers", setHideCooldownNumbers)
+    hooksecurefunc(Cooldown_MT, "Clear", deactivateDisplay)
 
-hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function(cooldown)
-	setHideCooldownNumbers(cooldown, true)
-end)
+    hooksecurefunc(Cooldown_MT, "SetHideCountdownNumbers", setHideCooldownNumbers)
+
+    hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function(cooldown)
+        setHideCooldownNumbers(cooldown, true)
+    end)
+end

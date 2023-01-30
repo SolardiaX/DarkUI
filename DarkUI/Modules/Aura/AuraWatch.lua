@@ -5,6 +5,8 @@ if not C.aura.auraWatch.enable then return end
 ----------------------------------------------------------------------------------------
 --	AuraWatch (Modified from NDUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Aura"):Sub("AuraWatch")
+
 local LBG = LibStub("LibButtonGlow-1.0", true)
 
 local CreateFrame = CreateFrame
@@ -22,7 +24,12 @@ local GameTooltip = _G.GameTooltip
 local maxFrames = 12 -- Max Tracked Auras
 local AuraList, FrameList, UnitIDTable, IntTable, IntCD, myTable, cooldownTable = {}, {}, {}, {}, {}, {}, {}
 local updater = CreateFrame("Frame")
-local module = CreateFrame("Frame")
+
+local bit_bor = bit.bor
+
+local MyPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_MINE, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+local PartyPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_PARTY, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
+local RaidPetFlags = bit_bor(COMBATLOG_OBJECT_AFFILIATION_RAID, COMBATLOG_OBJECT_REACTION_FRIENDLY, COMBATLOG_OBJECT_CONTROL_PLAYER, COMBATLOG_OBJECT_TYPE_PET)
 
 -- DataConvert
 local function DataAnalyze(v)
@@ -80,7 +87,7 @@ local function ConvertTable()
         end
     end
 
-    for _, v in pairs(C.aura.auraWatch[E.class]) do
+    for _, v in pairs(C.aura.auraWatch[E.myClass]) do
         if v.Name == "Player Aura" then
             InsertData(1, v.List)
         elseif v.Name == "Target Aura" then
@@ -114,7 +121,7 @@ end
 local function BuildAuraList()
     AuraList = C.aura.auraWatch["ALL"] or {}
     for class in pairs(C.aura.auraWatch) do
-        if class == E.class then
+        if class == E.myClass then
             for _, value in pairs(C.aura.auraWatch[class]) do
                 tinsert(AuraList, value)
             end
@@ -205,9 +212,9 @@ local function BuildICON(iconSize)
 
     local frame = CreateFrame("Frame", nil, E.PetBattleFrameHider)
     frame:SetSize(iconSize, iconSize)
-    frame:CreateTextureBorder(2)
-    frame:CreateShadow()
     frame:Hide()
+
+    E:ApplyOverlayBorder(frame, 2)
 
     frame.Icon = frame:CreateTexture(nil, "ARTWORK")
     frame.Icon:SetPoint("TOPLEFT", frame, 2, -2)
@@ -237,8 +244,7 @@ end
 local function BuildBAR(barWidth, iconSize)
     local frame = CreateFrame("Frame", nil, E.PetBattleFrameHider)
     frame:SetSize(iconSize, iconSize)
-    frame:CreateTextureBorder(2)
-    frame:CreateShadow()
+    E:ApplyOverlayBorder(frame, 2)
 
     frame.Icon = frame:CreateTexture(nil, "ARTWORK")
     frame.Icon:SetPoint("TOPLEFT", frame, 2, -2)
@@ -252,7 +258,7 @@ local function BuildBAR(barWidth, iconSize)
     frame.Statusbar:SetMinMaxValues(0, 1)
     frame.Statusbar:SetValue(0)
     frame.Statusbar:SetStatusBarTexture(C.media.texture.gradient)
-    frame.Statusbar:SetStatusBarColor(E.color.r, E.color.g, E.color.b)
+    frame.Statusbar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
     frame.Statusbar:SetTemplate("Default")
     frame.Statusbar:CreateShadow()
 
@@ -580,7 +586,7 @@ function module:AuraWatch_SetupInt(intID, itemID, duration, unitID, guid, source
         class = select(2, GetPlayerInfoByGUID(guid))
         name = "*" .. sourceName
     else
-        class = E.class
+        class = E.myClass
     end
     if frame.Icon then
         frame.Icon:SetTexture(icon)
@@ -596,7 +602,7 @@ function module:AuraWatch_SetupInt(intID, itemID, duration, unitID, guid, source
         frame.Spellname:SetText(name)
     end
     if frame.Statusbar then
-        frame.Statusbar:SetStatusBarColor(E.color.r, E.color.g, E.color.b)
+        frame.Statusbar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
         frame.Statusbar:SetMinMaxValues(0, duration)
         frame.elapsed = 0
         frame.duration = duration
@@ -610,7 +616,7 @@ local eventList = {
 }
 
 local function checkPetFlags(sourceFlags, all)
-    if sourceFlags == E.MyPetFlags or (all and (sourceFlags == E.PartyPetFlags or sourceFlags == E.RaidPetFlags)) then
+    if sourceFlags == MyPetFlags or (all and (sourceFlags == PartyPetFlags or sourceFlags == RaidPetFlags)) then
         return true
     end
 end
@@ -623,7 +629,7 @@ function module:IsUnitWeNeed(value, name, flags)
             return true
         end
     elseif value.UnitID:lower() == "player" then
-        if name and name == E.name or checkPetFlags(flags) then
+        if name and name == E.myName or checkPetFlags(flags) then
             return true
         end
     end
@@ -717,7 +723,7 @@ function module:AuraWatch_OnUpdate(elapsed)
 end
 updater:SetScript("OnUpdate", module.AuraWatch_OnUpdate)
 
-function module:Active()
+module:RegisterEvent("PLAYER_LOGIN", function(self)
     if not SavedStatsPerChar["AuraWatch"] then
         SavedStatsPerChar["AuraWatch"] = {}
 
@@ -814,10 +820,7 @@ function module:Active()
         end
     end
     SLASH_AuraWatch1 = "/aw"
-end
-
-module:RegisterEvent("PLAYER_LOGIN")
-module:SetScript("OnEvent", module.Active)
+end)
 
 -- Gift of the Titans
 local hasTitan

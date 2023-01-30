@@ -1,4 +1,4 @@
-local T, C, L, _ = unpack(select(2, ...))
+local E, C, L, M = unpack(select(2, ...))
 
 if not C.blizzard.custom_position then return end
 
@@ -216,7 +216,7 @@ frame:SetScript("OnEvent", function()
     for _, widget in pairs(UIWidgetBelowMinimapContainerFrame.widgetFrames) do
         local previous = nil
         if widget.widgetType == Enum.UIWidgetVisualizationType.CaptureBar then
-            skinCaptureBar(previous, widget)
+            SkinCaptureBar(previous, widget)
             if previous == nil then previous = widget end
         end
     end
@@ -235,8 +235,8 @@ end)
 
 -- Maw Buffs skin
 maw:SetSize(210, 40)
-maw.Container:SkinButton()
 maw.Container:SetSize(200, 30)
+E:StyleButton(maw)
 
 maw.Container.List:StripTextures()
 maw.Container.List:SetTemplate("Overlay")

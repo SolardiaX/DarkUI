@@ -97,9 +97,9 @@ hooksecurefunc("QuestObjectiveSetupBlockButton_Item", function(block)
     if item and not item.skinned then
         item:SetSize(26, 26)
         item:SetTemplate("Default")
-        item:StyleButton()
-        item:CreateTextureBorder()
         item:SetNormalTexture(0)
+
+        E:StyleButton(item)
 
         item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
         item.icon:SetPoint("TOPLEFT", item, 2, -2)
@@ -136,7 +136,8 @@ hooksecurefunc("QuestObjectiveSetupBlockButton_FindGroup", function(block)
         icon:SetNormalTexture(0)
         icon:SetHighlightTexture(0)
         icon:SetPushedTexture(0)
-        icon:CreateTextureBorder()
+
+        E:ApplyOverlayBorder(icon)
         
         icon.b = CreateFrame("Frame", nil, icon)
         icon.b:SetTemplate("Overlay")
@@ -242,7 +243,7 @@ end
 ----------------------------------------------------------------------------------------
 --	Kill reward animation when finished dungeon or bonus objectives
 ----------------------------------------------------------------------------------------
-ObjectiveTrackerScenarioRewardsFrame.Show = E.dummy
+ObjectiveTrackerScenarioRewardsFrame.Show = E.Dummy
 
 hooksecurefunc("BonusObjectiveTracker_AnimateReward", function()
     ObjectiveTrackerBonusRewardsFrame:ClearAllPoints()

@@ -5,6 +5,39 @@ if not C.automation.auto_quest then return end
 ----------------------------------------------------------------------------------------
 --	Quest automation(QuickQuest by p3lim)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("AutoQuest")
+
+local _G = _G
+local UnitGUID = UnitGUID
+local GetNumTrackingTypes, GetTrackingInfo = GetNumTrackingTypes, GetTrackingInfo
+local GetInstanceInfo = GetInstanceInfo
+local GetNumGroupMembers, GetNumActiveQuests = GetNumGroupMembers, GetNumActiveQuests
+local GetActiveQuestID, GetActiveTitle, SelectActiveQuest = GetActiveQuestID, GetActiveTitle, SelectActiveQuest
+local GetNumAvailableQuests = GetNumAvailableQuests
+local GetAvailableQuestInfo = GetAvailableQuestInfo
+local SelectAvailableQuest = SelectAvailableQuest
+local QuestIsFromAreaTrigger = QuestIsFromAreaTrigger
+local AcceptQuest, CloseQuest, CompleteQuest = AcceptQuest, CloseQuest, CompleteQuest
+local QuestGetAutoAccept = QuestGetAutoAccept
+local AcknowledgeAutoAcceptQuest = AcknowledgeAutoAcceptQuest
+local GetQuestID = GetQuestID
+local IsQuestCompletable = IsQuestCompletable
+local GetNumQuestItems, GetQuestItemLink = GetNumQuestItems, GetQuestItemLink
+local GetItemInfoFromHyperlink = GetItemInfoFromHyperlink
+local GetQuestItemInfo = GetQuestItemInfo
+local GetNumQuestChoices = GetNumQuestChoices
+local GetQuestReward = GetQuestReward
+local GetItemInfo = GetItemInfo
+local GetNumAutoQuestPopUps, GetAutoQuestPopUp = GetNumAutoQuestPopUps, GetAutoQuestPopUp
+local ShowQuestOffer, ShowQuestComplete = ShowQuestOffer, ShowQuestComplete
+local UnitIsDeadOrGhost = UnitIsDeadOrGhost
+local AutoQuestPopupTracker_RemovePopUp = AutoQuestPopupTracker_RemovePopUp
+local QuestLogPushQuest = QuestLogPushQuest
+local QuestInfoItem_OnClick = QuestInfoItem_OnClick
+local StaticPopup_Hide = StaticPopup_Hide
+local C_GossipInfo, C_QuestLog, C_Map = C_GossipInfo, C_QuestLog, C_Map
+local tonumber, tostring, strsub = tonumber, tostring, string.sub
+local MINIMAP_TRACKING_TRIVIAL_QUESTS = MINIMAP_TRACKING_TRIVIAL_QUESTS
 
 local QuickQuestDB = {
     general = {
@@ -72,8 +105,6 @@ local QuickQuestDB = {
             [88604] = true, -- Nat's Fishing Journal
         },
         npcs = {
-
-
             -- misc
             [103792] = true, -- Griftah (his quests are scams)
             [143925] = true, -- Dark Iron Mole Machine (Dark Iron Dwarf racial)
@@ -97,7 +128,6 @@ local QuickQuestDB = {
             [95146] = true,
             [95200] = true,
             [95201] = true,
-
         },
         quests = {
             -- 6.0 coins
@@ -153,63 +183,6 @@ local QuickQuestDB = {
         },
     },
 }
-
-local questHandler = CreateFrame('Frame')
-questHandler.events = {}
-questHandler:SetScript('OnEvent', function(self, event, ...)
-    self:Trigger(event, ...)
-end)
-
-function questHandler:Register(event, func)
-    local registered = not not self.events[event]
-    if not registered then
-        self.events[event] = {}
-    end
-
-    for _, f in next, self.events[event] do
-        if f == func then
-            -- avoid the same function being registered multiple times for the same event
-            return
-        end
-    end
-
-    table.insert(self.events[event], func)
-
-    if not registered then
-        self:RegisterEvent(event)
-    end
-end
-
-function questHandler:Unregister(event, func)
-    local funcs = self.events[event]
-    if funcs then
-        for i, f in next, funcs do
-            if f == func then
-                funcs[i] = nil
-                break
-            end
-        end
-    end
-
-    if funcs and #funcs == 0 then
-        self:UnregisterEvent(event)
-    end
-end
-
-function questHandler:Trigger(event, ...)
-    local funcs = self.events[event]
-    if funcs then
-        for _, func in next, funcs do
-            if type(func) == 'string' then
-                self:Trigger(func, ...)
-            else
-                if func(...) then
-                    self:Unregister(event, func)
-                end
-            end
-        end
-    end
-end
 
 local NPC_ID_PATTERN = '%w+%-.-%-.-%-.-%-.-%-(.-)%-'
 local function GetNPCID(unit)
@@ -272,7 +245,7 @@ local function IsQuestIgnored(questID)
     return false
 end
 
-questHandler:Register('GOSSIP_CONFIRM', function(index)
+module:RegisterEvent('GOSSIP_CONFIRM', function(_, _, index)
     -- triggered when a gossip confirm prompt is displayed
     if paused then
         return
@@ -286,7 +259,7 @@ questHandler:Register('GOSSIP_CONFIRM', function(index)
     end
 end)
 
-questHandler:Register('GOSSIP_SHOW', function()
+module:RegisterEvent('GOSSIP_SHOW', function()
     -- triggered when the player interacts with an NPC that presents dialogue
     if paused then
         return
@@ -341,7 +314,7 @@ questHandler:Register('GOSSIP_SHOW', function()
     end
 end)
 
-questHandler:Register('GOSSIP_SHOW', function()
+module:RegisterEvent('GOSSIP_SHOW', function()
     -- triggered when the player interacts with an NPC that presents dialogue
     if paused then
         return
@@ -363,14 +336,14 @@ questHandler:Register('GOSSIP_SHOW', function()
     -- accept all available quests
     for index, info in next, C_GossipInfo.GetAvailableQuests() do
         if not IsQuestIgnored(info.questID) then
-            if not info.isTrivial or ns.ShouldAcceptTrivialQuests() then
+            if not info.isTrivial or ShouldAcceptTrivialQuests() then
                 C_GossipInfo.SelectAvailableQuest(index)
             end
         end
     end
 end)
 
-questHandler:Register('QUEST_GREETING', function()
+module:RegisterEvent('QUEST_GREETING', function()
     -- triggered when the player interacts with an NPC that hands in/out quests
     if paused then
         return
@@ -401,7 +374,7 @@ questHandler:Register('QUEST_GREETING', function()
     end
 end)
 
-questHandler:Register('QUEST_DETAIL', function(questItemID)
+module:RegisterEvent('QUEST_DETAIL', function(_, _, questItemID)
     -- triggered when the information about an available quest is available
     if paused then
         return
@@ -423,7 +396,7 @@ questHandler:Register('QUEST_DETAIL', function(questItemID)
     end
 end)
 
-questHandler:Register('QUEST_PROGRESS', function()
+module:RegisterEvent('QUEST_PROGRESS', function()
     -- triggered when an active quest is selected during turn-in
     if paused then
         return
@@ -453,17 +426,17 @@ questHandler:Register('QUEST_PROGRESS', function()
             end
         else
             -- item is not cached yet, trigger the item and wait for the cache to populate
-            questHandler:Register('QUEST_ITEM_UPDATE', 'QUEST_PROGRESS')
+            module:RegisterEventOnce('QUEST_ITEM_UPDATE', 'QUEST_PROGRESS')
             GetQuestItemInfo('required', index)
             return
         end
     end
 
     CompleteQuest()
-    questHandler:Unregister('QUEST_ITEM_UPDATE', 'QUEST_PROGRESS')
+    module:UnregisterEvent('QUEST_ITEM_UPDATE', 'QUEST_PROGRESS')
 end)
 
-questHandler:Register('QUEST_COMPLETE', function()
+module:RegisterEvent('QUEST_COMPLETE', function()
     -- triggered when an active quest is ready to be completed
     if paused then
         return
@@ -475,7 +448,7 @@ questHandler:Register('QUEST_COMPLETE', function()
     end
 end)
 
-questHandler:Register('QUEST_COMPLETE', function()
+module:RegisterEvent('QUEST_COMPLETE', function()
     -- triggered when an active quest is ready to be completed
     local numItemRewards = GetNumQuestChoices()
     if numItemRewards <= 1 then
@@ -483,7 +456,7 @@ questHandler:Register('QUEST_COMPLETE', function()
         return
     end
 
-    local highestItemValue, highestItemValueIndex = 0
+    local highestItemValue, highestItemValueIndex = 0, 0
 
     -- iterate through the item rewards and automatically select the one worth the most
     for index = 1, numItemRewards do
@@ -503,21 +476,21 @@ questHandler:Register('QUEST_COMPLETE', function()
             end
         else
             -- item is not cached yet, trigger the item and wait for the cache to populate
-            questHandler:Register('QUEST_ITEM_UPDATE', 'QUEST_COMPLETE')
+            module:RegisterEventOnce('QUEST_ITEM_UPDATE', 'QUEST_COMPLETE')
             GetQuestItemInfo('choice', index)
             return
         end
     end
 
-    if highestItemValueIndex then
+    if highestItemValueIndex and QuestInfoRewardsFrame.RewardButtons[highestItemValueIndex] then
         -- this is considered an intrusive action, as we're modifying the UI
         QuestInfoItem_OnClick(QuestInfoRewardsFrame.RewardButtons[highestItemValueIndex])
     end
 
-    questHandler:Unregister('QUEST_ITEM_UPDATE', 'QUEST_COMPLETE')
+    module:UnregisterEvent('QUEST_ITEM_UPDATE', 'QUEST_COMPLETE')
 end)
 
-questHandler:Register('QUEST_WATCH_LIST_CHANGED', function()
+module:RegisterEvent('QUEST_WATCH_LIST_CHANGED', function()
     -- triggered when the player's quest log has been altered
     if paused then
         return
@@ -528,11 +501,11 @@ questHandler:Register('QUEST_WATCH_LIST_CHANGED', function()
     if GetNumAutoQuestPopUps() > 0 then
         if UnitIsDeadOrGhost('player') then
             -- can't accept quests while we're dead
-            questHandler:Register('PLAYER_REGEN_ENABLED', 'QUEST_WATCH_LIST_CHANGED')
+            module:RegisterEventOnce('PLAYER_REGEN_ENABLED', 'QUEST_WATCH_LIST_CHANGED')
             return
         end
 
-        questHandler:Unregister('PLAYER_REGEN_ENABLED', 'QUEST_WATCH_LIST_CHANGED')
+        module:UnregisterEvent('PLAYER_REGEN_ENABLED', 'QUEST_WATCH_LIST_CHANGED')
 
         -- this is considered an intrusive action, as we're modifying the UI
         local questID, questType = GetAutoQuestPopUp(1)
@@ -547,7 +520,7 @@ questHandler:Register('QUEST_WATCH_LIST_CHANGED', function()
     end
 end)
 
-questHandler:Register('QUEST_ACCEPT_CONFIRM', function()
+module:RegisterEvent('QUEST_ACCEPT_CONFIRM', function()
     -- triggered when a quest is shared in the party, but requires confirmation (like escorts)
     if paused then
         return
@@ -556,7 +529,7 @@ questHandler:Register('QUEST_ACCEPT_CONFIRM', function()
     AcceptQuest()
 end)
 
-questHandler:Register('QUEST_ACCEPTED', function(questID)
+module:RegisterEvent('QUEST_ACCEPTED', function(_, _, questID)
     -- triggered when a quest has been accepted by the player
     if QuickQuestDB.general.share then
         local questLogIndex = C_QuestLog.GetLogIndexForQuestID(questID)
@@ -566,9 +539,9 @@ questHandler:Register('QUEST_ACCEPTED', function(questID)
     end
 end)
 
-questHandler:Register('MODIFIER_STATE_CHANGED', function(key, state)
+module:RegisterEvent('MODIFIER_STATE_CHANGED', function(_, _, key, state)
     -- triggered when the player clicks any modifier keys on the keyboard
-    if string.sub(key, 2) == QuickQuestDB.general.pausekey then
+    if strsub(key, 2) == QuickQuestDB.general.pausekey then
         -- change the paused state
         if QuickQuestDB.general.pausekeyreverse then
             paused = state ~= 1
@@ -578,7 +551,7 @@ questHandler:Register('MODIFIER_STATE_CHANGED', function(key, state)
     end
 end)
 
-questHandler:Register('PLAYER_LOGIN', function()
+module:RegisterEvent('PLAYER_LOGIN', function()
     -- triggered when the game has completed the login process
     if QuickQuestDB.general.pausekeyreverse then
         -- default to a paused state

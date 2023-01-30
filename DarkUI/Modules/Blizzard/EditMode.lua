@@ -67,34 +67,34 @@ E:RegisterEvent("PLAYER_ENTERING_WORLD", function()
 		local ignore = IgnoreFrames[frame:GetName()]
 		if ignore and ignore() then
 			for _, key in next, ShutdownMode do
-				frame[key] = E.dummy
+				frame[key] = E.Dummy
 			end
 		end
 	end
 
 	-- account settings will be tainted
 	local mixin = editMode.AccountSettings
-	if CheckCastFrame() then mixin.RefreshCastBar = E.dummy end
-	if CheckAuraFrame() then mixin.RefreshAuraFrame = E.dummy end
-	if CheckBossFrame() then mixin.RefreshBossFrames = E.dummy end
-	if CheckArenaFrame() then mixin.RefreshArenaFrames = E.dummy end
+	if CheckCastFrame() then mixin.RefreshCastBar = E.Dummy end
+	if CheckAuraFrame() then mixin.RefreshAuraFrame = E.Dummy end
+	if CheckBossFrame() then mixin.RefreshBossFrames = E.Dummy end
+	if CheckArenaFrame() then mixin.RefreshArenaFrames = E.Dummy end
 
 	if CheckRaidFrame() then
-		mixin.RefreshRaidFrames = E.dummy
-		mixin.ResetRaidFrames = E.dummy
+		mixin.RefreshRaidFrames = E.Dummy
+		mixin.ResetRaidFrames = E.Dummy
 	end
 	if CheckPartyFrame() then
-		mixin.RefreshPartyFrames = E.dummy
-		mixin.ResetPartyFrames = E.dummy
+		mixin.RefreshPartyFrames = E.Dummy
+		mixin.ResetPartyFrames = E.Dummy
 	end
 	if CheckTargetFrame() and CheckFocusFrame() then
-		mixin.RefreshTargetAndFocus = E.dummy
-		mixin.ResetTargetAndFocus = E.dummy
+		mixin.RefreshTargetAndFocus = E.Dummy
+		mixin.ResetTargetAndFocus = E.Dummy
 	end
 
 	if CheckActionBar() then
-		mixin.RefreshVehicleLeaveButton = E.dummy
-		mixin.RefreshActionBarShown = E.dummy
-		mixin.RefreshEncounterBar = E.dummy
+		mixin.RefreshVehicleLeaveButton = E.Dummy
+		mixin.RefreshActionBarShown = E.Dummy
+		mixin.RefreshEncounterBar = E.Dummy
 	end
 end)

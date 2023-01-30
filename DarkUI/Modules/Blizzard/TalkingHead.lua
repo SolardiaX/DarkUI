@@ -4,20 +4,18 @@ if not C.blizzard.custom_position then return end
 ------------------------------------------------------------------------------------------
 --	Set custom position for TalkingHeadFrame
 ------------------------------------------------------------------------------------------
-local Load = CreateFrame("Frame")
-Load:RegisterEvent("PLAYER_ENTERING_WORLD")
-Load:SetScript("OnEvent", function()
+local module = E:Module("Blizzard"):Sub("TalkingHead")
+
+module:RegisterEventOnce("PLAYER_ENTERING_WORLD", function()
     if not _G.TalkingHeadFrame then
         _G.TalkingHead_LoadUI()
     end
-    
+
     TalkingHeadFrame.ignoreFramePositionManager = true
     TalkingHeadFrame.ignoreFrameLayout = true
     TalkingHeadFrame:ClearAllPoints()
     TalkingHeadFrame:SetPoint(unpack(C.blizzard.talking_head_pos))
-    TalkingHeadFrame.SetPoint = E.dummy
-
-    Load:UnregisterEvent("PLAYER_ENTERING_WORLD")
+    TalkingHeadFrame.SetPoint = E.Dummy
 
     hooksecurefunc(TalkingHeadFrame, "SetPoint", function(self, _, _, _, _, y)
         if y ~= C.blizzard.talking_head_pos[5] then

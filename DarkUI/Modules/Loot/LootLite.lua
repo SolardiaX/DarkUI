@@ -210,9 +210,9 @@ addon:SetScript("OnHide", function()
 end)
 
 local close = CreateFrame("Button", "LootCloseButton", addon, "UIPanelCloseButton")
-close:SkinCloseButton(addon)
 close:SetSize(18, 18)
 close:SetScript("OnClick", function() CloseLoot() end)
+E:SkinCloseButton(close, addon)
 
 local OnEnter = function(self)
     local slot = self:GetID()
@@ -364,4 +364,3 @@ LootFrame:UnregisterAllEvents()
 
 -- Escape the dungeon
 tinsert(UISpecialFrames, "addon")
-

@@ -1,20 +1,21 @@
-local _, ns = ...
-local E, C, L = ns:unpack()
+local E, C, L = select(2, ...):unpack()
 
 if not C.unitframe.enable then return end
 
 ----------------------------------------------------------------------------------------
 -- Core Methods of UnitFrame
 ----------------------------------------------------------------------------------------
+local module = E:Module("UFCore")
 
 local _G = _G
 local GetSpellInfo, GetCombatRatingBonus = GetSpellInfo, GetCombatRatingBonus
 local UnitClass, UnitCastingInfo = UnitClass, UnitCastingInfo
 local UnitAura = UnitAura
-local UnitIsFriend, UnitIsPlayer = UnitIsFriend, UnitIsPlayer
+local UnitIsFriend, UnitIsPlayer, UnitIsUnit = UnitIsFriend, UnitIsPlayer, UnitIsUnit
 local UnitIsDeadOrGhost, UnitIsConnected = UnitIsDeadOrGhost, UnitIsConnected
-local IsSpellKnown = IsSpellKnown
+local IsSpellKnown, IsPlayerSpell = IsSpellKnown, IsPlayerSpell
 local IsInRaid = IsInRaid
+local SpellIsPriorityAura = SpellIsPriorityAura
 local select, pairs, ipairs, unpack, tinsert = select, pairs, ipairs, unpack, table.insert
 local MAX_BOSS_FRAMES = MAX_BOSS_FRAMES
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
@@ -51,18 +52,14 @@ local channelingTicks = {
     [356995] = 3,	-- 裂解，龙希尔
 }
 
-if E.class == "PRIEST" then
-    local function updateTicks()
+module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE", function()
+    if E.myClass == "PRIEST" then
         local numTicks = 3
         if IsPlayerSpell(193134) then numTicks = 4 end
         channelingTicks[47757] = numTicks
         channelingTicks[47758] = numTicks
     end
-    E:RegisterEvent("PLAYER_LOGIN", updateTicks)
-    E:RegisterEvent("PLAYER_TALENT_UPDATE", updateTicks)
-end
-
-local DUF = {}
+end)
 
 ------------------------------------------------------------------
 --  Unitframes test mode                                        --
@@ -84,13 +81,13 @@ SLASH_TESTUI1 = "/testui"
 ------------------------------------------------------------------
 --  methods for element                                         --
 ------------------------------------------------------------------
-function DUF.FlipTexture(texture)
+function module:FlipTexture(texture)
     if (texture and texture.SetTexCoord) then
         return texture:SetTexCoord(1, 0, 0, 1)
     end
 end
 
-function DUF.CreateFont(parent, fontname, fontHeight, fontStyle)
+function module:CreateFont(parent, fontname, fontHeight, fontStyle)
     local fontStr = parent:CreateFontString(nil, 'OVERLAY')
     fontStr:SetFont(fontname or STANDARD_TEXT_FONT, fontHeight or 12, fontStyle)
     fontStr:SetJustifyH('LEFT')
@@ -100,7 +97,7 @@ function DUF.CreateFont(parent, fontname, fontHeight, fontStyle)
     return fontStr
 end
 
-function DUF.CreateIcon(f, layer, size, sublevel, anchorframe, anchorpoint1, anchorpoint2, posx, posy)
+function module:CreateIcon(f, layer, size, sublevel, anchorframe, anchorpoint1, anchorpoint2, posx, posy)
     local icon = f:CreateTexture(nil, layer, nil, sublevel)
     icon:SetSize(size, size)
     icon:SetPoint(anchorpoint1, anchorframe, anchorpoint2, posx, posy)
@@ -133,7 +130,7 @@ local function setBarTicks(Castbar, ticks, numTicks)
     end
 end
 
-function DUF.updateCastbarColor(Castbar, unit)
+local function updateCastbarColor(Castbar, unit)
     if not UnitIsUnit(unit, "player") and Castbar.notInterruptible then
         Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
         Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
@@ -143,8 +140,14 @@ function DUF.updateCastbarColor(Castbar, unit)
     end
 end
 
-function DUF.PostCastStart(Castbar, unit, _, _)
-    if (Castbar.SafeZone) then
+function module:PostCastStart(unit, _, _)
+    local Castbar = self
+
+    if Castbar.enableFader then
+        Castbar:SetAlpha(1)
+    end
+
+    if Castbar.SafeZone then
         Castbar.SafeZone:SetDrawLayer("BORDER")
     end
 
@@ -156,25 +159,35 @@ function DUF.PostCastStart(Castbar, unit, _, _)
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
     end
 
-    DUF.updateCastbarColor(Castbar, unit)
+    updateCastbarColor(Castbar, unit)
 end
 
-function DUF.PostCastFail(Castbar, ...)
+function module:PostCastFail(...)
+    local Castbar = self
+
     Castbar:SetStatusBarColor(unpack(CastbarFailColor))
     Castbar:SetValue(Castbar.max)
-    Castbar.fadeOut = true
-    Castbar:Show()
+
+    if Castbar.enableFader then
+        Castbar:FadeOut()
+    end
 end
 
-function DUF.PostCastStop(Castbar, unit, spellname, _)
+function module:PostCastStop(unit, spellname, _)
+    local Castbar = self
+
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
     Castbar:SetValue(Castbar.max)
-    Castbar.fadeOut = true
-    Castbar:Show()
+    
+    if Castbar.enableFader then
+        Castbar:FadeOut()
+    end
 end
 
-function DUF.PostCastInterruptible(Castbar, unit)
-    DUF.updateCastBarColor(Castbar, unit)
+function module:PostCastInterruptible(unit)
+    local Castbar = self
+
+    updateCastbarColor(Castbar, unit)
 end
 
 ------------------------------------------------------------------
@@ -186,87 +199,91 @@ local playerUnits = {
     ["vehicle"] = true,
 }
 
-function DUF.PostCreateIcon(_, button)
+function module:PostCreateIcon(button)
+    E:ApplyOverlayBorder(button)
+
     button.Icon:SetTexCoord(unpack(C.media.texCoord))
     button.Icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     button.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     button.Icon:SetDrawLayer("BACKGROUND", -8)
     
-    button.Overlay:SetTexture(C.media.texture.border)
-    button.Overlay:SetTexCoord(0, 1, 0, 1)
-    button.Overlay:SetDrawLayer("BACKGROUND", -7)
-    button.Overlay:ClearAllPoints()
-    button.Overlay:SetAllPoints(button)
-    button.Overlay:SetVertexColor(0.25, 0.25, 0.25)
-    
-    button:CreateTextureBorder()
-    button:CreateShadow()
-
-    -- button.Overlay.Hide = E.dummy
+    button.Overlay:SetTexture(nil)
+	button.Stealable:SetAtlas("bags-newitem")
 end
 
-function DUF.PostUpdateIcon(element, button, unit, data)
+function module:PostUpdateGapIcon(unit, button, offset)
+    button.border:Hide()
+    button.shadow:Hide()
+end
+
+function module:PostUpdateIcon(button, unit, data)
+    button.border:Show()
+    button.shadow:Show()
+    
+    button.shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
+    button.Icon:SetDesaturated(false)
+
     if data.isHarmful then
         if not UnitIsFriend("player", unit) and not playerUnits[data.sourceUnit] then
-            button.Overlay:SetVertexColor(unpack(C.media.border_color))
             button.Icon:SetDesaturated(true)
         else
             local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
-            button.Overlay:SetVertexColor(color.r * .6, color.g * .6, color.b * .6)
-            button.Icon:SetDesaturated(false)
+            button.shadow:SetBackdropBorderColor(color.r * .82, color.g * .82, color.b * .82)
         end
     else
-        if (data.isStealable or ((E.class == "MAGE" or E.class == "PRIEST" or E.class == "SHAMAN" or E.class == "HUNTER") and data.dispelName == "Magic")) and not UnitIsFriend("player", unit) then
-            button.Overlay:SetVertexColor(1, 0.85, 0)
-        else
-            button.Overlay:SetVertexColor(unpack(C.media.border_color))
+        if (data.isStealable or ((E.myClass == "MAGE" or E.myClass == "PRIEST" or E.myClass == "SHAMAN" or E.myClass == "HUNTER") and data.dispelName == "Magic")) and not UnitIsFriend("player", unit) then
+            button.shadow:SetBackdropBorderColor(1, 0.85, 0)
         end
-        button.Icon:SetDesaturated(false)
     end
 end
 
-function DUF.CreateAuraTimer(self, elapsed)
-    if self.timeLeft then
-        self.elapsed = (self.elapsed or 0) + elapsed
-        if self.elapsed >= 0.1 then
-            if not self.first then
-                self.timeLeft = self.timeLeft - self.elapsed
+function module.CreateAuraTimer(aura, elapsed)
+    if aura.timeLeft then
+        aura.elapsed = (aura.elapsed or 0) + elapsed
+        if aura.elapsed >= 0.1 then
+            if not aura.first then
+                aura.timeLeft = aura.timeLeft - aura.elapsed
             else
-                self.timeLeft = self.timeLeft - GetTime()
-                self.first = false
+                aura.timeLeft = aura.timeLeft - GetTime()
+                aura.first = false
             end
-            if self.timeLeft > 0 then
-                local time = E:FormatTime(self.timeLeft)
-                self.remaining:SetText(time)
+            if aura.timeLeft > 0 then
+                local time = E:FormatTime(aura.timeLeft)
+                aura.remaining:SetText(time)
 
-                if floor(self.timeLeft + 0.5) > 5 then
-                    self.remaining:SetTextColor(1, 1, 1)
+                if floor(aura.timeLeft + 0.5) > 5 then
+                    aura.remaining:SetTextColor(1, 1, 1)
                 else
-                    self.remaining:SetTextColor(1, 0.2, 0.2)
+                    aura.remaining:SetTextColor(1, 0.2, 0.2)
                 end
             else
-                self.remaining:Hide()
-                self:SetScript("OnUpdate", nil)
+                aura.remaining:Hide()
+                aura:SetScript("OnUpdate", nil)
             end
-            self.elapsed = 0
+            aura.elapsed = 0
         end
     end
 end
 
-function DUF.FilterAuras(element, unit, data)
+function module:FilterAuras(unit, data)
     local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
-    local isPlayer = playerUnits[data.sourceUnit]
+    local isFromPlayer = playerUnits[data.sourceUnit]
+    local spellID = data.spellId
 
     if isInRaid == "raid" then
-        local auraList = C.aura.raidbuffs[E.class]
-        if auraList and auraList[data.spellID] and data.isFromPlayerOrPlayerPet then
+        local auraList = C.aura.raidbuffs[E.myClass]
+        if auraList and auraList[spellID] and data.isFromPlayerOrPlayerPet then
             return true
-        elseif C.aura.raidbuffs["ALL"][data.spellID] then
+        elseif C.aura.raidbuffs["ALL"][spellID] then
             return true
         end
-    elseif element.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
+    elseif self.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
         return true
-    elseif (element.onlyShowPlayer and isPlayer) or (not element.onlyShowPlayer and data.name) or data.isBossAura then
+    elseif self.onlyShowPlayer and isFromPlayer then
+        return true
+    elseif data.isBossAura or SpellIsPriorityAura(spellID) then
+        return true
+    elseif not self.onlyShowPlayer and data.name then
         return true
     end
 
@@ -276,7 +293,7 @@ end
 ------------------------------------------------------------------
 --  Methods for powerbar                                        --
 ------------------------------------------------------------------
-function DUF.PostUpdatePower(Power, unit, _, max)
+function module:PostUpdatePower(Power, unit, _, max)
     if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) or (max == 0) then
         Power:SetValue(0)
         if Power.Value then
@@ -292,27 +309,24 @@ end
 ------------------------------------------------------------------
 --  Methods for fader                                           --
 ------------------------------------------------------------------
-function DUF.SetFader(self, config)
+function module:SetFader(f, config)
     if config ~= nil then
 
         local index = 1
         for k, v in pairs(config) do
             if k == "NormalAlpha" then
-                self.NormalAlpha = v
+                f.NormalAlpha = v
             elseif k == "Range" then
-                self.Range = v
-                self.outsideRangeAlphaPerc = .3
+                f.Range = v
+                f.outsideRangeAlphaPerc = .3
             else
-                if not self.Fader then self.Fader = {} end
+                if not f.Fader then f.Fader = {} end
 
-                self.Fader[index] = {}
-                self.Fader[index][k] = v
+                f.Fader[index] = {}
+                f.Fader[index][k] = v
 
                 index = index + 1
             end
         end
     end
 end
-
-
-E.unitframe = DUF

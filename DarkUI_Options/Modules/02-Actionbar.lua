@@ -14,7 +14,7 @@ ns.OptionList[2] = { -- Actionbar
         self:HookScript('OnClick', function(self)
             ns.opt_widgets['actionbar:bars.micromenu.enable']:SetEnabled(self:GetChecked())
             ns.opt_widgets['actionbar:bars.bags.enable']:SetEnabled(self:GetChecked())
-            ns.opt_widgets['actionbar:bars.mergebar4andbar5']:SetEnabled(self:GetChecked())
+            ns.opt_widgets['actionbar:bars.mergeright']:SetEnabled(self:GetChecked())
             ns.opt_widgets['actionbar:bars.texture']:SetEnabled(self:GetChecked())
             --
             ns.opt_widgets['actionbar:bars.exp.enable']:SetEnabled(self:GetChecked())
@@ -40,7 +40,7 @@ ns.OptionList[2] = { -- Actionbar
             self:SetEnabled(ns.opt_widgets['actionbar:bars.enable']:GetChecked())
         end)
     end },
-    { 1, 'actionbar', 'bars.mergebar4andbar5', L_OPT_BARS_MERGEBAR4ANDBAR5, false, nil, function(self)
+    { 1, 'actionbar', 'bars.mergeright', L_OPT_BARS_MERGERIGHT, false, nil, function(self)
         self:HookScript('OnShow', function(self)
             self:SetEnabled(ns.opt_widgets['actionbar:bars.enable']:GetChecked())
         end)

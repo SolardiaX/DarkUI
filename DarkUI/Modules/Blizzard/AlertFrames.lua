@@ -5,11 +5,13 @@ if IsAddOnLoaded("MoveAnything") or not C.blizzard.custom_position then return e
 ----------------------------------------------------------------------------------------
 --	AlertFrameMove(by Gethe)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Blizzard"):Sub("AlertFrames")
 
 local CreateFrame, AlertFrame = CreateFrame, AlertFrame
+local UIParent = UIParent
+
 local unpack, find, tremove = unpack, string.find, table.remove
 local hooksecurefunc = hooksecurefunc
-local UIParent = UIParent
 
 local AchievementAnchor = CreateFrame("Frame", "AchievementAnchor", UIParent)
 AchievementAnchor:SetWidth(230)
@@ -21,7 +23,7 @@ local alertBlacklist = {
     TalkingHeadFrame   = true
 }
 
-local POSITION, ANCHOR_POINT, YOFFSET = "BOTTOM", "TOP", -9
+local POSITION, ANCHOR_POINT, FIRST_YOFFSET, YOFFSET = "BOTTOM", "TOP", 0, -9
 
 local function CheckGrow()
     local point = AchievementAnchor:GetPoint()
@@ -39,58 +41,55 @@ local function CheckGrow()
     end
 end
 
-local ReplaceAnchors
-do
-    local function QueueAdjustAnchors(self, relativeAlert)
-        CheckGrow()
+local function QueueAdjustAnchors(self, relativeAlert)
+    CheckGrow()
 
-        for alertFrame in self.alertFramePool:EnumerateActive() do
-            alertFrame:ClearAllPoints()
-            alertFrame:SetPoint(POSITION, relativeAlert, ANCHOR_POINT, 0, YOFFSET)
-            relativeAlert = alertFrame
-        end
-        return relativeAlert
+    for alertFrame in self.alertFramePool:EnumerateActive() do
+        alertFrame:ClearAllPoints()
+        alertFrame:SetPoint(POSITION, relativeAlert, ANCHOR_POINT, 0, YOFFSET)
+        relativeAlert = alertFrame
     end
+    return relativeAlert
+end
 
-    local function SimpleAdjustAnchors(self, relativeAlert)
-        CheckGrow()
+local function SimpleAdjustAnchors(self, relativeAlert)
+    CheckGrow()
 
-        if self.alertFrame:IsShown() then
-            self.alertFrame:ClearAllPoints()
-            self.alertFrame:SetPoint(POSITION, relativeAlert, ANCHOR_POINT, 0, YOFFSET)
-            return self.alertFrame
-        end
-        return relativeAlert
+    if self.alertFrame:IsShown() then
+        self.alertFrame:ClearAllPoints()
+        self.alertFrame:SetPoint(POSITION, relativeAlert, ANCHOR_POINT, 0, YOFFSET)
+        return self.alertFrame
     end
+    return relativeAlert
+end
 
-    local function AnchorAdjustAnchors(self, relativeAlert)
-        if self.anchorFrame:IsShown() then
-            return self.anchorFrame
-        end
-        return relativeAlert
+local function AnchorAdjustAnchors(self, relativeAlert)
+    if self.anchorFrame:IsShown() then
+        return self.anchorFrame
     end
+    return relativeAlert
+end
 
-    function ReplaceAnchors(alertFrameSubSystem)
-        if alertFrameSubSystem.alertFramePool then
-            if alertBlacklist[alertFrameSubSystem.alertFramePool.frameTemplate] then
-                return alertFrameSubSystem.alertFramePool.frameTemplate, true
-            else
-                alertFrameSubSystem.AdjustAnchors = QueueAdjustAnchors
-            end
-        elseif alertFrameSubSystem.alertFrame then
-            local frame = alertFrameSubSystem.alertFrame
-            if alertBlacklist[frame:GetName()] then
-                return frame:GetName(), true
-            else
-                alertFrameSubSystem.AdjustAnchors = SimpleAdjustAnchors
-            end
-        elseif alertFrameSubSystem.anchorFrame then
-            local frame = alertFrameSubSystem.anchorFrame
-            if alertBlacklist[frame:GetName()] then
-                return frame:GetName(), true
-            else
-                alertFrameSubSystem.AdjustAnchors = AnchorAdjustAnchors
-            end
+local function ReplaceAnchors(alertFrameSubSystem)
+    if alertFrameSubSystem.alertFramePool then
+        if alertBlacklist[alertFrameSubSystem.alertFramePool.frameTemplate] then
+            return alertFrameSubSystem.alertFramePool.frameTemplate, true
+        else
+            alertFrameSubSystem.AdjustAnchors = QueueAdjustAnchors
+        end
+    elseif alertFrameSubSystem.alertFrame then
+        local frame = alertFrameSubSystem.alertFrame
+        if alertBlacklist[frame:GetName()] then
+            return frame:GetName(), true
+        else
+            alertFrameSubSystem.AdjustAnchors = SimpleAdjustAnchors
+        end
+    elseif alertFrameSubSystem.anchorFrame then
+        local frame = alertFrameSubSystem.anchorFrame
+        if alertBlacklist[frame:GetName()] then
+            return frame:GetName(), true
+        else
+            alertFrameSubSystem.AdjustAnchors = AnchorAdjustAnchors
         end
     end
 end
@@ -126,4 +125,6 @@ local function SetUpAlert()
     end
 end
 
-SetUpAlert()
+function module:OnLogin()
+    SetUpAlert()
+end

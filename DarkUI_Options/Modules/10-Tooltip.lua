@@ -104,11 +104,6 @@ ns.OptionList[10] = { -- Tooltip
             self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())
         end)
     end },
-    { 1, 'tooltip', 'arena_experience', L_OPT_TOOLTIP_ARENA_EXPERIENCE, false, nil, function(self)
-        self:HookScript('OnShow', function(self)
-            self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())
-        end)
-    end },
     { 1, 'tooltip', 'spell_id', L_OPT_TOOLTIP_SPELL_ID, false, nil, function(self)
         self:HookScript('OnShow', function(self)
             self:SetEnabled(ns.opt_widgets['tooltip:enable']:GetChecked())

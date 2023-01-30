@@ -790,7 +790,7 @@ local OnEvent = function(self, event, ...)
                 end
             end
         elseif eventType == "SPELL_HEAL" or eventType == "SPELL_PERIODIC_HEAL" then
-            spellId, spellName, spellSchool, amount, over, school, resist = arg12
+            local spellId, spellName, spellSchool, amount, over, school, resist = arg12, nil, nil, nil, nil, nil, nil
             if IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) and combatstarted then
                 over = over or 0
                 if amount and amount > 0 then
@@ -809,7 +809,7 @@ local OnEvent = function(self, event, ...)
                 Add(sourceGUID, 1, INTERRUPTS, "Interrupt", destName)
             end
         elseif eventType == "SPELL_AURA_APPLIED" then
-            local spellId, spellName, spellSchool, auraType, amount = arg12
+            local spellId, spellName, spellSchool, auraType, amount = arg12, nil, nil, nil, nil
             sourceGUID = owners[sourceGUID] or sourceGUID
             if amount and AbsorbSpellDuration[spellId] and IsFriendlyUnit(sourceGUID) and IsFriendlyUnit(destGUID) then
                 shields[destGUID] = shields[destGUID] or {}
@@ -817,7 +817,7 @@ local OnEvent = function(self, event, ...)
                 shields[destGUID][spellName][sourceGUID] = amount
             end
         elseif eventType == "SPELL_AURA_REFRESH" then
-            local spellId, spellName, spellSchool, auraType, amount = arg12
+            local spellId, spellName, spellSchool, auraType, amount = arg12, nil, nil, nil, nil
             sourceGUID = owners[sourceGUID] or sourceGUID
             if amount and AbsorbSpellDuration[spellId] and IsFriendlyUnit(destGUID) then
                 if shields[destGUID] and shields[destGUID][spellName] and shields[destGUID][spellName][sourceGUID] then
@@ -829,7 +829,7 @@ local OnEvent = function(self, event, ...)
                 end
             end
         elseif eventType == "SPELL_AURA_REMOVED" then
-            local spellId, spellName, spellSchool, auraType, amount = arg12
+            local spellId, spellName, spellSchool, auraType, amount = arg12, nil, nil, nil, nil
             sourceGUID = owners[sourceGUID] or sourceGUID
             if amount and AbsorbSpellDuration[spellId] and IsFriendlyUnit(destGUID) then
                 if shields[destGUID] and shields[destGUID][spellName] and shields[destGUID][spellName][sourceGUID] then

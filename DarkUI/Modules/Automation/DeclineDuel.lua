@@ -5,8 +5,8 @@ if not C.automation.decline_duel then return end
 ----------------------------------------------------------------------------------------
 --	Auto decline duel
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("DeclineDuel")
 
-local CreateFrame = CreateFrame
 local CancelDuel = CancelDuel
 local RaidNotice_AddMessage = RaidNotice_AddMessage
 local RaidWarningFrame = RaidWarningFrame
@@ -14,10 +14,7 @@ local StaticPopup_Hide = StaticPopup_Hide
 local C_PetBattles_CancelPVPDuel = C_PetBattles.CancelPVPDuel
 local print, format = print, format
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("DUEL_REQUESTED")
-frame:RegisterEvent("PET_BATTLE_PVP_DUEL_REQUESTED")
-frame:SetScript("OnEvent", function(_, event, name)
+module:RegisterEvent("DUEL_REQUESTED PET_BATTLE_PVP_DUEL_REQUESTED", function(_, event, name)
     if event == "DUEL_REQUESTED" then
         CancelDuel()
         RaidNotice_AddMessage(RaidWarningFrame, L.INFO_DUEL..name, {r = 0.41, g = 0.8, b = 0.94}, 3)

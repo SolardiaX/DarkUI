@@ -8,6 +8,7 @@ if C.tooltip.enable ~= true or C.tooltip.average_lvl ~= true then return end
 
 local CreateFrame = CreateFrame
 local CanInspect = CanInspect
+local NotifyInspect = NotifyInspect
 local GetPlayerInfoByGUID = GetPlayerInfoByGUID
 local GetNumGroupMembers = GetNumGroupMembers
 local GetDetailedItemLevelInfo = GetDetailedItemLevelInfo
@@ -202,13 +203,15 @@ end
 local SlotCache = {} -- [slot] = itemLevel or false
 local ItemCache = {} -- [slot] = itemLink
 local TestTips = {}
+
 for _, slot in pairs(InventorySlots) do
     local tip = CreateFrame("GameTooltip", "AverageItemLevelTooltip" .. slot, nil, "GameTooltipTemplate")
     tip:SetOwner(WorldFrame, "ANCHOR_NONE")
     TestTips[slot] = tip
     tip.slot = slot
 end
-function OnTooltipSetItem(self)
+
+local function OnTooltipSetItem(self)
         local slot = self.slot
 	if(not slot) then
 		return
@@ -325,7 +328,6 @@ local ShouldInspect = false
 local lastInspectRequest = 0
 local FailTimeout = 1
 f:SetScript("OnUpdate", function()
-
     local _, unitID = GameTooltip:GetUnit()
     local guid = unitID and UnitGUID(unitID)
     if not guid or (InspectFrame and InspectFrame:IsVisible()) then return end
@@ -334,8 +336,7 @@ f:SetScript("OnUpdate", function()
         ShouldInspect = false
         if ActiveGUID ~= guid then
             local cache = GuidCache[guid]
-            if cache and GetTime() - cache.timestamp <= CACHE_TIMEOUT then
-            elseif CanInspect(unitID) then
+            if (not cache or GetTime() - cache.timestamp > CACHE_TIMEOUT )and CanInspect(unitID) then
                 NotifyInspect(unitID)
             end
         end
@@ -374,7 +375,7 @@ hooksecurefunc("ClearInspectPlayer", function()
 end)
 
 local function DoInspect()
-    -- AddLine(Sekret, SEARCH .. ": ", " ...", "|cff9A9A9A", "|cff9A9A9A")
+    AddLine(Sekret, SEARCH .. ": ", " ...", "|cff9A9A9A", "|cff9A9A9A")
     ShouldInspect = true
 end
 
@@ -496,8 +497,7 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(self
         local cache = GuidCache[guid]
         if cache then
             DecorateTooltip(guid)
-        end
-        if CanInspect(unitID) then
+        elseif CanInspect(unitID) then
             DoInspect()
         end
     end

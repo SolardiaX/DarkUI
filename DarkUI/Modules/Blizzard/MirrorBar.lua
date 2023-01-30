@@ -5,6 +5,7 @@ if not C.blizzard.custom_position then return end
 ----------------------------------------------------------------------------------------
 --	Based on oMirrorBars(by Haste)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Blizzard"):Sub("MirrorBar")
 
 local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
 
@@ -93,12 +94,7 @@ do
     end
 end
 
-local frame = CreateFrame("Frame")
-frame:SetScript("OnEvent", function(self, event, ...)
-    return self[event](self, ...)
-end)
-
-function frame:ADDON_LOADED(addon)
+function module:ADDON_LOADED(_, addon)
     if addon == E.addonName then
         UIParent:UnregisterEvent("MIRROR_TIMER_START")
 
@@ -106,9 +102,8 @@ function frame:ADDON_LOADED(addon)
         self.ADDON_LOADED = nil
     end
 end
-frame:RegisterEvent("ADDON_LOADED")
 
-function frame:PLAYER_ENTERING_WORLD()
+function module:PLAYER_ENTERING_WORLD()
     for i = 1, MIRRORTIMER_NUMTIMERS do
         local type, value, maxvalue, scale, paused, text = GetMirrorTimerInfo(i)
         if type ~= "UNKNOWN" then
@@ -116,19 +111,18 @@ function frame:PLAYER_ENTERING_WORLD()
         end
     end
 end
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-function frame:MIRROR_TIMER_START(type, value, maxvalue, scale, paused, text)
+function module:MIRROR_TIMER_START(_, type, value, maxvalue, scale, paused, text)
     return Spawn(type):Start(value, maxvalue, scale, paused, text)
 end
-frame:RegisterEvent("MIRROR_TIMER_START")
 
-function frame:MIRROR_TIMER_STOP(type)
+function module:MIRROR_TIMER_STOP(_, type)
+
     return Spawn(type):Hide()
 end
-frame:RegisterEvent("MIRROR_TIMER_STOP")
 
-function frame:MIRROR_TIMER_PAUSE(duration)
+function module:MIRROR_TIMER_PAUSE(_, duration)
     return PauseAll((duration > 0 and duration) or nil)
 end
-frame:RegisterEvent("MIRROR_TIMER_PAUSE")
+
+module:RegisterEvent("ADDON_LOADED PLAYER_ENTERING_WORLD MIRROR_TIMER_START MIRROR_TIMER_STOP MIRROR_TIMER_PAUSE")

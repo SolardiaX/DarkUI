@@ -5,6 +5,7 @@ if not C.actionbar.bars.enable or not C.actionbar.bars.exp.enable then return en
 ----------------------------------------------------------------------------------------
 --	Exp Bar
 ----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("ExpRep")
 
 local _G = _G
 local CollapseFactionHeader = CollapseFactionHeader
@@ -224,7 +225,7 @@ end
 
 local function bar_OnEvent(self, event, arg1, arg2, ...)
     if event == "PLAYER_ENTERING_WORLD" then
-        if E.level == MAX_PLAYER_LEVEL then
+        if E.myLevel == MAX_PLAYER_LEVEL then
             bar_showRep(self)
         else
             bar_showXP(self)
@@ -232,7 +233,7 @@ local function bar_OnEvent(self, event, arg1, arg2, ...)
     elseif event == "PLAYER_XP_UPDATE" and arg1 == "player" then
         updateBar(self)
     elseif event == "PLAYER_LEVEL_UP" then
-        if E.level == MAX_PLAYER_LEVEL then
+        if E.myLevel == MAX_PLAYER_LEVEL then
             bar_showRep(self)
         else
             bar_showXP(self)
@@ -241,12 +242,12 @@ local function bar_OnEvent(self, event, arg1, arg2, ...)
         if arg1 == "LCTRL" or arg1 == "RCTRL" then
             if arg2 == 1 then
                 bar_showRep(self)
-            elseif arg2 == 0 and E.level ~= MAX_PLAYER_LEVEL then
+            elseif arg2 == 0 and E.myLevel ~= MAX_PLAYER_LEVEL then
                 bar_showXP(self)
             end
         end
     elseif event == "UPDATE_FACTION" then
-        if E.level == MAX_PLAYER_LEVEL then
+        if E.myLevel == MAX_PLAYER_LEVEL then
             bar_showRep(self)
         end
     end
@@ -258,12 +259,14 @@ local function bar_OnEnter()
     local rxp = GetXPExhaustion()
     local name, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
 
+    local withXp = false
+
     GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
 
     GameTooltip:AddLine(L.ACTIONBAR_EXP_REP)
     GameTooltip:AddLine(" ")
 
-    if E.level ~= MAX_PLAYER_LEVEL then
+    if E.myLevel ~= MAX_PLAYER_LEVEL then
         GameTooltip:AddLine(L.ACTIONBAR_EXP)
         GameTooltip:AddLine(" ")
         
@@ -284,6 +287,8 @@ local function bar_OnEnter()
         if IsXPUserDisabled() then
             GameTooltip:AddLine("|cffff0000" .. XP .. LOCKED)
         end
+
+        withXp = true
     end
 
     if factionID then
@@ -319,7 +324,7 @@ local function bar_OnEnter()
             end
         end
 
-        GameTooltip:AddLine(" ")
+        if withXp then GameTooltip:AddLine(" ") end
         GameTooltip:AddLine(L.ACTIONBAR_REP)
         GameTooltip:AddLine(" ")
 
@@ -389,61 +394,56 @@ local function bar_OnLeave()
     GameTooltip:Hide()
 end
 
-if not IsAddOnLoaded("Blizzard_GuildUI") then LoadAddOn("Blizzard_GuildUI") end
+function module:OnInit()
+    if not IsAddOnLoaded("Blizzard_GuildUI") then LoadAddOn("Blizzard_GuildUI") end
 
-if cfg.disable_at_max_lvl and E.level == MAX_PLAYER_LEVEL then
-    local holder = CreateFrame("Frame", nil, UIParent)
-    holder:SetFrameStrata(cfg.bfstrata)
-    holder:SetFrameLevel(cfg.bflevel)
-    holder:SetSize(cfg.width, cfg.height)
-    holder:SetPoint(unpack(cfg.pos))
-    holder:SetScale(cfg.scale)
+    if cfg.disable_at_max_lvl and E.myLevel == MAX_PLAYER_LEVEL then
+        local holder = CreateFrame("Frame", nil, UIParent)
+        holder:SetFrameStrata(cfg.bfstrata)
+        holder:SetFrameLevel(cfg.bflevel)
+        holder:SetSize(cfg.width, cfg.height)
+        holder:SetPoint(unpack(cfg.pos))
+        holder:SetScale(cfg.scale)
 
-    holder.texture = holder:CreateTexture(nil, "BACKGROUND")
-    holder.texture:SetTexture(cfg.statusbar)
-    holder.texture:SetAllPoints(holder)
-    holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
+        holder.texture = holder:CreateTexture(nil, "BACKGROUND")
+        holder.texture:SetTexture(C.media.texture.status)
+        holder.texture:SetAllPoints(holder)
+        holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
 
-    return
+        return
+    end
+
+    local statusbar = CreateFrame("StatusBar", "DarkUI_XPBar", UIParent)
+    statusbar:SetFrameStrata(cfg.bfstrata)
+    statusbar:SetFrameLevel(cfg.bflevel)
+    statusbar:SetSize(cfg.width, cfg.height)
+    statusbar:SetPoint(unpack(cfg.pos))
+    statusbar:SetScale(cfg.scale)
+    statusbar:SetStatusBarTexture(C.media.texture.status)
+    statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b)
+
+    statusbar.rest = CreateFrame("Statusbar", nil, statusbar)
+    statusbar.rest:SetFrameStrata(cfg.bfstrata)
+    statusbar.rest:SetFrameLevel(cfg.bflevel)
+    statusbar.rest:SetAllPoints(statusbar)
+    statusbar.rest:SetStatusBarTexture(C.media.texture.status)
+    statusbar.rest:SetStatusBarColor(cfg.restcolor.r, cfg.restcolor.g, cfg.restcolor.b)
+
+    statusbar.background = statusbar:CreateTexture(nil, "BACKGROUND", nil, -8)
+    statusbar.background:SetAllPoints(statusbar)
+    statusbar.background:SetTexture(C.media.texture.status)
+    statusbar.background:SetVertexColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.3)
+
+    statusbar:SetScript("OnEvent", bar_OnEvent)
+    statusbar:SetScript("OnEnter", bar_OnEnter)
+    statusbar:SetScript("OnLeave", bar_OnLeave)
+
+    statusbar:RegisterEvent("PLAYER_XP_UPDATE")
+    statusbar:RegisterEvent("PLAYER_LEVEL_UP")
+    statusbar:RegisterEvent("PLAYER_ENTERING_WORLD")
+    statusbar:RegisterEvent("UPDATE_FACTION")
+    statusbar:RegisterEvent("MODIFIER_STATE_CHANGED")
+
+    -- register events
+    self:RegisterEvent("COMBAT_TEXT_UPDATE CHAT_MSG_COMBAT_FACTION_CHANGE", switcher_OnEvent)
 end
-
-local statusbar = CreateFrame("StatusBar", "DarkUI_XPBar", UIParent)
-statusbar:SetFrameStrata(cfg.bfstrata)
-statusbar:SetFrameLevel(cfg.bflevel)
-statusbar:SetSize(cfg.width, cfg.height)
-statusbar:SetPoint(unpack(cfg.pos))
-statusbar:SetScale(cfg.scale)
-statusbar:SetStatusBarTexture(cfg.statusbar)
-statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b)
-
-statusbar.rest = CreateFrame("Statusbar", nil, statusbar)
-statusbar.rest:SetFrameStrata(cfg.bfstrata)
-statusbar.rest:SetFrameLevel(cfg.bflevel)
-statusbar.rest:SetAllPoints(statusbar)
-statusbar.rest:SetStatusBarTexture(cfg.statusbar)
-statusbar.rest:SetStatusBarColor(cfg.restcolor.r, cfg.restcolor.g, cfg.restcolor.b)
-
-statusbar.background = statusbar:CreateTexture(nil, "BACKGROUND", nil, -8)
-statusbar.background:SetAllPoints(statusbar)
-statusbar.background:SetTexture(cfg.statusbar)
-statusbar.background:SetVertexColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.3)
-
-statusbar:SetScript("OnEvent", bar_OnEvent)
-statusbar:SetScript("OnEnter", bar_OnEnter)
-statusbar:SetScript("OnLeave", bar_OnLeave)
-
-statusbar:RegisterEvent("PLAYER_XP_UPDATE")
-statusbar:RegisterEvent("PLAYER_LEVEL_UP")
-statusbar:RegisterEvent("PLAYER_ENTERING_WORLD")
-statusbar:RegisterEvent("UPDATE_FACTION")
-statusbar:RegisterEvent("MODIFIER_STATE_CHANGED")
-
--- create frame as event listener
-local switcher = CreateFrame("Frame")
-
--- register events
-switcher:RegisterEvent("COMBAT_TEXT_UPDATE")
-switcher:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
-
--- set script
-switcher:SetScript("OnEvent", switcher_OnEvent)

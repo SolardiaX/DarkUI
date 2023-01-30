@@ -2,43 +2,18 @@
     <Button name="DarkUIAuraTemplate" inherits="SecureActionButtonTemplate, BackdropTemplate" virtual="true" framelevel="4">
         <Size x="30" y="30"/>
         <Attributes>
-            <Attribute name="type" value="cancelaura"/>
+            <Attribute name="type2" value="cancelaura"/>
         </Attributes>
         <Scripts>
             <OnLoad>
-                local _, C = unpack(DarkUI)
-                local Auras = C.aura.host
+                local E, C, L = unpack(DarkUI)
+                local auras = E:Module("Aura"):Sub("Auras")
 
-                Auras:CreateAuraIcon(self)
+                auras:CreateAuraIcon(self)
             </OnLoad>
         </Scripts>
     </Button>
 
-    <Button name="DarkUIAuraTemplate24" inherits="DarkUIAuraTemplate" virtual="true"><Size x="24" y="24"/></Button>
-    <Button name="DarkUIAuraTemplate25" inherits="DarkUIAuraTemplate" virtual="true"><Size x="25" y="25"/></Button>
-    <Button name="DarkUIAuraTemplate26" inherits="DarkUIAuraTemplate" virtual="true"><Size x="26" y="26"/></Button>
-    <Button name="DarkUIAuraTemplate27" inherits="DarkUIAuraTemplate" virtual="true"><Size x="27" y="27"/></Button>
     <Button name="DarkUIAuraTemplate28" inherits="DarkUIAuraTemplate" virtual="true"><Size x="28" y="28"/></Button>
-    <Button name="DarkUIAuraTemplate29" inherits="DarkUIAuraTemplate" virtual="true"><Size x="29" y="29"/></Button>
-    <Button name="DarkUIAuraTemplate30" inherits="DarkUIAuraTemplate" virtual="true"><Size x="30" y="30"/></Button>
-    <Button name="DarkUIAuraTemplate31" inherits="DarkUIAuraTemplate" virtual="true"><Size x="31" y="31"/></Button>
     <Button name="DarkUIAuraTemplate32" inherits="DarkUIAuraTemplate" virtual="true"><Size x="32" y="32"/></Button>
-    <Button name="DarkUIAuraTemplate33" inherits="DarkUIAuraTemplate" virtual="true"><Size x="33" y="33"/></Button>
-    <Button name="DarkUIAuraTemplate34" inherits="DarkUIAuraTemplate" virtual="true"><Size x="34" y="34"/></Button>
-    <Button name="DarkUIAuraTemplate35" inherits="DarkUIAuraTemplate" virtual="true"><Size x="35" y="35"/></Button>
-    <Button name="DarkUIAuraTemplate36" inherits="DarkUIAuraTemplate" virtual="true"><Size x="36" y="36"/></Button>
-    <Button name="DarkUIAuraTemplate37" inherits="DarkUIAuraTemplate" virtual="true"><Size x="37" y="37"/></Button>
-    <Button name="DarkUIAuraTemplate38" inherits="DarkUIAuraTemplate" virtual="true"><Size x="38" y="38"/></Button>
-    <Button name="DarkUIAuraTemplate39" inherits="DarkUIAuraTemplate" virtual="true"><Size x="39" y="39"/></Button>
-    <Button name="DarkUIAuraTemplate40" inherits="DarkUIAuraTemplate" virtual="true"><Size x="40" y="40"/></Button>
-    <Button name="DarkUIAuraTemplate41" inherits="DarkUIAuraTemplate" virtual="true"><Size x="41" y="41"/></Button>
-    <Button name="DarkUIAuraTemplate42" inherits="DarkUIAuraTemplate" virtual="true"><Size x="42" y="42"/></Button>
-    <Button name="DarkUIAuraTemplate43" inherits="DarkUIAuraTemplate" virtual="true"><Size x="43" y="43"/></Button>
-    <Button name="DarkUIAuraTemplate44" inherits="DarkUIAuraTemplate" virtual="true"><Size x="44" y="44"/></Button>
-    <Button name="DarkUIAuraTemplate45" inherits="DarkUIAuraTemplate" virtual="true"><Size x="45" y="45"/></Button>
-    <Button name="DarkUIAuraTemplate46" inherits="DarkUIAuraTemplate" virtual="true"><Size x="46" y="46"/></Button>
-    <Button name="DarkUIAuraTemplate47" inherits="DarkUIAuraTemplate" virtual="true"><Size x="47" y="47"/></Button>
-    <Button name="DarkUIAuraTemplate48" inherits="DarkUIAuraTemplate" virtual="true"><Size x="48" y="48"/></Button>
-    <Button name="DarkUIAuraTemplate49" inherits="DarkUIAuraTemplate" virtual="true"><Size x="49" y="49"/></Button>
-    <Button name="DarkUIAuraTemplate50" inherits="DarkUIAuraTemplate" virtual="true"><Size x="50" y="50"/></Button>
 </Ui>

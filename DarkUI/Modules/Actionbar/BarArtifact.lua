@@ -2,9 +2,10 @@ local E, C, L = select(2, ...):unpack()
 
 if not C.actionbar.bars.enable or not C.actionbar.bars.artifact.enable then return end
 
-------------------------------------------------------
+----------------------------------------------------------------------------------------
 -- Artifact Bar
-------------------------------------------------------
+----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("Artifact")
 
 local _G = _G
 local CreateFrame = CreateFrame
@@ -24,13 +25,13 @@ local UIParent = _G.UIParent
 
 local cfg = C.actionbar.bars.artifact
 
-local function IsAzeriteAvailable()
+local function isAzeriteAvailable()
     local itemLocation = C_AzeriteItem_FindActiveAzeriteItem()
     return itemLocation and itemLocation:IsEquipmentSlot() and not C_AzeriteItem_IsAzeriteItemAtMaxLevel()
 end
 
 local function bar_OnEvent(self, _, ...)
-    if IsAzeriteAvailable() then
+    if isAzeriteAvailable() then
         local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
         local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
         self:SetStatusBarColor(.9, .8, .6)
@@ -59,7 +60,7 @@ local function bar_OnEnter(self)
     GameTooltip:AddLine(L.ACTIONBAR_APB)
     GameTooltip:AddLine(" ")
 
-    if IsAzeriteAvailable() then
+    if isAzeriteAvailable() then
         local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
         local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
         local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
@@ -95,40 +96,42 @@ local function bar_OnLeave()
     GameTooltip:Hide()
 end
 
-if cfg.only_at_max_level and E.level < MAX_PLAYER_LEVEL then
-    local holder = CreateFrame("Frame", nil, UIParent)
-    holder:SetFrameStrata(cfg.bfstrata)
-    holder:SetFrameLevel(cfg.bflevel)
-    holder:SetSize(cfg.width, cfg.height)
-    holder:SetPoint(unpack(cfg.pos))
-    holder:SetScale(cfg.scale)
+function module:OnInit()
+    if cfg.only_at_max_level and E.myLevel < MAX_PLAYER_LEVEL then
+        local holder = CreateFrame("Frame", nil, UIParent)
+        holder:SetFrameStrata(cfg.bfstrata)
+        holder:SetFrameLevel(cfg.bflevel)
+        holder:SetSize(cfg.width, cfg.height)
+        holder:SetPoint(unpack(cfg.pos))
+        holder:SetScale(cfg.scale)
 
-    holder.texture = holder:CreateTexture(nil, "BACKGROUND")
-    holder.texture:SetTexture(cfg.statusbar)
-    holder.texture:SetAllPoints(holder)
-    holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
+        holder.texture = holder:CreateTexture(nil, "BACKGROUND")
+        holder.texture:SetTexture(C.media.texture.status)
+        holder.texture:SetAllPoints(holder)
+        holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
 
-    return
+        return
+    end
+
+    local statusbar = CreateFrame("StatusBar", "DarkUI_ArtifactBar", UIParent)
+    statusbar:SetFrameStrata(cfg.bfstrata)
+    statusbar:SetFrameLevel(cfg.bflevel)
+    statusbar:SetSize(cfg.width, cfg.height)
+    statusbar:SetPoint(unpack(cfg.pos))
+    statusbar:SetScale(cfg.scale)
+    statusbar:SetStatusBarTexture(C.media.texture.status)
+    statusbar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+
+    statusbar.background = statusbar:CreateTexture(nil, "BACKGROUND", nil, -7)
+    statusbar.background:SetAllPoints()
+    statusbar.background:SetTexture(C.media.texture.status)
+    statusbar.background:SetVertexColor(1, 0, 0, 0.3)
+
+    statusbar:SetScript("OnEvent", bar_OnEvent)
+    statusbar:SetScript("OnEnter", bar_OnEnter)
+    statusbar:SetScript("OnLeave", bar_OnLeave)
+
+    statusbar:RegisterEvent("ARTIFACT_XP_UPDATE")
+    statusbar:RegisterEvent("UNIT_INVENTORY_CHANGED")
+    statusbar:RegisterEvent("PLAYER_ENTERING_WORLD")
 end
-
-local statusbar = CreateFrame("StatusBar", "DarkUI_ArtifactBar", UIParent)
-statusbar:SetFrameStrata(cfg.bfstrata)
-statusbar:SetFrameLevel(cfg.bflevel)
-statusbar:SetSize(cfg.width, cfg.height)
-statusbar:SetPoint(unpack(cfg.pos))
-statusbar:SetScale(cfg.scale)
-statusbar:SetStatusBarTexture(cfg.statusbar)
-statusbar:SetStatusBarColor(E.color.r, E.color.g, E.color.b)
-
-statusbar.background = statusbar:CreateTexture(nil, "BACKGROUND", nil, -7)
-statusbar.background:SetAllPoints()
-statusbar.background:SetTexture(cfg.statusbar)
-statusbar.background:SetVertexColor(1, 0, 0, 0.3)
-
-statusbar:SetScript("OnEvent", bar_OnEvent)
-statusbar:SetScript("OnEnter", bar_OnEnter)
-statusbar:SetScript("OnLeave", bar_OnLeave)
-
-statusbar:RegisterEvent("ARTIFACT_XP_UPDATE")
-statusbar:RegisterEvent("UNIT_INVENTORY_CHANGED")
-statusbar:RegisterEvent("PLAYER_ENTERING_WORLD")

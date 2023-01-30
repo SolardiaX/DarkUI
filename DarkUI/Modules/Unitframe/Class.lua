@@ -1,13 +1,11 @@
-local _, ns = ...
-local E, C, L = ns:unpack()
+local E, C, L = select(2, ...):unpack()
 
 if not C.unitframe.enable then return end
 
 ----------------------------------------------------------------------------------------
 -- Special Class Methods of UnitFrame
 ----------------------------------------------------------------------------------------
-
-local module = E.unitframe
+local module = E:Module("UFCore")
 
 local _G = _G
 local CreateFrame = CreateFrame
@@ -40,7 +38,7 @@ module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer:Show()
     PlayerFrameBottomManagedFramesContainer:Layout()
 
-    PlayerFrameBottomManagedFramesContainer.SetPoint = E.dummy
+    PlayerFrameBottomManagedFramesContainer.SetPoint = E.Dummy
     PlayerFrameBottomManagedFramesContainer.unit = "player"
 end
 
@@ -221,7 +219,7 @@ module.classModule.classpowerbar.CreateDiablolicBar = function(self, ...)
     classpower.PostUpdate = ClassPower_PostUpdate
     classpower.PostUpdateColor = ClassPower_PostUpdateColor
 
-    local maxPoints = (E.class == "MONK" or E.class == "ROGUE") and 6 or 5
+    local maxPoints = (E.myClass == "MONK" or E.myClass == "ROGUE") and 6 or 5
     classpower:SetWidth(maxPoints * classpower.pointWidth)
 
     for i = 1,maxPoints do
@@ -239,7 +237,7 @@ module.classModule.classpowerbar.CreateDiablolicBar = function(self, ...)
 
     -- Stagger (Monk)
     --------------------------------------------
-    if E.class == "MONK" then
+    if E.myClass == "MONK" then
         local stagger = CreateFrame("Frame", nil, self)
         stagger:SetSize(126,42)
         stagger:SetPoint(unpack(cfg.classModule.classpowerbar.position))
@@ -261,7 +259,7 @@ module.classModule.classpowerbar.CreateDiablolicBar = function(self, ...)
 
     -- Runes (Death Knight)
     --------------------------------------------
-    if E.class == "DEATHKNIGHT" then
+    if E.myClass == "DEATHKNIGHT" then
         local runes = CreateFrame("Frame", nil, self)
         runes:SetSize(252,42)
         runes:SetPoint(unpack(cfg.classModule.classpowerbar.position))

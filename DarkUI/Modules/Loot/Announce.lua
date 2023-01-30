@@ -7,7 +7,7 @@ if not C.loot.enable or not _G["LootLite"] then return end
 ----------------------------------------------------------------------------------------
 
 local CreateFrame = CreateFrame
-local GetNumLootItems, GetLootSlotType = GetNumLootItems, GetLootSlotType
+local GetNumLootItems, GetLootSlotType, GetLootSlotInfo = GetNumLootItems, GetLootSlotType, GetLootSlotInfo
 local LootSlotHasItem, GetLootSlotLink = LootSlotHasItem, GetLootSlotLink
 local UnitIsPlayer, UnitExists, UnitName = UnitIsPlayer, UnitExists, UnitName
 local SendChatMessage = SendChatMessage
@@ -16,7 +16,7 @@ local ToggleDropDownMenu = ToggleDropDownMenu
 local UIDropDownMenu_Initialize = UIDropDownMenu_Initialize
 local format = format
 local LOOT = LOOT
-local LOOT_SLOT_MONEY = LOOT_SLOT_MONEY
+local LOOT_SLOT_MONEY = Enum.LootSlotType.Money
 local LootLite, LootCloseButton = LootLite, LootCloseButton
 
 local function Announce(chn)
@@ -29,12 +29,18 @@ local function Announce(chn)
     else
         SendChatMessage(">> " .. LOOT .. " - '" .. UnitName("target") .. "':", chn)
     end
-    for i = 1, GetNumLootItems() do
+
+    for i = 1, nums do
         if LootSlotHasItem(i) then
             local link = GetLootSlotLink(i)
             local messlink = "- %s"
+
             if GetLootSlotType(i) ~= LOOT_SLOT_MONEY then
                 SendChatMessage(format(messlink, link), chn)
+            else
+                local _, item = GetLootSlotInfo(i)
+                item = item:gsub("\n", ", ")
+                SendChatMessage(format(messlink, item), chn)
             end
         end
     end
@@ -87,7 +93,8 @@ end
 local ann = CreateFrame("Button", "LootLiteAnn", LootLite, "UIPanelScrollDownButtonTemplate")
 local LDD = CreateFrame("Frame", "LootLiteLDD", LootLite, "UIDropDownMenuTemplate")
 
-ann:SkinCharButton(LootLite, ">")
+E:SkinCharButton(ann, LootLite, ">")
+
 ann:SetSize(14, 14)
 ann:ClearAllPoints()
 ann:SetPoint("RIGHT", LootCloseButton, "LEFT", -4, 0)
@@ -97,10 +104,11 @@ ann:SetScript(
         "OnClick",
         function(_, button)
             if button == "RightButton" then
-                ToggleDropDownMenu(nil, nil, LDD, lb, 0, 0)
+                ToggleDropDownMenu(nil, nil, LDD, ann, 0, 0)
             else
                 Announce(E:CheckChat())
             end
         end
 )
+
 UIDropDownMenu_Initialize(LDD, LDD_Initialize, "MENU")

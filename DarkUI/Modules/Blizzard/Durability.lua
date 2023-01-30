@@ -59,5 +59,5 @@ function frame:OnEvent()
 end
 
 frame:SetScript("OnEvent", frame.OnEvent)
-frame:RegisterEvent("ADDON_LOADED")
+frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("UPDATE_INVENTORY_DURABILITY")

@@ -16,8 +16,7 @@ local cfg = C.chat
 local function CreateButton(f, b, l, r, m)
     b:SetSize(16, 16)
 
-    b:CreateTextureBorder(1)
-    b:CreateShadow()
+    E:StyleButton(b)
 
     b.texture = b:CreateTexture(nil, "ARTWORK")
     b.texture:SetTexture(C.media.texture.status)

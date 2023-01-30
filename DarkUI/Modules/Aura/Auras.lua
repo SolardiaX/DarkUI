@@ -3,32 +3,24 @@ local E, C, L = select(2, ...):unpack()
 if not C.aura.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Aura styles (modified from ShestakUI)
+--	Aura styles (modified from NDui)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Aura"):Sub("Auras")
 
 local cfg = C.aura
-
-local auras = CreateFrame("Frame")
-C.aura.host = auras
-
-local _G = _G
-local format, floor, strmatch, select, unpack, tonumber = format, floor, strmatch, select, unpack, tonumber
-local UnitAura, GetTime = UnitAura, GetTime
-local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
 local oUF = select(2, ...).oUF
 
-auras:RegisterEvent("PLAYER_LOGIN")
-auras:SetScript("OnEvent", function()
-    auras:HideBlizBuff()
-    auras:BuildBuffFrame()
-end)
+local _G = _G
+local UnitAura, GetTime = UnitAura, GetTime
+local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
+local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
+local RegisterAttributeDriver = RegisterAttributeDriver
+local RegisterStateDriver = RegisterStateDriver
+local SecureHandlerSetFrameRef = SecureHandlerSetFrameRef
+local CreateFrame = CreateFrame
+local format, floor, strmatch, select, unpack, tonumber = format, floor, strmatch, select, unpack, tonumber
 
-function auras:HideBlizBuff()
-    _G.BuffFrame:Kill()
-    _G.DebuffFrame:Kill()
-end
-
-function auras:StartOrStopFlash(animation, timeleft)
+local function startOrStopFlash(animation, timeleft)
     if(timeleft < cfg.flash_timer) then
         if(not animation:IsPlaying()) then
             animation:Play()
@@ -39,7 +31,7 @@ function auras:StartOrStopFlash(animation, timeleft)
 end
 
 local day, hour, minute = 86400, 3600, 60
-function auras:FormatAuraTime(s)
+local function formatAuraTime(s)
 	if s >= day then
 		return E:FormatTime(s, true), s%day
 	elseif s >= 2*hour then
@@ -57,50 +49,72 @@ function auras:FormatAuraTime(s)
 	end
 end
 
-function auras:BuildBuffFrame()
-    -- Movers
-    auras.BuffFrame = auras:CreateAuraHeader("HELPFUL")
-    auras.BuffFrame:ClearAllPoints()
-    auras.BuffFrame:SetPoint(unpack(cfg.buff_pos))
-
-    auras.DebuffFrame = auras:CreateAuraHeader("HARMFUL")
-    auras.DebuffFrame:ClearAllPoints()
-    auras.DebuffFrame:SetPoint(unpack(cfg.debuff_pos))
-end
-
-function auras:UpdateTimer(elapsed)
-    local onTooltip = GameTooltip:IsOwned(self)
-
-    if not (self.timeLeft or self.expiration or onTooltip) then
-        self:SetScript("OnUpdate", nil)
-        return
-    end
-
-    if self.expiration then
-        self.timeLeft = self.expiration / 1e3
-    elseif self.timeLeft then
-        self.timeLeft = self.timeLeft - elapsed
-    end
-
-    if self.nextUpdate > 0 then
-        self.nextUpdate = self.nextUpdate - elapsed
-        return
-    end
-
-    if self.timeLeft and self.timeLeft >= 0 then
-        local timer, nextUpdate = auras:FormatAuraTime(self.timeLeft)
-        self.nextUpdate = nextUpdate
-        self.timer:SetText(timer)
-    end
-
-    if onTooltip then auras:Button_SetTooltip(self) end
-end
-
-function auras:GetSpellStat(arg16, arg17, arg18)
+local function getSpellStat(arg16, arg17, arg18)
     return (arg16 > 0 and L.AURA_VERSA) or (arg17 > 0 and L.AURA_MASTERY) or (arg18 > 0 and L.AURA_HASTE) or L.AURA_CRIT
 end
 
-function auras:UpdateAuras(button, index)
+local Button_SetTooltip = function(button)
+    if button:GetAttribute("index") then
+        GameTooltip:SetUnitAura(button.header:GetAttribute("unit"), button:GetID(), button.filter)
+    elseif button:GetAttribute("target-slot") then
+        GameTooltip:SetInventoryItem("player", button:GetID())
+    end
+end
+
+local Button_UpdateTimer = function(button, elapsed)
+    local onTooltip = GameTooltip:IsOwned(button)
+
+    if not (button.timeLeft or button.expiration or onTooltip) then
+        button:SetScript("OnUpdate", nil)
+        return
+    end
+
+    if button.expiration then
+        button.timeLeft = button.expiration / 1e3
+    elseif button.timeLeft then
+        button.timeLeft = button.timeLeft - elapsed
+    end
+
+    if button.nextUpdate > 0 then
+        button.nextUpdate = button.nextUpdate - elapsed
+        return
+    end
+
+    if button.timeLeft and button.timeLeft >= 0 then
+        local timer, nextUpdate = formatAuraTime(button.timeLeft)
+        button.nextUpdate = nextUpdate
+        button.timer:SetText(timer)
+    end
+
+    if onTooltip then Button_SetTooltip(button) end
+end
+
+local Button_OnAttributeChanged = function(button, attribute, value)
+    if attribute == "index" then
+        module:UpdateAuras(button, value)
+    elseif attribute == "target-slot" then
+        module:UpdateTempEnchant(button, value)
+    end
+end
+
+local Button_OnEnter = function(button)
+    GameTooltip:SetOwner(button, "ANCHOR_BOTTOMLEFT", -5, -5)
+    -- Update tooltip
+    button.nextUpdate = -1
+    button:SetScript("OnUpdate", Button_UpdateTimer)
+end
+
+module.BuildBuffFrame = function(self)
+    self.BuffFrame = self:CreateAuraHeader("HELPFUL")
+    self.BuffFrame:ClearAllPoints()
+    self.BuffFrame:SetPoint(unpack(cfg.buff_pos))
+
+    self.DebuffFrame = self:CreateAuraHeader("HARMFUL")
+    self.DebuffFrame:ClearAllPoints()
+    self.DebuffFrame:SetPoint(unpack(cfg.debuff_pos))
+end
+
+module.UpdateAuras = function(self, button, index)
     local unit, filter = button.header:GetAttribute("unit"), button.filter
     local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID, _, _, _, _, _, arg16, arg17, arg18 = UnitAura(unit, index, filter)
     if not name then return end
@@ -110,15 +124,15 @@ function auras:UpdateAuras(button, index)
         if not button.timeLeft then
             button.nextUpdate = -1
             button.timeLeft = timeLeft
-            button:SetScript("OnUpdate", auras.UpdateTimer)
+            button:SetScript("OnUpdate", Button_UpdateTimer)
         else
             button.timeLeft = timeLeft
         end
         button.nextUpdate = -1
-        auras.UpdateTimer(button, 0)
+        Button_UpdateTimer(button, 0)
 
         if cfg.enable_flash and timeLeft then
-            auras:StartOrStopFlash(button.animation, timeLeft)
+            startOrStopFlash(button.animation, timeLeft)
         end
 
         if timeLeft and (duration == ceil(timeLeft)) and (cfg.enable_animation and button.auraGrowth) then
@@ -148,7 +162,7 @@ function auras:UpdateAuras(button, index)
 
     -- Show spell stat for 'Soleahs Secret Technique'
     if spellID == 368512 then
-        button.count:SetText(auras:GetSpellStat(arg16, arg17, arg18))
+        button.count:SetText(getSpellStat(arg16, arg17, arg18))
     end
 
     button.spellID = spellID
@@ -156,7 +170,7 @@ function auras:UpdateAuras(button, index)
     button.expiration = nil
 end
 
-function auras:UpdateTempEnchant(button, index)
+module.UpdateTempEnchant = function(self, button, index)
     local expirationTime = select(button.enchantOffset, GetWeaponEnchantInfo())
     if expirationTime then
         local quality = GetInventoryItemQuality("player", index)
@@ -165,9 +179,10 @@ function auras:UpdateTempEnchant(button, index)
         button.icon:SetTexture(GetInventoryItemTexture("player", index))
 
         button.expiration = expirationTime
-        button:SetScript("OnUpdate", auras.UpdateTimer)
+        button:SetScript("OnUpdate", Button_UpdateTimer)
         button.nextUpdate = -1
-        auras.UpdateTimer(button, 0)
+        
+        Button_UpdateTimer(button, 0)
     else
         button.expiration = nil
         button.timeLeft = nil
@@ -175,15 +190,7 @@ function auras:UpdateTempEnchant(button, index)
     end
 end
 
-function auras:OnAttributeChanged(attribute, value)
-    if attribute == "index" then
-        auras:UpdateAuras(self, value)
-    elseif attribute == "target-slot" then
-        auras:UpdateTempEnchant(self, value)
-    end
-end
-
-function auras:UpdateHeader(header)
+module.UpdateHeader = function(_, header)
     local size = cfg.debuff_size
 
     if header.filter == "HELPFUL" then
@@ -193,7 +200,7 @@ function auras:UpdateHeader(header)
     end
 
     header:SetAttribute("separateOwn", 1)
-    header:SetAttribute("sortMethod", "INDEX")
+    header:SetAttribute("sortMethod", "TIME")
     header:SetAttribute("sortDirection", "+")
     header:SetAttribute("wrapAfter", cfg.row_num)
     header:SetAttribute("maxWraps", header.filter == "HELPFUL" and 3 or 1)
@@ -223,11 +230,11 @@ function auras:UpdateHeader(header)
     end
 end
 
-function auras:CreateAuraHeader(filter)
+module.CreateAuraHeader = function(self, filter)
     local name = "DarkUIPlayerDebuffs"
     if filter == "HELPFUL" then name = "DarkUIPlayerBuffs" end
 
-    local header = CreateFrame("Frame", name, UIParent, "SecureAuraHeaderTemplate")
+    local header = CreateFrame("Frame", name, _G.UIParent, "SecureAuraHeaderTemplate")
     header:SetClampedToScreen(true)
     header:UnregisterEvent("UNIT_AURA") -- we only need to watch player and vehicle
     header:RegisterUnitEvent("UNIT_AURA", "player", "vehicle")
@@ -236,7 +243,7 @@ function auras:CreateAuraHeader(filter)
     header.filter = filter
     RegisterAttributeDriver(header, "unit", "[vehicleui] vehicle; player")
 
-    header.visibility = CreateFrame("Frame", nil, UIParent, "SecureHandlerStateTemplate")
+    header.visibility = CreateFrame("Frame", nil, _G.UIParent, "SecureHandlerStateTemplate")
     SecureHandlerSetFrameRef(header.visibility, "AuraHeader", header)
     RegisterStateDriver(header.visibility, "customVisibility", "[petbattle] 0;1")
     header.visibility:SetAttribute("_onstate-customVisibility", [[
@@ -250,30 +257,15 @@ function auras:CreateAuraHeader(filter)
         header:SetAttribute("includeWeapons", 1)
     end
 
-    auras:UpdateHeader(header)
+    self:UpdateHeader(header)
     header:Show()
 
     return header
 end
 
-function auras:Button_SetTooltip(button)
-    if button:GetAttribute("index") then
-        GameTooltip:SetUnitAura(button.header:GetAttribute("unit"), button:GetID(), button.filter)
-    elseif button:GetAttribute("target-slot") then
-        GameTooltip:SetInventoryItem("player", button:GetID())
-    end
-end
-
-function auras:Button_OnEnter()
-    GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT", -5, -5)
-    -- Update tooltip
-    self.nextUpdate = -1
-    self:SetScript("OnUpdate", auras.UpdateTimer)
-end
-
 local indexToOffset = {2, 6, 10}
 
-function auras:CreateAuraIcon(button)
+module.CreateAuraIcon = function(self, button)
     local enchantIndex = tonumber(strmatch(button:GetName(), "TempEnchant(%d)$"))
     button.enchantOffset = indexToOffset[enchantIndex]
 
@@ -287,24 +279,21 @@ function auras:CreateAuraIcon(button)
     button.icon:SetDrawLayer("BACKGROUND", -8)
     button.icon:SetTexCoord(unpack(C.media.texCoord))
 
-    button.count = button:CreateFontString(nil, "ARTWORK")
+    button.count = button:CreateFontString(nil, "OVERLAY")
     button.count:SetPoint(unpack(cfg.count_pos))
     button.count:SetFont(unpack(cfg.count_font_style))
 
-    button.timer = button:CreateFontString(nil, "ARTWORK")
+    button.timer = button:CreateFontString(nil, "OVERLAY")
     button.timer:SetPoint(unpack(cfg.dur_pos))
     button.timer:SetFont(unpack(cfg.dur_font_style))
 
-    button.highlight = button:CreateTexture(nil, "HIGHLIGHT")
-    button.highlight:SetColorTexture(1, 1, 1, .25)
-    button.highlight:SetInside()
+    E:StyleButton(button)
 
-    button:CreateTextureBorder()
     button:CreateShadow()
-
-    button:RegisterForClicks("RightButtonDown")
-    button:SetScript("OnAttributeChanged", auras.OnAttributeChanged)
-    button:SetScript("OnEnter", auras.Button_OnEnter)
+    
+    button:RegisterForClicks("RightButtonUp", "RightButtonDown")
+    button:SetScript("OnAttributeChanged", Button_OnAttributeChanged)
+    button:SetScript("OnEnter", Button_OnEnter)
     button:SetScript("OnLeave", GameTooltip_Hide)
 
     if cfg.enable_flash then
@@ -335,4 +324,12 @@ function auras:CreateAuraIcon(button)
 
         button.auraGrowth = auraGrowth
     end
+end
+
+function module:OnLogin()
+    _G.BuffFrame.numHideableBuffs = 0
+    _G.BuffFrame:Kill()
+    _G.DebuffFrame:Kill()
+
+    module:BuildBuffFrame()
 end

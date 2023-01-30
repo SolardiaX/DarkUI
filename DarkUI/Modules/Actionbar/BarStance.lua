@@ -5,9 +5,13 @@ if not C.actionbar.bars.enable then return end
 ----------------------------------------------------------------------------------------
 --	StanceBar (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Actionbar"):Sub("BarStance")
 
 local _G = _G
 local CreateFrame = CreateFrame
+local GetShapeshiftFormInfo, GetShapeshiftFormCooldown = GetShapeshiftFormInfo, GetShapeshiftFormCooldown
+local CooldownFrame_Set = CooldownFrame_Set
+local InCombatLockdown = InCombatLockdown
 local RegisterStateDriver = RegisterStateDriver
 local unpack, tinsert = unpack, tinsert
 local UIParent = _G.UIParent
@@ -39,7 +43,6 @@ local shiftBarUpdate = function()
             CooldownFrame_Set(cooldown, start, duration, enable)
 
             if isActive then
-                --BETA StanceBar.lastSelected = button:GetID()
                 button:SetChecked(true)
             else
                 button:SetChecked(false)
@@ -54,73 +57,75 @@ local shiftBarUpdate = function()
     end
 end
 
-local bar = CreateFrame("Frame", "StanceBarHolder", UIParent, "SecureHandlerStateTemplate")
-bar:SetWidth(NUM_STANCE_SLOTS * cfg.button.size + (NUM_STANCE_SLOTS - 1) * cfg.button.space)
-bar:SetHeight(cfg.button.size)
-bar:SetPoint(unpack(cfg.pos))
-bar.buttonList = {}
+function module:OnInit()
+    local bar = CreateFrame("Frame", "DarkUI_StanceBarHolder", UIParent, "SecureHandlerStateTemplate")
+    bar:SetWidth(NUM_STANCE_SLOTS * cfg.button.size + (NUM_STANCE_SLOTS - 1) * cfg.button.space)
+    bar:SetHeight(cfg.button.size)
+    bar:SetPoint(unpack(cfg.pos))
+    bar.buttonList = {}
 
-bar:RegisterEvent("PLAYER_ENTERING_WORLD")
-bar:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
-bar:RegisterEvent("UPDATE_SHAPESHIFT_USABLE")
-bar:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN")
-bar:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
-bar:SetScript("OnEvent", function(self, event)
-    if event == "PLAYER_ENTERING_WORLD" then
+    bar:RegisterEvent("PLAYER_LOGIN")
+    bar:RegisterEvent("UPDATE_SHAPESHIFT_FORMS")
+    bar:RegisterEvent("UPDATE_SHAPESHIFT_USABLE")
+    bar:RegisterEvent("UPDATE_SHAPESHIFT_COOLDOWN")
+    bar:RegisterEvent("ACTIONBAR_PAGE_CHANGED")
+    bar:SetScript("OnEvent", function(self, event)
+        if event == "PLAYER_LOGIN" then
+            StanceBar.ignoreFramePositionManager = true
+            StanceBar:StripTextures()
+            StanceBar:SetParent(bar)
+            StanceBar:ClearAllPoints()
+            StanceBar:SetPoint("TOPLEFT", bar, "TOPLEFT", -7, 0)
+            StanceBar:EnableMouse(false)
+            StanceBar:UnregisterAllEvents()
 
-        StanceBar.ignoreFramePositionManager = true
-        StanceBar:StripTextures()
-        StanceBar:SetParent(bar)
-        StanceBar:ClearAllPoints()
-        StanceBar:SetPoint("TOPLEFT", bar, "TOPLEFT", -7, 0)
-        StanceBar:EnableMouse(false)
-        StanceBar:UnregisterAllEvents()
+            for i = 1, NUM_STANCE_SLOTS do
+                local button = _G["StanceButton" .. i]
+                tinsert(bar.buttonList, button) --add the button object to the list
+                button:SetSize(cfg.button.size, cfg.button.size)
+                button:SetParent(bar)
+                button:ClearAllPoints()
+                if i == 1 then
+                    button:SetPoint("BOTTOMLEFT", bar, 0, 0)
+                else
+                    local previous = _G["StanceButton" .. i - 1]
+                    button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+                end
 
-        for i = 1, NUM_STANCE_SLOTS do
-            local button = _G["StanceButton" .. i]
-            tinsert(bar.buttonList, button) --add the button object to the list
-            button:SetSize(cfg.button.size, cfg.button.size)
-            button:ClearAllPoints()
-            if i == 1 then
-                button:SetPoint("BOTTOMLEFT", bar, 0, 0)
-            else
-                local previous = _G["StanceButton" .. i - 1]
-                button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space, 0)
+                local icon = GetShapeshiftFormInfo(i)
+                if icon then
+                    button:Show()
+                else
+                    button:Hide()
+                end
             end
 
-            local icon = GetShapeshiftFormInfo(i)
-            if icon then
-                button:Show()
-            else
-                button:Hide()
+            --show/hide the frame on a given state driver
+            bar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
+            RegisterStateDriver(bar, "visibility", bar.frameVisibility)
+
+            --create the mouseover functionality
+            if cfg.fader_mouseover then
+                E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
             end
-        end
 
-        --show/hide the frame on a given state driver
-        bar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
-        RegisterStateDriver(bar, "visibility", bar.frameVisibility)
-
-        --create the mouseover functionality
-        if cfg.fader_mouseover then
-            E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-        end
-
-        --create the combat fader
-        if cfg.fader_combat then
-            E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-        end
-    elseif event == "UPDATE_SHAPESHIFT_FORMS" then
-        if InCombatLockdown() then return end
-        for i = 1, NUM_STANCE_SLOTS do
-            local button = _G["StanceButton"..i]
-            local icon = GetShapeshiftFormInfo(i)
-            if icon then
-                button:Show()
-            else
-                button:Hide()
+            --create the combat fader
+            if cfg.fader_combat then
+                E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
             end
+        elseif event == "UPDATE_SHAPESHIFT_FORMS" then
+            if InCombatLockdown() then return end
+            for i = 1, NUM_STANCE_SLOTS do
+                local button = _G["StanceButton"..i]
+                local icon = GetShapeshiftFormInfo(i)
+                if icon then
+                    button:Show()
+                else
+                    button:Hide()
+                end
+            end
+        else
+            shiftBarUpdate()
         end
-    else
-        shiftBarUpdate()
-    end
-end)
+    end)
+end

@@ -42,7 +42,7 @@ local function GetQuests(unitID)
 		if not text or text == "" then return end
 
 		if UnitIsPlayer(text) then
-			notMyQuest = text ~= E.name
+			notMyQuest = text ~= E.myName
 		elseif text and not notMyQuest then
 			local count, percent = CheckTextForQuest(text)
 

@@ -1,11 +1,12 @@
 local _, ns = ...
 local E, C, L = ns:unpack()
 
-if not C.unitframe.enable then return end
+if not C.unitframe.enable or not C.unitframe.party.enable or C.unitframe.party.raidMode then return end
 
 ----------------------------------------------------------------------------------------
 -- Party Frame of DarkUI
 ----------------------------------------------------------------------------------------
+local core = E:Module("UFCore")
 
 local oUF = ns.oUF or oUF
 
@@ -18,7 +19,6 @@ local unpack, tinsert = unpack, table.insert
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 
 local cfg = C.unitframe
-local DUF = E.unitframe
 
 local mediaPath = cfg.mediaPath
 
@@ -46,37 +46,35 @@ local createTexture = function(self)
     self.FrameFG = CreateFrame('Frame', nil, self)
     self.FrameFG:SetFrameStrata("LOW")
     self.FrameFG:SetFrameLevel(5)
+    self.FrameFG:SetSize(256, 128)
+    self.FrameFG:SetPoint('CENTER', self, 0, 0)
 
     self.FrameFG.texture = self.FrameFG:CreateTexture(nil, 'BORDER')
     self.FrameFG.texture:SetTexture(media.foreground)
     self.FrameFG.texture:SetAllPoints(self.FrameFG)
     self.FrameFG.texture:SetTexCoord(1, 0, 0, 1)
 
-    self.FrameFG:SetSize(256, 128)
-    self.FrameFG:SetPoint('CENTER', self, 0, 0)
-
     -- background
     self.FrameBG = CreateFrame('Frame', nil, self)
     self.FrameBG:SetFrameStrata('BACKGROUND')
     self.FrameBG:SetFrameLevel(1)
+    self.FrameBG:SetSize(256, 128)
+    self.FrameBG:SetPoint("CENTER", self, 0, 0)
 
     self.FrameBG.texture = self.FrameBG:CreateTexture(nil, 'BACKGROUND')
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
     self.FrameBG.texture:SetTexCoord(1, 0, 0, 1)
 
-    self.FrameBG:SetSize(256, 128)
-    self.FrameBG:SetPoint("CENTER", self, 0, 0)
-
     self.DebuffHighlight = self:CreateTexture(nil, "OVERLAY")
     self.DebuffHighlight:SetVertexColor(0, 0, 0, 0)
     self.DebuffHighlight:SetBlendMode("ADD")
     self.DebuffHighlight:SetTexture(media.debuffHighlight)
-    self.DebuffHighlightAlpha = 0.9
-    self.DebuffHighlightFilter = false
-
     self.DebuffHighlight:SetPoint("TOPLEFT", self.FrameFG, "TOPLEFT", -5, 5)
     self.DebuffHighlight:SetPoint("BOTTOMRIGHT", self.FrameFG, "BOTTOMRIGHT", 5, -5)
+
+    self.DebuffHighlightAlpha = 0.9
+    self.DebuffHighlightFilter = false
 end
 
 local createBar = function(self)
@@ -85,7 +83,6 @@ local createBar = function(self)
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(94, 14)
     self.Health:SetPoint('BOTTOM', self.FrameBG, 'BOTTOM', 0, 21)
-
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -108,37 +105,71 @@ local createBar = function(self)
     self.Power:SetFrameLevel(4)
     self.Power:SetPoint('TOP', self.Health, 'BOTTOM', 0, 0)
     self.Power:SetSize(94, 4)
-
     self.Power:SetStatusBarTexture(media.mpTex)
-
-    self.Power.frequentUpdates = true
-    self.Power.colorPower = true
-    self.Power.Smooth = true
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg.multiplier = .45
     self.Power.bg:SetAllPoints()
     self.Power.bg:SetTexture(media.mpTex)
+    
+    self.Power.frequentUpdates = true
+    self.Power.colorPower = true
+    self.Power.Smooth = true
 
     --Incoming heal
     local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
+    mhpb:SetWidth(1)
     mhpb:SetTexture(media.incoming_barTex)
     mhpb:SetVertexColor(0, 1, 0.5, 0.2)
 
     local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
+    ohpb:SetWidth(1)
     ohpb:SetTexture(media.incoming_barTex)
     ohpb:SetVertexColor(0, 1, 0, 0.2)
 
-    local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ahpb:SetTexture(media.incoming_barTex)
-    ahpb:SetVertexColor(1, 1, 0, 0.2)
+    local abb = self.Health:CreateTexture(nil, "ARTWORK")
+    abb:SetWidth(1)
+    abb:SetTexture(media.incoming_barTex)
+    abb:SetVertexColor(1, 1, 0, 0.2)
 
-    self.HealPrediction = {
-        myBar           = mhpb,
-        otherBar        = ohpb,
-        absorbBar       = ahpb,
-        maxOverflow     = 1,
-        frequentUpdates = true
+    local abbo = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    abbo:SetAllPoints(abb)
+    abbo:SetTexture("Interface\\RaidFrame\\Shield-Overlay", true, true)
+    abbo.tileSize = 32
+
+    local oag = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    oag:SetWidth(15)
+    oag:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
+    oag:SetBlendMode("ADD")
+    oag:SetAlpha(.7)
+    oag:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
+    oag:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
+
+    local hab = CreateFrame("StatusBar", nil, self.Health)
+    hab:SetPoint("TOPLEFT", self.Health)
+    hab:SetPoint("BOTTOMRIGHT", self.Health:GetStatusBarTexture())
+    hab:SetReverseFill(true)
+    hab:SetStatusBarTexture(media.incoming_barTex)
+    hab:SetStatusBarColor(0, .5, .8, .5)
+    hab:SetFrameLevel(self.Health:GetFrameLevel())
+
+    local ohg = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    ohg:SetWidth(15)
+    ohg:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
+    ohg:SetBlendMode("ADD")
+    ohg:SetAlpha(.5)
+    ohg:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
+    ohg:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
+
+    self.HealPredictionAndAbsorb = {
+        myBar = mhpb,
+        otherBar = ohpb,
+        absorbBar = abb,
+        absorbBarOverlay = abbo,
+        overAbsorbGlow = oag,
+        healAbsorbBar = hab,
+        overHealAbsorbGlow = ohg,
+        maxOverflow = 1,
     }
 end
 
@@ -219,6 +250,7 @@ local createThreatType = function(self)
 
     self:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE', event_handler)
     self:RegisterEvent('UNIT_TARGET', event_handler)
+
     tinsert(self.__elements, event_handler)
 end
 
@@ -233,14 +265,21 @@ local createAuraIcon = function(self)
     f['growth-x'] = 'RIGHT'
     f['growth-y'] = 'DOWN'
 
-    local h = (f.size + f.spacing) * 6
     local w = (f.size + f.spacing) * 4
-    f:SetSize(h, w)
-    f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -10, -20)
+    local h = (f.size + f.spacing) * 4
+    f:SetSize(w, h)
 
-    f.PostCreateButton = DUF.PostCreateIcon
-    f.PostUpdateButton = DUF.PostUpdateIcon
-    f.FilterAura = DUF.FilterAuras
+    if C.unitframe.partypet.enable then
+        f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -10, -60)
+    else
+        f:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', -10, -20)
+    end
+
+    f.reanchorIfVisibleChanged = true
+    f.PostCreateButton = core.PostCreateIcon
+    f.PostUpdateButton = core.PostUpdateIcon
+    f.PostUpdateGapButton = core.PostUpdateGapIcon
+    f.FilterAura = core.FilterAuras
 
     self.Auras = f
 end
@@ -262,22 +301,22 @@ local createStyle = function(self)
     createThreatType(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = DUF.CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
+    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.LeaderIndicator = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 30)
+    self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 30)
     self.LeaderIndicator:SetTexture(media.leader_Tex)
 
-    self.AssistantIndicator = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMLEFT", "TOPLEFT", 12, 25)
+    self.AssistantIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMLEFT", "TOPLEFT", 12, 25)
     self.AssistantIndicator:SetTexture(media.assistant_Tex)
     
-    self.MasterLooter = DUF.CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "BOTTOM", 0, 0)
-    self.ReadyCheckIndicator = DUF.CreateIcon(self.FrameFG, "OVERLAY", 24, -1, self, "TOPRIGHT", "TOPRIGHT", 0, 8)
+    self.MasterLooter = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "BOTTOM", 0, 0)
+    self.ReadyCheckIndicator = core:CreateIcon(self.FrameFG, "OVERLAY", 24, -1, self, "TOPRIGHT", "TOPRIGHT", 0, 8)
 
-    DUF.SetFader(self, cfg.party.fader)
+    core:SetFader(self, cfg.party.fader)
 end
 
 ---------------------------------------------
@@ -310,10 +349,10 @@ oUF:Factory(function()
             "xOffset", xOffset,
             "yOffset", yOffset,
             "oUF-initialConfigFunction", ([[
-                    self:SetWidth(%d)
-                    self:SetHeight(%d)
-                    self:SetScale(%f)
-                ]]):format(100, 40, cfg.scale)
+                self:SetWidth(%d)
+                self:SetHeight(%d)
+                self:SetScale(%f)
+            ]]):format(100, 40, cfg.scale)
     )
 
     party:SetPoint(unpack(position))
@@ -331,4 +370,8 @@ oUF:Factory(function()
             party:SetPoint(unpack(cfg.party.position.healer))
         end
     end)
+
+    if CompactPartyFrame then
+        CompactPartyFrame:UnregisterAllEvents()
+    end
 end)

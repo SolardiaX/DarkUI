@@ -1,7 +1,8 @@
+local E, C, L = select(2, ...):unpack()
+
 ----------------------------------------------------------------------------------------
 --	Configuration of CombatText AoeSpam
 ----------------------------------------------------------------------------------------
-local E, C, L = select(2, ...):unpack()
 
 C.aoespam = {}
 
@@ -33,7 +34,7 @@ C.aoespam.aoespam[351687] = 3			-- Mnemonic Equipment (Maldraxxus)
 
 
 -- Class config
-if E.class == "DEATHKNIGHT" then
+if E.myClass == "DEATHKNIGHT" then
     C.aoespam.aoespam[91778] = 0        -- Sweeping Claws
     C.aoespam.aoespam[207311] = 0        -- Clawing Shadows
     C.aoespam.aoespam[115994] = 4        -- Unholy Blight
@@ -85,7 +86,7 @@ if E.class == "DEATHKNIGHT" then
     C.aoespam.healfilter[55078] = true    -- Blood Plague
     C.aoespam.healfilter[53365] = true    -- Unholy Strength
     C.aoespam.healfilter[119980] = true    -- Conversion
-elseif E.class == "DEMONHUNTER" then
+elseif E.myClass == "DEMONHUNTER" then
     C.aoespam.aoespam[258926] = 3.5        -- Fel Barrage
     C.aoespam.aoespam[258921] = 0.5        -- Immolation Aura (Havoc Talent)
     C.aoespam.aoespam[258922] = 4        -- Immolation Aura Tick (Havoc Talent)
@@ -136,7 +137,7 @@ elseif E.class == "DEMONHUNTER" then
     C.aoespam.aoespam[345423] = 6		-- The Hunt (Heal)
     C.aoespam.aoespam[342857] = 3		-- Glaive Tempest
     C.aoespam.aoespam[346278] = 3		-- Burning Wound (Legendary)
-elseif E.class == "DRUID" then
+elseif E.myClass == "DRUID" then
     -- Healing spells
     C.aoespam.aoespam[207386] = 4        -- Spring Blossoms
     C.aoespam.aoespam[102352] = 4        -- Cenarion Ward
@@ -179,7 +180,7 @@ elseif E.class == "DRUID" then
     C.aoespam.healfilter[145109] = true    -- Ysera's Gift (Self)
     C.aoespam.healfilter[145110] = true    -- Ysera's Gift
     C.aoespam.healfilter[202636] = true    -- Leader of the Pack
-elseif E.class == "HUNTER" then
+elseif E.myClass == "HUNTER" then
     C.aoespam.aoespam[217200] = 4        -- Barbed Shot
     C.aoespam.aoespam[270329] = 0.5        -- Pheromone Bomb
     C.aoespam.aoespam[270332] = 2        -- Pheromone Bomb Tick
@@ -247,7 +248,7 @@ elseif E.class == "HUNTER" then
     C.aoespam.aoespam[197161] = 8        -- Mimiron's Shell Heal
     C.aoespam.aoespam[339400] = 4		-- Rejuvenating Wind (Conduit)
     C.aoespam.healfilter[197205] = true    -- Spirit Bond
-elseif E.class == "MAGE" then
+elseif E.myClass == "MAGE" then
     C.aoespam.aoespam[217694] = 3.5        -- Living Bomb
     C.aoespam.aoespam[244813] = 3.5        -- Living Bomb
     C.aoespam.aoespam[44461] = 3.5        -- Living Bomb (AoE)
@@ -299,7 +300,7 @@ elseif E.class == "MAGE" then
     C.aoespam.aoespam[44425] = 1.2        -- Arcane Barrage
     C.aoespam.aoespam[277703] = 3		-- Trailing Embers
     C.aoespam.aoespam[325130] = 1.9		-- Shifting Power (Covenant Night Fae)
-elseif E.class == "MONK" then
+elseif E.myClass == "MONK" then
     -- Healing spells
     C.aoespam.aoespam[119611] = 3        -- Renewing Mist
     C.aoespam.aoespam[124682] = 3        -- Enveloping Mist
@@ -330,7 +331,7 @@ elseif E.class == "MONK" then
     C.aoespam.aoespam[158221] = 1        -- Hurricane Strike
     C.aoespam.healfilter[196608] = true    -- Eye of the Tiger
     C.aoespam.healfilter[216521] = true    -- Celestial Fortune
-elseif E.class == "PALADIN" then
+elseif E.myClass == "PALADIN" then
     -- Healing spells
     C.aoespam.aoespam[203539] = 10        -- Greater Blessing of Wisdom
     C.aoespam.aoespam[216371] = 4        -- Avenging Crusader
@@ -364,7 +365,7 @@ elseif E.class == "PALADIN" then
     C.aoespam.aoespam[20271] = 1        -- Judgment
     C.aoespam.aoespam[217020] = 1        -- Zeal
     C.aoespam.aoespam[286232] = 1		-- Light's Decree
-elseif E.class == "PRIEST" then
+elseif E.myClass == "PRIEST" then
     -- Healing spells
     C.aoespam.aoespam[204065] = 0        -- Shadow Covenant
     C.aoespam.aoespam[270501] = 2.5        -- Contrition
@@ -405,7 +406,7 @@ elseif E.class == "PRIEST" then
     C.aoespam.aoespam[148859] = 3        -- Shadowy Apparition
     C.aoespam.healfilter[34914] = true    -- Vampiric Touch
     C.aoespam.healfilter[15290] = false    -- Vampiric Embrace
-elseif E.class == "ROGUE" then
+elseif E.myClass == "ROGUE" then
     C.aoespam.aoespam[121411] = 2.5        -- Crimson Tempest
     C.aoespam.aoespam[271881] = 0.5        -- Blade Rush
     C.aoespam.aoespam[280720] = 2        -- Secret Technique
@@ -442,7 +443,7 @@ elseif E.class == "ROGUE" then
     C.aoespam.merge[27576] = 5374        -- Mutilate Off-Hand
     C.aoespam.merge[113780] = 2818        -- Deadly Poison
     C.aoespam.merge[57842] = 57841        -- Killing Spree Off-Hand
-elseif E.class == "SHAMAN" then
+elseif E.myClass == "SHAMAN" then
     -- Healing spells
     C.aoespam.aoespam[197997] = 1        -- Wellspring
     C.aoespam.aoespam[73921] = 5        -- Healing Rain
@@ -492,7 +493,7 @@ elseif E.class == "SHAMAN" then
     C.aoespam.aoespam[210854] = 4        -- Hailstorm
     C.aoespam.aoespam[187874] = 1        -- Crash Lightning
     C.aoespam.aoespam[195592] = 1        -- Crash Lightning
-elseif E.class == "WARLOCK" then
+elseif E.myClass == "WARLOCK" then
     C.aoespam.aoespam[278350] = 4        -- Vile Taint
     C.aoespam.aoespam[196278] = 1        -- Implosion
     C.aoespam.aoespam[265931] = 5        -- Conflagrate DoT
@@ -542,7 +543,7 @@ elseif E.class == "WARLOCK" then
     C.aoespam.healfilter[205179] = true    -- Phantom Singularity
     C.aoespam.healfilter[63106] = true    -- Siphon Life
     C.aoespam.healfilter[108359] = true    -- Dark Regeneration
-elseif E.class == "WARRIOR" then
+elseif E.myClass == "WARRIOR" then
     C.aoespam.aoespam[845] = 0.5        -- Cleave (Arms)
     C.aoespam.aoespam[202147] = 5        -- Second Wind (Arms Talent Heal)
     C.aoespam.aoespam[260643] = 0.5        -- Skullsplitter (Arms Talent Sweeping Strikes)

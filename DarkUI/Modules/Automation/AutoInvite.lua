@@ -5,9 +5,9 @@ if not C.automation.accept_invite then return end
 ----------------------------------------------------------------------------------------
 --	Accept invites from guild members or friend list(by ALZA)
 ----------------------------------------------------------------------------------------
+local module = E:Module("Automation"):Sub("AutoInvite")
 
 local _G = _G
-local CreateFrame = CreateFrame
 local C_BattleNet_GetAccountInfoByGUID = C_BattleNet.GetAccountInfoByGUID
 local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local C_FriendList_IsFriend = C_FriendList.IsFriend
@@ -30,9 +30,7 @@ local function CheckFriend(inviterGUID)
     end
 end
 
-local ai = CreateFrame("Frame")
-ai:RegisterEvent("PARTY_INVITE_REQUEST")
-ai:SetScript("OnEvent", function(_, _, name, _, _, _, _, _, inviterGUID)
+module:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, name, _, _, _, _, _, inviterGUID)
     if QueueStatusMinimapButton:IsShown() or GetNumGroupMembers() > 0 then return end
     if CheckFriend(inviterGUID) then
         RaidNotice_AddMessage(RaidWarningFrame, L.AUTO_INVITE_INFO .. name, { r = 0.41, g = 0.8, b = 0.94 }, 3)
@@ -53,13 +51,7 @@ ai:SetScript("OnEvent", function(_, _, name, _, _, _, _, _, inviterGUID)
     end
 end)
 
-----------------------------------------------------------------------------------------
---  Auto invite by whisper(by Tukz)
-----------------------------------------------------------------------------------------
-local autoinvite = CreateFrame("Frame")
-autoinvite:RegisterEvent("CHAT_MSG_WHISPER")
-autoinvite:RegisterEvent("CHAT_MSG_BN_WHISPER")
-autoinvite:SetScript("OnEvent", function(_, event, arg1, arg2, ...)
+module:RegisterEvent("CHAT_MSG_WHISPER CHAT_MSG_BN_WHISPER", function(_, event, arg1, arg2, ...)
     if ((not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) and arg1:lower():match(C.automation.invite_keyword)) and not QueueStatusMinimapButton:IsShown() then
         if event == "CHAT_MSG_WHISPER" then
             C_PartyInfo_InviteUnit(arg2)

@@ -5,10 +5,20 @@ if C.tooltip.enable ~= true or C.tooltip.mount ~= true then return end
 ----------------------------------------------------------------------------------------
 --	Show source of mount
 ----------------------------------------------------------------------------------------
+local module = E:Module("Tooltip"):Sub("MountSource")
+
+local C_MountJournal = C_MountJournal
+local C_UnitAuras = C_UnitAuras
+local GameTooltip = GameTooltip
+local UnitIsPlayer = UnitIsPlayer
+local UnitIsUnit = UnitIsUnit
+local hooksecurefunc = hooksecurefunc
+local ipairs, select = ipairs, select
+local COLLECTED, NOT_COLLECTED = COLLECTED, NOT_COLLECTED
+
 local MountCache = {}
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_LOGIN")
-frame:SetScript("OnEvent", function()
+
+module:RegisterEvent("PLAYER_LOGIN", function()
 	for _, mountID in ipairs(C_MountJournal.GetMountIDs()) do
 		MountCache[select(2, C_MountJournal.GetMountInfoByID(mountID))] = mountID
 	end

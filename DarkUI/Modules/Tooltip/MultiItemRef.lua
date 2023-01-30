@@ -38,7 +38,7 @@ local CreateTip = function(link)
     local num = #tips + 1
     local tip = CreateFrame("GameTooltip", "ItemRefTooltip" .. num, UIParent, "GameTooltipTemplate")
     if num == 2 then
-        tip:SetPoint("LEFT", ItemRefTooltip, "RIGHT", 3, 0)
+        tip:SetPoint("LEFT", "ItemRefTooltip", "RIGHT", 3, 0)
     else
         tip:SetPoint("LEFT", "ItemRefTooltip" .. num - 1, "RIGHT", 3, 0)
     end
@@ -80,7 +80,8 @@ local ShowTip = function(tip, link)
     shown = nil
 end
 
-local SetHyperlink = _G.ItemRefTooltip.SetHyperlink
+local SetHyperlinkBase = _G.ItemRefTooltip.SetHyperlink
+
 function _G.ItemRefTooltip:SetHyperlink(link, ...)
     local handled = strsplit(":", link)
     if not InCombatLockdown() and not IsModifiedClick() and handled and types[handled] and not shown then
@@ -90,5 +91,6 @@ function _G.ItemRefTooltip:SetHyperlink(link, ...)
         end
         return
     end
-    SetHyperlink(self, link, ...)
+    
+    SetHyperlinkBase(self, link, ...)
 end

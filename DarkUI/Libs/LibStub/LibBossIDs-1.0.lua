@@ -161,7 +161,7 @@ local BossIDs = {
 	-------------------------------------------------------------------------------
 	[9156]	= true,	-- Ambassador Flamelash
 	[8923]	= true,	-- Panzor the Invincible
-	[17808]	= true,	-- Anger'rel
+	-- [17808]	= true,	-- Anger'rel
 	[9039]	= true,	-- Doom'rel
 	[9040]	= true,	-- Dope'rel
 	[9037]	= true,	-- Gloom'rel
@@ -414,7 +414,7 @@ local BossIDs = {
 	[54445] = true,	-- Echo of Jaina
 	[54123] = true,	-- Echo of Sylvanas
 	[54544] = true,	-- Echo of Tyrande
-	[54432] = true,	-- Murozond
+	-- [54432] = true,	-- Murozond
 
 	-------------------------------------------------------------------------------
 	-- Eye of Azshara
@@ -529,7 +529,6 @@ local BossIDs = {
 	[38112]	= true,	-- Falric
 	[38113]	= true,	-- Marwyn
 	[37226]	= true,	-- The Lich King
-	[38113]	= true,	-- Marvyn
 
 	-------------------------------------------------------------------------------
 	-- Halls of Stone
@@ -1818,7 +1817,7 @@ local BossIDs = {
 	[23577]	= true,	-- Halazzi
 	[28517]	= true,	-- Halazzi
 	[29022]	= true,	-- Halazzi
-	[24239]	= true,	-- Malacrass
+	-- [24239]	= true,	-- Malacrass
 
 	-- Final Bosses
 	[24239]	= true,	-- Hex Lord Malacrass

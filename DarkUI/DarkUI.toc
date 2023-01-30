@@ -1,22 +1,22 @@
-## Interface: 100002
+## Interface: 100005
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Notes-zhCN: 整合插件 DarkUI
-## Notes: A total UI overhaul for World of Warcraft
+## Notes: DarkUI for World of Warcraft
 ## Author: SolardiaX
-## Version: 10.0.2-b1.0.6
-## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options, ItemRack, Outfitter
-## LoadWith: Blizzard_TradeSkillUI
+## Version: 10.0.5-b1.0.0
+## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options
 ## SavedVariables: SavedStats
 ## SavedVariablesPerCharacter: SavedStatsPerChar
-## X-Thanks: kaxu@ngacn, silverband@ngacn, Tuller, zork, siwai, Elv, Tuz
-## X-Credits: ElvUI, Tukui, ShestakUI, NDUI, ouf_DD
+## X-Credits: Aezay, Elv, GoldpawsStuff, Silverband, Siwai, Tuller, Tuz, Zork, p3lim
 
 Init.lua
 
-Libs\load.xml
-Locales\load.xml
+Libs\_load_.xml
+Locales\_load_.xml
 
-Config\load.xml
-Core\load.xml
-Modules\load.xml
+Config\_load_.xml
+Core\_load_.xml
+Modules\_load_.xml
+
+TaintLess.xml

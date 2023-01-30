@@ -41,8 +41,11 @@ local locs = {
     ["INVTYPE_RANGEDRIGHT"]    = 1,
 }
 
-local WIMtooltip = function(tooltip)
-    local _, link = tooltip:GetItem()
+local WIMtooltip = function(self, _)
+    local slot = self.slot
+	if not slot then return end
+
+    local _, link = self:GetItem()
     if not link then return end
     local itemID = link:match("item:(%d+)")
     if not itemID then return end
@@ -62,23 +65,23 @@ local WIMtooltip = function(tooltip)
     if (quality < 2 or subClass == LE_ITEM_CLASS_MISCELLANEOUS) and not (canBeChanged or canBeSource) then return end
 
     if noChangeReason or noSourceReason then
-        GameTooltip:AddLine(" ")
+        self:AddLine(" ")
     end
 
     if subClass == LE_ITEM_CLASS_MISCELLANEOUS and class ~= "INVTYPE_HOLDABLE" then
-        tooltip:AddLine("|cffff0000" .. ERR_TRANSMOGRIFY_INVALID_ITEM_TYPE .. "|r", nil, nil, nil, true)
+        self:AddLine("|cffff0000" .. ERR_TRANSMOGRIFY_INVALID_ITEM_TYPE .. "|r", nil, nil, nil, true)
     end
 
     if noChangeReason then
-        tooltip:AddLine(gsub("|cffff0000" .. (_G["ERR_TRANSMOGRIFY_" .. noChangeReason] or ERR_TRANSMOGRIFY_INVALID_SOURCE), "%%s", ""), nil, nil, nil, true)
+        self:AddLine(gsub("|cffff0000" .. (_G["ERR_TRANSMOGRIFY_" .. noChangeReason] or ERR_TRANSMOGRIFY_INVALID_SOURCE), "%%s", ""), nil, nil, nil, true)
     end
 
     if noSourceReason and noSourceReason ~= noChangeReason then
-        tooltip:AddLine(gsub("|cffff0000" .. (_G["ERR_TRANSMOGRIFY_" .. noSourceReason] or ERR_TRANSMOGRIFY_MISMATCH), "%%s", ""), nil, nil, nil, true)
+        self:AddLine(gsub("|cffff0000" .. (_G["ERR_TRANSMOGRIFY_" .. noSourceReason] or ERR_TRANSMOGRIFY_MISMATCH), "%%s", ""), nil, nil, nil, true)
     end
-
-    tooltip:Show()
 end
 
-GameTooltip:HookScript("OnTooltipSetItem", WIMtooltip)
-ItemRefTooltip:HookScript("OnTooltipSetItem", WIMtooltip)
+-- GameTooltip:HookScript("OnTooltipSetItem", WIMtooltip)
+-- ItemRefTooltip:HookScript("OnTooltipSetItem", WIMtooltip)
+
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, WIMtooltip)

@@ -5,12 +5,15 @@ if not C.map.minimap.enable then return end
 ----------------------------------------------------------------------------------------
 --	MiniMap Styles
 ----------------------------------------------------------------------------------------
+local module = E:Module("Map"):Sub("MiniMap")
 
+local _G = _G
 local IsAddOnLoaded, LoadAddOn = IsAddOnLoaded, LoadAddOn
 local Minimap_ZoomIn, Minimap_ZoomOut = Minimap_ZoomIn, Minimap_ZoomOut
 local unpack, select, ipairs = unpack, select, ipairs
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 local MinimapCluster, Minimap = MinimapCluster, Minimap
+local MinimapCompassTexture = MinimapCompassTexture
 local MinimapBackdrop, MinimapBorder, MinimapBorderTop = MinimapBackdrop, MinimapBorder, MinimapBorderTop
 local MinimapZoomIn, MinimapZoomOut = MinimapZoomIn, MinimapZoomOut
 local MiniMapTracking, MiniMapTrackingBackground = MiniMapTracking, MiniMapTrackingBackground
@@ -21,7 +24,11 @@ local MinimapZoneText, MinimapZoneTextButton = MinimapZoneText, MinimapZoneTextB
 local MiniMapMailFrame = MiniMapMailFrame
 local GameTimeFrame = GameTimeFrame
 local QueueStatusMinimapButton, QueueStatusMinimapButtonBorder = QueueStatusMinimapButton, QueueStatusMinimapButtonBorder
+local QueueStatusFrame, QueueStatusButton = QueueStatusFrame, QueueStatusButton
 local GarrisonLandingPageMinimapButton = GarrisonLandingPageMinimapButton
+local ExpansionLandingPageMinimapButton = ExpansionLandingPageMinimapButton
+local C_Timer_After = C_Timer.After
+local hooksecurefunc = hooksecurefunc
 
 local cfg = C.map.minimap
 
@@ -55,58 +62,59 @@ local frames_to_rotate = {
     }
 }
 
-if not IsAddOnLoaded("Blizzard_TimeManager") then
-    LoadAddOn("Blizzard_TimeManager")
-end
+local function disableBlizzart()
+    -- Disable Minimap Cluster
+    MinimapCluster:EnableMouse(false)
 
--- Disable Minimap Cluster
-MinimapCluster:EnableMouse(false)
--- Hide Border
-MinimapCompassTexture:Hide()
-MinimapCluster.BorderTop:StripTextures()
--- Hide Zoom Buttons
-Minimap.ZoomIn:Kill()
-Minimap.ZoomOut:Kill()
--- Hide Blob Ring
-Minimap:SetArchBlobRingScalar(0)
-Minimap:SetQuestBlobRingScalar(0)
--- Hide Zone Frame
-MinimapCluster.ZoneTextButton:Hide()
+    -- Hide Border
+    MinimapCompassTexture:Hide()
+    MinimapCluster.BorderTop:StripTextures()
 
-local frame = CreateFrame("Frame")
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-frame:SetScript("OnEvent", function(self, event)
+    -- Hide Zoom Buttons
+    Minimap.ZoomIn:Kill()
+    Minimap.ZoomOut:Kill()
+
+    -- Hide Blob Ring
+    Minimap:SetArchBlobRingScalar(0)
+    Minimap:SetQuestBlobRingScalar(0)
+
+    -- Hide Zone Frame
+    MinimapCluster.ZoneTextButton:Hide()
+
     --minimap position
     --Minimap:SetSize(152, 152)
     Minimap:ClearAllPoints()
     Minimap:SetPoint(unpack(cfg.position))
 
     MinimapBackdrop:Kill()
+end
 
-    -- Instance Difficulty icon
+local function resetIcons()
+    -- Difficulty icon
 	MinimapCluster.InstanceDifficulty:SetParent(Minimap)
 	MinimapCluster.InstanceDifficulty:ClearAllPoints()
 	MinimapCluster.InstanceDifficulty:SetPoint(unpack(cfg.iconpos.instance))
+
+    -- Instance Difficulty icon
 	MinimapCluster.InstanceDifficulty.Instance.Border:Hide()
     MinimapCluster.InstanceDifficulty.Instance.Background:SetSize(28, 36)
 	MinimapCluster.InstanceDifficulty.Instance.Background:SetVertexColor(0.6, 0.3, 0)
-    -- MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:ClearAllPoints()
-    -- MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:SetPoint("CENTER", 0, 7)
-    -- MinimapCluster.InstanceDifficulty.Instance.MythicTexture:ClearAllPoints()
-    -- MinimapCluster.InstanceDifficulty.Instance.MythicTexture:SetPoint("CENTER", 0, 7)
+    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:ClearAllPoints()
+    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:SetPoint("CENTER", -1, 7)
+    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture.SetPoint = E.Dummy
+    MinimapCluster.InstanceDifficulty.Instance.MythicTexture:ClearAllPoints()
+    MinimapCluster.InstanceDifficulty.Instance.MythicTexture:SetPoint("CENTER", -1, 7)
+    MinimapCluster.InstanceDifficulty.Instance.MythicTexture.SetPoint = E.Dummy
 
 	-- Guild Instance Difficulty icon
 	MinimapCluster.InstanceDifficulty.Guild.Border:Hide()
 	MinimapCluster.InstanceDifficulty.Guild.Background:SetSize(28, 36)
-	MinimapCluster.InstanceDifficulty.Guild.Background:ClearAllPoints()
-	MinimapCluster.InstanceDifficulty.Guild.Background:SetPoint(unpack(cfg.iconpos.instance))
+	MinimapCluster.InstanceDifficulty.Guild.Background:SetVertexColor(0.6, 0.3, 0)
 
 	-- Challenge Mode icon
 	MinimapCluster.InstanceDifficulty.ChallengeMode.Border:Hide()
 	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetSize(28, 36)
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetVertexColor(0.8, 0.8, 0)
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:ClearAllPoints()
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetPoint(unpack(cfg.iconpos.instance))
+	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
 
     -- Move QueueStatus icon
 	QueueStatusFrame:SetClampedToScreen(true)
@@ -125,18 +133,18 @@ frame:SetScript("OnEvent", function(self, event)
     GameTimeFrame:SetPushedTexture(0)
     GameTimeFrame:SetHighlightTexture(0)
 
-    TimeManagerClockButton:ClearAllPoints()
-    TimeManagerClockButton:SetPoint(unpack(cfg.iconpos.clock))
-    TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
+    _G["TimeManagerClockButton"]:ClearAllPoints()
+    _G["TimeManagerClockButton"]:SetPoint(unpack(cfg.iconpos.clock))
+    _G["TimeManagerClockTicker"]:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
     -- TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
-    TimeManagerAlarmFiredTexture:ClearAllPoints()
-    TimeManagerAlarmFiredTexture:SetPoint("TOPLEFT", TimeManagerClockTicker, "TOPLEFT", -18, 10)
-    TimeManagerAlarmFiredTexture:SetPoint("BOTTOMRIGHT", TimeManagerClockTicker, "BOTTOMRIGHT", 15, -13)
+    _G["TimeManagerAlarmFiredTexture"]:ClearAllPoints()
+    _G["TimeManagerAlarmFiredTexture"]:SetPoint("TOPLEFT", _G["TimeManagerClockTicker"], "TOPLEFT", -18, 10)
+    _G["TimeManagerAlarmFiredTexture"]:SetPoint("BOTTOMRIGHT", _G["TimeManagerClockTicker"], "BOTTOMRIGHT", 15, -13)
     
     -- Move Mail icon
-    MinimapCluster.MailFrame:SetSize(cfg.iconSize, cfg.iconSize)
-    MinimapCluster.MailFrame:ClearAllPoints()
-    MinimapCluster.MailFrame:SetPoint(unpack(cfg.iconpos.mail))
+    MinimapCluster.IndicatorFrame.MailFrame:SetSize(cfg.iconSize, cfg.iconSize)
+    MinimapCluster.IndicatorFrame.MailFrame:ClearAllPoints()
+    MinimapCluster.IndicatorFrame.MailFrame:SetPoint(unpack(cfg.iconpos.mail))
 
     -- Move Garrison icon
     local updateGrarrion = function()
@@ -149,79 +157,94 @@ frame:SetScript("OnEvent", function(self, event)
     updateGrarrion()
     ExpansionLandingPageMinimapButton:HookScript("OnShow", updateGrarrion)
     hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIconForGarrison", updateGrarrion)
-end)
 
---create rotating cogwheel texture
-for index, _ in ipairs(frames_to_rotate) do
-    local ftr = frames_to_rotate[index]
-
-    local t = MinimapCluster:CreateTexture(nil, "ARTWORK", nil, -6)
-    t:SetTexture(ftr.texture)
-    t:SetPoint("CENTER", Minimap, 0, 0)
-    t:SetSize(ftr.width, ftr.height)
-    t:SetVertexColor(ftr.color_red, ftr.color_green, ftr.color_blue, ftr.alpha)
-    t:SetBlendMode("BLEND")
-
-    t.ag = t:CreateAnimationGroup()
-    t.ag.a1 = t.ag:CreateAnimation("Rotation")
-    t.ag.a1:SetDegrees(ftr.direction == 1 and 360 or -360)
-    t.ag.a1:SetDuration(ftr.duration)
-    t.ag:SetLooping("REPEAT")
-    t.ag:Play()
+    -- Move Tracking Icon
+    MinimapCluster.Tracking:SetParent(Minimap)
+    MinimapCluster.Tracking:SetSize(28, 28)
+    MinimapCluster.Tracking:ClearAllPoints()
+    MinimapCluster.Tracking:SetPoint("LEFT", Minimap, "RIGHT", -12, 2)
+    MinimapCluster.Tracking.Background:Hide()
+    MinimapCluster.Tracking.Button:SetSize(28, 28)
 end
 
---minimap gloss
-local gloss = Minimap:CreateTexture(nil, "ARTWORK", nil, -3)
-gloss:SetTexture(media.map_gloss)
-gloss:SetPoint("CENTER", 0, 0)
-gloss:SetSize(256 * .88, 256 * .88)
-gloss:SetDesaturated(1)
-gloss:SetVertexColor(0.3, 0.3, 0.3, 1)
-gloss:SetBlendMode("BLEND")
+local function addTexture()
+    --create rotating cogwheel texture
+    for index, _ in ipairs(frames_to_rotate) do
+        local ftr = frames_to_rotate[index]
 
---minimap border texture
-local border = Minimap:CreateTexture(nil, "ARTWORK", nil, -2)
-border:SetTexture(media.map_overlay)
-border:SetPoint("CENTER", -4, -4)
+        local t = MinimapCluster:CreateTexture(nil, "ARTWORK", nil, -6)
+        t:SetTexture(ftr.texture)
+        t:SetPoint("CENTER", Minimap, 0, 0)
+        t:SetSize(ftr.width, ftr.height)
+        t:SetVertexColor(ftr.color_red, ftr.color_green, ftr.color_blue, ftr.alpha)
+        t:SetBlendMode("BLEND")
 
---TRACKING ICON
-MinimapCluster.Tracking:SetParent(Minimap)
-MinimapCluster.Tracking:SetSize(28, 28)
-MinimapCluster.Tracking:ClearAllPoints()
-MinimapCluster.Tracking:SetPoint("LEFT", Minimap, "RIGHT", -12, 2)
-
-MinimapCluster.Tracking.Background:Hide()
-MinimapCluster.Tracking.Button:SetSize(28, 28)
-
---minimap mousewheel zoom
-Minimap:EnableMouseWheel()
-Minimap:SetScript("OnMouseWheel", function(_, direction)
-    if (direction > 0) then
-        Minimap.ZoomIn:Click()
-    else
-        Minimap.ZoomOut:Click()
+        t.ag = t:CreateAnimationGroup()
+        t.ag.a1 = t.ag:CreateAnimation("Rotation")
+        t.ag.a1:SetDegrees(ftr.direction == 1 and 360 or -360)
+        t.ag.a1:SetDuration(ftr.duration)
+        t.ag:SetLooping("REPEAT")
+        t.ag:Play()
     end
-end)
 
--- -- Auto Zoom Out
-if not cfg.autoZoom then return end
+    --minimap gloss
+    local gloss = Minimap:CreateTexture(nil, "ARTWORK", nil, -3)
+    gloss:SetTexture(media.map_gloss)
+    gloss:SetPoint("CENTER", 0, 0)
+    gloss:SetSize(256 * .88, 256 * .88)
+    gloss:SetAlpha(0.62)
+    -- gloss:SetVertexColor(0.3, 0.3, 0.3, 0.3)
+    -- gloss:SetDesaturated(1)
+    -- gloss:SetBlendMode("ADD")
 
-local isResetting
-local function resetZoom()
-    Minimap:SetZoom(0)
-
-    Minimap.ZoomIn:Enable() -- Reset enabled state of buttons
-    Minimap.ZoomOut:Disable()
-
-    isResetting = false
+    --minimap border texture
+    local border = Minimap:CreateTexture(nil, "ARTWORK", nil, -2)
+    border:SetTexture(media.map_overlay)
+    border:SetPoint("CENTER", -4, -4)
 end
 
-local function setupZoomReset()
-    if not isResetting then
-        isResetting = true
+local function enableAutoZoomOut()
+    -- Auto Zoom Out
+    if not cfg.autoZoom then return end
 
-        C_Timer.After(3, resetZoom)
+    local isResetting
+    local function resetZoom()
+        Minimap:SetZoom(0)
+
+        Minimap.ZoomIn:Enable() -- Reset enabled state of buttons
+        Minimap.ZoomOut:Disable()
+
+        isResetting = false
     end
+
+    local function setupZoomReset()
+        if not isResetting then
+            isResetting = true
+
+            C_Timer_After(3, resetZoom)
+        end
+    end
+
+    hooksecurefunc(Minimap, 'SetZoom', setupZoomReset)
 end
 
-hooksecurefunc(Minimap, 'SetZoom', setupZoomReset)
+function module:OnActive()
+    if not IsAddOnLoaded("Blizzard_TimeManager") then
+        LoadAddOn("Blizzard_TimeManager")
+    end
+
+    disableBlizzart()
+    resetIcons()
+    addTexture()
+    enableAutoZoomOut()
+
+    --minimap mousewheel zoom
+    Minimap:EnableMouseWheel()
+    Minimap:SetScript("OnMouseWheel", function(_, direction)
+        if (direction > 0) then
+            Minimap.ZoomIn:Click()
+        else
+            Minimap.ZoomOut:Click()
+        end
+    end)
+end

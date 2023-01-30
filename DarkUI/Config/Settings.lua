@@ -1,7 +1,8 @@
+local E, C, L = select(2, ...):unpack()
+
 ----------------------------------------------------------------------------------------
 --  Default configuration of Modules
 ----------------------------------------------------------------------------------------
-local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
 --  Configuration of General
@@ -29,7 +30,6 @@ local fader_combat = {
 
 local styles = {
     buttons  = {
-        enable         = true,
         showMacroName  = true,
         showCooldown   = true,
         showHotkey     = true,
@@ -41,7 +41,7 @@ local styles = {
         drawEdge         = false,
         drawSwipe        = true,
         fontFace         = STANDARD_TEXT_FONT,
-        fontSize         = 18,
+        fontSize         = 14,
         minScale         = 0.3,
         minDuration      = 3,
         expiringDuration = 5,
@@ -71,137 +71,148 @@ local styles = {
     }
 }
 
-local hover_binding = {
-    enable = true
-}
-
 local bars = {
-    enable           = true,
-    mergebar4andbar5 = true,
-    texture          = true,
-    bar1             = {
-        pos    = { "BOTTOM", "UIParent", "BOTTOM", 0, 30 },
-        button = {
-            size  = 28,
-            space = 6.15
+    enable          = true,
+    texture         = true,
+    mergeright      = true, --[[ new from v10.0.2-2.0.0b ]]--
+    mergebottom     = true, --[[ new from v10.0.2-2.0.0b ]]--
+    bar1            = {
+        enable      = true,
+        pos         = { "BOTTOM", "UIParent", "BOTTOM", 0, 30 },
+        button      = {
+            size    = 28,
+            space   = 6.84
         }
     },
-    bar2             = {
-        pos    = { "BOTTOM", "DarkUI_ActionBar1", "TOP", -2.5, 22 },
-        button = {
-            size  = 33,
-            space = 7.6
+    bar2            = {
+        enable      = true,
+        pos         = { "BOTTOM", "DarkUI_ActionBar1", "TOP", 0, 22 },
+        button      = {
+            size    = 33,
+            space   = 8.54
         }
     },
-    bar3             = {
-        pos    = { "BOTTOM", "DarkUI_ActionBar2", "TOP", 0, 12 },
-        button = {
-            size  = 33,
-            space = 7.6
+    bar3            = {
+        enable      = true,
+        pos         = { "BOTTOM", "DarkUI_ActionBar2", "TOP", 0, 12 },
+        button      = {
+            size    = 33,
+            space   = 8.54
         }
     },
-    bar4             = {
-        pos             = { "RIGHT", "UIParent", "RIGHT", -4, 0 },
-        button          = {
-            size  = 28,
-            space = 6
+    bar4            = {
+        enable      = true,
+        pos         = { "RIGHT", "UIParent", "RIGHT", -4, 0 },
+        button      = {
+            size    = 28,
+            space   = 6
         },
         fader_mouseover = fader_mouseover,
         fader_combat    = fader_combat
     },
-    bar5             = {
-        pos             = { "RIGHT", "UIParent", "RIGHT", -36, 0 },
-        button          = {
-            size  = 28,
-            space = 6
+    bar5            = {
+        enable      = true,
+        pos         = { "RIGHT", "UIParent", "RIGHT", -36, 0 },
+        button      = {
+            size    = 28,
+            space   = 6
         },
         fader_mouseover = fader_mouseover,
         fader_combat    = fader_combat
     },
-    bar6             = {
-        pos    = { "CENTER", "UIParent", "CENTER", 0, 10 },
-        button = {
-            size  = 28,
-            space = 6
-        }
-    },
-    bar7             = {
-        pos    = { "CENTER", "UIParent", "CENTER", 0, 50 },
-        button = {
-            size  = 28,
-            space = 6
-        }
-    },
-    bar8             = {
-        pos    = { "CENTER", "UIParent", "CENTER", 0, 90 },
-        button = {
-            size  = 28,
-            space = 6
-        }
-    },
-    barpet           = {
-        pos             = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
-        button          = {
-            size  = 24,
-            space = 6
+    bar6            = {
+        enable      = false,
+        pos         = { "RIGHT", "UIParent", "RIGHT", -68, 0 },
+        button      = {
+            size    = 28,
+            space   = 6
         },
         fader_mouseover = fader_mouseover,
         fader_combat    = fader_combat
     },
-    barstance        = {
-        pos             = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
-        button          = {
-            size  = 24,
-            space = 6
+    bar7            = {
+        enable      = false,
+        pos         = { "BOTTOM", "DarkUI_ActionBar1", "TOP", 0, 140 },
+        button      = {
+            size    = 28,
+            space   = 6
         },
         fader_mouseover = fader_mouseover,
         fader_combat    = fader_combat
     },
-    barextra         = {
-        pos             = { "BOTTOM", "UIParent", "BOTTOM", 0, 220 },
-        button          = {
-            size  = 36,
-            space = 6
+    bar8            = {
+        enable      = false,
+        pos         = { "BOTTOM", "DarkUI_ActionBar1", "TOP", 0, 172 },
+        button      = {
+            size    = 28,
+            space   = 6
+        },
+        fader_mouseover = fader_mouseover,
+        fader_combat    = fader_combat
+    },
+    barpet          = {
+        pos         = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
+        button      = {
+            size    = 24,
+            space   = 6
+        },
+        fader_mouseover = fader_mouseover,
+        fader_combat    = fader_combat
+    },
+    barstance       = {
+        pos         = { "BOTTOM", "DarkUI_ActionBar3", "TOP", 0, 10 },
+        button      = {
+            size    = 24,
+            space   = 4
+        },
+        fader_mouseover = fader_mouseover,
+        fader_combat    = fader_combat
+    },
+    barextra        = {
+        pos         = { "BOTTOM", "UIParent", "BOTTOM", 0, 220 },
+        button      = {
+            size    = 36,
+            space   = 6
         },
         fader_mouseover = nil,
         fader_combat    = nil
     },
-    leave_vehicle    = {
-        pos             = { "BOTTOM", "UIParent", "BOTTOM", 0, 340 },
-        button          = {
-            size  = 32,
-            space = 6
+    leave_vehicle   = {
+        pos         = { "BOTTOM", "UIParent", "BOTTOM", 0, 340 },
+        button      = {
+            size    = 36,
+            space   = 6
         },
         fader_mouseover = nil,
         fader_combat    = nil
     },
-    micromenu        = {
-        enable          = true,
-        pos             = { "TOP", "UIParent", "TOP", 0, -15 },
-        button          = {
-            size  = 24,
-            space = 2
+    micromenu       = {
+        enable      = true,
+        pos         = { "TOP", "UIParent", "TOP", 0, -15 },
+        button      = {
+            size    = 24,
+            space   = 2
         },
-        scale           = 1,
+        scale       = 1,
         fader_mouseover = {
             fadeIn  = { time = 0.4, alpha = 1 },
             fadeOut = { time = 0.3, alpha = 0 }
         }
     },
-    bags             = {
-        enable          = true,
-        pos             = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 34 },
-        scale           = 0.82,
-        button          = {
-            size  = 24,
-            space = 4
+    bags            = {
+        enable      = true,
+        pos         = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 34 },
+        scale       = 0.98,
+        button      = {
+            size    = 24,
+            space   = 4
         },
         fader_mouseover = {
             fadeIn  = { time = 0.4, alpha = 1 },
             fadeOut = { time = 0.3, alpha = 0 }
         }
     },
-    exp              = {
+    exp             = {
         enable             = true,
         scale              = 1,
         width              = 408,
@@ -211,7 +222,6 @@ local bars = {
         disable_at_max_lvl = false,
         bflevel            = 1,
         bfstrata           = "BACKGROUND",
-        statusbar          = C.media.texture.status,
         xpcolor            = { r = 0.8, g = 0, b = 0.8 },
         repcolor           = { r = 1, g = 0.6, b = 0 },
         restcolor          = { r = 1, g = 0.7, b = 0 }
@@ -225,14 +235,13 @@ local bars = {
         only_at_max_level = false,
         bflevel           = 1,
         bfstrata          = "BACKGROUND",
-        statusbar         = C.media.texture.status
     },
 }
 
 C.actionbar = {
     bars          = bars,
     styles        = styles,
-    hover_binding = hover_binding
+    hover_binding = true,
 }
 
 ----------------------------------------------------------------------------------------
@@ -258,7 +267,7 @@ C.aura = {
     buff_pos         = { "TOPRIGHT", "UIParent", -260, -20 }, -- buffs position
     debuff_pos       = { "TOPRIGHT", "UIParent", -260, -100 }, -- debuffs position
     dur_pos          = { "BOTTOM", 0, -6 }, -- buffs/debuffs timer position
-    count_pos        = { "TOPRIGHT", 0, 0 }, -- buffs/debuffs counter position
+    count_pos        = { "TOPRIGHT", -2, -2 }, -- buffs/debuffs counter position
     buff_size        = 28, -- buff icons size
     debuff_size      = 32, -- debuff icons size
     enchant_size     = 28, -- enchant icons size
@@ -283,7 +292,7 @@ C.automation = {
     auto_confirm_de = true, -- enable/disable auto accept disenchant confirmation
     auto_greed      = true, -- enable/disable auto greed in party/raid
     auto_quest      = true, -- enable/disable auto accept quest, can use shift+click npc to manual choice quest
-    tab_binder      = true -- enable/disable auto change tab key to only target enemy players in PVP
+    tab_binder      = true  -- enable/disable auto change tab key to only target enemy players in PVP
 }
 
 ----------------------------------------------------------------------------------------
@@ -341,7 +350,6 @@ C.blizzard = {
     slot_durability   = true,
     shift_mark        = true,
     style             = true,
-    esc_for_gamemenu  = true,
 }
 
 ----------------------------------------------------------------------------------------
@@ -507,7 +515,7 @@ C.quest = {
     auto_collapse     = true,
     quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -60, -60 },
     auto_button       = true,
-    auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -20 },
+    auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -240 },
 }
 
 ----------------------------------------------------------------------------------------
@@ -522,22 +530,21 @@ C.tooltip = {
     hideforactionbar  = false, -- Hide tooltip for actions bars
     health_value      = true, -- Numeral health value
     target            = true, -- Target player in tooltip
-    title             = false, -- Player title in tooltip
+    title             = true, -- Player title in tooltip
     realm             = true, -- Player realm name in tooltip
     rank              = true, -- Player guild-rank in tooltip
-    raid_icon         = false, -- Raid icon
+    raid_icon         = true, -- Raid icon
     who_targetting    = true, -- Show who is targetting the unit(in raid or party)
     achievements      = true, -- Comparing achievements in tooltip
-    item_transmogrify = false, -- Displays items can not be transmogrified
-    instance_lock     = false, -- Your instance lock status in tooltip
+    item_transmogrify = true, -- Displays items can not be transmogrified
+    instance_lock     = true, -- Your instance lock status in tooltip
     item_count        = true, -- Item count in tooltip
     item_icon         = true, -- Item icon in tooltip
     average_lvl       = true, -- Average items level
-    arena_experience  = false, -- Player PvP experience in arena
     spell_id          = true, -- Id number spells
     talents           = true, -- Show tooltip talents
     mount             = true, -- Show source of mount
-    unit_role         = true -- Unit role in tooltip
+    unit_role         = true, -- Unit role in tooltip
 }
 
 ----------------------------------------------------------------------------------------
@@ -575,6 +582,7 @@ C.nameplate = {
     arrow                = true, -- enable/disable show arrow of current target
     quest                = true, -- show quest infomation
 }
+
 ----------------------------------------------------------------------------------------
 --  Configuration of Unitframe
 ----------------------------------------------------------------------------------------
@@ -707,9 +715,11 @@ C.unitframe = {
         }
     },
     party        = {
+        enable         = true,
+        raidMode       = false,
         position       = {
             auto   = true,
-            dps    = { "TOPLEFT", UIParent, "TOPLEFT", 20, -55 },
+            dps    = { "TOPLEFT", UIParent, "TOPLEFT", 30, -55 },
             healer = { "CENTER", UIParent, "CENTER", 620, -80 }
         },
         unitsPerColumn = 5,
@@ -725,9 +735,19 @@ C.unitframe = {
             }
         }
     },
+    partypet        = {
+        enable         = false,
+        position       = { "TOP", "DarkUIPartyHeader", "BOTTOM", 0, -40 },
+        fader          = {
+            Range  = {
+                insideAlpha  = 1,
+                outsideAlpha = 0.5
+            }
+        }
+    },
     raid         = {
         enable      = true,
-        position    = { "TOPLEFT", UIParent, "TOPLEFT", 20, -20 },
+        position    = { "TOPLEFT", UIParent, "TOPLEFT", 25, -20 },
         showSolo    = false,
         colorHealth = false,
         size        = 96,
@@ -747,85 +767,9 @@ C.unitframe = {
     -- class stuff
     classModule  = {
         classpowerbar = {
-            diabolic = true,
-            blizzard = false,
+            diabolic = false,
+            blizzard = true,
             position = { "CENTER", UIParent, "CENTER", 0, -120 }
         }
     }
-}
-
-C.autobutton = {
-    -- Daily Quests
-    [32971] = true,		-- Water Bucket
-    [38689] = true,		-- Chicken Net
-    [52507] = true,		-- Stardust No.2
-    [62829] = true,		-- Magnetized Scrap Collector
-    [63351] = true,		-- Tahret Dynasty Mallet
-    [69235] = true,		-- Fang of the Wolf
-    [69240] = true,		-- Enchanted Salve
-    [69981] = true,		-- Ironforge Rations
-    [71978] = true,		-- Darkmoon Bandage
-    [77475] = true,		-- Stack of Mantras
-    [78947] = true,		-- Silken Rope
-    [79885] = true,		-- Barrel of Fireworks
-    [80127] = true,		-- Shadelight Truffle Spores
-    [80403] = true,		-- Angler's Fishing Spear
-    [80599] = true,		-- Goblin Fishing Bomb
-    [82346] = true,		-- Pot of Fire
-    [82381] = true,		-- Yak's Milk Flask
-    [82807] = true,		-- Shado-Pan Dragon Gun
-    [83134] = true,		-- Bronze Claws
-    [84762] = true,		-- Highly Explosive Yaungol Oil
-    [85884] = true,		-- Sonic Emitter
-    [86532] = true,		-- Bag of Shado-Pan Gas Bombs
-    [87394] = true,		-- Sonic Disruption Fork
-    [87841] = true,		-- Korven's Experimental Grenades
-    [92019] = true,		-- The Bilgewater Molotov
-    [93180] = true,		-- Re-Configured Remote
-    [93668] = true,		-- Saur Fetish
-    [93751] = true,		-- Blessed Torch
-    [93761] = true,		-- Arcane Emancipator
-    [93806] = true,		-- Resonance Siphon
-    -- Seaforium
-    [46847] = true,		-- Seaforium Bombs
-    [47030] = true,		-- Huge Seaforium Bombs
-    -- Other
-    [45072] = true,		-- Brightly Colored Egg (Noblegarden)
-    -- Legion
-    [118330] = true,	-- Pile of Weapons
-    [122100] = true,	-- Soul Gem
-    [127030] = true,	-- Granny's Flare Grenades
-    [127295] = true,	-- Blazing Torch
-    [128651] = true,	-- Critter Hand Cannon
-    [128772] = true,	-- Branch of the Runewood
-    [129161] = true,	-- Stormforged Horn
-    [129725] = true,	-- Smoldering Torch
-    [131931] = true,	-- Khadgar's Wand
-    [133756] = true,	-- Fresh Mound of Flesh
-    [133882] = true,	-- Trap Rune
-    [133897] = true,	-- Telemancy Beacon
-    [133925] = true,	-- Fel Lash
-    [133999] = true,	-- Inert Crystal
-    [136605] = true,	-- Solendra's Compassion
-    [137299] = true,	-- Nightborne Spellblad
-    [138146] = true,	-- Rediant Ley Crystal
-    [138965] = true,	-- Wand of Siphoning
-    [140916] = true,	-- Satchel of Locklimb Powder
-    [142509] = true,	-- Withered Targeting Orb
-    [128329] = true,	-- Depleted Leyflame Burner
-    [130260] = true,	-- Thaedris' Elixir
-    [140257] = true,	-- Advanced Telemancy Beacon
-    [142401] = true,	-- Telemancy Orbs
-    -- BfA
-    [166905] = true,	-- Hunting Knife
-    [168183] = true,	-- Rare Metal Collector
-    [168253] = true,	-- Fathom Hook
-    [168482] = true,	-- Plug the Geysers
-    -- Shadowlands
-    [177836] = true,	-- Wingpierce Javelin
-    [180280] = true,	-- Soulforged Core
-    [183045] = true,	-- Korinna's Allaying Crook
-    [180170] = true,	-- Pulsing Animacone
-    [180876] = true,	-- Aqueous Material Accumulator
-    [188697] = true,	-- Kinematic Micro-Life Recalibrator
 }
