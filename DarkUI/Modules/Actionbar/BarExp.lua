@@ -291,7 +291,7 @@ local function bar_OnEnter()
         withXp = true
     end
 
-    if factionID then
+    if name then
         local standingtext
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
