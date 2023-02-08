@@ -304,25 +304,27 @@ end
 local function SetupAnchor()
     for key, VALUE in pairs(FrameList) do
         local value = AuraList[key]
-        local previous
-        for i = 1, #VALUE do
-            local frame = VALUE[i]
-            if i == 1 then
-                frame:SetPoint("CENTER", frame.MoveHandle)
-            elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 then
-                frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, value.Interval)
-            else
-                if value.Direction:lower() == "right" then
-                    frame:SetPoint("LEFT", previous, "RIGHT", value.Interval, 0)
-                elseif value.Direction:lower() == "left" then
-                    frame:SetPoint("RIGHT", previous, "LEFT", -value.Interval, 0)
-                elseif value.Direction:lower() == "up" then
-                    frame:SetPoint("BOTTOM", previous, "TOP", 0, value.Interval)
-                elseif value.Direction:lower() == "down" then
-                    frame:SetPoint("TOP", previous, "BOTTOM", 0, -value.Interval)
+        if value then
+            local previous
+            for i = 1, #VALUE do
+                local frame = VALUE[i]
+                if i == 1 then
+                    frame:SetPoint("CENTER", frame.MoveHandle)
+                elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 then
+                    frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, value.Interval)
+                else
+                    if value.Direction:lower() == "right" then
+                        frame:SetPoint("LEFT", previous, "RIGHT", value.Interval, 0)
+                    elseif value.Direction:lower() == "left" then
+                        frame:SetPoint("RIGHT", previous, "LEFT", -value.Interval, 0)
+                    elseif value.Direction:lower() == "up" then
+                        frame:SetPoint("BOTTOM", previous, "TOP", 0, value.Interval)
+                    elseif value.Direction:lower() == "down" then
+                        frame:SetPoint("TOP", previous, "BOTTOM", 0, -value.Interval)
+                    end
                 end
+                previous = frame
             end
-            previous = frame
         end
     end
 end
