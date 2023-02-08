@@ -94,7 +94,7 @@ ns.Variable = Variable
 local function SelectTab(i)
     for num = 1, #ns.Categories do
         if num == i then
-            guiTab[num]:SetBackdropColor(E.color.r, E.color.g, E.color.b, .3)
+            guiTab[num]:SetBackdropColor(E.myColor.r, E.myColor.g, E.myColor.b, .3)
             guiTab[num].checked = true
             guiPage[num]:Show()
         else
@@ -113,7 +113,7 @@ end
 
 local function tabOnEnter(self)
     if self.checked then return end
-    self:SetBackdropColor(E.color.r, E.color.g, E.color.b, .3)
+    self:SetBackdropColor(E.myColor.r, E.myColor.g, E.myColor.b, .3)
 end
 
 local function tabOnLeave(self)
@@ -217,7 +217,7 @@ end
 
 local function CreateCheckBox(parent)
     local cb = CreateFrame("CheckButton", nil, parent, "InterfaceOptionsCheckButtonTemplate")
-    cb:SkinCheckBox()
+    E:SkinCheckBox(cb)
 
     cb.name = cb:CreateFontText(14, '', false, "LEFT", 30, 0)
 
@@ -232,7 +232,7 @@ ns.CreateCheckBox = CreateCheckBox
 local function CreateButton(parent, width, height, text, fontSize, name)
     local bu = CreateFrame("Button", name, parent)
     bu:SetSize(width, height)
-    bu:SkinButton()
+    E:StyleTextButton(bu)
 
     bu.text = bu:CreateFontText(fontSize or 14, text, true)
 

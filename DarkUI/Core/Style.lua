@@ -155,6 +155,96 @@ function E:ApplyOverlayBorder(f, margin)
 end
 
 ----------------------------------------------------------------------------------------
+-- Sample Button Style Methods
+----------------------------------------------------------------------------------------
+local setModifiedBackdrop = function(self)
+    if self:IsEnabled() then
+        self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
+        if self.overlay then
+            self.overlay:SetVertexColor(E.myColor.r * 0.3, E.myColor.g * 0.3, E.myColor.b * 0.3, 1)
+        end
+    end
+end
+
+local setOriginalBackdrop = function(self)
+    self:SetBackdropBorderColor(unpack(C.media.border_color))
+    if self.overlay then
+        self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+    end
+end
+
+function E:StyleTextButton(f, strip)
+    if strip then
+        f:StripTextures()
+    end
+
+    if f.SetNormalTexture then
+        f:SetNormalTexture("")
+    end
+    if f.SetHighlightTexture then
+        f:SetHighlightTexture("")
+    end
+    if f.SetPushedTexture then
+        f:SetPushedTexture("")
+    end
+    if f.SetDisabledTexture then
+        f:SetDisabledTexture("")
+    end
+
+    if f.Left then
+        f.Left:SetAlpha(0)
+    end
+    if f.Right then
+        f.Right:SetAlpha(0)
+    end
+    if f.Middle then
+        f.Middle:SetAlpha(0)
+    end
+    if f.LeftSeparator then
+        f.LeftSeparator:SetAlpha(0)
+    end
+    if f.RightSeparator then
+        f.RightSeparator:SetAlpha(0)
+    end
+    if f.Flash then
+        f.Flash:SetAlpha(0)
+    end
+
+    if f.TopLeft then
+        f.TopLeft:Hide()
+    end
+    if f.TopRight then
+        f.TopRight:Hide()
+    end
+    if f.BottomLeft then
+        f.BottomLeft:Hide()
+    end
+    if f.BottomRight then
+        f.BottomRight:Hide()
+    end
+    if f.TopMiddle then
+        f.TopMiddle:Hide()
+    end
+    if f.MiddleLeft then
+        f.MiddleLeft:Hide()
+    end
+    if f.MiddleRight then
+        f.MiddleRight:Hide()
+    end
+    if f.BottomMiddle then
+        f.BottomMiddle:Hide()
+    end
+    if f.MiddleMiddle then
+        f.MiddleMiddle:Hide()
+    end
+
+    f:SetTemplate("Overlay")
+    f:HookScript("OnEnter", setModifiedBackdrop)
+    f:HookScript("OnLeave", setOriginalBackdrop)
+end
+
+
+----------------------------------------------------------------------------------------
 --  Normal Button Style Methods
 ----------------------------------------------------------------------------------------
 function E:StyleButton(button, margin)
