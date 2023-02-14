@@ -5,6 +5,7 @@
     
     <Script file="AoeSpam.lua"/>
     <Script file="AutoButton.lua"/>
+    <Script file="ChatSpam.lua"/>
     <Script file="DataText.lua"/>
 
     <Script file="AurasTable.lua" />

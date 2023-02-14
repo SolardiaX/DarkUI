@@ -58,12 +58,12 @@ end
 ----------------------------------------------------------------------------------------
 --	Players spam filter(by Evl, Elv22 and Affli)
 ----------------------------------------------------------------------------------------
-if C.chat.spam == true then
+if cfg.spam == true then
     -- Repeat spam filter
     local lastMessage
 
     local function repeatMessageFilter(self, _, text, sender)
-    sender = Ambiguate(sender, "guild")
+        sender = Ambiguate(sender, "guild")
         if sender == E.myName or UnitIsInMyGuild(sender) then return end
 
         if not self.repeatMessages or self.repeatCount > 100 then
@@ -80,12 +80,15 @@ if C.chat.spam == true then
 
     ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", repeatMessageFilter)
     ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", repeatMessageFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", repeatMessageFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", repeatMessageFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", repeatMessageFilter)
 
     -- Gold/portals spam filter
     local SpamList = cfg.spamlist or {}
 
     local function tradeFilter(_, _, text, sender)
-    sender = Ambiguate(sender, "guild")
+        sender = Ambiguate(sender, "guild")
         if sender == E.myName or UnitIsInMyGuild(sender) then return end
 
         for _, value in pairs(SpamList) do
@@ -97,4 +100,7 @@ if C.chat.spam == true then
 
     ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", tradeFilter)
     ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", tradeFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", tradeFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", tradeFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", tradeFilter)
 end
