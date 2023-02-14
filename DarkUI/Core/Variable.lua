@@ -121,6 +121,8 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, name)
         if tonumber(GetCVar("uiScale")) ~= tonumber(cfgScale) then SetCVar("uiScale", cfgScale) end
         if cfgScale then UIParent:SetScale(cfgScale) end
 
+        TutorialFrameAlertButton:Kill()
+        
         SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WORLD_MAP_FRAME, true)
         SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_PET_JOURNAL, true)
         SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_GARRISON_BUILDING, true)
