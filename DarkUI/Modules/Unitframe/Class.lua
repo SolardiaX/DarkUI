@@ -31,6 +31,11 @@ module.classModule.blizzard["DRUID"] = function(self, ...)
     ComboPointDruidPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
 end
 
+module.classModule.blizzard["ROGUE"] = function(self, ...)
+    ComboPointPlayerFrame:Setup()
+    ComboPointPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
+end
+
 module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer:ClearAllPoints()
     PlayerFrameBottomManagedFramesContainer:SetParent(self)
@@ -39,7 +44,7 @@ module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer:Layout()
 
     PlayerFrameBottomManagedFramesContainer.SetPoint = E.Dummy
-    PlayerFrameBottomManagedFramesContainer.unit = "player"
+    -- PlayerFrameBottomManagedFramesContainer.unit = "player"
 end
 
 ------------------------------------------------------------------------
