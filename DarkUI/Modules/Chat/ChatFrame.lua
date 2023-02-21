@@ -325,8 +325,9 @@ local function SetupChatPosAndFont()
     -- /run BNToastFrame:AddToast(BN_TOAST_TYPE_ONLINE, 1)
 	hooksecurefunc(BNToastFrame, "ShowToast", function(self)
 		if not self.IsSkinned then
-			self.CloseButton:SkinCloseButton(self)
 			self.CloseButton:SetSize(16, 16)
+            E:SkinCloseButton(self.CloseButton, self)
+
 			self.IsSkinned = true
 		end
 	end)
