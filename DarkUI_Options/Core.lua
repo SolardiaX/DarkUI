@@ -184,7 +184,7 @@ local function tooltipOnEnter(self)
     elseif self.text then
         local r, g, b = 1, 1, 1
         if self.color == "class" then
-            r, g, b = E.class.r, E.class.g, E.class.b
+            r, g, b = E.myClass.r, E.myClass.g, E.myClass.b
         elseif self.color == "system" then
             r, g, b = 1, .8, 0
         elseif self.color == "info" then
