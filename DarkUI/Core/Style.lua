@@ -79,7 +79,7 @@ function E:SkinCharButton(f, point, text)
     f:SetTemplate("Overlay")
 
     -- E:StyleIcon(f)
-    E:StyleButton(f)
+    E:ApplyOverlayBorder(f)
 
     if not text then
         text = "x"
