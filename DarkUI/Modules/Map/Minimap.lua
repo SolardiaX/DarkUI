@@ -91,14 +91,14 @@ end
 
 local function resetIcons()
     -- Difficulty icon
-	MinimapCluster.InstanceDifficulty:SetParent(Minimap)
-	MinimapCluster.InstanceDifficulty:ClearAllPoints()
-	MinimapCluster.InstanceDifficulty:SetPoint(unpack(cfg.iconpos.instance))
+    MinimapCluster.InstanceDifficulty:SetParent(Minimap)
+    MinimapCluster.InstanceDifficulty:ClearAllPoints()
+    MinimapCluster.InstanceDifficulty:SetPoint(unpack(cfg.iconpos.instance))
 
     -- Instance Difficulty icon
-	MinimapCluster.InstanceDifficulty.Instance.Border:Hide()
+    MinimapCluster.InstanceDifficulty.Instance.Border:Hide()
     MinimapCluster.InstanceDifficulty.Instance.Background:SetSize(28, 36)
-	MinimapCluster.InstanceDifficulty.Instance.Background:SetVertexColor(0.6, 0.3, 0)
+    MinimapCluster.InstanceDifficulty.Instance.Background:SetVertexColor(0.6, 0.3, 0)
     MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:ClearAllPoints()
     MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:SetPoint("CENTER", -1, 7)
     MinimapCluster.InstanceDifficulty.Instance.HeroicTexture.SetPoint = E.Dummy
@@ -106,23 +106,23 @@ local function resetIcons()
     MinimapCluster.InstanceDifficulty.Instance.MythicTexture:SetPoint("CENTER", -1, 7)
     MinimapCluster.InstanceDifficulty.Instance.MythicTexture.SetPoint = E.Dummy
 
-	-- Guild Instance Difficulty icon
-	MinimapCluster.InstanceDifficulty.Guild.Border:Hide()
-	MinimapCluster.InstanceDifficulty.Guild.Background:SetSize(28, 36)
-	MinimapCluster.InstanceDifficulty.Guild.Background:SetVertexColor(0.6, 0.3, 0)
+    -- Guild Instance Difficulty icon
+    MinimapCluster.InstanceDifficulty.Guild.Border:Hide()
+    MinimapCluster.InstanceDifficulty.Guild.Background:SetSize(28, 36)
+    MinimapCluster.InstanceDifficulty.Guild.Background:SetVertexColor(0.6, 0.3, 0)
 
-	-- Challenge Mode icon
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Border:Hide()
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetSize(28, 36)
-	MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
+    -- Challenge Mode icon
+    MinimapCluster.InstanceDifficulty.ChallengeMode.Border:Hide()
+    MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetSize(28, 36)
+    MinimapCluster.InstanceDifficulty.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
 
     -- Move QueueStatus icon
-	QueueStatusFrame:SetClampedToScreen(true)
-	QueueStatusFrame:SetFrameStrata("TOOLTIP")
+    QueueStatusFrame:SetClampedToScreen(true)
+    QueueStatusFrame:SetFrameStrata("TOOLTIP")
     QueueStatusButton:SetParent(Minimap)
-	QueueStatusButton:ClearAllPoints()
-	QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
-	QueueStatusButton:SetScale(0.48)
+    QueueStatusButton:ClearAllPoints()
+    QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
+    QueueStatusButton:SetScale(0.48)
 
     -- Move GameTime icon
     GameTimeFrame:SetSize(26, 26)
@@ -145,18 +145,58 @@ local function resetIcons()
     MinimapCluster.IndicatorFrame.MailFrame:SetSize(cfg.iconSize, cfg.iconSize)
     MinimapCluster.IndicatorFrame.MailFrame:ClearAllPoints()
     MinimapCluster.IndicatorFrame.MailFrame:SetPoint(unpack(cfg.iconpos.mail))
+    MinimapCluster.IndicatorFrame.MailFrame.SetPoint = E.Dummy
 
-    -- Move Garrison icon
-    local updateGrarrion = function()
-        ExpansionLandingPageMinimapButton:SetParent(Minimap)
-        ExpansionLandingPageMinimapButton:ClearAllPoints()
-        ExpansionLandingPageMinimapButton:SetPoint(unpack(cfg.iconpos.garrison))
-        ExpansionLandingPageMinimapButton:SetScale(0.6)
+    local garrMinimapButton = _G.ExpansionLandingPageMinimapButton
+    if garrMinimapButton then
+        local function updateMinimapButtons(self)
+            self:SetParent(Minimap)
+            self:ClearAllPoints()
+            self:SetPoint(unpack(cfg.iconpos.garrison))
+            self:SetScale(0.6)
+            -- self:SetSize(30, 30)
+        end
+
+        updateMinimapButtons(garrMinimapButton)
+        garrMinimapButton:HookScript("OnShow", updateMinimapButtons)
+        hooksecurefunc(garrMinimapButton, "UpdateIcon", updateMinimapButtons)
+
+        local function ToggleLandingPage(_, ...)
+            if not C_Garrison.HasGarrison(...) then
+                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+                return
+            end
+            ShowGarrisonLandingPage(...)
+        end
+
+        local menuList = {
+            {text =	_G.GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_9_0, notCheckable = true},
+            {text =	_G.WAR_CAMPAIGN, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_8_0, notCheckable = true},
+            {text =	_G.ORDER_HALL_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_7_0, notCheckable = true},
+            {text =	_G.GARRISON_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_6_0, notCheckable = true},
+        }
+        garrMinimapButton:HookScript("OnMouseDown", function(self, btn)
+            if btn == "RightButton" then
+                if _G.GarrisonLandingPage and _G.GarrisonLandingPage:IsShown() then
+                    HideUIPanel(_G.GarrisonLandingPage)
+                end
+                if _G.ExpansionLandingPage and _G.ExpansionLandingPage:IsShown() then
+                    HideUIPanel(_G.ExpansionLandingPage)
+                end
+
+                local menu = CreateFrame("Frame", nil, UIParent, "UIDropDownMenuTemplate")
+
+                EasyMenu(menuList, menu, self, -80, 0, "MENU", 1)
+            end
+        end)
+        garrMinimapButton:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+            GameTooltip:SetText(self.title, 1, 1, 1)
+            GameTooltip:AddLine(self.description, nil, nil, nil, true)
+            GameTooltip:AddLine(L["SwitchGarrisonType"], nil, nil, nil, true)
+            GameTooltip:Show()
+        end)
     end
-
-    updateGrarrion()
-    ExpansionLandingPageMinimapButton:HookScript("OnShow", updateGrarrion)
-    hooksecurefunc(ExpansionLandingPageMinimapButton, "UpdateIconForGarrison", updateGrarrion)
 
     -- Move Tracking Icon
     MinimapCluster.Tracking:SetParent(Minimap)
