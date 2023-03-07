@@ -69,7 +69,8 @@ local function Timer_OnUpdate(self, elapsed)
 				self.text:SetText("")
 				self.nextUpdate = 1
 			else
-				local remain = self.duration - (GetTime() - self.start)
+                local passTime = GetTime() - self.start
+				local remain = passTime >= 0 and self.duration - passTime or self.duration
 				if floor(remain + 0.5) > 0 then
 					local formatStr, time, timeUntilNextUpdate = getTimeText(remain)
                     self.text:SetFormattedText(formatStr, time)
