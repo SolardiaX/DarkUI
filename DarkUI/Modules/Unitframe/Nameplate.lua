@@ -148,8 +148,8 @@ local function createBorderFrame(frame, point)
 
     frame.backdrop = frame:CreateTexture(nil, "BORDER")
     frame.backdrop:SetDrawLayer("BORDER", -8)
-    frame.backdrop:SetPoint("TOPLEFT", point, "TOPLEFT", -E.noscalemult * 3, E.noscalemult * 3)
-    frame.backdrop:SetPoint("BOTTOMRIGHT", point, "BOTTOMRIGHT", E.noscalemult * 3, -E.noscalemult * 3)
+    frame.backdrop:SetPoint("TOPLEFT", point, "TOPLEFT", -E.noscalemult * 2, E.noscalemult * 2)
+    frame.backdrop:SetPoint("BOTTOMRIGHT", point, "BOTTOMRIGHT", E.noscalemult * 2, -E.noscalemult * 2)
     frame.backdrop:SetColorTexture(unpack(C.media.backdrop_color))
 
     frame.bordertop = frame:CreateTexture(nil, "BORDER")
@@ -408,10 +408,10 @@ end
 local AurasCustomFilter = function(element, unit, data)
     if cfg.blackList[data.spellID] then
         return false
-    elseif cfg.whiteList[data.spellID] then
+    elseif cfg.whiteList[data.spellID] and data.isFromPlayerOrPlayerPet then
         return true
     else
-        return core:FilterAuras(unit, data)
+        return core:FilterAuras(unit, data, element)
     end
 end
 
@@ -535,6 +535,7 @@ local function style(self, unit)
     self.Health.border = self.Health:CreateTexture(nil, "BORDER")
     self.Health.border:SetTexture(bar_border)
     self.Health.border:SetPoint("CENTER")
+    -- E:ApplyBarBorder(self.Health)
 
     -- Health Text
     if cfg.health_value == true then
@@ -712,7 +713,7 @@ local function style(self, unit)
         self.Auras["growth-x"] = "LEFT"
         self.Auras.numDebuffs = cfg.track_debuffs and 6 or 0
         self.Auras.numBuffs = cfg.track_buffs and 4 or 0
-        self.Auras.maxAuras = 6
+        self.Auras.maxAuras = 5
         self.Auras:SetSize(20 + cfg.width, cfg.auras_size)
         self.Auras.spacing = cfg.icon_spacing
         self.Auras.size = cfg.auras_size
