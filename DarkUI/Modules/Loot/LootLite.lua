@@ -36,7 +36,7 @@ addon:SetClampedToScreen(true)
 addon:SetFrameStrata("DIALOG")
 addon:SetToplevel(true)
 addon:SetFrameLevel(10)
-addon:SetTemplate("Blur")
+addon:SetTemplate("Blur", 2)
 addon:CreateShadow()
 addon:Hide()
 
