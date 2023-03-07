@@ -387,14 +387,14 @@ for i = 1, numf do
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
             f:SetPoint("BOTTOMLEFT", "DarkUIPlayerFrame", "TOPLEFT", -5, 140)
         else
-            f:SetPoint("CENTER", -200, 60)
+            f:SetPoint("CENTER", -200, 70)
         end
     elseif i == 2 then
         f:SetJustifyH(ct.justify_2)
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
             f:SetPoint("BOTTOMRIGHT", "DarkUIPlayerFrame", "TOPRIGHT", 5, 140)
         else
-            f:SetPoint("CENTER", 200, 60)
+            f:SetPoint("CENTER", 200, 70)
         end
     elseif i == 3 then
         f:SetJustifyH(ct.justify_3)
@@ -409,7 +409,7 @@ for i = 1, numf do
         if C.unitframe.enable == true and _G["DarkUITargetFrame"] then
             f:SetPoint("BOTTOMRIGHT", "DarkUITargetFrame", "TOPRIGHT", 5, 140)
         else
-            f:SetPoint("CENTER", 330, 205)
+            f:SetPoint("CENTER", 330, 220)
         end
         local a, _, c = f:GetFont()
         if cfg.font.combat_text_font_size == "auto" then
