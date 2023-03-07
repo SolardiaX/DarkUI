@@ -387,14 +387,14 @@ for i = 1, numf do
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
             f:SetPoint("BOTTOMLEFT", "DarkUIPlayerFrame", "TOPLEFT", -5, 140)
         else
-            f:SetPoint("CENTER", -192, 32)
+            f:SetPoint("CENTER", -200, 60)
         end
     elseif i == 2 then
         f:SetJustifyH(ct.justify_2)
         if C.unitframe.enable == true and _G["DarkUIPlayerFrame"] then
             f:SetPoint("BOTTOMRIGHT", "DarkUIPlayerFrame", "TOPRIGHT", 5, 140)
         else
-            f:SetPoint("CENTER", 192, 32)
+            f:SetPoint("CENTER", 200, 60)
         end
     elseif i == 3 then
         f:SetJustifyH(ct.justify_3)
