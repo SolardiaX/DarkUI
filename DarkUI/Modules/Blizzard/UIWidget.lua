@@ -195,6 +195,11 @@ local function SkinCaptureBar(previous, widget)
             widget.backdrop:SetPoint("TOPLEFT", widget.LeftBar, -2, 2)
             widget.backdrop:SetPoint("BOTTOMRIGHT", widget.RightBar, 2, -2)
         end
+
+        widget.border = widget:CreateTexture(nil, "BORDER")
+        widget.border:SetTexture(C.media.path .. C.general.style .. "\\" .. "tex_bar_border")
+        widget.border:SetPoint("CENTER")
+        widget.border:SetSize(256 * widget:GetWidth() / 198, 64 * widget:GetHeight() / 12)
         
         widget.skinned = true
     end

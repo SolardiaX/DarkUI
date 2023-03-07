@@ -42,11 +42,14 @@ do
 
     function Spawn(type)
         if barPool[type] then return barPool[type] end
-        local frame = CreateFrame("StatusBar", nil, UIParent)
-
-        frame:SetScript("OnUpdate", OnUpdate)
 
         local r, g, b = unpack(C.blizzard.mirrorbar[string.lower(type)].color)
+        
+        local frame = CreateFrame("StatusBar", nil, UIParent)
+        frame:SetSize(198, 12)
+        frame:SetStatusBarTexture(C.media.texture.status)
+        frame:SetStatusBarColor(r, g, b)
+        frame:SetScript("OnUpdate", OnUpdate)
 
         local bg = frame:CreateTexture(nil, "BACKGROUND")
         bg:SetAllPoints(frame)
@@ -54,8 +57,9 @@ do
         bg:SetVertexColor(r * 0.3, g * 0.3, b * 0.3)
 
         local border = frame:CreateTexture(nil, "BORDER")
-        border:SetPoint("CENTER", frame, 0, -1)
+        border:SetPoint("CENTER")
         border:SetTexture(bar_border)
+        border:SetSize(256 * frame:GetWidth() / 198, 64 * frame:GetHeight() / 12)
 
         local text = frame:CreateFontString(nil, "OVERLAY")
         text:SetFont(STANDARD_TEXT_FONT, 10, "OUTLINE")
@@ -67,11 +71,6 @@ do
         text:SetPoint("RIGHT", frame)
         text:SetPoint("TOP", frame, 0, 1)
         text:SetPoint("BOTTOM", frame)
-
-        frame:SetSize(198, 12)
-
-        frame:SetStatusBarTexture(C.media.texture.status)
-        frame:SetStatusBarColor(r, g, b)
 
         frame.type = type
         frame.text = text
