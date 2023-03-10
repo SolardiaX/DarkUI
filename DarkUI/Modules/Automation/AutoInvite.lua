@@ -13,7 +13,7 @@ local C_BattleNet_GetAccountInfoByID = C_BattleNet.GetAccountInfoByID
 local C_FriendList_IsFriend = C_FriendList.IsFriend
 local C_PartyInfo_InviteUnit, BNInviteFriend = C_PartyInfo.InviteUnit, BNInviteFriend
 local IsGuildMember = IsGuildMember
-local QueueStatusMinimapButton = QueueStatusMinimapButton
+local QueueStatusButton = QueueStatusButton
 local GetNumGroupMembers = GetNumGroupMembers
 local UnitExists, UnitIsGroupLeader, UnitIsGroupAssistant = UnitExists, UnitIsGroupLeader, UnitIsGroupAssistant
 local RaidNotice_AddMessage = RaidNotice_AddMessage
@@ -31,7 +31,7 @@ local function CheckFriend(inviterGUID)
 end
 
 module:RegisterEvent("PARTY_INVITE_REQUEST", function(_, _, name, _, _, _, _, _, inviterGUID)
-    if QueueStatusMinimapButton:IsShown() or GetNumGroupMembers() > 0 then return end
+    if QueueStatusButton:IsShown() or GetNumGroupMembers() > 0 then return end
     if CheckFriend(inviterGUID) then
         RaidNotice_AddMessage(RaidWarningFrame, L.AUTO_INVITE_INFO .. name, { r = 0.41, g = 0.8, b = 0.94 }, 3)
         print(format("|cffffff00" .. L.AUTO_INVITE_INFO .. name .. ".|r"))
