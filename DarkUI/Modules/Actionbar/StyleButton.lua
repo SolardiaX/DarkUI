@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.actionbar.bars.enable then return end
+if not C.actionbar.bars.enable and not C.actionbar.styles.enable then return end
 
 ----------------------------------------------------------------------------------------
 --	ActionBar Button Style (modified from NDui)

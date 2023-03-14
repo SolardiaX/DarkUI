@@ -29,6 +29,7 @@ local fader_combat = {
 }
 
 local styles = {
+    enable         = true,
     buttons  = {
         showMacroName  = true,
         showCooldown   = true,

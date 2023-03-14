@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.actionbar.styles.range.enable then return end
+if not C.actionbar.bars.enable and not C.actionbar.styles.range.enable then return end
 
 ----------------------------------------------------------------------------------------
 --	Out of range check (modified from tullaCC)

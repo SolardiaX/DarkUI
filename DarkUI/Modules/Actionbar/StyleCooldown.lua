@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.actionbar.styles.cooldown.enable then return end
+if not C.actionbar.bars.enable and not C.actionbar.styles.cooldown.enable then return end
 
 ----------------------------------------------------------------------------------------
 --	Cooldown count (modified from tullaCC)

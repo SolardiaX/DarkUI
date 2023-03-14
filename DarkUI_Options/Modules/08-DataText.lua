@@ -41,5 +41,5 @@ ns.OptionList[8] = { -- DataText
     {},
     { 1, 'stats', 'durability', L_OPT_DATATEXT_DURABILITY_ENABLE, false },
     { 1, 'stats', 'bags', L_OPT_DATATEXT_BAGS_ENABLE, false },
-    { 1, 'stats', 'gold', L_OPT_DATATEXT_GOLD_ENABLE, false },
+    { 1, 'stats', 'currencies', L_OPT_DATATEXT_GOLD_ENABLE, false },
 }
