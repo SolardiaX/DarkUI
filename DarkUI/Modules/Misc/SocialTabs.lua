@@ -8,12 +8,14 @@ if not C.misc.socialtabs.enable then return end
 
 local cfg = C.misc.socialtabs
 
+local SHOW_LFD_LEVEL = 15
+
 local playerLevel = UnitLevel("player")
 local playerFacion = UnitFactionGroup("player")
 
 local hookAtLoad = { "FriendsFrame", "PVEFrame", "RaidBrowserFrame" }
 
-SocialTabs = CreateFrame("Frame")
+local SocialTabs = CreateFrame("Frame")
 
 local VisibleFrames = {}
 local TabRefArray = {}
@@ -138,8 +140,8 @@ end
 SocialTabs.createTab = function(pf, fname, prevtab)
     local pname = pf and pf:GetName() or "SocialTabs"
     local tframe = CreateFrame("CheckButton", pname .. '_st_' .. fname, pf, "SpellBookSkillLineTabTemplate")
-    tframe:SkinCheckBox()
     tframe:Show()
+    E:SkinCheckBox(tframe)
 
     if prevtab then
         tframe:SetPoint("TOPLEFT", prevtab, "BOTTOMLEFT", 0, -15)
