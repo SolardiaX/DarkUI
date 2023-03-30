@@ -7,6 +7,30 @@ local _, ns = ...
 ns.Categories[4] = L_CATEGORIES_UNITFRAME
 
 ns.Hooks[4] = function()
+    for name, opt in pairs(ns.opt_widgets) do
+        if string.find(name, "unitframe:party.") and name ~= 'unitframe:party.standalone' then
+            opt:HookScript("OnShow", function(self)
+                self:SetEnabled(ns.opt_widgets['unitframe:enable']:GetChecked()
+                                    and ns.opt_widgets['unitframe:party.standalone']:GetChecked())
+            end)
+        end
+    
+        if string.find(name, "unitframe:raid.") and name ~= 'unitframe:raid.enable' then
+            opt:HookScript("OnShow", function(self)
+                self:SetEnabled(ns.opt_widgets['unitframe:enable']:GetChecked()
+                                    and ns.opt_widgets['unitframe:raid.enable']:GetChecked())
+            end)
+        end
+
+        if string.find(name, "unitframe:raid.raidDebuffs.") and name ~= 'unitframe:raid.raidDebuffs.enable' then
+            opt:HookScript("OnShow", function(self)
+                self:SetEnabled(ns.opt_widgets['unitframe:enable']:GetChecked()
+                                        and ns.opt_widgets['unitframe:raid.enable']:GetChecked()
+                                        and ns.opt_widgets['unitframe:raid.raidDebuffs.enable']:GetChecked())
+            end)
+        end
+    end
+
     -- all
     ns.opt_widgets['unitframe:enable']:HookScript('OnClick', function(self)
         for name, opt in pairs(ns.opt_widgets) do
@@ -18,30 +42,48 @@ ns.Hooks[4] = function()
         end
     end)
 
-    for name, opt in pairs(ns.opt_widgets) do
-        if string.find(name, "unitframe:") and name ~= 'unitframe:enable' then
-            if name == 'unitframe:raid.enable' or not string.find(name, 'unitframe:raid.') then
-                opt:HookScript("OnShow", function(self)
-                    self:SetEnabled(ns.opt_widgets['unitframe:enable']:GetChecked())
-                end)
-            end
-        end
-    end
+    -- party
+    ns.opt_widgets['unitframe:party.standalone']:HookScript('OnClick', function(self)
+        ns.opt_widgets['unitframe:party.showPlayer']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:party.showSolo']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:party.aura.player_aura_only']:SetEnabled(self:GetChecked())
+    end)
+
+    ns.opt_widgets['unitframe:raid.enable']:HookScript('OnDisable', function(self)
+        ns.opt_widgets['unitframe:party.showPlayer']:SetEnabled(false)
+        ns.opt_widgets['unitframe:party.showSolo']:SetEnabled(false)
+        ns.opt_widgets['unitframe:party.aura.player_aura_only']:SetEnabled(false)
+    end)
+
+    ns.opt_widgets['unitframe:party.standalone']:HookScript('OnEnable', function(self)
+        ns.opt_widgets['unitframe:party.showPlayer']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:party.showSolo']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:party.aura.player_aura_only']:SetEnabled(self:GetChecked())
+    end)
 
     -- raid
     ns.opt_widgets['unitframe:raid.enable']:HookScript('OnClick', function(self)
         ns.opt_widgets['unitframe:raid.colorHealth']:SetEnabled(self:GetChecked())
         ns.opt_widgets['unitframe:raid.raidDebuffs.enable']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.enableTooltip']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.showDebuffBorder']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.filterDispellableDebuff']:SetEnabled(self:GetChecked())
     end)
 
     ns.opt_widgets['unitframe:raid.enable']:HookScript('OnDisable', function(self)
         ns.opt_widgets['unitframe:raid.colorHealth']:SetEnabled(false)
         ns.opt_widgets['unitframe:raid.raidDebuffs.enable']:SetEnabled(false)
+        ns.opt_widgets['unitframe:raid.raidDebuffs.enableTooltip']:SetEnabled(false)
+        ns.opt_widgets['unitframe:raid.raidDebuffs.showDebuffBorder']:SetEnabled(false)
+        ns.opt_widgets['unitframe:raid.raidDebuffs.filterDispellableDebuff']:SetEnabled(false)
     end)
 
     ns.opt_widgets['unitframe:raid.enable']:HookScript('OnEnable', function(self)
         ns.opt_widgets['unitframe:raid.colorHealth']:SetEnabled(self:GetChecked())
         ns.opt_widgets['unitframe:raid.raidDebuffs.enable']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.enableTooltip']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.showDebuffBorder']:SetEnabled(self:GetChecked())
+        ns.opt_widgets['unitframe:raid.raidDebuffs.filterDispellableDebuff']:SetEnabled(self:GetChecked())
     end)
 
     ns.opt_widgets['unitframe:raid.colorHealth']:HookScript("OnShow", function(self)
@@ -73,16 +115,6 @@ ns.Hooks[4] = function()
             end
         end
     end)
-
-    for name, opt in pairs(ns.opt_widgets) do
-        if string.find(name, "unitframe:raid.raidDebuffs.") and name ~= 'unitframe:raid.raidDebuffs.enable' then
-            opt:HookScript("OnShow", function(self)
-                self:SetEnabled(ns.opt_widgets['unitframe:enable']:GetChecked()
-                                        and ns.opt_widgets['unitframe:raid.enable']:GetChecked()
-                                        and ns.opt_widgets['unitframe:raid.raidDebuffs.enable']:GetChecked())
-            end)
-        end
-    end
 end
 
 -- optType, group, key, name, horizon, data, init, callback, tooltip
@@ -106,6 +138,7 @@ ns.OptionList[4] = { -- UnitFrame
     { 1, 'unitframe', 'boss.aura.player_aura_only', L_OPT_UF_BOSS_PLAYER_AURA_ONLY, false },
     { 1, 'unitframe', 'boss.aura.show_stealable_buffs', L_OPT_UF_BOSS_SHOW_STEALABLE_BUFFS, false },
     {},
+    { 1, 'unitframe', 'party.standalone', L_OPT_UF_PARTY_STANDMODE, false },
     { 1, 'unitframe', 'party.showPlayer', L_OPT_UF_PARTY_SHOWPLAYER, false },
     { 1, 'unitframe', 'party.showSolo', L_OPT_UF_PARTY_SHOWSOLO, false },
     { 1, 'unitframe', 'party.aura.player_aura_only', L_OPT_UF_PARTY_PLAYER_AURA_ONLY, false },

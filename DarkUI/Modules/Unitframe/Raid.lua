@@ -258,7 +258,7 @@ end
 -- SPAWN RAID UNIT
 ---------------------------------------------
 oUF:Factory(function()
-    if cfg.party.raidMode then
+    if cfg.party.enable and not cfg.party.standalone then
         oUF:RegisterStyle("DarkUI:party", createStyle)
         oUF:SetActiveStyle("DarkUI:party")
         

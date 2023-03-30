@@ -717,10 +717,10 @@ C.unitframe = {
     },
     party        = {
         enable         = true,
-        raidMode       = false,
+        standalone     = true,
         position       = {
             auto   = true,
-            dps    = { "TOPLEFT", UIParent, "TOPLEFT", 30, -55 },
+            dps    = { "TOPLEFT", UIParent, "TOPLEFT", 30, -30 },
             healer = { "CENTER", UIParent, "CENTER", 620, -80 }
         },
         unitsPerColumn = 5,
@@ -748,7 +748,7 @@ C.unitframe = {
     },
     raid         = {
         enable      = true,
-        position    = { "TOPLEFT", UIParent, "TOPLEFT", 25, -20 },
+        position    = { "TOPLEFT", UIParent, "TOPLEFT", 10, -10 },
         showSolo    = false,
         colorHealth = false,
         size        = 96,

@@ -53,6 +53,7 @@ L_OPT_MAP_WORLDMAP_REWARDICON = '啟用大地圖顯示日常任務獎勵類型'
 L_OPT_UF_ENABLE = '啟用單位框體模塊'
 L_OPT_UF_PORTRAIT3D = '單位框體顯示 3D 頭像 (僅限玩家/目標/小隊/焦點)'
 --
+L_OPT_UF_PARTY_STANDMODE = '使用獨立小隊框體 (反之則使用團隊框體顯示小隊)'
 L_OPT_UF_PLAYER_COLORHEALTH = '玩家框體按職業著色血條'
 L_OPT_UF_PLAYER_CLASSBAR_DIABOLIC = '啟用擴展玩家職業資源條 (連擊點/符文/靈魂碎片/...)'
 L_OPT_UF_PLAYER_CLASSBAR_BLIZZARD = '啟用系統內置玩家職業資源條 (連擊點/符文/靈魂碎片/...)'

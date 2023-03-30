@@ -67,6 +67,7 @@ L_OPT_UF_FOCUS_SHOW_STEALABLE_BUFFS = 'Show stealable buff with focus frame'
 L_OPT_UF_BOSS_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with boss frame (includes boss buff/debuff)'
 L_OPT_UF_BOSS_SHOW_STEALABLE_BUFFS = 'Show stealable buff with boss frame'
 --
+L_OPT_UF_PARTY_STANDMODE = 'Use standard party frames (Otherwise use raid frame for party)'
 L_OPT_UF_PARTY_SHOWPLAYER = 'Show player in party frames'
 L_OPT_UF_PARTY_SHOWSOLO = 'Show party frames in solo'
 L_OPT_UF_PARTY_PLAYER_AURA_ONLY = 'Only shows player cast buff/debuff with party frame (includes boss buff/debuff)'

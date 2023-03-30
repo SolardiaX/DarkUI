@@ -14,7 +14,7 @@ local CreateFrame = CreateFrame
 local UnitFrame_OnEnter, UnitFrame_OnLeave = UnitFrame_OnEnter, UnitFrame_OnLeave
 local UnitCanAttack = UnitCanAttack
 local UnitThreatSituation = UnitThreatSituation
-local unpack = unpack
+local unpack, tinsert = unpack, table.insert
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
 
 local cfg = C.unitframe
@@ -81,7 +81,7 @@ local createBar = function(self)
     self.Health:SetFrameStrata("LOW")
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(94, 14)
-    self.Health:SetPoint('BOTTOM', self, 'BOTTOM', 0, 0)
+    self.Health:SetPoint('BOTTOM', self.FrameBG, 'BOTTOM', 0, 21)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -207,7 +207,7 @@ local createTag = function(self)
 
     self.Tags.name = self:CreateTag(self.FrameFG, '[raidcolor][dd:realname]')
                          :SetFont(STANDARD_TEXT_FONT, 14, 'THICKOUTLINE')
-                         :SetPoint('TOP', self, 'BOTTOM', 0, -16)
+                         :SetPoint('TOP', self.FrameBG, 'BOTTOM', 0, 2)
                          :SetJustifyH('CENTER')
                          :done()
 
@@ -234,7 +234,7 @@ local createThreatType = function(self)
     local default_status = 1
     local threat_status_file
 
-    local event_handler = function(self, _, unit)
+    local event_handler = function(self, event, unit)
         if (unit and unit ~= self.unit) then
             return
         end
@@ -251,14 +251,14 @@ local createThreatType = function(self)
     self:RegisterEvent('UNIT_THREAT_SITUATION_UPDATE', event_handler)
     self:RegisterEvent('UNIT_TARGET', event_handler)
 
-    table.insert(self.__elements, event_handler)
+    tinsert(self.__elements, event_handler)
 end
 
 local createAuraIcon = function(self)
     local f = CreateFrame('Frame', nil, self)
 
     f.size = 28
-    f.spacing = 6
+    f.spacing = 4
     f.gap = true
     f.initialAnchor = 'RIGHT'
     f.onlyShowPlayer = cfg.focus.aura.player_aura_only
@@ -266,9 +266,9 @@ local createAuraIcon = function(self)
     f['growth-x'] = 'LEFT'
     f['growth-y'] = 'DOWN'
 
-    local h = (f.size + f.spacing) * 6
     local w = (f.size + f.spacing) * 4
-    f:SetSize(h, w)
+    local h = (f.size + f.spacing) * 4
+    f:SetSize(w, h)
     f:SetPoint('RIGHT', self, 'LEFT', -40, 0)
 
     f.reanchorIfVisibleChanged = true
@@ -299,19 +299,20 @@ local createStyle = function(self)
     createThreatType(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "BACKGROUND", 18, -1, self, "CENTER", "BOTTOM", 0, 5)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, 18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "BACKGROUND", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 14)
+    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "TOP", 0, 20)
+    self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 30)
     self.LeaderIndicator:SetTexture(media.leader_Tex)
 
-    self.AssistantIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "TOP", 0, 20)
+    self.AssistantIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMLEFT", "TOPLEFT", 12, 25)
     self.AssistantIndicator:SetTexture(media.assistant_Tex)
     
     self.MasterLooter = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "BOTTOM", 0, 0)
+    self.ReadyCheckIndicator = core:CreateIcon(self.FrameFG, "OVERLAY", 24, -1, self, "TOPRIGHT", "TOPRIGHT", 0, 8)
 
     core:SetFader(self, cfg.focus.fader)
 end

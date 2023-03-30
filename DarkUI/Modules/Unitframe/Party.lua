@@ -1,7 +1,7 @@
 local _, ns = ...
 local E, C, L = ns:unpack()
 
-if not C.unitframe.enable or not C.unitframe.party.enable or C.unitframe.party.raidMode then return end
+if not C.unitframe.enable or not C.unitframe.party.enable or not C.unitframe.party.standalone then return end
 
 ----------------------------------------------------------------------------------------
 -- Party Frame of DarkUI
@@ -301,7 +301,7 @@ local createStyle = function(self)
     createThreatType(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, -18)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, 18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
@@ -352,7 +352,7 @@ oUF:Factory(function()
                 self:SetWidth(%d)
                 self:SetHeight(%d)
                 self:SetScale(%f)
-            ]]):format(100, 40, cfg.scale)
+            ]]):format(85, 85, cfg.scale)
     )
 
     party:SetPoint(unpack(position))
