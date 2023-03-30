@@ -26,6 +26,14 @@ local UnitHealth, UnitHealthMax = UnitHealth, UnitHealthMax
 local UnitIsInMyGuild, UnitExists = UnitIsInMyGuild, UnitExists
 local UnitIsEnemy, UnitIsFriend = UnitIsEnemy, UnitIsFriend
 local UnitPower, UnitPowerType, UnitPowerMax = UnitPower, UnitPowerType, UnitPowerMax
+local C_PetBattles_GetNumAuras = C_PetBattles.GetNumAuras
+local C_PetBattles_GetAuraInfo = C_PetBattles.GetAuraInfo
+local UIParent = UIParent
+local GameTooltip = GameTooltip
+local GameTooltipText = GameTooltipText
+local GameTooltipTextSmall = GameTooltipTextSmall
+local GameTooltipHeaderText = GameTooltipHeaderText
+local GameTooltipStatusBar = GameTooltipStatusBar
 local GetCVar = GetCVar
 local select, unpack, wipe = select, unpack, wipe
 local hooksecurefunc = hooksecurefunc
@@ -36,12 +44,6 @@ local LOCALIZED_CLASS_NAMES_FEMALE = LOCALIZED_CLASS_NAMES_FEMALE
 local ENCOUNTER_JOURNAL_ENCOUNTER = ENCOUNTER_JOURNAL_ENCOUNTER
 local FRIENDS_LIST_REALM = FRIENDS_LIST_REALM
 local STATUS_TEXT_TARGET, UNIT_YOU = STATUS_TEXT_TARGET, UNIT_YOU
-local UIParent = UIParent
-local GameTooltip = GameTooltip
-local GameTooltipText = GameTooltipText
-local GameTooltipTextSmall = GameTooltipTextSmall
-local GameTooltipHeaderText = GameTooltipHeaderText
-local GameTooltipStatusBar = GameTooltipStatusBar
 
 local cfg = C.tooltip
 
