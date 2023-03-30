@@ -304,13 +304,13 @@ local createStyle = function(self)
     self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, 18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, -10)
+    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 10)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 30)
+    self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 10)
     self.LeaderIndicator:SetTexture(media.leader_Tex)
 
-    self.AssistantIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMLEFT", "TOPLEFT", 12, 25)
+    self.AssistantIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMLEFT", "TOPLEFT", 0, 10)
     self.AssistantIndicator:SetTexture(media.assistant_Tex)
     
     self.MasterLooter = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "BOTTOM", 0, 0)
