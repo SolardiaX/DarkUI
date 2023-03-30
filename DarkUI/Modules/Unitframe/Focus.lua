@@ -299,10 +299,10 @@ local createStyle = function(self)
     createThreatType(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = core:CreateIcon(self, "BACKGROUND", 18, -1, self, "CENTER", "BOTTOM", 0, 5)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "BACKGROUND", 18, -1, self, "CENTER", "BOTTOM", 0, 5)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
-    self.GroupRoleIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 14)
+    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "BACKGROUND", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 14)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "CENTER", "TOP", 0, 20)
