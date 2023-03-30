@@ -9,7 +9,7 @@ local module = E:Module("Automation"):Sub("AutoQuest")
 
 local _G = _G
 local UnitGUID = UnitGUID
-local GetNumTrackingTypes, GetTrackingInfo = GetNumTrackingTypes, GetTrackingInfo
+local GetNumTrackingTypes, GetTrackingInfo = C_Minimap.GetNumTrackingTypes, C_Minimap.GetTrackingInfo
 local GetInstanceInfo = GetInstanceInfo
 local GetNumGroupMembers, GetNumActiveQuests = GetNumGroupMembers, GetNumActiveQuests
 local GetActiveQuestID, GetActiveTitle, SelectActiveQuest = GetActiveQuestID, GetActiveTitle, SelectActiveQuest
