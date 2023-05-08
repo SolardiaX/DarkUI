@@ -101,4 +101,8 @@ function module:OnInit()
     
     -- Update token panel
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", updateTokenVisibility)
+
+    -- Hide blizzard expbar
+    StatusTrackingBarManager:UnregisterAllEvents()
+    StatusTrackingBarManager:Hide()
 end

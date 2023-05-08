@@ -11,5 +11,5 @@
 
     <Script file="Variable.lua"/>
 
-    <!-- <Script file="EditMode.lua" /> -->
+    <Script file="Mover.lua" />
 </Ui>

@@ -100,7 +100,11 @@ end
 
 local function registerEventOnce(module, event, func)
     registerEvent(module, event, function(_, e, ...)
-        func(module, e, ...)
+        if type(func) == "function" then
+            func(module, e, ...)
+        elseif type(func) == "string" then
+            module.hosts.events[func](module, e, ...)
+        end
         unregisterEvent(module, e)
     end)
 end

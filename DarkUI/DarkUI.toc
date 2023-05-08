@@ -1,10 +1,10 @@
-## Interface: 100005
+## Interface: 100100
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Notes-zhCN: 整合插件 DarkUI
 ## Notes: DarkUI for World of Warcraft
 ## Author: SolardiaX
-## Version: 10.0.5-b2.0.1
+## Version: 10.1.0-b1.0.1
 ## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options
 ## SavedVariables: SavedStats
 ## SavedVariablesPerCharacter: SavedStatsPerChar

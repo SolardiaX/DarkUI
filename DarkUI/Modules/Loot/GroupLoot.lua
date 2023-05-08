@@ -329,7 +329,6 @@ LootRollAnchor:SetScript(
         function()
             LootRollAnchor:UnregisterEvent("PLAYER_LOGIN")
             LootRollAnchor:RegisterEvent("START_LOOT_ROLL")
-            LootRollAnchor:RegisterEvent("LOOT_HISTORY_ROLL_CHANGED")
 
             UIParent:UnregisterEvent("START_LOOT_ROLL")
             UIParent:UnregisterEvent("CANCEL_LOOT_ROLL")
