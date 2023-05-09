@@ -8,6 +8,9 @@
     <!-- LibEditMode -->
     <Include file="LibEditMode\_load_.xml" />
 
+    <!-- HereBeDragons -->
+    <Include file="HereBeDragons\_load_.xml" />
+
     <!-- oUF -->
     <Include file="oUF\_load_.xml" />
 
