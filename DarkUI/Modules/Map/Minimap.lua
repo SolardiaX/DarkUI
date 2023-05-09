@@ -123,6 +123,12 @@ local function resetIcons()
     QueueStatusButton:ClearAllPoints()
     QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
     QueueStatusButton:SetScale(0.48)
+    hooksecurefunc(QueueStatusButton, "SetPoint", function(self, _, anchor)
+		if anchor ~= Minimap then
+			self:ClearAllPoints()
+			self:SetPoint(unpack(cfg.iconpos.queue))
+		end
+	end)
 
     -- Move GameTime icon
     GameTimeFrame:SetSize(26, 26)
@@ -261,7 +267,7 @@ local function enableAutoZoomOut()
         if not isResetting then
             isResetting = true
 
-            C_Timer_After(3, resetZoom)
+            C_Timer_After(10, resetZoom)
         end
     end
 
