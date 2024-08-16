@@ -99,7 +99,11 @@ oUF.Tags.Methods['dd:pp'] = function(u, r)
         color = C.oUF_colors.power[select(1, UnitPowerType(u))]
     end
 
-    return Hex(color[1], color[2], color[3]) .. E:ShortValue(UnitPower(u))
+    if color == nil then
+        color = {0.6, 0.6, 0.6}
+    end
+
+    return Hex(color[1], color[2], color[3]) .. E:ShortValue(UnitPower(u) or 0)
 end
 oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
 

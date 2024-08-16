@@ -10,7 +10,6 @@ local module = E:Module("Actionbar"):Sub("MicroMenu")
 local _G = _G
 local CreateFrame = CreateFrame
 local RegisterStateDriver = RegisterStateDriver
-local UpdateMicroButtonsParent = UpdateMicroButtonsParent
 local unpack, tinsert, pairs = unpack, tinsert, pairs
 local UIParent = _G.UIParent
 
@@ -18,17 +17,17 @@ local cfg = C.actionbar.bars.micromenu
 
 local buttonList = { 
     "CharacterMicroButton",
-    "SpellbookMicroButton",
-    "TalentMicroButton",
-    "AchievementMicroButton",
-    "QuestLogMicroButton",
-    "GuildMicroButton",
-    "LFDMicroButton",
-    "EJMicroButton",
-    "CollectionsMicroButton",
-    "StoreMicroButton",
-    "MainMenuMicroButton",
-    "HelpMicroButton",
+	"ProfessionMicroButton",
+	"PlayerSpellsMicroButton",
+	"AchievementMicroButton",
+	"QuestLogMicroButton",
+	"GuildMicroButton",
+	"LFDMicroButton",
+	"EJMicroButton",
+	"CollectionsMicroButton",
+	"StoreMicroButton",
+	"MainMenuMicroButton",
+	"HelpMicroButton",
 }
 
 local num = #buttonList
@@ -41,13 +40,12 @@ function module:OnInit()
     bar:SetScale(cfg.scale)
     bar.buttonList = {}
 
-    -- UpdateMicroButtonsParent(bar)
-
     --move the buttons into position and reparent them
     local previous
     for i, b in pairs(buttonList) do
         local button = _G[b]
 
+        button:SetScale(.75)
         button:CreateBackdrop()
         button.backdrop:CreateShadow()
 

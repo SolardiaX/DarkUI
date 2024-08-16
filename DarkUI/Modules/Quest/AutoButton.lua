@@ -134,7 +134,8 @@ function module:OnLogin()
     self:HideButton()
 
     -- Add all items from quest to our table
-    hooksecurefunc("QuestObjectiveItem_Initialize", function(_, questLogIndex)
+    hooksecurefunc(QuestObjectiveTracker, "UpdateSingle", function(_, quest)
+        local questLogIndex = quest:GetQuestLogIndex()
         local link = GetQuestLogSpecialItemInfo(questLogIndex)
         if link then
             local _, itemID = strsplit(":", link)

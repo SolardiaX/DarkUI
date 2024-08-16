@@ -164,7 +164,7 @@ end
 --	Set Variable in game
 ----------------------------------------------------------------------------------------
 function E:SetVariable(group, key, value)
-    if not IsAddOnLoaded("DarkUI_Options") then return end
+    if not C_AddOns.IsAddOnLoaded("DarkUI_Options") then return end
     
     local t = SavedOptions.global and SavedOptions or SavedOptionsPerChar
     

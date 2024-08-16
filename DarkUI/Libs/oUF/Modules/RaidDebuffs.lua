@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------
---	Based on oUF_RaidDebuffs (modified from NDUI)
+--    Based on oUF_RaidDebuffs (modified from NDUI)
 ----------------------------------------------------------------------------------------
 local _, ns = ...
 local oUF = ns.oUF
@@ -24,13 +24,13 @@ local DispellPriority = {
 }
 
 local CanDispel = {
-	DRUID = {Magic = false, Curse = true, Poison = true},
-	EVOKER = {Magic = false, Curse = true, Poison = true, Disease = true},
-	MAGE = {Curse = true},
-	MONK = {Magic = false, Poison = true, Disease = true},
-	PALADIN = {Magic = false, Poison = true, Disease = true},
-	PRIEST = {Magic = false, Disease = true},
-	SHAMAN = {Magic = false, Curse = true}
+    DRUID = {Magic = false, Curse = true, Poison = true},
+    EVOKER = {Magic = false, Curse = true, Poison = true, Disease = true},
+    MAGE = {Curse = true},
+    MONK = {Magic = false, Poison = true, Disease = true},
+    PALADIN = {Magic = false, Poison = true, Disease = true},
+    PRIEST = {Magic = false, Disease = true},
+    SHAMAN = {Magic = false, Curse = true}
 }
 
 local DispellFilter = CanDispel[class] or {}
@@ -128,8 +128,8 @@ local function UpdateDebuffFrame(self, name, icon, count, debuffType, duration, 
         end
 
         local c = DispellColor[debuffType] or DispellColor.none
-	if rd.ShowDebuffBorder and rd.__shadow then
-		rd.__shadow:SetBackdropBorderColor(c[1], c[2], c[3])
+    if rd.ShowDebuffBorder and rd.__shadow then
+        rd.__shadow:SetBackdropBorderColor(c[1], c[2], c[3])
         end
 
         if rd.glowFrame then
@@ -198,7 +198,7 @@ local function Update(self, _, unit)
     end
 
     if rd.priority == invalidPrio then
-		rd.index, rd.spellID, _name = nil, nil, nil
+        rd.index, rd.spellID, _name = nil, nil, nil
     end
 
     UpdateDebuffFrame(self, _name, _icon, _count, _debuffType, _duration, _expiration)

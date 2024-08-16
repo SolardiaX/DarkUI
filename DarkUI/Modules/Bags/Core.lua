@@ -52,7 +52,8 @@ local optDefaults = {
 -- Those are internal settings, don't touch them at all:
 local defaults = {}
 
-local ItemSetCaption = (IsAddOnLoaded('ItemRack') and "ItemRack ") or (IsAddOnLoaded('Outfitter') and "Outfitter ") or "Item "
+local ItemSetCaption = (C_AddOns.IsAddOnLoaded('ItemRack') and "ItemRack ") 
+                        or (C_AddOns.IsAddOnLoaded('Outfitter') and "Outfitter ") or "Item "
 local bankOpenState = false
 function cbNivaya:ShowBags(...)
     local bags = {...}

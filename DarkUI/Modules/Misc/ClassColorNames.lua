@@ -1,4 +1,4 @@
-﻿if IsAddOnLoaded("yClassColor") then return end
+﻿if C_AddOns.IsAddOnLoaded("yClassColor") then return end
 
 ----------------------------------------------------------------------------------------
 --	Class color guild/friends/etc list(yClassColor by Yleaf)
@@ -196,15 +196,7 @@ local function RefreshList(self)
     end
 end
 
-local loaded = false
-hooksecurefunc("Communities_LoadUI", function()
-    if loaded then
-        return
-    else
-        loaded = true
         hooksecurefunc(CommunitiesMemberListEntryMixin, "RefreshExpandedColumns", RefreshList)
-    end
-end)
 
 -- FriendsList
 local FRIENDS_LEVEL_TEMPLATE = FRIENDS_LEVEL_TEMPLATE:gsub("%%d", "%%s")

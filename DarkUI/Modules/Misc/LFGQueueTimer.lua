@@ -2,7 +2,7 @@
 
 if not C.misc.lfg_queue_timer then return end
 
-if IsAddOnLoaded("DBM-Core") or IsAddOnLoaded("BigWigs") then return end
+if C_AddOns.IsAddOnLoaded("DBM-Core") or C_AddOns.IsAddOnLoaded("BigWigs") then return end
 
 ----------------------------------------------------------------------------------------
 --	Queue timer on LFGDungeonReadyDialog

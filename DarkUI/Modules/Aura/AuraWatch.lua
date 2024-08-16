@@ -3,7 +3,7 @@
 if not C.aura.auraWatch.enable then return end
 
 ----------------------------------------------------------------------------------------
---	AuraWatch (Modified from NDUI)
+--    AuraWatch (Modified from NDUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Aura"):Sub("AuraWatch")
 
@@ -11,7 +11,14 @@ local LBG = LibStub("LibButtonGlow-1.0", true)
 
 local CreateFrame = CreateFrame
 local InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
-local GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell = GetTime, GetSpellInfo, GetSpellCooldown, GetSpellCharges, GetTotemInfo, IsPlayerSpell
+local GetTime = GetTime
+local GetSpellInfo = C_Spell.GetSpellInfo
+local GetSpellName = C_Spell.GetSpellName
+local GetSpellTexture = C_Spell.GetSpellTexture
+local GetSpellCooldown = C_Spell.GetSpellCooldown
+local GetSpellCharges = C_Spell.GetSpellCharges
+local GetTotemInfo, IsPlayerSpell = GetTotemInfo, IsPlayerSpell
+local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
 local GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown = GetItemCooldown, GetItemInfo, GetInventoryItemLink, GetInventoryItemCooldown
 local GameTooltip_Hide = GameTooltip_Hide
 local PlaySound = PlaySound
@@ -37,7 +44,11 @@ local function DataAnalyze(v)
     if type(v[1]) == "number" then
         newTable.IntID = v[1]
         newTable.Duration = v[2]
-        if v[3] == "OnCastSuccess" then newTable.OnSuccess = true end
+        if v[3] == "OnCastSuccess" then
+            newTable.OnSuccess = true
+        elseif v[3] == "UnitCastSucceed" then
+            newTable.CastSucceed = true
+        end
         newTable.UnitID = v[4]
         newTable.ItemID = v[5]
     else
@@ -304,16 +315,28 @@ end
 local function SetupAnchor()
     for key, VALUE in pairs(FrameList) do
         local value = AuraList[key]
+        if not value then return end
+		local direction, interval = value.Direction, value.Interval
+		-- check whether using CENTER direction
+		if value.Mode == "BAR" and direction == "CENTER" then
+			direction = "UP" -- sorry, no "CENTER" for bars mode
+		end
+		if not hasCentralize then
+			hasCentralize = direction == "CENTER"
+		end
+
         if value then
             local previous
             for i = 1, #VALUE do
                 local frame = VALUE[i]
                 if i == 1 then
                     frame:SetPoint("CENTER", frame.MoveHandle)
-                elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 then
+                    frame.__direction = direction
+				    frame.__interval = interval
+                elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 and direction ~= "CENTER" then
                     frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, value.Interval)
                 else
-                    if value.Direction:lower() == "right" then
+                    if value.Direction:lower() == "right" or direction == "CENTER" then
                         frame:SetPoint("LEFT", previous, "RIGHT", value.Interval, 0)
                     elseif value.Direction:lower() == "left" then
                         frame:SetPoint("RIGHT", previous, "LEFT", -value.Interval, 0)
@@ -396,9 +419,18 @@ function module:AuraWatch_UpdateCD()
             local value = group.List[spellID]
             if value then
                 if value.SpellID then
-                    local name, _, icon = GetSpellInfo(value.SpellID)
-                    local start, duration = GetSpellCooldown(value.SpellID)
-                    local charges, maxCharges, chargeStart, chargeDuration = GetSpellCharges(value.SpellID)
+                    local name, icon = GetSpellName(value.SpellID), GetSpellTexture(value.SpellID)
+
+                    local cooldownInfo = C_Spell.GetSpellCooldown(value.SpellID)
+                    local start = cooldownInfo and cooldownInfo.startTime
+                    local duration = cooldownInfo and cooldownInfo.duration
+
+                    local chargeInfo = C_Spell.GetSpellCharges(spellID)
+                    local charges = chargeInfo and chargeInfo.currentCharges
+                    local maxCharges = chargeInfo and chargeInfo.maxCharges
+                    local chargeStart = chargeInfo and chargeInfo.cooldownStartTime
+                    local chargeDuration = chargeInfo and chargeInfo.cooldownDuration
+                    
                     if group.Mode:lower() == "icon" then name = nil end
                     if charges and maxCharges and maxCharges > 1 and charges < maxCharges then
                         module:AuraWatch_SetupCD(KEY, name, icon, chargeStart, chargeDuration, true, 1, value.SpellID, charges)
@@ -436,13 +468,15 @@ function module:AuraWatch_UpdateCD()
 end
 
 -- UpdateAura
-function module:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, expires, id, filter, flash)
-    if not index then return end
+function module:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count, duration, expires, spellID, flash)
+    if not KEY then return end
+
     local frames = FrameList[index]
+    if frames == nil then return end
     local frame = frames[frames.Index]
     if frame then frame:Show() end
     if frame.Icon then frame.Icon:SetTexture(icon) end
-    if frame.Count then frame.Count:SetText(count > 1 and count or nil) end
+    if frame.Count then frame.Count:SetText(count > 1 and count or "") end
     if frame.Cooldown then
         frame.Cooldown:SetReverse(true)
         frame.Cooldown:SetCooldown(expires - duration, duration)
@@ -465,59 +499,53 @@ function module:AuraWatch_SetupAura(index, UnitID, name, icon, count, duration, 
     frame.unitID = UnitID
     frame.id = id
     frame.filter = filter
+    frame.spellID = spellID
 
     frames.Index = (frames.Index + 1 > maxFrames) and maxFrames or frames.Index + 1
 end
 
-function module:AuraWatch_UpdateAura(spellID, UnitID, index, bool)
+function module:AuraWatch_UpdateAura(unit, index, filter, name, icon, count, duration, expires, caster, spellID, number, inCombat)
     for KEY, VALUE in pairs(AuraList) do
         local value = VALUE.List[spellID]
-        if value and value.AuraID and value.UnitID == UnitID then
-            local filter = bool and "HELPFUL" or "HARMFUL"
-            local name, icon, count, _, duration, expires, caster, _, _, _, _, _, _, _, _, number = UnitAura(value.UnitID, index, filter)
-            if value.Combat and not InCombatLockdown() then return false end
-            if value.Caster and value.Caster:lower() ~= caster then return false end
-            if value.Stack and count and value.Stack > count then return false end
+        if value and value.AuraID and value.UnitID == unit then
+            if value.Combat and not inCombat then return end
+            if value.Caster and value.Caster ~= caster then return end
+            if value.Stack and count and value.Stack > count then return end
             if value.Value and number then
-                if VALUE.Mode:lower() == "icon" then
+                if VALUE.Mode == "ICON" then
                     name = E:ShortValue(number)
-                elseif VALUE.Mode:lower() == "bar" then
-                    name = name .. ":" .. E:ShortValue(number)
+                elseif VALUE.Mode == "BAR" then
+                    name = name..":"..E:ShortValue(number)
                 end
             else
-                if VALUE.Mode:lower() == "icon" then
+                if VALUE.Mode == "ICON" then
                     name = value.Text or nil
-                elseif VALUE.Mode:lower() == "bar" then
+                elseif VALUE.Mode == "BAR" then
                     name = name
                 end
             end
             if value.Timeless then duration, expires = 0, 0 end
-            return KEY, value.UnitID, name, icon, count, duration, expires, index, filter, value.Flash
+            module:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count, duration, expires, spellID, value.Flash)
+            return
         end
     end
-    return false
 end
 
-function module:UpdateAuraWatch(UnitID)
+function module:UpdateAuraWatchByFilter(unit, filter, inCombat)
     local index = 1
-    while true do
-        local name, _, _, _, _, _, _, _, _, spellID = UnitBuff(UnitID, index)
-        if not name then
-            break
-        end
-        module:AuraWatch_SetupAura(module:AuraWatch_UpdateAura(spellID, UnitID, index, true))
-        index = index + 1
-    end
 
-    local index = 1
     while true do
-        local name, _, _, _, _, _, _, _, _, spellID = UnitDebuff(UnitID, index)
-        if not name then
-            break
-        end
-        module:AuraWatch_SetupAura(module:AuraWatch_UpdateAura(spellID, UnitID, index, false))
+        local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
+        if not auraData then break end
+        module:AuraWatch_UpdateAura(unit, index, filter, auraData.name, auraData.icon, auraData.applications, auraData.duration, auraData.expirationTime, auraData.sourceUnit, auraData.spellId, (auraData.points[1] == 0 and tonumber(auraData.points[2]) or tonumber(auraData.points[1])), inCombat)
+
         index = index + 1
     end
+end
+
+function module:UpdateAuraWatch(unit, inCombat)
+    module:UpdateAuraWatchByFilter(unit, "HELPFUL", inCombat)
+    module:UpdateAuraWatchByFilter(unit, "HARMFUL", inCombat)
 end
 
 -- Update InternalCD
@@ -580,7 +608,7 @@ function module:AuraWatch_SetupInt(intID, itemID, duration, unitID, guid, source
         frame.type = 2
         frame.spellID = itemID
     else
-        name, _, icon = GetSpellInfo(intID)
+        name, icon = GetSpellName(intID), GetSpellTexture(intID)
         frame.type = 1
         frame.spellID = intID
     end
@@ -623,7 +651,7 @@ local function checkPetFlags(sourceFlags, all)
     end
 end
 
-function module:IsUnitWeNeed(value, name, flags)
+function module:IsUnitWeNeed(value, guid, name, flags)
     if not value.UnitID then
         value.UnitID = "Player" end
     if value.UnitID:lower() == "all" then
@@ -637,10 +665,10 @@ function module:IsUnitWeNeed(value, name, flags)
     end
 end
 
-function module:IsAuraTracking(value, eventType, sourceName, sourceFlags, destName, destFlags)
-    if value.OnSuccess and eventType == "SPELL_CAST_SUCCESS" and module:IsUnitWeNeed(value, sourceName, sourceFlags) then
+function module:IsAuraTracking(value, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags)
+    if value.OnSuccess and eventType == "SPELL_CAST_SUCCESS" and module:IsUnitWeNeed(value, sourceGUID, sourceName, sourceFlags) then
         return true
-    elseif not value.OnSuccess and eventList[eventType] and module:IsUnitWeNeed(value, destName, destFlags) then
+    elseif not value.OnSuccess and eventList[eventType] and module:IsUnitWeNeed(value, destGUID, destName, destFlags) then
         return true
     end
 end
@@ -718,8 +746,11 @@ function module:AuraWatch_OnUpdate(elapsed)
 
         module:AuraWatch_Cleanup()
         module.AuraWatch_UpdateCD()
+
+        local inCombat = InCombatLockdown()
+
         for _, value in pairs(UnitIDTable) do
-            module:UpdateAuraWatch(value)
+            module:UpdateAuraWatch(value, inCombat)
         end
     end
 end
@@ -827,28 +858,28 @@ end)
 -- Gift of the Titans
 local hasTitan
 function module:AuraWatch_OnUnitAura()
-	if not IntCD.MoveHandle then return end
+    if not IntCD.MoveHandle then return end
 
-	for i = 1, 40 do
-		local name, _, _, _, _, expires, _, _, _, spellID = UnitBuff("player", i)
-		if not name then break end
-		if spellID == 313698 then
-			if not hasTitan then
-				module:AuraWatch_SetupInt(313698, nil, expires-GetTime()+60, "player")
-			end
-			hasTitan = true
-			return
-		end
-	end
-	hasTitan = false
+    for i = 1, 40 do
+        local name, _, _, _, _, expires, _, _, _, spellID = UnitBuff("player", i)
+        if not name then break end
+        if spellID == 313698 then
+            if not hasTitan then
+                module:AuraWatch_SetupInt(313698, nil, expires-GetTime()+60, "player")
+            end
+            hasTitan = true
+            return
+        end
+    end
+    hasTitan = false
 end
 
 function module:AuraWatch_CheckInstance()
-	local diffID = select(3, GetInstanceInfo())
-	if diffID == 152 then
-		module:RegisterEvent("UNIT_AURA", module.AuraWatch_OnUnitAura, "player")
-	else
-		module:UnregisterEvent("UNIT_AURA", module.AuraWatch_OnUnitAura)
-	end
+    local diffID = select(3, GetInstanceInfo())
+    if diffID == 152 then
+        module:RegisterEvent("UNIT_AURA", module.AuraWatch_OnUnitAura, "player")
+    else
+        module:UnregisterEvent("UNIT_AURA", module.AuraWatch_OnUnitAura)
+    end
 end
 module:RegisterEvent("UPDATE_INSTANCE_INFO", module.AuraWatch_CheckInstance)

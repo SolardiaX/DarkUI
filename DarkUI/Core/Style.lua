@@ -3,10 +3,10 @@ local E, C, L = select(2, ...):unpack()
 local styles = {
     backdrop = { 
         bgFile = "Interface\\Collections\\CollectionsBackgroundTile",
-        edgeFile = "Interface\\Tooltips\\ChatBubble-Backdrop",
+        edgeFile = C.media.texture.border,
         tile = 1,
         tileSize = 16, 
-        edgeSize = 16,
+        edgeSize = 2,
         insets = { left = 2, right = 2, top = 2, bottom = 2 } 
     },
 

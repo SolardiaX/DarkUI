@@ -724,7 +724,7 @@ C.unitframe = {
             healer = { "CENTER", UIParent, "CENTER", 620, -80 }
         },
         unitsPerColumn = 5,
-        showPlayer     = true,
+        showPlayer     = false,
         showSolo       = false,
         aura           = {
             player_aura_only     = true

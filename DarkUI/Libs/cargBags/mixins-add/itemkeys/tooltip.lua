@@ -22,8 +22,8 @@ DESCRIPTION:
     Item keys which require tooltip parsing to work
 ]]
 local _, ns = ...
+local B, C, L, DB = unpack(ns)
 local cargBags = ns.cargBags
-
 
 local bindTypeToString = {
     [ITEM_BIND_ON_USE] = "equip",
@@ -34,6 +34,7 @@ local bindTypeToString = {
     [ITEM_ACCOUNTBOUND] = "account",
     [ITEM_BIND_TO_ACCOUNT] = "account",
     [ITEM_BNETACCOUNTBOUND] = "account",
+    [ITEM_ACCOUNTBOUND_UNTIL_EQUIP] = "accountequip",
 }
 
 cargBags.itemKeys["bindOn"] = function(i)
@@ -45,14 +46,11 @@ cargBags.itemKeys["bindOn"] = function(i)
     for j = 2, 5 do
         local lineData = data.lines[j]
         if not lineData then break end
-        local argVal = lineData.args
-        if argVal then
-            local lineText = argVal[2] and argVal[2].stringVal
-            local bindOn = lineText and bindTypeToString[lineText]
-            if bindOn then
-                i.bindOn = bindOn
-                return bindOn
-            end
+        local lineText = lineData.leftText
+        local bindOn = lineText and bindTypeToString[lineText]
+        if bindOn then
+            i.bindOn = bindOn
+            return bindOn
         end
     end
 end

@@ -242,7 +242,7 @@ end
 
 -- Reset New
 local resetNewItems = function(self)
-    cB_KnownItems = _G.SavedStatsPerChar.cB_KnownItems or {}
+    local cB_KnownItems = _G.SavedStatsPerChar.cB_KnownItems or {}
     if not _G.SavedStatsPerChar.cBniv.clean then
         for item, numItem in next, cB_KnownItems do
             if type(item) == "string" then
@@ -258,9 +258,9 @@ local resetNewItems = function(self)
                 local item = cbNivaya:GetItemInfo(bag, slot)
                 if item.id then
                     if cB_KnownItems[item.id] then
-                        cB_KnownItems[item.id] = cB_KnownItems[item.id] + (item.stackCount and item.stackCount or 0)
+                        cB_KnownItems[item.id] = cB_KnownItems[item.id] + (item.count and item.count or 0)
                     else
-                        cB_KnownItems[item.id] = item.stackCount and item.stackCount or 1
+                        cB_KnownItems[item.id] = item.count and item.count or 1
                     end
                 end
             end 
@@ -765,7 +765,7 @@ function MyButton:OnCreate()
     self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", -1, 1)
     self.durability:SetFont(unpack(C.media.standard_font))
 
-    if IsAddOnLoaded("CanIMogIt") then
+    if C_AddOns.IsAddOnLoaded("CanIMogIt") then
         self.canIMogIt = parentFrame:CreateTexture(nil, "OVERLAY")
         self.canIMogIt:SetSize(13, 13)
         self.canIMogIt:SetPoint(unpack(CanIMogIt.ICON_LOCATIONS[CanIMogItOptions["iconLocation"]]))
@@ -817,7 +817,7 @@ local function updateCanIMogIt(self, item)
 end
 
 local function updatePawnArrow(self, item)
-    if not IsAddOnLoaded("Pawn") then return end
+    if not C_AddOns.IsAddOnLoaded("Pawn") then return end
     if not PawnIsContainerItemAnUpgrade then return end
     if self.UpgradeIcon then
         self.UpgradeIcon:SetShown(PawnIsContainerItemAnUpgrade(item.bagId, item.slotId))

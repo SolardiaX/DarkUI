@@ -38,7 +38,7 @@ end
 
 local function updateTokenVisibility()
     TokenFrame_LoadUI()
-    TokenFrame_Update()
+    TokenFrame:Update()
 end
 
 local function buttonEventsRegisterFrame(self, added)

@@ -14,10 +14,11 @@ local MaxNumContainer = 12
 
 local cbNivaya = cargBags:NewImplementation("Nivaya")
 cbNivaya:RegisterBlizzard()
+cbNivaya:HookScript("OnShow", function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end)
+cbNivaya:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
 function cbNivaya:UpdateBags() for i = -3, MaxNumContainer do cbNivaya:UpdateBag(i) end end
 
 cB_Filters = {}
-cB_KnownItems = {}
 cBniv_CatInfo = {}
 cB_ItemClass = {}
 
@@ -84,9 +85,9 @@ cB_Filters.fNewItems = function(item)
     if not _G.SavedStats.cBnivCfg.NewItems then return false end
     if not ((item.bagId >= 0) and (item.bagId <= NumBagContainer)) then return false end
     if not item.link then return false end
-    if not cB_KnownItems[item.id] then return true end
+    if not  _G.SavedStatsPerChar.cB_KnownItems[item.id] then return true end
     local t = GetItemCount(item.id)	--cbNivaya:getItemCount(item.id)
-    return (t > cB_KnownItems[item.id]) and true or false
+    return (t >  _G.SavedStatsPerChar.cB_KnownItems[item.id]) and true or false
 end
 
 -----------------------------------------
@@ -94,8 +95,8 @@ end
 -----------------------------------------
 local item2setIR = {} -- ItemRack
 local item2setOF = {} -- Outfitter
-local IR = IsAddOnLoaded('ItemRack')
-local OF = IsAddOnLoaded('Outfitter')
+local IR = C_AddOns.IsAddOnLoaded('ItemRack')
+local OF = C_AddOns.IsAddOnLoaded('Outfitter')
 
 cB_Filters.fItemSets = function(item)
     --print("fItemSets", item, item.isInSet)

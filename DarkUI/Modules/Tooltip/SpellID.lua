@@ -12,7 +12,7 @@ local function addLine(self, id, isItem)
         if not line then break end
         local text = line:GetText()
         -- if text and (text:match(L.TOOLTIP_ITEM_ID) or text:match(L.TOOLTIP_SPELL_ID)) then return end
-        if text and strfind(text, id) then return end
+        if text and string.find(text, id) then return end
     end
     if isItem then
         self:AddLine("|cffffffff"..L.TOOLTIP_ITEM_ID.." "..id)
@@ -22,22 +22,24 @@ local function addLine(self, id, isItem)
     self:Show()
 end
 
--- Spells
-hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
-    local id = select(10, UnitAura(...))
-    if id then addLine(self, id) end
-    if id and IsModifierKeyDown() then print(UnitAura(...)..": "..id) end
-end)
 
 local function attachByAuraInstanceID(self, ...)
     local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
     local id = aura and aura.spellId
     if id then addLine(self, id) end
-    if debuginfo == true and id and IsModifierKeyDown() then print(UnitAura(...)..": "..id) end
 end
+
+-- Spells
+hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
+    local unit, slot = ...
+	local aura = C_UnitAuras.GetAuraDataBySlot(unit, slot)
+    local id = aura and aura.spellId
+	if id then addLine(self, id) end
+end)
 
 hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", attachByAuraInstanceID)
 hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", attachByAuraInstanceID)
+
 hooksecurefunc("SetItemRef", function(link)
     local id = tonumber(link:match("spell:(%d+)"))
     if id then addLine(ItemRefTooltip, id) end

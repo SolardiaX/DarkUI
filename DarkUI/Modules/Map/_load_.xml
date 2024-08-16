@@ -2,10 +2,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
 
-	<Frame name='BetterWorldQuestPinTemplate' inherits='WorldMap_WorldQuestPinTemplate' mixin='BetterWorldQuestPinMixin' virtual='true'/>
-	
+	<Frame name='BetterWorldQuestPinTemplate' inherits='POIButtonTemplate, LegendHighlightableMapPoiPinTemplate' mixin='BetterWorldQuestPinMixin' virtual='true'/>
+
     <Script file="Minimap.lua" />
 	<Script file="Worldmap.lua" />
 	<Script file="WorldmapFog.lua" />
 	<Script file="WorldmapRewardIcon.lua" />
+	<Script file="WorldmapRewardIcon_Storms.lua" />
 </Ui>

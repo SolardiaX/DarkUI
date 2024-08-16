@@ -16,7 +16,7 @@ ns[3] = {}            -- L, Locale
 ns[1].screenWidth, ns[1].screenHeight = GetPhysicalScreenSize()
 ns[1].locale = GetLocale()
 ns[1].realm = GetRealmName()
-ns[1].version = GetAddOnMetadata(addonName, "Version")
+ns[1].version = C_AddOns.GetAddOnMetadata(addonName, "Version")
 ns[1].addonName = addonName
 
 ns[1].myClass = select(2, UnitClass('player'))

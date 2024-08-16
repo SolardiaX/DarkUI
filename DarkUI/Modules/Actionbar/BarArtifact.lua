@@ -19,7 +19,7 @@ local C_AzeriteItem_GetPowerLevel = C_AzeriteItem.GetPowerLevel
 local HasArtifactEquipped = HasArtifactEquipped
 local Item = Item
 local unpack = unpack
-local MAX_PLAYER_LEVEL, NORMAL_FONT_COLOR = MAX_PLAYER_LEVEL, NORMAL_FONT_COLOR
+local MAX_PLAYER_LEVEL, NORMAL_FONT_COLOR = GetMaxPlayerLevel(), NORMAL_FONT_COLOR
 local GameTooltip = _G.GameTooltip
 local UIParent = _G.UIParent
 
@@ -31,6 +31,15 @@ local function isAzeriteAvailable()
 end
 
 local function bar_OnEvent(self, _, ...)
+    if isAzeriteAvailable() and HasArtifactEquipped() then
+        module.holder:Hide()
+        module.statusbar:Show()
+    else
+        module.holder:Show()
+        module.statusbar:Hide()
+        return
+    end
+
     if isAzeriteAvailable() then
         local azeriteItemLocation = C_AzeriteItem_FindActiveAzeriteItem()
         local xp, totalLevelXP = C_AzeriteItem_GetAzeriteItemXPInfo(azeriteItemLocation)
@@ -51,8 +60,6 @@ local function bar_OnEvent(self, _, ...)
             self:SetValue(power)            
         end
     end
-    
-    self:Show()
 end
 
 local function bar_OnEnter(self)
@@ -97,21 +104,17 @@ local function bar_OnLeave()
 end
 
 function module:OnInit()
-    if cfg.only_at_max_level and E.myLevel < MAX_PLAYER_LEVEL then
-        local holder = CreateFrame("Frame", nil, UIParent)
-        holder:SetFrameStrata(cfg.bfstrata)
-        holder:SetFrameLevel(cfg.bflevel)
-        holder:SetSize(cfg.width, cfg.height)
-        holder:SetPoint(unpack(cfg.pos))
-        holder:SetScale(cfg.scale)
+    local holder = CreateFrame("Frame", nil, UIParent)
+    holder:SetFrameStrata(cfg.bfstrata)
+    holder:SetFrameLevel(cfg.bflevel)
+    holder:SetSize(cfg.width, cfg.height)
+    holder:SetPoint(unpack(cfg.pos))
+    holder:SetScale(cfg.scale)
 
-        holder.texture = holder:CreateTexture(nil, "BACKGROUND")
-        holder.texture:SetTexture(C.media.texture.status)
-        holder.texture:SetAllPoints(holder)
-        holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
-
-        return
-    end
+    holder.texture = holder:CreateTexture(nil, "BACKGROUND")
+    holder.texture:SetTexture(C.media.texture.status)
+    holder.texture:SetAllPoints(holder)
+    holder.texture:SetVertexColor(1 / 255, 1 / 255, 1 / 255)
 
     local statusbar = CreateFrame("StatusBar", "DarkUI_ArtifactBar", UIParent)
     statusbar:SetFrameStrata(cfg.bfstrata)
@@ -126,7 +129,7 @@ function module:OnInit()
     statusbar.background:SetAllPoints()
     statusbar.background:SetTexture(C.media.texture.status)
     statusbar.background:SetVertexColor(1, 0, 0, 0.3)
-
+    
     statusbar:SetScript("OnEvent", bar_OnEvent)
     statusbar:SetScript("OnEnter", bar_OnEnter)
     statusbar:SetScript("OnLeave", bar_OnLeave)
@@ -134,4 +137,7 @@ function module:OnInit()
     statusbar:RegisterEvent("ARTIFACT_XP_UPDATE")
     statusbar:RegisterEvent("UNIT_INVENTORY_CHANGED")
     statusbar:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+    module.holder = holder
+    module.statusbar = statusbar
 end

@@ -1,6 +1,9 @@
 ﻿local E, C, L = select(2, ...):unpack()
 
-if IsAddOnLoaded("OpenAll") or IsAddOnLoaded("Postal") or IsAddOnLoaded("TradeSkillMaster_Mailing") or not C.blizzard.style then return end
+if C_AddOns.IsAddOnLoaded("OpenAll") 
+    or C_AddOns.IsAddOnLoaded("Postal") 
+    or C_AddOns.IsAddOnLoaded("TradeSkillMaster_Mailing") 
+    or not C.blizzard.style then return end
 
 ----------------------------------------------------------------------------------------
 --	Grab mail in 1 button(OpenAll by Kemayo)

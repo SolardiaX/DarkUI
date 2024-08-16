@@ -34,7 +34,7 @@ local UnitWidgetSet = UnitWidgetSet
 local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
 local IsInInstance, IsInGroup, IsInRaid = IsInInstance, IsInGroup, IsInRaid
 local GetNumGroupMembers = GetNumGroupMembers
-local GetSpellInfo = GetSpellInfo
+local GetSpellInfo = C_Spell.GetSpellInfo
 local hooksecurefunc = hooksecurefunc
 local unpack = unpack
 

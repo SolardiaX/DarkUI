@@ -31,10 +31,12 @@ function module:OnInit()
 
     --	Change position
     hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", function()
-        if CharacterFrame:IsShown() or SpellBookFrame:IsShown() or
-                (PlayerTalentFrame and PlayerTalentFrame:IsShown()) or
-                (ChannelFrame and ChannelFrame:IsShown()) or
-                PVEFrame:IsShown()
+        if CharacterFrame:IsShown() or 
+            (PlayerTalentFrame and PlayerSpellsFrame:IsShown()) or 
+            (PlayerTalentFrame and PlayerTalentFrame:IsShown()) or 
+            (ChannelFrame and ChannelFrame:IsShown()) or PVEFrame:IsShown() or 
+            (MacroFrame and MacroFrame:IsShown()) or 
+            (GarrisonLandingPage and GarrisonLandingPage:IsShown())
         then
             return
         end

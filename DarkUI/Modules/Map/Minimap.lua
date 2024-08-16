@@ -8,7 +8,7 @@ if not C.map.minimap.enable then return end
 local module = E:Module("Map"):Sub("MiniMap")
 
 local _G = _G
-local IsAddOnLoaded, LoadAddOn = IsAddOnLoaded, LoadAddOn
+local IsAddOnLoaded, LoadAddOn = C_AddOns.IsAddOnLoaded, C_AddOns.LoadAddOn
 local Minimap_ZoomIn, Minimap_ZoomOut = Minimap_ZoomIn, Minimap_ZoomOut
 local unpack, select, ipairs = unpack, select, ipairs
 local STANDARD_TEXT_FONT = STANDARD_TEXT_FONT
@@ -96,15 +96,15 @@ local function resetIcons()
     MinimapCluster.InstanceDifficulty:SetPoint(unpack(cfg.iconpos.instance))
 
     -- Instance Difficulty icon
-    MinimapCluster.InstanceDifficulty.Instance.Border:Hide()
-    MinimapCluster.InstanceDifficulty.Instance.Background:SetSize(28, 36)
-    MinimapCluster.InstanceDifficulty.Instance.Background:SetVertexColor(0.6, 0.3, 0)
-    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:ClearAllPoints()
-    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture:SetPoint("CENTER", -1, 7)
-    MinimapCluster.InstanceDifficulty.Instance.HeroicTexture.SetPoint = E.Dummy
-    MinimapCluster.InstanceDifficulty.Instance.MythicTexture:ClearAllPoints()
-    MinimapCluster.InstanceDifficulty.Instance.MythicTexture:SetPoint("CENTER", -1, 7)
-    MinimapCluster.InstanceDifficulty.Instance.MythicTexture.SetPoint = E.Dummy
+    MinimapCluster.InstanceDifficulty.Default.Border:Hide()
+    MinimapCluster.InstanceDifficulty.Default.Background:SetSize(28, 36)
+    MinimapCluster.InstanceDifficulty.Default.Background:SetVertexColor(0.6, 0.3, 0)
+    MinimapCluster.InstanceDifficulty.Default.HeroicTexture:ClearAllPoints()
+    MinimapCluster.InstanceDifficulty.Default.HeroicTexture:SetPoint("CENTER", -1, 7)
+    MinimapCluster.InstanceDifficulty.Default.HeroicTexture.SetPoint = E.Dummy
+    MinimapCluster.InstanceDifficulty.Default.MythicTexture:ClearAllPoints()
+    MinimapCluster.InstanceDifficulty.Default.MythicTexture:SetPoint("CENTER", -1, 7)
+    MinimapCluster.InstanceDifficulty.Default.MythicTexture.SetPoint = E.Dummy
 
     -- Guild Instance Difficulty icon
     MinimapCluster.InstanceDifficulty.Guild.Border:Hide()
@@ -214,6 +214,7 @@ local function resetIcons()
 end
 
 local function addTexture()
+    MinimapCluster:SetScale(0.88)
     --create rotating cogwheel texture
     for index, _ in ipairs(frames_to_rotate) do
         local ftr = frames_to_rotate[index]

@@ -13,6 +13,7 @@ local StaticPopup_Show = StaticPopup_Show
 local ToggleChatColorNamesByClassGroup = ToggleChatColorNamesByClassGroup
 local hooksecurefunc = hooksecurefunc
 
+
 local function disableTutorial()
     TutorialFrameAlertButton:Kill()
     local function AcknowledgeTips()

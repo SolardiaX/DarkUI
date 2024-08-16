@@ -11,7 +11,9 @@ local cfg = C.aura
 local oUF = select(2, ...).oUF
 
 local _G = _G
-local UnitAura, GetTime = UnitAura, GetTime
+local GetTime = GetTime
+local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local C_Spell_GetSpellTexture = C_Spell.GetSpellTexture
 local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
 local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
 local RegisterAttributeDriver = RegisterAttributeDriver
@@ -116,11 +118,12 @@ end
 
 module.UpdateAuras = function(self, button, index)
     local unit, filter = button.header:GetAttribute("unit"), button.filter
-    local name, texture, count, debuffType, duration, expirationTime, _, _, _, spellID, _, _, _, _, _, arg16, arg17, arg18 = UnitAura(unit, index, filter)
-    if not name then return end
+    local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
 
-    if duration > 0 and expirationTime then
-        local timeLeft = expirationTime - GetTime()
+    if not auraData then return end
+
+    if auraData.duration > 0 and auraData.expirationTime then
+        local timeLeft = auraData.expirationTime - GetTime()
         if not button.timeLeft then
             button.nextUpdate = -1
             button.timeLeft = timeLeft
@@ -135,7 +138,7 @@ module.UpdateAuras = function(self, button, index)
             startOrStopFlash(button.animation, timeLeft)
         end
 
-        if timeLeft and (duration == ceil(timeLeft)) and (cfg.enable_animation and button.auraGrowth) then
+        if timeLeft and (auraData.duration == ceil(timeLeft)) and (cfg.enable_animation and button.auraGrowth) then
             button.auraGrowth:Play()
         end
     else
@@ -147,26 +150,26 @@ module.UpdateAuras = function(self, button, index)
         end
     end
 
-    if count and count > 1 then
-        button.count:SetText(count)
+    if auraData.count and auraData.count > 1 then
+        button.count:SetText(auraData.count)
     else
         button.count:SetText("")
     end
 
     if filter == "HARMFUL" then
-        local color = oUF.colors.debuff[debuffType or "none"]
+        local color = oUF.colors.debuff[auraData.dispelName or "none"]
         button:SetBackdropBorderColor(color[1], color[2], color[3])
     else
         button:SetBackdropBorderColor(0, 0, 0)
     end
 
     -- Show spell stat for 'Soleahs Secret Technique'
-    if spellID == 368512 then
-        button.count:SetText(getSpellStat(arg16, arg17, arg18))
+    if auraData.spellID == 368512 then
+        button.count:SetText(getSpellStat(unpack(auraData.points)))
     end
 
-    button.spellID = spellID
-    button.icon:SetTexture(texture)
+    button.spellID = auraData.spellID
+    button.icon:SetTexture(auraData.icon)
     button.expiration = nil
 end
 

@@ -1,9 +1,9 @@
 local MINOR = 3
 local lib, minor = LibStub('LibEditMode')
 if minor > MINOR then
-	return
+    return
 end
 
 lib.internal:CreatePool('button', function()
-	return CreateFrame('Button', nil, UIParent, 'EditModeSystemSettingsDialogExtraButtonTemplate')
+    return CreateFrame('Button', nil, UIParent, 'EditModeSystemSettingsDialogExtraButtonTemplate')
 end)

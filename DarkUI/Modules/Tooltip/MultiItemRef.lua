@@ -60,7 +60,7 @@ local CreateTip = function(link)
 
     local close = CreateFrame("Button", "ItemRefTooltip" .. num .. "CloseButton", tip)
     close:SetScript("OnClick", function() HideUIPanel(tip) end)
-    close:SkinCloseButton()
+    E:SkinCloseButton(close)
 
     tinsert(UISpecialFrames, tip:GetName())
 

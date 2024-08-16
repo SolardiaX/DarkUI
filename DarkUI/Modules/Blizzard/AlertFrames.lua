@@ -1,6 +1,6 @@
 ﻿local E, C, L = select(2, ...):unpack()
 
-if IsAddOnLoaded("MoveAnything") or not C.blizzard.custom_position then return end
+if C_AddOns.IsAddOnLoaded("MoveAnything") or not C.blizzard.custom_position then return end
 
 ----------------------------------------------------------------------------------------
 --	AlertFrameMove(by Gethe)

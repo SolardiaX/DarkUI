@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
---	Based on LitePanels(by Katae)
+--    Based on LitePanels(by Katae)
 ----------------------------------------------------------------------------------------
 
 local lp, hidden, deps = CreateFrame("Frame", "lp_C"), {}, {} lp:Hide()
@@ -35,7 +35,7 @@ local floor = math.floor
 local unpack = unpack
 local pairs = pairs
 local ipairs = ipairs
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local hooksecurefunc = hooksecurefunc
 
 local r, is = function(n, dec) return floor(n * (10 ^ (dec or 0)) + 0.5) end, function(v, t) return type(v) == t end
@@ -52,8 +52,8 @@ end
 
 ----------------------------------------------------------------------------------------
 -- API: lpanels:CreateLayout("Layout Name", { _layout code_ }
---	» arg1 - Layout name. Name can be anything at all.
---	» arg2 - Table with your layout code, can also be set as a variable.
+--    » arg1 - Layout name. Name can be anything at all.
+--    » arg2 - Table with your layout code, can also be set as a variable.
 function lpanels:CreateLayout(name, layout)
     if name and layout then
         self.profile[name] = layout or {}
@@ -62,13 +62,13 @@ end
 
 ----------------------------------------------------------------------------------------
 -- API: lpanels:ApplyLayout("n:Character r:Realm c:Class", "layout1", "layout2")
---	» arg1 - Profile string: May be set to any combination of n:ame, r:ealm, c:lass,
---		separated by a single space. If nil, applies the specified layouts to all
---		characters. Additionally, a dash may be applied to front of the
---		condition (-n:ame -r:ealm -c:lass) to make the layout NOT load on the specified
---		value. The profile string is *not* CASE-sensitive.
---	» arg2,... - Layout names created by CreateLayout() to apply to this profile. No set
---		limit to how many layouts can be applied per profile.
+--    » arg1 - Profile string: May be set to any combination of n:ame, r:ealm, c:lass,
+--        separated by a single space. If nil, applies the specified layouts to all
+--        characters. Additionally, a dash may be applied to front of the
+--        condition (-n:ame -r:ealm -c:lass) to make the layout NOT load on the specified
+--        value. The profile string is *not* CASE-sensitive.
+--    » arg2,... - Layout names created by CreateLayout() to apply to this profile. No set
+--        limit to how many layouts can be applied per profile.
 function lpanels:MatchProf(profile, AND)
     local apply = false
     for a, str in gmatch(profile, "(%-?[nrc]):([^%s]+)") do
@@ -137,7 +137,7 @@ function lpanels:MakePanel(f)
     panel.width, panel.height = f.width, f.height
 
     -- Hide dependant frames, will show later for late loading addons
-    if f.require and not IsAddOnLoaded(f.require) then deps[f.name] = f.require panel:Hide() end
+    if f.require and not C_AddOns.IsAddOnLoaded(f.require) then deps[f.name] = f.require panel:Hide() end
 
     -- Set positions
     panel:SetParent(f.parent)
@@ -283,7 +283,7 @@ function lpanels.OnEvent(_, event)
         lpanels = lpanels:Exit()
     elseif event == "ADDON_LOADED" and deps then
         for frame, addon in pairs(deps) do
-            if IsAddOnLoaded(addon) then _G[frame]:Show() frame = nil end
+            if C_AddOns.IsAddOnLoaded(addon) then _G[frame]:Show() frame = nil end
         end
     end
 end

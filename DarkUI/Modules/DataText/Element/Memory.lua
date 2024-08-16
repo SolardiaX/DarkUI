@@ -10,9 +10,7 @@ local module = E:Module("DataText")
 local GetAddOnCPUUsage, GetAddOnInfo, GetAddOnMemoryUsage = GetAddOnCPUUsage, GetAddOnInfo, GetAddOnMemoryUsage
 local GetAvailableBandwidth = GetAvailableBandwidth
 local GetCVar = GetCVar
-local GetFramerate, GetNetStats, GetNumAddOns = GetFramerate, GetNetStats, GetNumAddOns
 local GetDownloadedPercentage = GetDownloadedPercentage
-local IsAddOnLoaded, IsAltKeyDown, IsControlKeyDown = IsAddOnLoaded, IsAltKeyDown, IsControlKeyDown
 local UpdateAddOnCPUUsage, UpdateAddOnMemoryUsage = UpdateAddOnCPUUsage, UpdateAddOnMemoryUsage
 local AddonList_OnCancel = AddonList_OnCancel
 local PlaySound = PlaySound
@@ -41,7 +39,7 @@ module:Inject("Memory", {
             self.total = 0
             UpdateMemUse()
             local parent = self:GetParent()
-            for i = 1, GetNumAddOns() do self.total = self.total + GetAddOnMemoryUsage(i) end
+            for i = 1, C_AddOns.GetNumAddOns() do self.total = self.total + GetAddOnMemoryUsage(i) end
             if parent.hovered then self:GetParent():GetScript("OnEnter")(parent) end
             return self.total >= 1024 and format(cfg.fmt_mb, self.total / 1024) or format(cfg.fmt_kb, self.total)
         end, update = 5,
@@ -65,18 +63,18 @@ module:Inject("Memory", {
                 if isCPU and IsControlKeyDown() then
                     UpdateAddOnCPUUsage()
                     for i = 1, #memoryt do memoryt[i] = nil end
-                    for i = 1, GetNumAddOns() do
-                        local addon, name = GetAddOnInfo(i)
-                        if IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnCPUUsage(i) }) end
+                    for i = 1, C_AddOns.GetNumAddOns() do
+                        local addon, name = C_AddOns.GetAddOnInfo(i)
+                        if C_AddOns.IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnCPUUsage(i) }) end
                     end
                     tsort(memoryt, sortdesc)
                 else
                     self.timer = time()
                     UpdateMemUse()
                     for i = 1, #memoryt do memoryt[i] = nil end
-                    for i = 1, GetNumAddOns() do
-                        local addon, name = GetAddOnInfo(i)
-                        if IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnMemoryUsage(i) }) end
+                    for i = 1, C_AddOns.GetNumAddOns() do
+                        local addon, name = C_AddOns.GetAddOnInfo(i)
+                        if C_AddOns.IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnMemoryUsage(i) }) end
                     end
                     tsort(memoryt, sortdesc)
                 end
@@ -117,7 +115,7 @@ module:Inject("Memory", {
         if isCPU then
             self.totalCPU = 0
             UpdateAddOnCPUUsage()
-            for i = 1, GetNumAddOns() do self.totalCPU = self.totalCPU + GetAddOnCPUUsage(i) end
+            for i = 1, C_AddOns.GetNumAddOns() do self.totalCPU = self.totalCPU + GetAddOnCPUUsage(i) end
             GameTooltip:AddDoubleLine(L.DATATEXT_TOTAL_CPU_USAGE, format("%d ms", self.totalCPU), module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1, 1, 1)
         end
         GameTooltip:Show()

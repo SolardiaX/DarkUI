@@ -27,14 +27,14 @@ local function _getRealItemLevel(slotId, unit)
 
     for i = 2, #data.lines do
         local lineData = data.lines[i]
-        local argVal = lineData and lineData.args
-        if argVal then
-            local text = argVal[2] and argVal[2].stringVal
-            local found = text and strfind(text, itemLevelString)
+        local text = lineData and lineData.leftText
+        if text then
+            local found = strfind(text, itemLevelString)
             if found then
                 local level = strmatch(text, "(%d+)%)?$")
                 if level and (tonumber(level) > 0) then
                     realItemLevel = level
+                    break
                 end
             end
         end
@@ -64,12 +64,12 @@ local function _updateItems(unit, frame)
             if itemLink and (realItemLevel ~= "" and tonumber(realItemLevel) > minItemLevel) then
                 local _, _, enchant, gem1, gem2, gem3 = strsplit(":", itemLink)
                 if i == INVSLOT_BACK or i == INVSLOT_CHEST or i == INVSLOT_MAINHAND or i == INVSLOT_FINGER1 or i == INVSLOT_FINGER2 or i == INVSLOT_WRIST or i == INVSLOT_FEET or i == INVSLOT_LEGS then
-					if enchant and enchant == "" then
-						color = "|cffFF0000"
-					end
-				end
+                    if enchant and enchant == "" then
+                        color = "|cffFF0000"
+                    end
+                end
 
-                local info = GetItemStats(itemLink)
+                local info = C_Item.GetItemStats(itemLink)
                 local numSocket = info["EMPTY_SOCKET_PRISMATIC"] or 0
                 local numGem = 0
 
@@ -239,15 +239,17 @@ local function SetupFlyoutLevel(button, bag, slot)
     end
     local link, level
     if bag then
-        link = GetContainerItemLink(bag, slot)
+        link = C_Container.GetContainerItemLink(bag, slot)
         level = _getRealItemLevel(link, bag, slot)
     else
         link = GetInventoryItemLink("player", slot)
         level = _getRealItemLevel(link, "player", slot)
     end
-    if level then
-        button.iLvl:SetText("|cFFFFFF00"..level)
+    level = level or ""
+    if level and tonumber(level) == 1 then
+        level = ""
     end
+    button.iLvl:SetText("|cFFFFFF00"..level)
 end
 
 hooksecurefunc("EquipmentFlyout_DisplayButton", function(button)

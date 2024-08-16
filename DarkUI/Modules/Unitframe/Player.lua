@@ -380,48 +380,6 @@ local createClassModule = function(self)
     end
 end
 
-local createQuakeTimer = function(self)
-    local bar = CreateFrame("StatusBar", nil, self)
-    bar:SetSize(300, 20)
-    bar:SetStatusBarTexture(C.media.texture.status_s)
-    bar:SetStatusBarColor(0, 1, 0)
-    bar:CreateShadow()
-    bar:SetPoint("TOP", UIParent, "TOP", 0, -140)
-    bar:Hide()
-
-    bar.Background = bar:CreateTexture(nil, "BACKGROUND")
-    bar.Background:SetAllPoints()
-    bar.Background:SetTexture(C.media.texture.status_s)
-    bar.Background:SetVertexColor(0, 0, 0, .5)
-
-    bar.Tex = bar:CreateTexture(nil, "BACKGROUND", nil, 1)
-    bar.Tex:SetAllPoints(bar.Background)
-    bar.Tex:SetTexture(C.media.texture.status_bg, true, true)
-    bar.Tex:SetHorizTile(true)
-    bar.Tex:SetVertTile(true)
-    bar.Tex:SetBlendMode("ADD")
-
-    bar.Spark = bar:CreateTexture(nil, "OVERLAY")
-    bar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
-    bar.Spark:SetBlendMode("ADD")
-    bar.Spark:SetAlpha(.8)
-    bar.Spark:SetPoint("TOPLEFT", bar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
-    bar.Spark:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
-
-    bar.SpellName = core:CreateFont(bar, STANDARD_TEXT_FONT, 12, "OUTLINE")
-    bar.SpellName:SetPoint("LEFT", 2, 0)
-
-    bar.Text = core:CreateFont(bar, STANDARD_TEXT_FONT, 12, "OUTLINE")
-    bar.Text:SetPoint("RIGHT", -2, 0)
-
-    bar.Icon = bar:CreateTexture(nil, "ARTWORK")
-    bar.Icon:SetSize(bar:GetHeight(), bar:GetHeight())
-    bar.Icon:SetPoint("RIGHT", bar, "LEFT", -5, 0)
-    bar.Icon:SetTexCoord(unpack(C.media.texCoord))
-
-    self.QuakeTimer = bar
-end
-
 local createStyle = function(self)
     self.colors = C.oUF_colors
     self.cUnit = "player"
@@ -441,7 +399,6 @@ local createStyle = function(self)
     createCastbar(self)
     createThreatType(self)
     createClassModule(self)
-    -- createQuakeTimer(self)
 
     self.RestingIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "RIGHT", "LEFT", -32, 0)
     self.RestingIndicator:SetTexCoord(0, 0.5, 0, 0.421875)

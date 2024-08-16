@@ -32,9 +32,8 @@ local NUM_CHAT_WINDOWS = NUM_CHAT_WINDOWS
 
 local cfg = C.chat
 if cfg.auto_width then
-    local holder = _G["DarkUI_ActionBar1HolderBG"]
     local renderScale = UIParent:GetEffectiveScale()
-    cfg.width = ((E.screenWidth - (holder and holder:GetWidth() or 1024)) / 2 - 80) * renderScale
+    cfg.width = ((E.screenWidth - 1024) / 3 - 120) * renderScale
 end
 
 local origs = {}

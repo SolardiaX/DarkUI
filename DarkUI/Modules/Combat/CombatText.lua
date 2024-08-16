@@ -8,6 +8,8 @@ if C.combat.combattext.enable ~= true then return end
 
 local cfg = C.combat.combattext
 
+local GetSpellTexture = C_Spell.GetSpellTexture
+
 -- Justify messages in frames
 local ct = {
     ["justify_1"] = "LEFT", -- Incoming damage justify

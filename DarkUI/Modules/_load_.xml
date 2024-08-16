@@ -10,7 +10,7 @@
 	<Include file="DataText\_load_.xml"/>
 	<Include file="Loot\_load_.xml"/>
 	<Include file="Map\_load_.xml"/>
-	<Include file="Misc\_load_.xml"/>
+	<Include file="Misc\_load_.xml"/> 
 	<Include file="Quest\_load_.xml"/>
 	<Include file="Tooltip\_load_.xml"/>
 	<Include file="Unitframe\_load_.xml"/>

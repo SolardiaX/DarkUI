@@ -69,7 +69,7 @@ function C.aura:AddNewAuraWatch(class, list)
         for _, v in pairs(k) do
             local spellID = v.AuraID or v.SpellID
             if spellID then
-                local name = GetSpellInfo(spellID)
+                local name = C_Spell.GetSpellName(spellID)
                 if not name and not v.Disabled then
                     wipe(v)
                 end

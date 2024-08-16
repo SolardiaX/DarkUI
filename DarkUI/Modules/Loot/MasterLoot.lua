@@ -9,7 +9,7 @@ if not C.loot.enable then return end
 local DoMasterLootRoll = DoMasterLootRoll
 local StaticPopup_Show, CloseDropDownMenus = StaticPopup_Show, CloseDropDownMenus
 local UIDropDownMenu_CreateInfo, UIDropDownMenu_AddButton = UIDropDownMenu_CreateInfo, UIDropDownMenu_AddButton
-local UIDropDownMenu_Initialize, GroupLootDropDown = UIDropDownMenu_Initialize, GroupLootDropDown
+local UIDropDownMenu_Initialize = UIDropDownMenu_Initialize
 local GiveMasterLoot, GetMasterLootCandidate, IsInRaid = GiveMasterLoot, GetMasterLootCandidate, IsInRaid
 local pairs, format, tinsert, tsort, wipe, random = pairs, string.format, tinsert, table.sort, table.wipe, math.random
 local RAID_CLASS_COLORS, CUSTOM_CLASS_COLORS = RAID_CLASS_COLORS, CUSTOM_CLASS_COLORS
@@ -195,4 +195,5 @@ if CUSTOM_CLASS_COLORS then
     update()
 end
 
+local GroupLootDropDown = CreateFrame("Frame", nil, UIParent, "UIDropDownMenuTemplate")
 UIDropDownMenu_Initialize(GroupLootDropDown, init, "MENU")

@@ -113,249 +113,249 @@ local validateEvent = Private.validateEvent
 local _PATTERN = '%[..-%]+'
 
 local _ENV = {
-	Hex = function(r, g, b)
-		if(type(r) == 'table') then
-			if(r.r) then
-				r, g, b = r.r, r.g, r.b
-			else
-				r, g, b = unpack(r)
-			end
-		end
-		return string.format('|cff%02x%02x%02x', r * 255, g * 255, b * 255)
-	end,
+    Hex = function(r, g, b)
+        if(type(r) == 'table') then
+            if(r.r) then
+                r, g, b = r.r, r.g, r.b
+            else
+                r, g, b = unpack(r)
+            end
+        end
+        return string.format('|cff%02x%02x%02x', r * 255, g * 255, b * 255)
+    end,
 }
 _ENV.ColorGradient = function(...)
-	return _ENV._FRAME:ColorGradient(...)
+    return _ENV._FRAME:ColorGradient(...)
 end
 
 local _PROXY = setmetatable(_ENV, {__index = _G})
 
 local tagStrings = {
-	['affix'] = [[function(u)
-		local c = UnitClassification(u)
-		if(c == 'minus') then
-			return 'Affix'
-		end
-	end]],
+    ['affix'] = [[function(u)
+        local c = UnitClassification(u)
+        if(c == 'minus') then
+            return 'Affix'
+        end
+    end]],
 
-	['arcanecharges'] = [[function()
-		if(GetSpecialization() == SPEC_MAGE_ARCANE) then
-			local num = UnitPower('player', Enum.PowerType.ArcaneCharges)
-			if(num > 0) then
-				return num
-			end
-		end
-	end]],
+    ['arcanecharges'] = [[function()
+        if(GetSpecialization() == SPEC_MAGE_ARCANE) then
+            local num = UnitPower('player', Enum.PowerType.ArcaneCharges)
+            if(num > 0) then
+                return num
+            end
+        end
+    end]],
 
-	['arenaspec'] = [[function(u)
-		local id = u:match('arena(%d)$')
-		if(id) then
-			local specID = GetArenaOpponentSpec(tonumber(id))
-			if(specID and specID > 0) then
-				local _, specName = GetSpecializationInfoByID(specID)
-				return specName
-			end
-		end
-	end]],
+    ['arenaspec'] = [[function(u)
+        local id = u:match('arena(%d)$')
+        if(id) then
+            local specID = GetArenaOpponentSpec(tonumber(id))
+            if(specID and specID > 0) then
+                local _, specName = GetSpecializationInfoByID(specID)
+                return specName
+            end
+        end
+    end]],
 
-	['chi'] = [[function()
-		if(GetSpecialization() == SPEC_MONK_WINDWALKER) then
-			local num = UnitPower('player', Enum.PowerType.Chi)
-			if(num > 0) then
-				return num
-			end
-		end
-	end]],
+    ['chi'] = [[function()
+        if(GetSpecialization() == SPEC_MONK_WINDWALKER) then
+            local num = UnitPower('player', Enum.PowerType.Chi)
+            if(num > 0) then
+                return num
+            end
+        end
+    end]],
 
-	['classification'] = [[function(u)
-		local c = UnitClassification(u)
-		if(c == 'rare') then
-			return 'Rare'
-		elseif(c == 'rareelite') then
-			return 'Rare Elite'
-		elseif(c == 'elite') then
-			return 'Elite'
-		elseif(c == 'worldboss') then
-			return 'Boss'
-		elseif(c == 'minus') then
-			return 'Affix'
-		end
-	end]],
+    ['classification'] = [[function(u)
+        local c = UnitClassification(u)
+        if(c == 'rare') then
+            return 'Rare'
+        elseif(c == 'rareelite') then
+            return 'Rare Elite'
+        elseif(c == 'elite') then
+            return 'Elite'
+        elseif(c == 'worldboss') then
+            return 'Boss'
+        elseif(c == 'minus') then
+            return 'Affix'
+        end
+    end]],
 
-	['cpoints'] = [[function(u)
-		local cp = UnitPower(u, Enum.PowerType.ComboPoints)
+    ['cpoints'] = [[function(u)
+        local cp = UnitPower(u, Enum.PowerType.ComboPoints)
 
-		if(cp > 0) then
-			return cp
-		end
-	end]],
+        if(cp > 0) then
+            return cp
+        end
+    end]],
 
-	['creature'] = [[function(u)
-		return UnitCreatureFamily(u) or UnitCreatureType(u)
-	end]],
+    ['creature'] = [[function(u)
+        return UnitCreatureFamily(u) or UnitCreatureType(u)
+    end]],
 
-	['curmana'] = [[function(unit)
-		return UnitPower(unit, Enum.PowerType.Mana)
-	end]],
+    ['curmana'] = [[function(unit)
+        return UnitPower(unit, Enum.PowerType.Mana)
+    end]],
 
-	['dead'] = [[function(u)
-		if(UnitIsDead(u)) then
-			return 'Dead'
-		elseif(UnitIsGhost(u)) then
-			return 'Ghost'
-		end
-	end]],
+    ['dead'] = [[function(u)
+        if(UnitIsDead(u)) then
+            return 'Dead'
+        elseif(UnitIsGhost(u)) then
+            return 'Ghost'
+        end
+    end]],
 
-	['deficit:name'] = [[function(u)
-		local missinghp = _TAGS['missinghp'](u)
-		if(missinghp) then
-			return '-' .. missinghp
-		else
-			return _TAGS['name'](u)
-		end
-	end]],
+    ['deficit:name'] = [[function(u)
+        local missinghp = _TAGS['missinghp'](u)
+        if(missinghp) then
+            return '-' .. missinghp
+        else
+            return _TAGS['name'](u)
+        end
+    end]],
 
-	['difficulty'] = [[function(u)
-		if UnitCanAttack('player', u) then
-			local l = UnitEffectiveLevel(u)
-			return Hex(GetCreatureDifficultyColor((l > 0) and l or 999))
-		end
-	end]],
+    ['difficulty'] = [[function(u)
+        if UnitCanAttack('player', u) then
+            local l = UnitEffectiveLevel(u)
+            return Hex(GetCreatureDifficultyColor((l > 0) and l or 999))
+        end
+    end]],
 
-	['group'] = [[function(unit)
-		local name, server = UnitName(unit)
-		if(server and server ~= '') then
-			name = string.format('%s-%s', name, server)
-		end
+    ['group'] = [[function(unit)
+        local name, server = UnitName(unit)
+        if(server and server ~= '') then
+            name = string.format('%s-%s', name, server)
+        end
 
-		for i=1, GetNumGroupMembers() do
-			local raidName, _, group = GetRaidRosterInfo(i)
-			if( raidName == name ) then
-				return group
-			end
-		end
-	end]],
+        for i=1, GetNumGroupMembers() do
+            local raidName, _, group = GetRaidRosterInfo(i)
+            if( raidName == name ) then
+                return group
+            end
+        end
+    end]],
 
-	['holypower'] = [[function()
-		if(GetSpecialization() == SPEC_PALADIN_RETRIBUTION) then
-			local num = UnitPower('player', Enum.PowerType.HolyPower)
-			if(num > 0) then
-				return num
-			end
-		end
-	end]],
+    ['holypower'] = [[function()
+        if(GetSpecialization() == SPEC_PALADIN_RETRIBUTION) then
+            local num = UnitPower('player', Enum.PowerType.HolyPower)
+            if(num > 0) then
+                return num
+            end
+        end
+    end]],
 
-	['leader'] = [[function(u)
-		if(UnitIsGroupLeader(u)) then
-			return 'L'
-		end
-	end]],
+    ['leader'] = [[function(u)
+        if(UnitIsGroupLeader(u)) then
+            return 'L'
+        end
+    end]],
 
-	['leaderlong']  = [[function(u)
-		if(UnitIsGroupLeader(u)) then
-			return 'Leader'
-		end
-	end]],
+    ['leaderlong']  = [[function(u)
+        if(UnitIsGroupLeader(u)) then
+            return 'Leader'
+        end
+    end]],
 
-	['level'] = [[function(u)
-		local l = UnitEffectiveLevel(u)
-		if(UnitIsWildBattlePet(u) or UnitIsBattlePetCompanion(u)) then
-			l = UnitBattlePetLevel(u)
-		end
+    ['level'] = [[function(u)
+        local l = UnitEffectiveLevel(u)
+        if(UnitIsWildBattlePet(u) or UnitIsBattlePetCompanion(u)) then
+            l = UnitBattlePetLevel(u)
+        end
 
-		if(l > 0) then
-			return l
-		else
-			return '??'
-		end
-	end]],
+        if(l > 0) then
+            return l
+        else
+            return '??'
+        end
+    end]],
 
-	['maxmana'] = [[function(unit)
-		return UnitPowerMax(unit, Enum.PowerType.Mana)
-	end]],
+    ['maxmana'] = [[function(unit)
+        return UnitPowerMax(unit, Enum.PowerType.Mana)
+    end]],
 
-	['missinghp'] = [[function(u)
-		local current = UnitHealthMax(u) - UnitHealth(u)
-		if(current > 0) then
-			return current
-		end
-	end]],
+    ['missinghp'] = [[function(u)
+        local current = UnitHealthMax(u) - UnitHealth(u)
+        if(current > 0) then
+            return current
+        end
+    end]],
 
-	['missingpp'] = [[function(u)
-		local current = UnitPowerMax(u) - UnitPower(u)
-		if(current > 0) then
-			return current
-		end
-	end]],
+    ['missingpp'] = [[function(u)
+        local current = UnitPowerMax(u) - UnitPower(u)
+        if(current > 0) then
+            return current
+        end
+    end]],
 
-	['name'] = [[function(u, r)
-		return UnitName(r or u)
-	end]],
+    ['name'] = [[function(u, r)
+        return UnitName(r or u)
+    end]],
 
-	['offline'] = [[function(u)
-		if(not UnitIsConnected(u)) then
-			return 'Offline'
-		end
-	end]],
+    ['offline'] = [[function(u)
+        if(not UnitIsConnected(u)) then
+            return 'Offline'
+        end
+    end]],
 
-	['perhp'] = [[function(u)
-		local m = UnitHealthMax(u)
-		if(m == 0) then
-			return 0
-		else
-			return math.floor(UnitHealth(u) / m * 100 + .5)
-		end
-	end]],
+    ['perhp'] = [[function(u)
+        local m = UnitHealthMax(u)
+        if(m == 0) then
+            return 0
+        else
+            return math.floor(UnitHealth(u) / m * 100 + .5)
+        end
+    end]],
 
-	['perpp'] = [[function(u)
-		local m = UnitPowerMax(u)
-		if(m == 0) then
-			return 0
-		else
-			return math.floor(UnitPower(u) / m * 100 + .5)
-		end
-	end]],
+    ['perpp'] = [[function(u)
+        local m = UnitPowerMax(u)
+        if(m == 0) then
+            return 0
+        else
+            return math.floor(UnitPower(u) / m * 100 + .5)
+        end
+    end]],
 
-	['plus'] = [[function(u)
-		local c = UnitClassification(u)
-		if(c == 'elite' or c == 'rareelite') then
-			return '+'
-		end
-	end]],
+    ['plus'] = [[function(u)
+        local c = UnitClassification(u)
+        if(c == 'elite' or c == 'rareelite') then
+            return '+'
+        end
+    end]],
 
-	['powercolor'] = [[function(u)
-		local pType, pToken, altR, altG, altB = UnitPowerType(u)
-		local t = _COLORS.power[pToken]
+    ['powercolor'] = [[function(u)
+        local pType, pToken, altR, altG, altB = UnitPowerType(u)
+        local t = _COLORS.power[pToken]
 
-		if(not t) then
-			if(altR) then
-				if(altR > 1 or altG > 1 or altB > 1) then
-					return Hex(altR / 255, altG / 255, altB / 255)
-				else
-					return Hex(altR, altG, altB)
-				end
-			else
-				return Hex(_COLORS.power[pType] or _COLORS.power.MANA)
-			end
-		end
+        if(not t) then
+            if(altR) then
+                if(altR > 1 or altG > 1 or altB > 1) then
+                    return Hex(altR / 255, altG / 255, altB / 255)
+                else
+                    return Hex(altR, altG, altB)
+                end
+            else
+                return Hex(_COLORS.power[pType] or _COLORS.power.MANA)
+            end
+        end
 
-		return Hex(t)
-	end]],
+        return Hex(t)
+    end]],
 
-	['pvp'] = [[function(u)
-		if(UnitIsPVP(u)) then
-			return 'PvP'
-		end
-	end]],
+    ['pvp'] = [[function(u)
+        if(UnitIsPVP(u)) then
+            return 'PvP'
+        end
+    end]],
 
-	['raidcolor'] = [[function(u)
-		local _, class = UnitClass(u)
-		if(class) then
-			return Hex(_COLORS.class[class])
-		else
-			local id = u:match('arena(%d)$')
-			if(id) then
-				local specID = GetArenaOpponentSpec(tonumber(id))
+    ['raidcolor'] = [[function(u)
+        local _, class = UnitClass(u)
+        if(class) then
+            return Hex(_COLORS.class[class])
+        else
+            local id = u:match('arena(%d)$')
+            if(id) then
+        		local specID = GetArenaOpponentSpec(tonumber(id))
 				if(specID and specID > 0) then
 					_, _, _, _, _, class = GetSpecializationInfoByID(specID)
 					return Hex(_COLORS.class[class])
@@ -468,7 +468,7 @@ local tagStrings = {
 	end]],
 
 	['threatcolor'] = [[function(u)
-		return Hex(GetThreatStatusColor(UnitThreatSituation(u)))
+		return Hex(GetThreatStatusColor(UnitThreatSituation(u) or 0))
 	end]],
 }
 
@@ -981,7 +981,7 @@ oUF.Tags = {
 	end,
 	SetEventUpdateTimer = function(self, timer)
 		if(not timer) then return end
-		if(not type(timer) == 'number') then return end
+		if(type(timer) ~= 'number') then return end
 
 		eventTimerThreshold = math.max(0.05, timer)
 	end,

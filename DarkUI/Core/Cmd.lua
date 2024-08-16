@@ -116,13 +116,13 @@ SlashCmdList["FRAME"] = function(arg)
     if arg ~= "" then
         arg = _G[arg]
     else
-        arg = GetMouseFocus()
+        arg = GetMouseFoci()[1]
     end
-    if arg ~= nil then FRAME = arg end
-    if arg ~= nil and arg:GetName() ~= nil then
+    if arg ~= nil then _G.FRAME = arg end
+    if arg ~= nil and not arg:IsForbidden() then
         local point, relativeTo, relativePoint, xOfs, yOfs = arg:GetPoint()
         ChatFrame1:AddMessage("|cffCC0000~~~~~~~~~~~~~~~~~~~~~~~~~")
-        ChatFrame1:AddMessage("Name: |cffFFD100"..arg:GetName())
+        ChatFrame1:AddMessage("Name: |cffFFD100"..(arg:GetName() or "<unamed>"))
         if arg:GetParent() and arg:GetParent():GetName() then
             ChatFrame1:AddMessage("Parent: |cffFFD100"..arg:GetParent():GetName())
         end

@@ -42,7 +42,6 @@
     <Script file="modules\Smooth.lua"/>
     <Script file="modules\Fader.lua"/>
     <Script file="modules\QuestIcon.lua"/>
-    <Script file="modules\QuakeTimer.lua"/>
 
     <Script file="finalize.lua"/>
 

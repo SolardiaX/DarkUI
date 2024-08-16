@@ -87,13 +87,16 @@ local function OpenGUI()
     ns.SelectTab(1)
 end
 
+local gameMenuLastButtons = {
+	[_G.GAMEMENU_OPTIONS] = 1,
+	[_G.BLIZZARD_STORE] = 2
+}
+
 local gui = CreateFrame("Button", "GameMenuFrameDarkUI", GameMenuFrame, "GameMenuButtonTemplate")
+gui:SetSize(150, 28)
 gui:SetText(L_DARKUI_CONSOLE)
-gui:SetPoint("TOP", GameMenuButtonAddons, "BOTTOM", 0, -21)
-GameMenuFrame:HookScript("OnShow", function(self)
-    GameMenuButtonLogout:SetPoint("TOP", gui, "BOTTOM", 0, -21)
-    self:SetHeight(self:GetHeight() + gui:GetHeight() + 22)
-end)
+
+GameMenuFrame.DarkUI = gui
 
 gui:SetScript("OnClick", function()
     if not E then E, C, _ = DarkUI:unpack() end
@@ -102,3 +105,35 @@ gui:SetScript("OnClick", function()
     PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
     OpenGUI()
 end)
+
+local function PositionGameMenuButton()
+	local anchorIndex = (C_StorePublic.IsEnabled and C_StorePublic.IsEnabled() and 2) or 1
+	for button in GameMenuFrame.buttonPool:EnumerateActive() do
+		local text = button:GetText()
+
+		local lastIndex = gameMenuLastButtons[text]
+		if lastIndex == anchorIndex and GameMenuFrame.DarkUI then
+			GameMenuFrame.DarkUI:SetPoint("TOPLEFT", button, "BOTTOMLEFT", 0, -14)
+            GameMenuFrame.DarkUI:SetSize(button:GetSize())
+		elseif not lastIndex then
+			local point, anchor, point2, x, y = button:GetPoint()
+			button:SetPoint(point, anchor, point2, x, y - 35)
+		end
+
+		-- Replace EditMode with our moving system
+		-- if text and text == HUD_EDIT_MODE_MENU then
+		-- 	button:SetScript("OnClick", function()
+		-- 		PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
+		-- 		SlashCmdList.MOVING()
+		-- 		HideUIPanel(GameMenuFrame)
+		-- 	end)
+		-- end
+
+		local fstring = button:GetFontString()
+		fstring:SetFont(STANDARD_TEXT_FONT, 14)
+	end
+
+	GameMenuFrame:SetHeight(GameMenuFrame:GetHeight() + 14)
+end
+
+hooksecurefunc(GameMenuFrame, "Layout", PositionGameMenuButton)

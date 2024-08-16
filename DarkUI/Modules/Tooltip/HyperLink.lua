@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if C.tooltip.enable ~= true or IsAddOnLoaded("tekKompare") then return end
+if C.tooltip.enable ~= true or C_AddOns.IsAddOnLoaded("tekKompare") then return end
 
 ----------------------------------------------------------------------------------------
 --	Based on tekKompare(by Tekkub)

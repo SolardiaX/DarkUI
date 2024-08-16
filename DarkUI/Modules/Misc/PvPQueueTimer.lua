@@ -2,7 +2,7 @@
 
 if not C.misc.pvp_queue_timer then return end
 
-if IsAddOnLoaded("DBM-Core") then return end
+if C_AddOns.IsAddOnLoaded("DBM-Core") then return end
 
 ----------------------------------------------------------------------------------------
 --	Queue timer on PVPReadyDialog

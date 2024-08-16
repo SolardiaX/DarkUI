@@ -9,12 +9,12 @@ local module = E:Module("Tooltip")
 
 local _G = _G
 local CreateFrame = CreateFrame
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local PowerBarColor = PowerBarColor
 local UnitFactionGroup = UnitFactionGroup
 local UnitIsAFK, UnitIsDND, UnitSex = UnitIsAFK, UnitIsDND, UnitSex
 local InCombatLockdown, IsShiftKeyDown = InCombatLockdown, IsShiftKeyDown
-local GetMouseFocus = GetMouseFocus
+local GetMouseFoci = GetMouseFoci
 local GetCreatureDifficultyColor = GetCreatureDifficultyColor
 local GetRaidTargetIndex, GetGuildInfo = GetRaidTargetIndex, GetGuildInfo
 local GetNumSubgroupMembers, GetNumGroupMembers = GetNumSubgroupMembers, GetNumGroupMembers
@@ -47,7 +47,7 @@ local STATUS_TEXT_TARGET, UNIT_YOU = STATUS_TEXT_TARGET, UNIT_YOU
 
 local cfg = C.tooltip
 
-local tooltips = {
+local defaultTooltips = {
     ChatMenu,
     EmoteMenu,
     LanguageMenu,
@@ -82,7 +82,6 @@ local tooltips = {
     IMECandidatesFrame,
     QuickKeybindTooltip,
     GameSmallHeaderTooltip,
-    SettingsTooltip
 }
 
 local shoppingtips = {
@@ -246,7 +245,7 @@ end
 local function onTooltipSetUnit(self)
     if self ~= GameTooltip or self:IsForbidden() then return end
     local lines = self:NumLines()
-    local unit = (select(2, self:GetUnit())) or (GetMouseFocus() and GetMouseFocus().GetAttribute and GetMouseFocus():GetAttribute("unit")) or (UnitExists("mouseover") and "mouseover") or nil
+    local unit = (select(2, self:GetUnit())) or (GetMouseFoci() and GetMouseFoci().GetAttribute and GetMouseFoci():GetAttribute("unit")) or (UnitExists("mouseover") and "mouseover") or nil
 
     if not unit then return end
 
@@ -465,18 +464,18 @@ function module:CreateHealthValue()
     end)
 end
 
-module:RegisterEvent("ADDON_LOADED PLAYER_LOGIN", function(self, event, addon)
-    if IsAddOnLoaded("Aurora") then return end
+module:RegisterEvent("ADDON_LOADED PLAYER_LOGIN PLAYER_ENTERING_WORLD", function(self, event, addon)
+    if C_AddOns.IsAddOnLoaded("Aurora") then return end
 
     if event == "ADDON_LOADED" and self.rTips[addon] then
         self.rTips[addon]()
         self.rTips[addon] = nil
     elseif event == "PLAYER_LOGIN" then
-        for _, tip in ipairs(tooltips) do
+        for _, tip in pairs(defaultTooltips) do
             local tt = type(tip) == "table" and tip or _G[tip]
             if tt then styleTooltip(tt) end
         end
-        for _, tip in ipairs(shoppingtips) do
+        for _, tip in pairs(shoppingtips) do
             local tt = type(tip) == "table" and tip or _G[tip]
             if tt then
                 tt.shopping = true
@@ -522,6 +521,29 @@ module:RegisterEvent("ADDON_LOADED PLAYER_LOGIN", function(self, event, addon)
         end
         
         GameTooltip:HookScript("OnTooltipCleared", OnGameTooltipHide)
+    elseif event == "PLAYER_ENTERING_WORLD" then
+        local menuManagerProxy = Menu.GetManager()
+
+        local function skinMenu(menuFrame)
+            if menuFrame.styled then return end
+
+            menuFrame:DisableDrawLayer("BACKGROUND")
+            menuFrame:StripTextures()
+            menuFrame:CreateBackdrop()
+            menuFrame.backdrop:CreateShadow()
+
+            menuFrame.styled = true
+        end
+    
+        local function setupMenu()
+            local menuFrame = menuManagerProxy:GetOpenMenu()
+            if menuFrame then
+                skinMenu(menuFrame)
+            end
+        end
+
+        hooksecurefunc(menuManagerProxy, "OpenMenu", setupMenu)
+	    hooksecurefunc(menuManagerProxy, "OpenContextMenu", setupMenu)
     end
 end)
 

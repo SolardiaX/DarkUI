@@ -31,9 +31,8 @@ local function updatePetBar()
     for i = 1, num, 1 do
         local buttonName = "PetActionButton"..i
         local petActionButton = _G[buttonName]
-        local petActionIcon = _G[buttonName.."Icon"]
-        local petAutoCastableTexture = _G[buttonName].AutoCastable or _G[buttonName.."AutoCastable"]
-        local petAutoCastShine = _G[buttonName.."Shine"]
+        local petActionIcon = petActionButton.icon
+        local petAutoCastOverlay = petActionButton.AutoCastOverlay
 
         local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID = GetPetActionInfo(i)
 
@@ -48,47 +47,39 @@ local function updatePetBar()
         petActionButton.isToken = isToken
 
         if spellID then
-			local spell = Spell:CreateFromSpellID(spellID)
-			petActionButton.spellDataLoadedCancelFunc = spell:ContinueWithCancelOnSpellLoad(function()
-				petActionButton.tooltipSubtext = spell:GetSpellSubtext()
-			end)
-		end
-		if isActive then
-			if IsPetAttackAction(i) then
-				petActionButton:StartFlash()
-				-- the checked texture looks a little confusing at full alpha (looks like you have an extra ability selected)
-				petActionButton:GetCheckedTexture():SetAlpha(0.5)
-			else
-				petActionButton:StopFlash()
-				petActionButton:GetCheckedTexture():SetAlpha(1.0)
-			end
-			petActionButton:SetChecked(true)
-		else
-			petActionButton:StopFlash()
-			petActionButton:SetChecked(false)
-		end
-		if autoCastAllowed then
-			petAutoCastableTexture:Show()
-		else
-			petAutoCastableTexture:Hide()
-		end
-		if autoCastEnabled then
-			AutoCastShine_AutoCastStart(petAutoCastShine)
-		else
-			AutoCastShine_AutoCastStop(petAutoCastShine)
-		end
-		if texture then
-			if GetPetActionSlotUsable(i) then
-				petActionIcon:SetVertexColor(1, 1, 1)
-			else
-				petActionIcon:SetVertexColor(0.4, 0.4, 0.4)
-			end
-			petActionIcon:Show()
-		else
-			petActionIcon:Hide()
-		end
+            local spell = Spell:CreateFromSpellID(spellID)
+            petActionButton.spellDataLoadedCancelFunc = spell:ContinueWithCancelOnSpellLoad(function()
+                petActionButton.tooltipSubtext = spell:GetSpellSubtext()
+            end)
+        end
+        if isActive then
+            if IsPetAttackAction(i) then
+                petActionButton:StartFlash()
+                -- the checked texture looks a little confusing at full alpha (looks like you have an extra ability selected)
+                petActionButton:GetCheckedTexture():SetAlpha(0.5)
+            else
+                petActionButton:StopFlash()
+                petActionButton:GetCheckedTexture():SetAlpha(1.0)
+            end
+            petActionButton:SetChecked(true)
+        else
+            petActionButton:StopFlash()
+            petActionButton:SetChecked(false)
+        end
+        petAutoCastOverlay:SetShown(autoCastAllowed)
+        petAutoCastOverlay:ShowAutoCastEnabled(autoCastEnabled)
+        if texture then
+            if GetPetActionSlotUsable(i) then
+                petActionIcon:SetVertexColor(1, 1, 1)
+            else
+                petActionIcon:SetVertexColor(0.4, 0.4, 0.4)
+            end
+            petActionIcon:Show()
+        else
+            petActionIcon:Hide()
+        end
 
-		SharedActionButton_RefreshSpellHighlight(petActionButton, PET_ACTION_HIGHLIGHT_MARKS[i])
+        SharedActionButton_RefreshSpellHighlight(petActionButton, PET_ACTION_HIGHLIGHT_MARKS[i])
     end
 end
 

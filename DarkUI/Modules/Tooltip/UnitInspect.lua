@@ -8,7 +8,7 @@ if C.tooltip.enable ~= true or (C.tooltip.talents ~= true and C.tooltip.average_
 
 local LibFroznFunctions = LibStub:GetLibrary("LibFroznFunctions-1.0")
 
-local GetMouseFocus = GetMouseFocus
+local GetMouseFoci = GetMouseFoci
 local UnitGUID = UnitGUID
 local UnitInParty = UnitInParty
 local UnitInRaid = UnitInRaid
@@ -153,7 +153,7 @@ local function GTT_OnTooltipSetUnit(self, ...)
     local _, unitID = LibFroznFunctions:GetUnitFromTooltip(self)
     
     if not unitID then
-        local mouseFocus = GetMouseFocus()
+        local mouseFocus = GetMouseFoci()
         if (mouseFocus) and (mouseFocus.unit) then
             unitID = mouseFocus.unit
         end

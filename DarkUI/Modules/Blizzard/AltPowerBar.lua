@@ -79,21 +79,21 @@ bar:SetScript("OnLeave", GameTooltip_Hide)
 
 -- StatusBar
 local status = CreateFrame("StatusBar", "UIAltPowerBarStatus", bar)
-status:SetFrameLevel(bar:GetFrameLevel() + 1)
+status:SetFrameLevel(bar:GetFrameLevel() - 1)
 status:SetStatusBarTexture(C.media.texture.status)
 status:SetMinMaxValues(0, 100)
-status:SetPoint("TOPLEFT", bar, "TOPLEFT", 2, -2)
-status:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -2, 2)
+status:SetPoint("TOPLEFT", bar, "TOPLEFT", 2, 0)
+status:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", -2, 0)
 
-status.bg = status:CreateTexture(nil, "BACKGROUND")
+status.bg = bar:CreateTexture(nil, "BACKGROUND")
 status.bg:SetAllPoints(status)
 status.bg:SetTexture(C.media.texture.status)
 
-status.border = status:CreateTexture(nil, "BORDER")
+status.border = bar:CreateTexture(nil, "BORDER")
 status.border:SetPoint("CENTER", status, 0, -1)
 status.border:SetTexture(bar_border)
 
-status.text = status:CreateFontString(nil, "OVERLAY")
+status.text = bar:CreateFontString(nil, "OVERLAY")
 status.text:SetFont(unpack(C.media.standard_font))
 status.text:SetPoint("CENTER", bar, "CENTER", 0, 0)
 

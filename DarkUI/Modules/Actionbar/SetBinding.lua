@@ -14,7 +14,7 @@ local GetBindingKey, GetBindingByKey, RunBinding, SetBinding = GetBindingKey, Ge
 local GetCurrentBindingSet = GetCurrentBindingSet
 local SaveBindings, LoadBindings = SaveBindings, LoadBindings
 local IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown = IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown
-local IsAddOnLoaded = IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local hooksecurefunc = hooksecurefunc
 local tonumber = tonumber
 local NUM_ACTIONBAR_BUTTONS = NUM_ACTIONBAR_BUTTONS
@@ -332,7 +332,7 @@ SlashCmdList.MOUSEOVERBIND = function()
             MacroFrameTab2:HookScript("OnMouseUp", function() localmacros = 1 end)
         end
 
-        if not IsAddOnLoaded("Blizzard_MacroUI") then
+        if not C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") then
             hooksecurefunc("LoadAddOn", function(addon)
                 if addon=="Blizzard_MacroUI" then
                     registermacro()

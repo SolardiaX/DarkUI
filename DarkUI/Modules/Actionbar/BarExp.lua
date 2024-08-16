@@ -8,20 +8,20 @@ if not C.actionbar.bars.enable or not C.actionbar.bars.exp.enable then return en
 local module = E:Module("Actionbar"):Sub("ExpRep")
 
 local _G = _G
-local CollapseFactionHeader = CollapseFactionHeader
 local CreateFrame = CreateFrame
-local ExpandFactionHeader = ExpandFactionHeader
+local CollapseFactionHeader = C_Reputation.CollapseFactionHeader
+local ExpandFactionHeader = C_Reputation.ExpandFactionHeader
 local GetCurrentCombatTextEventInfo = GetCurrentCombatTextEventInfo
-local GetNumFactions = GetNumFactions
-local GetFactionInfo = GetFactionInfo
-local GetFactionInfoByID = GetFactionInfoByID
+local GetNumFactions = C_Reputation.GetNumFactions
+local GetFactionInfo = C_Reputation.GetFactionDataByIndex
+local GetFactionInfoByID = C_Reputation.GetFactionDataByID
 local C_GossipInfo_GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation
 local C_GossipInfo_GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks
 local GetGuildInfo = GetGuildInfo
-local GetWatchedFactionInfo = GetWatchedFactionInfo
-local IsFactionInactive = IsFactionInactive
-local IsAddOnLoaded, LoadAddOn = IsAddOnLoaded, LoadAddOn
-local SetWatchedFactionIndex = SetWatchedFactionIndex
+local C_Reputation_GetWatchedFactionData = C_Reputation.GetWatchedFactionData
+local IsFactionActive = C_Reputation.IsFactionActive
+local IsAddOnLoaded, LoadAddOn = C_AddOns.IsAddOnLoaded, C_AddOns.LoadAddOn
+local SetWatchedFactionIndex = C_Reputation.SetWatchedFactionByIndex
 local UnitXP, UnitXPMax, GetXPExhaustion = UnitXP, UnitXPMax, GetXPExhaustion
 local IsXPUserDisabled, IsWatchingHonorAsXP = IsXPUserDisabled, IsWatchingHonorAsXP
 local GetText, CanPrestige, GetPrestigeInfo = GetText, CanPrestige, GetPrestigeInfo
@@ -40,7 +40,7 @@ local FACTION_STANDING_DECREASED_GENERIC = FACTION_STANDING_DECREASED_GENERIC
 local FACTION_STANDING_INCREASED_ACH_BONUS = FACTION_STANDING_INCREASED_ACH_BONUS
 local FACTION_STANDING_INCREASED_BONUS = FACTION_STANDING_INCREASED_BONUS
 local FACTION_STANDING_INCREASED_DOUBLE_BONUS = FACTION_STANDING_INCREASED_DOUBLE_BONUS
-local MAX_PLAYER_LEVEL = MAX_PLAYER_LEVEL
+local MAX_PLAYER_LEVEL = GetMaxPlayerLevel()
 local MAX_REPUTATION_REACTION = MAX_REPUTATION_REACTION
 local FACTION_BAR_COLORS = FACTION_BAR_COLORS
 local COMBAT_XP_GAIN = COMBAT_XP_GAIN
@@ -57,7 +57,6 @@ local cfg = C.actionbar.bars.exp
 ------------------------------------------------------
 -- / Auto Rep Switch FUNCs / --
 ------------------------------------------------------
-local collapsed_factions = {}
 
 local faction_standing_msg = {
     gsub(FACTION_STANDING_INCREASED, "%%s", "(.+)"),
@@ -69,70 +68,20 @@ local faction_standing_msg = {
     gsub(FACTION_STANDING_INCREASED_DOUBLE_BONUS, "%%s", "(.+)")
 }
 
-local function switcher_ExpandAndRemember()
-    local i = 1
-
-    while i < GetNumFactions() do
-        local faction_name, _, _, _, _, _, _, _, _, is_collapsed = GetFactionInfo(i)
-        if is_collapsed then
-            collapsed_factions[faction_name] = true
-            ExpandFactionHeader(i)
-        end
-        i = i + 1
-    end
-end
-
-local function switcher_CollapseAndForget()
-    local i = 1
-
-    while i < GetNumFactions() do
-        local faction_name = GetFactionInfo(i)
-        if collapsed_factions[faction_name] then
-            CollapseFactionHeader(i)
-        end
-        i = i + 1
-    end
-    collapsed_factions = {}
-end
-
-local function switcher_SetFactionIndexByID(rep_id)
-    local faction_name, _, _ = GetFactionInfoByID(rep_id)
-
-    switcher_ExpandAndRemember()
-
-    local current_name
-    for i = 1, GetNumFactions() do
-        current_name = GetFactionInfo(i)
-        if faction_name == current_name then
-            if not IsFactionInactive(i) then
-                SetWatchedFactionIndex(i)
-            end
-            break
-        end
-    end
-
-    switcher_CollapseAndForget()
-    return
-end
 
 local function switcher_SetFactionIndexByName(faction_name)
     if faction_name == "Guild" then
         faction_name = GetGuildInfo("player")
     end
 
-    switcher_ExpandAndRemember()
-
     for i = 1, GetNumFactions() do
-        local current_name, _, _, _, _, _, _, _, _, _, _, _, _, rep_id = GetFactionInfo(i)
-        if faction_name == current_name then
-            switcher_CollapseAndForget()
-            switcher_SetFactionIndexByID(rep_id)
-            return
+        local factionInfo = GetFactionInfo(i)
+        if factionInfo.name == faction_name then
+            if IsFactionActive(i) then
+                SetWatchedFactionIndex(i)
+            end
         end
     end
-
-    switcher_CollapseAndForget()
-    return
 end
 
 local function switcher_OnEvent(_, event, ...)
@@ -172,7 +121,17 @@ local function updateBar(statusbar, isrep)
         statusbar.rest:SetMinMaxValues(0, max)
         statusbar.rest:SetValue(math_min(min + exhaustion, max))
     else
-        local _, standing, min, max, value, factionID = GetWatchedFactionInfo()
+        local factionData = C_Reputation_GetWatchedFactionData()
+        if not factionData then
+            statusbar:Hide()
+            return
+        end
+
+        local standing = factionData.reaction
+        local min = factionData.currentReactionThreshold
+        local max = factionData.nextReactionThreshold
+        local value = factionData.currentStanding
+        local factionID = factionData.factionID
 
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
@@ -209,15 +168,17 @@ local function updateBar(statusbar, isrep)
 end
 
 local function bar_showXP(statusbar)
+    statusbar:Show()
     statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.85)
     statusbar.background:SetVertexColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.3)
 
     statusbar.rest:Show()
-
+    
     updateBar(statusbar)
 end
 
 local function bar_showRep(statusbar)
+    statusbar:Show()
     statusbar.rest:Hide()
 
     updateBar(statusbar, true)
@@ -225,7 +186,7 @@ end
 
 local function bar_OnEvent(self, event, arg1, arg2, ...)
     if event == "PLAYER_ENTERING_WORLD" then
-        if E.myLevel == MAX_PLAYER_LEVEL then
+        if IsPlayerAtEffectiveMaxLevel() then
             bar_showRep(self)
         else
             bar_showXP(self)
@@ -233,7 +194,7 @@ local function bar_OnEvent(self, event, arg1, arg2, ...)
     elseif event == "PLAYER_XP_UPDATE" and arg1 == "player" then
         updateBar(self)
     elseif event == "PLAYER_LEVEL_UP" then
-        if E.myLevel == MAX_PLAYER_LEVEL then
+        if IsPlayerAtEffectiveMaxLevel() then
             bar_showRep(self)
         else
             bar_showXP(self)
@@ -242,12 +203,12 @@ local function bar_OnEvent(self, event, arg1, arg2, ...)
         if arg1 == "LCTRL" or arg1 == "RCTRL" then
             if arg2 == 1 then
                 bar_showRep(self)
-            elseif arg2 == 0 and E.myLevel ~= MAX_PLAYER_LEVEL then
+            elseif arg2 == 0 and not IsPlayerAtEffectiveMaxLevel() then
                 bar_showXP(self)
             end
         end
     elseif event == "UPDATE_FACTION" then
-        if E.myLevel == MAX_PLAYER_LEVEL then
+        if IsPlayerAtEffectiveMaxLevel() then
             bar_showRep(self)
         end
     end
@@ -257,7 +218,7 @@ local function bar_OnEnter()
     local mxp = UnitXPMax("player")
     local xp = UnitXP("player")
     local rxp = GetXPExhaustion()
-    local name, standing, barMin, barMax, value, factionID = GetWatchedFactionInfo()
+    local factionData = C_Reputation_GetWatchedFactionData()
 
     local withXp = false
 
@@ -266,7 +227,7 @@ local function bar_OnEnter()
     GameTooltip:AddLine(L.ACTIONBAR_EXP_REP)
     GameTooltip:AddLine(" ")
 
-    if E.myLevel ~= MAX_PLAYER_LEVEL then
+    if not IsPlayerAtEffectiveMaxLevel() then
         GameTooltip:AddLine(L.ACTIONBAR_EXP)
         GameTooltip:AddLine(" ")
         
@@ -291,7 +252,13 @@ local function bar_OnEnter()
         withXp = true
     end
 
-    if name then
+    if factionData then
+        local standing = factionData.reaction
+        local min = factionData.currentReactionThreshold
+        local max = factionData.nextReactionThreshold
+        local value = factionData.currentStanding
+        local factionID = factionData.factionID
+
         local standingtext
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
@@ -304,6 +271,7 @@ local function bar_OnEnter()
             local friendID, friendRep, friendThreshold, nextFriendThreshold, friendTextLevel = repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.text
             local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
             local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
+            local name = repInfo.name
             if friendID and friendID ~= 0 then
                 if maxRank > 0 then
                     name = name.." ("..currentRank.." / "..maxRank..")"
@@ -395,9 +363,9 @@ local function bar_OnLeave()
 end
 
 function module:OnInit()
-    if not IsAddOnLoaded("Blizzard_GuildUI") then LoadAddOn("Blizzard_GuildUI") end
+    if not C_AddOns.IsAddOnLoaded("Blizzard_GuildUI") then C_AddOns.LoadAddOn("Blizzard_GuildUI") end
 
-    if cfg.disable_at_max_lvl and E.myLevel == MAX_PLAYER_LEVEL then
+    if cfg.disable_at_max_lvl and not IsPlayerAtEffectiveMaxLevel() then
         local holder = CreateFrame("Frame", nil, UIParent)
         holder:SetFrameStrata(cfg.bfstrata)
         holder:SetFrameLevel(cfg.bflevel)

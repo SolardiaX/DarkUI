@@ -331,10 +331,8 @@ end
 
 local UpdateWindow = function()
     MainFrame:SetSize(cfg.width, cfg.maxbars * (cfg.barheight + cfg.spacing) - cfg.spacing)
-    if not IsAddOnLoaded("alInterface") then
-        MainFrame.bg:SetBackdropColor(unpack(cfg.backdrop_color))
-        MainFrame.bg:SetBackdropBorderColor(unpack(cfg.border_color))
-    end
+    MainFrame.bg:SetBackdropColor(unpack(cfg.backdrop_color))
+    MainFrame.bg:SetBackdropBorderColor(unpack(cfg.border_color))
     if cfg.hidetitle then
         MainFrame.title:Hide()
     else
@@ -344,10 +342,8 @@ local UpdateWindow = function()
         v:SetWidth(MainFrame:GetWidth())
         v:SetHeight(cfg.barheight)
         v:SetPoint("TOP", 0, -(cfg.barheight + cfg.spacing) * (i - 1))
-        if not IsAddOnLoaded("alInterface") then
-            v.left:SetFont(font, cfg.font_size, cfg.font_style)
-            v.right:SetFont(font, cfg.font_size, cfg.font_style)
-        end
+        v.left:SetFont(font, cfg.font_size, cfg.font_style)
+        v.right:SetFont(font, cfg.font_size, cfg.font_style)
     end
     UpdateBars()
 end

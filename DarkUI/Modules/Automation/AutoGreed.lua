@@ -1,6 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.automation.auto_greed or E.myLevel ~= MAX_PLAYER_LEVEL then return end
+if not C.automation.auto_greed or IsPlayerAtEffectiveMaxLevel() then return end
 
 ----------------------------------------------------------------------------------------
 --	Auto greed/disenchant on green items(by Tekkub)
