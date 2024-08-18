@@ -4,7 +4,7 @@ local E, C, L = ns:unpack()
 if not C.nameplate.enable then return end
 
 ----------------------------------------------------------------------------------------
---	oUF nameplates
+--    oUF nameplates
 ----------------------------------------------------------------------------------------
 local module = E:Module("Nameplate")
 local core = E:Module("UFCore")
@@ -44,21 +44,21 @@ local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
 local arrow = C.media.path .. "uf_nameplate_arrow"
 
 local totemData = {
-    [GetSpellInfo(192058)] = 136013,	-- Capacitor Totem
-    [GetSpellInfo(98008)]  = 237586,	-- Spirit Link Totem
-    [GetSpellInfo(192077)] = 538576,	-- Wind Rush Totem
-    [GetSpellInfo(204331)] = 511726,	-- Counterstrike Totem
-    [GetSpellInfo(204332)] = 136114,	-- Windfury Totem
-    [GetSpellInfo(204336)] = 136039,	-- Grounding Totem
-    [GetSpellInfo(157153)] = 971076,	-- Cloudburst Totem
-    [GetSpellInfo(5394)]   = 135127,	-- Healing Stream Totem
-    [GetSpellInfo(108280)] = 538569,	-- Healing Tide Totem
-    [GetSpellInfo(207399)] = 136080,	-- Ancestral Protection Totem
-    [GetSpellInfo(198838)] = 136098,	-- Earthen Wall Totem
-    [GetSpellInfo(51485)]  = 136100,	-- Earthgrab Totem
-    [GetSpellInfo(196932)] = 136232,	-- Voodoo Totem
-    [GetSpellInfo(192222)] = 971079,	-- Liquid Magma Totem
-    [GetSpellInfo(204330)] = 135829,	-- Skyfury Totem
+    [GetSpellInfo(192058)] = 136013,    -- Capacitor Totem
+    [GetSpellInfo(98008)]  = 237586,    -- Spirit Link Totem
+    [GetSpellInfo(192077)] = 538576,    -- Wind Rush Totem
+    [GetSpellInfo(204331)] = 511726,    -- Counterstrike Totem
+    [GetSpellInfo(204332)] = 136114,    -- Windfury Totem
+    [GetSpellInfo(204336)] = 136039,    -- Grounding Totem
+    [GetSpellInfo(157153)] = 971076,    -- Cloudburst Totem
+    [GetSpellInfo(5394)]   = 135127,    -- Healing Stream Totem
+    [GetSpellInfo(108280)] = 538569,    -- Healing Tide Totem
+    [GetSpellInfo(207399)] = 136080,    -- Ancestral Protection Totem
+    [GetSpellInfo(198838)] = 136098,    -- Earthen Wall Totem
+    [GetSpellInfo(51485)]  = 136100,    -- Earthgrab Totem
+    [GetSpellInfo(196932)] = 136232,    -- Voodoo Totem
+    [GetSpellInfo(192222)] = 971079,    -- Liquid Magma Totem
+    [GetSpellInfo(204330)] = 135829,    -- Skyfury Totem
 }
 
 local kickID = 0
@@ -80,13 +80,13 @@ local healerFactions = {
 }
 
 local healerSpecIDs = {
-    105,	-- Druid Restoration
+    105,    -- Druid Restoration
     1468,   -- Evoker Preservation
-    270,	-- Monk Mistweaver
-    65,		-- Paladin Holy
-    256,	-- Priest Discipline
-    257,	-- Priest Holy
-    264,	-- Shaman Restoration
+    270,    -- Monk Mistweaver
+    65,        -- Paladin Holy
+    256,    -- Priest Discipline
+    257,    -- Priest Holy
+    264,    -- Shaman Restoration
 }
 
 local lastCheck = 20

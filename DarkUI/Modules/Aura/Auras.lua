@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.aura.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Aura styles (modified from NDui)
+--    Aura styles (modified from NDui)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Aura"):Sub("Auras")
 
@@ -34,21 +34,21 @@ end
 
 local day, hour, minute = 86400, 3600, 60
 local function formatAuraTime(s)
-	if s >= day then
-		return E:FormatTime(s, true), s%day
-	elseif s >= 2*hour then
-		return E:FormatTime(s, true), s%hour
-	elseif s >= 10*minute then
-		return E:FormatTime(s, true), s%minute
-	elseif s >= minute then
-		return E:FormatTime(s, true), s - floor(s)
-	elseif s > 10 then
-		return E:FormatTime(s, true), s - floor(s)
-	elseif s > 5 then
-		return E:FormatTime(s, true), s - format("%.1f", s)
-	else
-		return E:FormatTime(s, true), s - format("%.1f", s)
-	end
+    if s >= day then
+        return E:FormatTime(s, true), s%day
+    elseif s >= 2*hour then
+        return E:FormatTime(s, true), s%hour
+    elseif s >= 10*minute then
+        return E:FormatTime(s, true), s%minute
+    elseif s >= minute then
+        return E:FormatTime(s, true), s - floor(s)
+    elseif s > 10 then
+        return E:FormatTime(s, true), s - floor(s)
+    elseif s > 5 then
+        return E:FormatTime(s, true), s - format("%.1f", s)
+    else
+        return E:FormatTime(s, true), s - format("%.1f", s)
+    end
 end
 
 local function getSpellStat(arg16, arg17, arg18)

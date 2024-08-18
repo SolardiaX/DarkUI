@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Button for Leave Vehicle (modified from ShestakUI)
+--    Button for Leave Vehicle (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("LeaveVehicle")
 

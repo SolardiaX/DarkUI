@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.combat.damagemeter.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	DamageMeter (modified from alDamageMeter)
+--    DamageMeter (modified from alDamageMeter)
 ----------------------------------------------------------------------------------------
 
 local cfg = C.combat.damagemeter

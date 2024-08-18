@@ -4,7 +4,7 @@ local E, C, L = ns:unpack()
 if not C.stats.enable or not C.stats.config.Bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Bags of DataText (modified from ShestakUI)
+--    Bags of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

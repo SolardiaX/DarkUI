@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.blizzard.shift_mark then return end
 
 ----------------------------------------------------------------------------------------
---	Mob marking(by ALZA)
+--    Mob marking(by ALZA)
 ----------------------------------------------------------------------------------------
 
 local menuFrame = CreateFrame("Frame", "MarkingFrame", UIParent, "UIDropDownMenuTemplate")

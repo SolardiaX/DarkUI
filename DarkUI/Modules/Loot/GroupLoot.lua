@@ -3,7 +3,7 @@
 if not C.loot.enable then return end
 
 ----------------------------------------------------------------------------------------
---	GroupLoot based on teksLoot(by Tekkub)
+--    GroupLoot based on teksLoot(by Tekkub)
 ----------------------------------------------------------------------------------------
 
 local _G = _G

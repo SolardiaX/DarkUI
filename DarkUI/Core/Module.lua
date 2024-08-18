@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Core Module Methods
+--    Core Module Methods
 ----------------------------------------------------------------------------------------
 local CreateFrame = CreateFrame
 local tinsert, pairs, gmatch = tinsert, pairs, string.gmatch
@@ -160,7 +160,7 @@ function E:Module(name)
 end
 
 ----------------------------------------------------------------------------------------
---	Collect garbage
+--    Collect garbage
 ----------------------------------------------------------------------------------------
 local eventcount = 0
 local InCombatLockdown = InCombatLockdown
@@ -180,7 +180,7 @@ Garbage:RegisterAllEvents(function(_, event)
 end)
 
 ----------------------------------------------------------------------------------------
---	Load all Modules
+--    Load all Modules
 ----------------------------------------------------------------------------------------
 local ipairs = ipairs
 

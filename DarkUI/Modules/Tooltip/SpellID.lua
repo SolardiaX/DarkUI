@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.tooltip.enable ~= true or C.tooltip.spell_id ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Spell/Item IDs(idTip by Silverwind)
+--    Spell/Item IDs(idTip by Silverwind)
 ----------------------------------------------------------------------------------------
 
 local function addLine(self, id, isItem)
@@ -32,9 +32,10 @@ end
 -- Spells
 hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
     local unit, slot = ...
-	local aura = C_UnitAuras.GetAuraDataBySlot(unit, slot)
+    if not unit and not slot then return end
+    local aura = C_UnitAuras.GetAuraDataBySlot(unit, slot)
     local id = aura and aura.spellId
-	if id then addLine(self, id) end
+    if id then addLine(self, id) end
 end)
 
 hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", attachByAuraInstanceID)

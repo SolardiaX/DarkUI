@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	ActionBars (modified from NDui)
+--    ActionBars (modified from NDui)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("Bars")
 local actionButton = LibStub("DarkUI-ActionButton")

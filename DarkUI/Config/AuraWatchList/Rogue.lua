@@ -7,7 +7,7 @@ if E.myClass ~= "ROGUE" then return end
 local list = {
     ["Player Aura"]    = {        -- 玩家光环组
         { AuraID = 1784, UnitID = "player" }, -- 潜行
-        {AuraID = 115191, UnitID = "player"},	-- 潜行
+        {AuraID = 115191, UnitID = "player"},    -- 潜行
         { AuraID = 2983, UnitID = "player" }, -- 疾跑
         { AuraID = 36554, UnitID = "player" }, -- 暗影步
         { AuraID = 197603, UnitID = "player" }, -- 黑暗之拥
@@ -36,11 +36,11 @@ local list = {
         { AuraID = 245389, UnitID = "target", Caster = "player" }, -- 淬毒之刃
         { AuraID = 121411, UnitID = "target", Caster = "player" }, -- 猩红风暴
         { AuraID = 255909, UnitID = "target", Caster = "player" }, -- 欺凌
-        {AuraID = 316220, UnitID = "target", Caster = "player"},	-- 洞悉弱点
-        {AuraID = 315341, UnitID = "target", Caster = "player"},	-- 正中眉心
-        {AuraID = 328305, UnitID = "target", Caster = "player"},	-- 败血刃伤
-        {AuraID = 323654, UnitID = "target", Caster = "player"},	-- Flagellation
-        {AuraID = 324073, UnitID = "target", Caster = "player"},	-- 锯齿骨刺
+        {AuraID = 316220, UnitID = "target", Caster = "player"},    -- 洞悉弱点
+        {AuraID = 315341, UnitID = "target", Caster = "player"},    -- 正中眉心
+        {AuraID = 328305, UnitID = "target", Caster = "player"},    -- 败血刃伤
+        {AuraID = 323654, UnitID = "target", Caster = "player"},    -- Flagellation
+        {AuraID = 324073, UnitID = "target", Caster = "player"},    -- 锯齿骨刺
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 1966, UnitID = "player" }, -- 佯攻
@@ -61,12 +61,12 @@ local list = {
         { AuraID = 185422, UnitID = "player" }, -- 影舞
         { AuraID = 212283, UnitID = "player" }, -- 死亡标记
         { AuraID = 202754, UnitID = "player" }, -- 隐秘刀刃
-        {AuraID = 193356, UnitID = "player", Text = L["Combo"]},	-- 强势连击，骰子
-        {AuraID = 193357, UnitID = "player", Text = L["Crit"]},	-- 暗鲨涌动，骰子
-        {AuraID = 193358, UnitID = "player", Text = L["AttackSpeed"]},	-- 大乱斗，骰子
-        {AuraID = 193359, UnitID = "player", Text = L["CD"]},	-- 双巧手，骰子
-        {AuraID = 199603, UnitID = "player", Text = L["Strike"]},	-- 骷髅黑帆，骰子
-        {AuraID = 199600, UnitID = "player", Text = L["Power"]},	-- 埋藏的宝藏，骰子
+        {AuraID = 193356, UnitID = "player", Text = L["Combo"]},    -- 强势连击，骰子
+        {AuraID = 193357, UnitID = "player", Text = L["Crit"]},    -- 暗鲨涌动，骰子
+        {AuraID = 193358, UnitID = "player", Text = L["AttackSpeed"]},    -- 大乱斗，骰子
+        {AuraID = 193359, UnitID = "player", Text = L["CD"]},    -- 双巧手，骰子
+        {AuraID = 199603, UnitID = "player", Text = L["Strike"]},    -- 骷髅黑帆，骰子
+        {AuraID = 199600, UnitID = "player", Text = L["Power"]},    -- 埋藏的宝藏，骰子
         { AuraID = 202665, UnitID = "player" }, -- 恐惧之刃诅咒
         { AuraID = 199754, UnitID = "player" }, -- 还击
         { AuraID = 195627, UnitID = "player" }, -- 可乘之机
@@ -76,8 +76,8 @@ local list = {
         { AuraID = 51690, UnitID = "player" }, -- 影舞步
         { AuraID = 277925, UnitID = "player" }, -- 袖剑旋风
         { AuraID = 196980, UnitID = "player" }, -- 暗影大师
-        {AuraID = 315496, UnitID = "player"},	-- 切割
-        {AuraID = 343142, UnitID = "player"},	-- 恐惧之刃
+        {AuraID = 315496, UnitID = "player"},    -- 切割
+        {AuraID = 343142, UnitID = "player"},    -- 恐惧之刃
     },
     ["Focus Aura"]     = {        -- 焦点光环组
         { AuraID = 6770, UnitID = "focus", Caster = "player" }, -- 闷棍

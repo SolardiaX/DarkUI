@@ -200,7 +200,7 @@ local function tooltipOnEnter(self)
     elseif self.type == 3 then
         GameTooltip:SetInventoryItem("player", self.spellID)
     elseif self.type == 4 then
-        GameTooltip:SetUnitAura(self.unitID, self.id, self.filter)
+        GameTooltip:SetUnitAura(self.unitID, self.spellID, self.filter)
     elseif self.type == 5 then
         GameTooltip:SetTotem(self.spellID)
     end
@@ -316,14 +316,14 @@ local function SetupAnchor()
     for key, VALUE in pairs(FrameList) do
         local value = AuraList[key]
         if not value then return end
-		local direction, interval = value.Direction, value.Interval
-		-- check whether using CENTER direction
-		if value.Mode == "BAR" and direction == "CENTER" then
-			direction = "UP" -- sorry, no "CENTER" for bars mode
-		end
-		if not hasCentralize then
-			hasCentralize = direction == "CENTER"
-		end
+        local direction, interval = value.Direction, value.Interval
+        -- check whether using CENTER direction
+        if value.Mode == "BAR" and direction == "CENTER" then
+            direction = "UP" -- sorry, no "CENTER" for bars mode
+        end
+        if not hasCentralize then
+            hasCentralize = direction == "CENTER"
+        end
 
         if value then
             local previous
@@ -332,7 +332,7 @@ local function SetupAnchor()
                 if i == 1 then
                     frame:SetPoint("CENTER", frame.MoveHandle)
                     frame.__direction = direction
-				    frame.__interval = interval
+                    frame.__interval = interval
                 elseif (value.Name == "Target Aura" or value.Name == "Enchant Aura") and i == 7 and direction ~= "CENTER" then
                     frame:SetPoint("BOTTOM", VALUE[1], "TOP", 0, value.Interval)
                 else
@@ -496,7 +496,7 @@ function module:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count,
         end
     end
     frame.type = 4
-    frame.unitID = UnitID
+    frame.unitID = unit
     frame.id = id
     frame.filter = filter
     frame.spellID = spellID

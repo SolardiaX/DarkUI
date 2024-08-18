@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable or not C.actionbar.bars.micromenu then return end
 
 ----------------------------------------------------------------------------------------
---	MicroMenu Bars (modified from ShestakUI)
+--    MicroMenu Bars (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("MicroMenu")
 
@@ -17,17 +17,17 @@ local cfg = C.actionbar.bars.micromenu
 
 local buttonList = { 
     "CharacterMicroButton",
-	"ProfessionMicroButton",
-	"PlayerSpellsMicroButton",
-	"AchievementMicroButton",
-	"QuestLogMicroButton",
-	"GuildMicroButton",
-	"LFDMicroButton",
-	"EJMicroButton",
-	"CollectionsMicroButton",
-	"StoreMicroButton",
-	"MainMenuMicroButton",
-	"HelpMicroButton",
+    "ProfessionMicroButton",
+    "PlayerSpellsMicroButton",
+    "AchievementMicroButton",
+    "QuestLogMicroButton",
+    "GuildMicroButton",
+    "LFDMicroButton",
+    "EJMicroButton",
+    "CollectionsMicroButton",
+    "StoreMicroButton",
+    "MainMenuMicroButton",
+    "HelpMicroButton",
 }
 
 local num = #buttonList

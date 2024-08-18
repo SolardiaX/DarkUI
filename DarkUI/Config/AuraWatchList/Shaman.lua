@@ -27,7 +27,7 @@ local list = {
         { AuraID = 207778, UnitID = "target", Caster = "player" }, -- 蒺藜
         { AuraID = 207400, UnitID = "target", Caster = "player" }, -- 先祖活力
         { AuraID = 269808, UnitID = "target", Caster = "player" }, -- 元素外露
-        {AuraID = 334168, UnitID = "target", Caster = "player"},	-- 鞭笞烈焰
+        {AuraID = 334168, UnitID = "target", Caster = "player"},    -- 鞭笞烈焰
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 73920, UnitID = "player" }, -- 治疗之雨
@@ -68,9 +68,9 @@ local list = {
         { AuraID = 224126, UnitID = "player" }, -- 冰
         { AuraID = 224127, UnitID = "player" }, -- 电
         { AuraID = 187878, UnitID = "player" }, -- 毁灭闪电
-        {AuraID = 288675, UnitID = "player"},	-- 浪潮汹涌
-        {AuraID = 320125, UnitID = "player"},	-- 回响震击
-        {AuraID = 344179, UnitID = "player", Combat = true},	-- 漩涡武器
+        {AuraID = 288675, UnitID = "player"},    -- 浪潮汹涌
+        {AuraID = 320125, UnitID = "player"},    -- 回响震击
+        {AuraID = 344179, UnitID = "player", Combat = true},    -- 漩涡武器
     },
     ["Focus Aura"]     = {        -- 焦点光环组
         { AuraID = 51514, UnitID = "focus", Caster = "player" }, -- 妖术

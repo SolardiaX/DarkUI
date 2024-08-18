@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.tooltip.enable ~= true or C.tooltip.unit_role ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Displays a players LFD/LFR role(gTooltipRoles by g0st)
+--    Displays a players LFD/LFR role(gTooltipRoles by g0st)
 ----------------------------------------------------------------------------------------
 
 local UnitGroupRolesAssigned = UnitGroupRolesAssigned

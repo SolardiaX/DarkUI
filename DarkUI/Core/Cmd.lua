@@ -11,7 +11,7 @@ local E, C, L = select(2, ...):unpack()
 ]]
 
 ----------------------------------------------------------------------------------------
---	Core SlashCMD Methods
+--    Core SlashCMD Methods
 ----------------------------------------------------------------------------------------
 SlashCmdList["RELOADUI"] = function() ReloadUI() end
 SLASH_RELOADUI1 = "/rl"
@@ -74,8 +74,8 @@ local function createGrid()
         tx:SetColorTexture(0, 0, 0, .5)
         
         tx:SetPoint("TOPLEFT", grid, "TOPLEFT", 0, -(height/2-i*hStep) + (size/2))
-        tx:SetPoint('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2-i*hStep + size/2))		
-    end	
+        tx:SetPoint('BOTTOMRIGHT', grid, 'TOPRIGHT', 0, -(height/2-i*hStep + size/2))        
+    end    
 end
 
 function showGrid()

@@ -27,9 +27,9 @@ local list = {
         { AuraID = 211881, UnitID = "target", Caster = "player" }, -- 邪能爆发
         { AuraID = 247456, UnitID = "target", Caster = "player" }, -- 脆弱
         { AuraID = 258860, UnitID = "target", Caster = "player" }, -- 黑暗鞭笞
-        {AuraID = 268178, UnitID = "target", Caster = "player"},	-- 虚空掠夺者
-        {AuraID = 323802, UnitID = "target", Caster = "player"},	-- 恶魔追击
-        {AuraID = 317009, UnitID = "target", Caster = "player"},	-- 罪孽烙印
+        {AuraID = 268178, UnitID = "target", Caster = "player"},    -- 虚空掠夺者
+        {AuraID = 323802, UnitID = "target", Caster = "player"},    -- 恶魔追击
+        {AuraID = 317009, UnitID = "target", Caster = "player"},    -- 罪孽烙印
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 162264, UnitID = "player" }, -- 恶魔变形
@@ -61,8 +61,8 @@ local list = {
         { AuraID = 263648, UnitID = "player", Value = true }, -- 灵魂壁障
         { AuraID = 218561, UnitID = "player", Value = true }, -- 虹吸能量
         { AuraID = 258920, UnitID = "player" }, -- 献祭光环
-        {AuraID = 343312, UnitID = "player"},	-- 狂怒凝视
-        {AuraID = 203981, UnitID = "player", Combat = true},	-- 灵魂残片
+        {AuraID = 343312, UnitID = "player"},    -- 狂怒凝视
+        {AuraID = 203981, UnitID = "player", Combat = true},    -- 灵魂残片
     },
     ["Focus Aura"]     = {        -- 焦点光环组
     },

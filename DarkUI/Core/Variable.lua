@@ -55,12 +55,12 @@ local function applyCVar()
     end
 
     if C.combat.combattext.enable then
-		if C.combat.combattext.incoming then
-			SetCVar("enableFloatingCombatText", 1)
-		else
-			SetCVar("enableFloatingCombatText", 0)
-		end
-	end
+        if C.combat.combattext.incoming then
+            SetCVar("enableFloatingCombatText", 1)
+        else
+            SetCVar("enableFloatingCombatText", 0)
+        end
+    end
 end
 
 module:RegisterEvent("ADDON_LOADED", function(self, event, name)

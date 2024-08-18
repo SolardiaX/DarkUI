@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable and not C.actionbar.bars.bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Bags (modified from ShestakUI & ElvUI)
+--    Bags (modified from ShestakUI & ElvUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("Bags")
 

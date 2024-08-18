@@ -3,7 +3,7 @@ local E, C, L, M = unpack(select(2, ...))
 if not C.blizzard.custom_position then return end
 
 ----------------------------------------------------------------------------------------
---	UIWidget position
+--    UIWidget position
 ----------------------------------------------------------------------------------------
 
 local top, below, power = _G["UIWidgetTopCenterContainerFrame"], _G["UIWidgetBelowMinimapContainerFrame"], _G["UIWidgetPowerBarContainerFrame"]
@@ -79,7 +79,7 @@ for _, frame in pairs({top, below, maw}) do
 end
 
 ----------------------------------------------------------------------------------------
---	UIWidget skin
+--    UIWidget skin
 ----------------------------------------------------------------------------------------
 local atlasColors = {
     ["UI-Frame-Bar-Fill-Blue"] = {0.2, 0.6, 1},
@@ -128,8 +128,12 @@ local function SkinStatusBar(widget)
                 insets = {left = 0, right = 0, top = 0, bottom = 0}
             })
             bar:SetBackdropColor(0.1, 0.1, 0.1, 1)
+            bar:SetStatusBarTexture(C.media.texture.status_f)
         else
-            bar:CreateBackdrop("Overlay")
+            -- bar:CreateBackdrop("Overlay")
+            bar:SetStatusBarTexture(C.media.texture.status_f)
+            bar:CreateBackdrop("Transparent")
+            bar:CreateBorder()
         end
         bar.styled = true
     end
@@ -139,7 +143,7 @@ local function SkinDoubleStatusBar(widget)
     for _, bar in pairs({widget.LeftBar, widget.RightBar}) do
         local atlas = bar:GetStatusBarTexture()
         if atlasColors[atlas] then
-            bar:SetStatusBarTexture(C.media.texture.status)
+            bar:SetStatusBarTexture(C.media.texture.status_f)
             bar:SetStatusBarColor(unpack(atlasColors[atlas]))
         end
         if not bar.styled then
@@ -149,7 +153,10 @@ local function SkinDoubleStatusBar(widget)
             bar.BorderCenter:SetAlpha(0)
             bar.Spark:SetAlpha(0)
             bar.SparkGlow:SetAlpha(0)
-            bar:CreateBackdrop("Overlay")
+            -- bar:CreateBackdrop("Overlay")
+            bar:SetStatusBarTexture(C.media.texture.status_f)
+            bar:CreateBackdrop("Transparent")
+            bar:CreateBorder()
             bar.styled = true
         end
     end
@@ -209,9 +216,9 @@ frame:SetScript("OnEvent", function()
 
     for _, widget in pairs(UIWidgetBelowMinimapContainerFrame.widgetFrames) do
         if widget.widgetType == Enum.UIWidgetVisualizationType.CaptureBar then
-			SkinCaptureBar(widget)
-		end
-	end
+            SkinCaptureBar(widget)
+        end
+    end
 end)
 
 hooksecurefunc(UIWidgetTemplateScenarioHeaderCurrenciesAndBackgroundMixin, "Setup", function(widgetInfo)

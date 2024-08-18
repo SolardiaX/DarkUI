@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Coords.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Coords of DataText (modified from ShestakUI)
+--    Coords of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

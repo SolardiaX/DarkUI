@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.tooltip.enable ~= true or C.tooltip.average_lvl ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Equipped average item level(AverageItemLevel by Semlar)
+--    Equipped average item level(AverageItemLevel by Semlar)
 ----------------------------------------------------------------------------------------
 
 local CreateFrame = CreateFrame
@@ -213,14 +213,14 @@ end
 
 local function OnTooltipSetItem(self)
         local slot = self.slot
-	if(not slot) then
-		return
-	end
-	local _, itemLink = self:GetItem()
+    if(not slot) then
+        return
+    end
+    local _, itemLink = self:GetItem()
         local tipName = self:GetName()
-	if self.itemLink then
-		itemLink = self.itemLink
-	end
+    if self.itemLink then
+        itemLink = self.itemLink
+    end
         if itemLink then
             local isCached = IsCached(itemLink)
             if isCached then
@@ -300,11 +300,11 @@ local function OnTooltipSetItem(self)
 
             local averageItemLevel = totalItemLevel / 16
 
-		-- should we just return the cache for this GUID?
+        -- should we just return the cache for this GUID?
             local guid = ScannedGUID
-		if not GuidCache[guid] then
-			GuidCache[guid] = {}
-		end
+        if not GuidCache[guid] then
+            GuidCache[guid] = {}
+        end
             GuidCache[guid].ilevel = averageItemLevel
             GuidCache[guid].weaponLevel = weaponLevel
             GuidCache[guid].timestamp = GetTime()
@@ -393,7 +393,7 @@ local function DecorateTooltip(guid, isInspect)
             unitID = "target"
         end
 
-		local levelText = format("|cff%2x%2x%2x%.1f|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel)
+        local levelText = format("|cff%2x%2x%2x%.1f|r", r1 * 255, g1 * 255, b1 * 255, averageItemLevel)
 
         if isInspect and averageItemLevel > 0 then
             InspectFrameiLvL:SetText(levelText)
@@ -447,11 +447,11 @@ function eve:INSPECT_READY(guid)
         -- end
 
         if not GuidCache[guid] then
-			GuidCache[guid] = {
-				ilevel = 0,
-				weaponLevel = 0,
-				timestamp = 0,
-			}
+            GuidCache[guid] = {
+                ilevel = 0,
+                weaponLevel = 0,
+                timestamp = 0,
+            }
         end
         -- local cache = GuidCache[guid]
         -- cache.specID = specID
@@ -504,7 +504,7 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(self
 end)
 
 ----------------------------------------------------------------------------------------
---	Character Info Sheet
+--    Character Info Sheet
 ----------------------------------------------------------------------------------------
 MIN_PLAYER_LEVEL_FOR_ITEM_LEVEL_DISPLAY = 1
 hooksecurefunc("PaperDollFrame_SetItemLevel", function(self, unit)

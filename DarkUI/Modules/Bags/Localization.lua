@@ -4,7 +4,7 @@ local E, C, L = ns:unpack()
 if not C.bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Localization of Bags (modified from cargBags_Nivaya of RealUI)
+--    Localization of Bags (modified from cargBags_Nivaya of RealUI)
 ----------------------------------------------------------------------------------------
 
 local _G = _G

@@ -31,17 +31,17 @@ local list = {
         { AuraID = 214621, UnitID = "target", Caster = "player" }, -- 教派分歧
         { AuraID = 152118, UnitID = "target", Caster = "player" }, -- 意志洞悉
         { AuraID = 204213, UnitID = "target", Caster = "player" }, -- 净化邪恶
-        {AuraID = 335467, UnitID = "target", Caster = "player"},	-- 噬灵疫病
-        {AuraID = 323673, UnitID = "target", Caster = "player"},	-- 控心术
-        {AuraID = 342132, UnitID = "target", Caster = "player"},	-- 盛怒法夜
-        {AuraID = 325203, UnitID = "target", Caster = "player"},	-- 邪恶灌注
+        {AuraID = 335467, UnitID = "target", Caster = "player"},    -- 噬灵疫病
+        {AuraID = 323673, UnitID = "target", Caster = "player"},    -- 控心术
+        {AuraID = 342132, UnitID = "target", Caster = "player"},    -- 盛怒法夜
+        {AuraID = 325203, UnitID = "target", Caster = "player"},    -- 邪恶灌注
         { AuraID = 17, UnitID = "target", Caster = "player", Value = true }, -- 真言术：盾
         { AuraID = 208772, UnitID = "target", Caster = "player", Value = true }, -- 惩击
         { AuraID = 271466, UnitID = "target", Caster = "player", Value = true }, -- 微光屏障
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
-        {AuraID = 17, UnitID = "player", Caster = "player"},	-- 真言术：盾
-        {AuraID = 194384, UnitID = "player", Caster = "player"},	-- 救赎
+        {AuraID = 17, UnitID = "player", Caster = "player"},    -- 真言术：盾
+        {AuraID = 194384, UnitID = "player", Caster = "player"},    -- 救赎
         { AuraID = 27827, UnitID = "player" }, -- 救赎之魂
         { AuraID = 47536, UnitID = "player" }, -- 全神贯注
         { AuraID = 65081, UnitID = "player" }, -- 身心合一

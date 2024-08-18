@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.auto_confirm_de then return end
 
 ----------------------------------------------------------------------------------------
---	Disenchant confirmation(tekKrush by Tekkub)
+--    Disenchant confirmation(tekKrush by Tekkub)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("AutoDisenchant")
 

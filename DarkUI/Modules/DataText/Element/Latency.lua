@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Latency.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Latency of DataText (modified from ShestakUI)
+--    Latency of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Configuration of CombatText AoeSpam
+--    Configuration of CombatText AoeSpam
 ----------------------------------------------------------------------------------------
 
 local pairs, tinsert, unpack = pairs, tinsert, unpack

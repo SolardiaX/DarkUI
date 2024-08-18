@@ -3,7 +3,7 @@
 if C.automation.auto_role ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Automatically sets your role(Auto role setter by iSpawnAtHome)
+--    Automatically sets your role(Auto role setter by iSpawnAtHome)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("SetRole")
 

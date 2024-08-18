@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	ExtraActionBar (modified from ShestakUI)
+--    ExtraActionBar (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("BarExtra")
 
@@ -90,7 +90,7 @@ function module:OnInit()
         end
     end)
 
-    --	Skin ZoneAbilityFrame
+    --    Skin ZoneAbilityFrame
     hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
         local previous = nil
         for spellButton in self.SpellButtonContainer:EnumerateActive() do

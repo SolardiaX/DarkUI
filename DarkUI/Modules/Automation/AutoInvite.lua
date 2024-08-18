@@ -3,7 +3,7 @@
 if not C.automation.accept_invite then return end
 
 ----------------------------------------------------------------------------------------
---	Accept invites from guild members or friend list(by ALZA)
+--    Accept invites from guild members or friend list(by ALZA)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("AutoInvite")
 

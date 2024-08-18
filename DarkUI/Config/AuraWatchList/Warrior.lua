@@ -26,7 +26,7 @@ local list = {
         { AuraID = 208086, UnitID = "target", Caster = "player" }, -- 巨人打击
         { AuraID = 115804, UnitID = "target", Caster = "player" }, -- 致死
         { AuraID = 280773, UnitID = "target", Caster = "player" }, -- 破城者
-        {AuraID = 317491, UnitID = "target", Caster = "player", Value = true},	-- 有罪
+        {AuraID = 317491, UnitID = "target", Caster = "player", Value = true},    -- 有罪
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 871, UnitID = "player" }, -- 盾墙

@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.misc.socialtabs.enable then return end
 
 ----------------------------------------------------------------------------------------
---	SoicalTabs
+--    SoicalTabs
 ----------------------------------------------------------------------------------------
 
 local cfg = C.misc.socialtabs

@@ -5,7 +5,7 @@ local cargBags = ns.cargBags
 if not C.bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Style of Bags (modified from cargBags_Nivaya of RealUI)
+--    Style of Bags (modified from cargBags_Nivaya of RealUI)
 ----------------------------------------------------------------------------------------
 
 local NumBagContainer = 5
@@ -129,7 +129,7 @@ function MyContainer:OnContentsChanged(forced)
     if (tBank or tBankBags or tReagent) then
         self.Columns = (usedSlotsBank > cfg.sizes.bank.largeItemCount) and cfg.sizes.bank.columnsLarge or cfg.sizes.bank.columnsSmall
 --  elseif (tReagent) then
---	self.Columns = (usedSlotsReagent > cfg.sizes.bank.largeItemCount) and cfg.sizes.bank.columnsLarge or cfg.sizes.bank.columnsSmall
+--    self.Columns = (usedSlotsReagent > cfg.sizes.bank.largeItemCount) and cfg.sizes.bank.columnsLarge or cfg.sizes.bank.columnsSmall
     else
         self.Columns = (usedSlotsBag > cfg.sizes.bags.largeItemCount) and cfg.sizes.bags.columnsLarge or cfg.sizes.bags.columnsSmall
     end
@@ -312,7 +312,7 @@ local SetFrameMovable = function(f, v)
                 _G.SavedStatsPerChar.cBniv.BagPos = {orig, "UIParent", tar, x, y}
             else
                 _G.SavedStatsPerChar.cBniv.BankPos = {orig, "UIParent", tar, x, y}
-            end			
+            end            
         end)
     else
         f:SetScript("OnMouseDown", nil)

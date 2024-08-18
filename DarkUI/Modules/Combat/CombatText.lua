@@ -3,7 +3,7 @@
 if C.combat.combattext.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Combat Text(xCT by Affli)
+--    Combat Text(xCT by Affli)
 ----------------------------------------------------------------------------------------
 
 local cfg = C.combat.combattext

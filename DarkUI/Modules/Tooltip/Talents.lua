@@ -3,7 +3,7 @@
 if C.tooltip.enable ~= true or C.tooltip.talents ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Target Talents(TipTacTalents by Aezay)
+--    Target Talents(TipTacTalents by Aezay)
 ----------------------------------------------------------------------------------------
 -- Constants
 local TALENTS_PREFIX = SPECIALIZATION..":|cffffffff "
@@ -25,7 +25,7 @@ ttt.current = current
 ttt:Hide()
 
 ----------------------------------------------------------------------------------------
---	Gather Talents
+--    Gather Talents
 ----------------------------------------------------------------------------------------
 local function GatherTalents(mouseover)
     if mouseover == 1 then
@@ -69,7 +69,7 @@ local function GatherTalents(mouseover)
 end
 
 ----------------------------------------------------------------------------------------
---	Event Handling
+--    Event Handling
 ----------------------------------------------------------------------------------------
 -- OnEvent
 ttt:SetScript("OnEvent", function(self, event, guid)

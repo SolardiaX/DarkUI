@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.map.minimap.enable then return end
 
 ----------------------------------------------------------------------------------------
---	MiniMap Styles
+--    MiniMap Styles
 ----------------------------------------------------------------------------------------
 local module = E:Module("Map"):Sub("MiniMap")
 
@@ -82,7 +82,9 @@ local function disableBlizzart()
     MinimapCluster.ZoneTextButton:Hide()
 
     --minimap position
-    --Minimap:SetSize(152, 152)
+    Minimap:SetSize(Minimap:GetWidth() * .88, Minimap:GetHeight() * .88)
+    -- Minimap:SetScale(.88)
+    Minimap.SetSize = E.Dummy
     Minimap:ClearAllPoints()
     Minimap:SetPoint(unpack(cfg.position))
 
@@ -124,11 +126,11 @@ local function resetIcons()
     QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
     QueueStatusButton:SetScale(0.48)
     hooksecurefunc(QueueStatusButton, "SetPoint", function(self, _, anchor)
-		if anchor ~= Minimap then
-			self:ClearAllPoints()
-			self:SetPoint(unpack(cfg.iconpos.queue))
-		end
-	end)
+        if anchor ~= Minimap then
+            self:ClearAllPoints()
+            self:SetPoint(unpack(cfg.iconpos.queue))
+        end
+    end)
 
     -- Move GameTime icon
     GameTimeFrame:SetSize(26, 26)
@@ -176,10 +178,10 @@ local function resetIcons()
         end
 
         local menuList = {
-            {text =	_G.GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_9_0, notCheckable = true},
-            {text =	_G.WAR_CAMPAIGN, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_8_0, notCheckable = true},
-            {text =	_G.ORDER_HALL_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_7_0, notCheckable = true},
-            {text =	_G.GARRISON_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_6_0, notCheckable = true},
+            {text =    _G.GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_9_0, notCheckable = true},
+            {text =    _G.WAR_CAMPAIGN, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_8_0, notCheckable = true},
+            {text =    _G.ORDER_HALL_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_7_0, notCheckable = true},
+            {text =    _G.GARRISON_LANDING_PAGE_TITLE, func = ToggleLandingPage, arg1 = Enum.GarrisonType.Type_6_0, notCheckable = true},
         }
         garrMinimapButton:HookScript("OnMouseDown", function(self, btn)
             if btn == "RightButton" then
@@ -214,7 +216,6 @@ local function resetIcons()
 end
 
 local function addTexture()
-    MinimapCluster:SetScale(0.88)
     --create rotating cogwheel texture
     for index, _ in ipairs(frames_to_rotate) do
         local ftr = frames_to_rotate[index]
@@ -225,6 +226,7 @@ local function addTexture()
         t:SetSize(ftr.width, ftr.height)
         t:SetVertexColor(ftr.color_red, ftr.color_green, ftr.color_blue, ftr.alpha)
         t:SetBlendMode("BLEND")
+        t:SetScale(.88)
 
         t.ag = t:CreateAnimationGroup()
         t.ag.a1 = t.ag:CreateAnimation("Rotation")
@@ -248,6 +250,7 @@ local function addTexture()
     local border = Minimap:CreateTexture(nil, "ARTWORK", nil, -2)
     border:SetTexture(media.map_overlay)
     border:SetPoint("CENTER", -4, -4)
+    border:SetScale(.88)
 end
 
 local function enableAutoZoomOut()

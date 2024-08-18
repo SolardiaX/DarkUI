@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.auto_greed or IsPlayerAtEffectiveMaxLevel() then return end
 
 ----------------------------------------------------------------------------------------
---	Auto greed/disenchant on green items(by Tekkub)
+--    Auto greed/disenchant on green items(by Tekkub)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("AutoGreed")
 

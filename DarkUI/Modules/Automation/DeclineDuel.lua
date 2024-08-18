@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.decline_duel then return end
 
 ----------------------------------------------------------------------------------------
---	Auto decline duel
+--    Auto decline duel
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("DeclineDuel")
 

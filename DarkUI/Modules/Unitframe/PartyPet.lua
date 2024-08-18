@@ -182,7 +182,7 @@ oUF:Factory(function()
             "yOffset", yOffset,
             "oUF-initialConfigFunction", ([[
                 self:SetAttribute("useOwnerUnit", "true")
-				self:SetAttribute("unitsuffix", "pet")
+                self:SetAttribute("unitsuffix", "pet")
                 self:SetWidth(%d)
                 self:SetHeight(%d)
                 self:SetScale(%f)

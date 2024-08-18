@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Configuration of Moveable Frames
+--    Configuration of Moveable Frames
 ----------------------------------------------------------------------------------------
 
 C.layoutFrames = {}

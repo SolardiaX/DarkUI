@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.auto_release then return end
 
 ----------------------------------------------------------------------------------------
---	Auto release the spirit in battlegrounds
+--    Auto release the spirit in battlegrounds
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("AutoRelease")
 

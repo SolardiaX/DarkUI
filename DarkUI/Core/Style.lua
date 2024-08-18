@@ -257,34 +257,34 @@ function E:StyleButton(button, margin)
         button.NormalTexture:SetAlpha(0)
     end
 
-	if button.SetHighlightTexture and not button.highlight then
-		local highlight = button:CreateTexture()
+    if button.SetHighlightTexture and not button.highlight then
+        local highlight = button:CreateTexture()
         highlight:SetTexture(C.media.button.hover)
-		highlight:SetInside(button, margin, margin)
-		button.highlight = highlight
-		button:SetHighlightTexture(highlight)
-	end
+        highlight:SetInside(button, margin, margin)
+        button.highlight = highlight
+        button:SetHighlightTexture(highlight)
+    end
 
-	if button.SetPushedTexture and not button.pushed then
-		local pushed = button:CreateTexture()
-		pushed:SetTexture(C.media.button.pushed)
-		pushed:SetInside(button, margin, margin)
-		button.pushed = pushed
-		button:SetPushedTexture(pushed)
-	end
+    if button.SetPushedTexture and not button.pushed then
+        local pushed = button:CreateTexture()
+        pushed:SetTexture(C.media.button.pushed)
+        pushed:SetInside(button, margin, margin)
+        button.pushed = pushed
+        button:SetPushedTexture(pushed)
+    end
 
-	if button.SetCheckedTexture and not button.checked then
-		local checked = button:CreateTexture()
-		checked:SetTexture(C.media.button.checked)
-		checked:SetInside(button, margin, margin)
-		button.checked = checked
-		button:SetCheckedTexture(checked)
-	end
+    if button.SetCheckedTexture and not button.checked then
+        local checked = button:CreateTexture()
+        checked:SetTexture(C.media.button.checked)
+        checked:SetInside(button, margin, margin)
+        button.checked = checked
+        button:SetCheckedTexture(checked)
+    end
 
-	local cooldown = button:GetName() and _G[button:GetName().."Cooldown"]
-	if cooldown then
-		cooldown:SetInside(button, margin, margin)
-	end
+    local cooldown = button:GetName() and _G[button:GetName().."Cooldown"]
+    if cooldown then
+        cooldown:SetInside(button, margin, margin)
+    end
 end
 
 ----------------------------------------------------------------------------------------

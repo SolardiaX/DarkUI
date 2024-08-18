@@ -1,18 +1,18 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
     <Script file="Core.lua" />
-	<!-- bottom left -->
-	<Script file="Element\Latency.lua" />
-	<Script file="Element\Memory.lua" />
-	<Script file="Element\Fps.lua" />
-	<Script file="Element\Friends.lua" />
-	<Script file="Element\Guild.lua" />
-	<!-- minimap block -->
-	<Script file="Element\Location.lua" />
-	<Script file="Element\Coords.lua" />
-	<!-- bottom right -->
-	<Script file="Element\Durability.lua" />
-	<Script file="Element\Bags.lua" />
-	<Script file="Element\Gold.lua" />
+    <!-- bottom left -->
+    <Script file="Element\Latency.lua" />
+    <Script file="Element\Memory.lua" />
+    <Script file="Element\Fps.lua" />
+    <Script file="Element\Friends.lua" />
+    <Script file="Element\Guild.lua" />
+    <!-- minimap block -->
+    <Script file="Element\Location.lua" />
+    <Script file="Element\Coords.lua" />
+    <!-- bottom right -->
+    <Script file="Element\Durability.lua" />
+    <Script file="Element\Bags.lua" />
+    <Script file="Element\Gold.lua" />
 </Ui>

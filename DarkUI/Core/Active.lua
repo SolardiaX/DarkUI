@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 -- if not C_AddOns.IsAddOnLoaded("DarkUI_Options") then return end
 
 ----------------------------------------------------------------------------------------
---	Loads user settings from DarkUI_Options
+--    Loads user settings from DarkUI_Options
 ----------------------------------------------------------------------------------------
 
 if not SavedOptions then SavedOptions = {} end

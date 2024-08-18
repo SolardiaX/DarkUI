@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable and not C.actionbar.styles.cooldown.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Cooldown count (modified from tullaCC)
+--    Cooldown count (modified from tullaCC)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleCooldown")
 
@@ -62,25 +62,25 @@ end
 
 local function Timer_OnUpdate(self, elapsed)
     if self.text:IsShown() then
-		if self.nextUpdate > 0 then
-			self.nextUpdate = self.nextUpdate - elapsed
-		else
-			if (self:GetEffectiveScale() / UIParent:GetEffectiveScale()) < cfg.minScale then
-				self.text:SetText("")
-				self.nextUpdate = 1
-			else
+        if self.nextUpdate > 0 then
+            self.nextUpdate = self.nextUpdate - elapsed
+        else
+            if (self:GetEffectiveScale() / UIParent:GetEffectiveScale()) < cfg.minScale then
+                self.text:SetText("")
+                self.nextUpdate = 1
+            else
                 local passTime = GetTime() - self.start
-				local remain = passTime >= 0 and self.duration - passTime or self.duration
-				if floor(remain + 0.5) > 0 then
-					local formatStr, time, timeUntilNextUpdate = getTimeText(remain)
+                local remain = passTime >= 0 and self.duration - passTime or self.duration
+                if floor(remain + 0.5) > 0 then
+                    local formatStr, time, timeUntilNextUpdate = getTimeText(remain)
                     self.text:SetFormattedText(formatStr, time)
-					self.nextUpdate = timeUntilNextUpdate
-				else
-					Timer_Stop(self)
-				end
-			end
-		end
-	end
+                    self.nextUpdate = timeUntilNextUpdate
+                else
+                    Timer_Stop(self)
+                end
+            end
+        end
+    end
 end
 
 --forces the given timer to update on the next frame
@@ -133,19 +133,19 @@ local function Timer_Create(cooldown)
 end
 
 local function deactivateDisplay(cooldown)
-	local timer = cooldown.timer
-	if timer then
-		Timer_Stop(timer)
-	end
+    local timer = cooldown.timer
+    if timer then
+        Timer_Stop(timer)
+    end
 end
 
 local function setHideCooldownNumbers(cooldown, hide)
-	if hide then
-		module.hideNumbers[cooldown] = true
-		deactivateDisplay(cooldown)
-	else
-		module.hideNumbers[cooldown] = nil
-	end
+    if hide then
+        module.hideNumbers[cooldown] = true
+        deactivateDisplay(cooldown)
+    else
+        module.hideNumbers[cooldown] = nil
+    end
 end
 
 function module:OnActive()

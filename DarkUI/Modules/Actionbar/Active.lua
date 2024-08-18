@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	ActionBar (modified from NDui)
+--    ActionBar (modified from NDui)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar")
 

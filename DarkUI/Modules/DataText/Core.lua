@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable then return end
 
 ----------------------------------------------------------------------------------------
---	DataText Core (modified from ShestakUI)
+--    DataText Core (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 
@@ -169,7 +169,7 @@ function module:Inject(name, stat)
 end
 
 ----------------------------------------------------------------------------------------
---	Applying modules
+--    Applying modules
 ----------------------------------------------------------------------------------------
 module:RegisterEvent("ADDON_LOADED", function(_, event, addon)
     if event == "ADDON_LOADED" and addon == E.addonName then

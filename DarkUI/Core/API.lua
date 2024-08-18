@@ -37,13 +37,13 @@ local Mult = E.mult
 E.Dummy = function() return end
 
 ----------------------------------------------------------------------------------------
---	Frame Hider
+--    Frame Hider
 ----------------------------------------------------------------------------------------
 E.FrameHider = CreateFrame("Frame")
 E.FrameHider:Hide()
 
 ----------------------------------------------------------------------------------------
---	Pet Battle Hider
+--    Pet Battle Hider
 ----------------------------------------------------------------------------------------
 E.PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
 E.PetBattleFrameHider:SetAllPoints()
@@ -235,7 +235,7 @@ local function setTemplate(f, t, edge, insets)
         borderr, borderg, borderb, bordera = unpack(C.media.shadow_color)
     elseif t == "Border" then
         if not edge then
-            edge = 16
+            edge = 12
         end
         if not insets then
             insets = Mult
@@ -351,7 +351,7 @@ local function createBorder(f, margin, shadow)
 
     margin = margin or Mult
 
-    f.border = CreateFrame("Frame", "$parentInnerBorder", f, "BackdropTemplate")
+    f.border = CreateFrame("Frame", "$parentBorder", f, "BackdropTemplate")
     f.border:ClearAllPoints()
     f.border:SetPoint("TOPLEFT", f, "TOPLEFT", -margin, margin)
     f.border:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", margin, -margin)

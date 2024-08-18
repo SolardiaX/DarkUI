@@ -3,7 +3,7 @@
 if not C.chat.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Colors links in Battle.net whispers(RealLinks by p3lim)
+--    Colors links in Battle.net whispers(RealLinks by p3lim)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Chat"):Sub("RealLinks")
 

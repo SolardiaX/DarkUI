@@ -3,7 +3,7 @@
 if C.tooltip.enable ~= true or C.tooltip.item_count ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Item count in bags and bank(by Tukz)
+--    Item count in bags and bank(by Tukz)
 ----------------------------------------------------------------------------------------
 
 local function OnTooltipSetItem(self, data)

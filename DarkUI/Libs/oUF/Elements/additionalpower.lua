@@ -66,181 +66,181 @@ local ADDITIONAL_POWER_BAR_NAME = 'MANA'
 local ADDITIONAL_POWER_BAR_INDEX = 0
 
 local function UpdateColor(self, event, unit, powerType)
-	if(not (unit and UnitIsUnit(unit, 'player') and powerType == ADDITIONAL_POWER_BAR_NAME)) then return end
-	local element = self.AdditionalPower
+    if(not (unit and UnitIsUnit(unit, 'player') and powerType == ADDITIONAL_POWER_BAR_NAME)) then return end
+    local element = self.AdditionalPower
 
-	local r, g, b, color
-	if(element.colorPower) then
-		color = self.colors.power[ADDITIONAL_POWER_BAR_INDEX]
-	elseif(element.colorClass) then
-		color = self.colors.class[playerClass]
-	elseif(element.colorSmooth) then
-		r, g, b = self:ColorGradient(element.cur or 1, element.max or 1, unpack(element.smoothGradient or self.colors.smooth))
-	end
+    local r, g, b, color
+    if(element.colorPower) then
+        color = self.colors.power[ADDITIONAL_POWER_BAR_INDEX]
+    elseif(element.colorClass) then
+        color = self.colors.class[playerClass]
+    elseif(element.colorSmooth) then
+        r, g, b = self:ColorGradient(element.cur or 1, element.max or 1, unpack(element.smoothGradient or self.colors.smooth))
+    end
 
-	if(color) then
-		r, g, b = color[1], color[2], color[3]
-	end
+    if(color) then
+        r, g, b = color[1], color[2], color[3]
+    end
 
-	if(b) then
-		element:SetStatusBarColor(r, g, b)
+    if(b) then
+        element:SetStatusBarColor(r, g, b)
 
-		local bg = element.bg
-		if(bg) then
-			local mu = bg.multiplier or 1
-			bg:SetVertexColor(r * mu, g * mu, b * mu)
-		end
-	end
+        local bg = element.bg
+        if(bg) then
+            local mu = bg.multiplier or 1
+            bg:SetVertexColor(r * mu, g * mu, b * mu)
+        end
+    end
 
-	--[[ Callback: AdditionalPower:PostUpdateColor(r, g, b)
-	Called after the element color has been updated.
+    --[[ Callback: AdditionalPower:PostUpdateColor(r, g, b)
+    Called after the element color has been updated.
 
-	* self - the AdditionalPower element
-	* r    - the red component of the used color (number)[0-1]
-	* g    - the green component of the used color (number)[0-1]
-	* b    - the blue component of the used color (number)[0-1]
-	--]]
-	if(element.PostUpdateColor) then
-		element:PostUpdateColor(r, g, b)
-	end
+    * self - the AdditionalPower element
+    * r    - the red component of the used color (number)[0-1]
+    * g    - the green component of the used color (number)[0-1]
+    * b    - the blue component of the used color (number)[0-1]
+    --]]
+    if(element.PostUpdateColor) then
+        element:PostUpdateColor(r, g, b)
+    end
 end
 
 local function Update(self, event, unit, powerType)
-	if(not (unit and UnitIsUnit(unit, 'player') and powerType == ADDITIONAL_POWER_BAR_NAME)) then return end
-	local element = self.AdditionalPower
+    if(not (unit and UnitIsUnit(unit, 'player') and powerType == ADDITIONAL_POWER_BAR_NAME)) then return end
+    local element = self.AdditionalPower
 
-	--[[ Callback: AdditionalPower:PreUpdate(unit)
-	Called before the element has been updated.
+    --[[ Callback: AdditionalPower:PreUpdate(unit)
+    Called before the element has been updated.
 
-	* self - the AdditionalPower element
-	* unit - the unit for which the update has been triggered (string)
-	--]]
-	if(element.PreUpdate) then
-		element:PreUpdate(unit)
-	end
+    * self - the AdditionalPower element
+    * unit - the unit for which the update has been triggered (string)
+    --]]
+    if(element.PreUpdate) then
+        element:PreUpdate(unit)
+    end
 
-	local cur, max = UnitPower('player', ADDITIONAL_POWER_BAR_INDEX), UnitPowerMax('player', ADDITIONAL_POWER_BAR_INDEX)
-	element:SetMinMaxValues(0, max)
-	element:SetValue(cur)
+    local cur, max = UnitPower('player', ADDITIONAL_POWER_BAR_INDEX), UnitPowerMax('player', ADDITIONAL_POWER_BAR_INDEX)
+    element:SetMinMaxValues(0, max)
+    element:SetValue(cur)
 
-	element.cur = cur
-	element.max = max
+    element.cur = cur
+    element.max = max
 
-	--[[ Callback: AdditionalPower:PostUpdate(cur, max)
-	Called after the element has been updated.
+    --[[ Callback: AdditionalPower:PostUpdate(cur, max)
+    Called after the element has been updated.
 
-	* self - the AdditionalPower element
-	* cur  - the current value of the player's additional power (number)
-	* max  - the maximum value of the player's additional power (number)
-	--]]
-	if(element.PostUpdate) then
-		return element:PostUpdate(cur, max)
-	end
+    * self - the AdditionalPower element
+    * cur  - the current value of the player's additional power (number)
+    * max  - the maximum value of the player's additional power (number)
+    --]]
+    if(element.PostUpdate) then
+        return element:PostUpdate(cur, max)
+    end
 end
 
 local function Path(self, ...)
-	--[[ Override: AdditionalPower.Override(self, event, unit, ...)
-	Used to completely override the element's update process.
+    --[[ Override: AdditionalPower.Override(self, event, unit, ...)
+    Used to completely override the element's update process.
 
-	* self  - the parent object
-	* event - the event triggering the update (string)
-	* unit  - the unit accompanying the event (string)
-	* ...   - the arguments accompanying the event
-	--]]
-	(self.AdditionalPower.Override or Update) (self, ...);
+    * self  - the parent object
+    * event - the event triggering the update (string)
+    * unit  - the unit accompanying the event (string)
+    * ...   - the arguments accompanying the event
+    --]]
+    (self.AdditionalPower.Override or Update) (self, ...);
 
-	--[[ Override: AdditionalPower.UpdateColor(self, event, unit, ...)
-	Used to completely override the internal function for updating the widgets' colors.
+    --[[ Override: AdditionalPower.UpdateColor(self, event, unit, ...)
+    Used to completely override the internal function for updating the widgets' colors.
 
-	* self  - the parent object
-	* event - the event triggering the update (string)
-	* unit  - the unit accompanying the event (string)
-	* ...   - the arguments accompanying the event
-	--]]
-	(self.AdditionalPower.UpdateColor or UpdateColor) (self, ...)
+    * self  - the parent object
+    * event - the event triggering the update (string)
+    * unit  - the unit accompanying the event (string)
+    * ...   - the arguments accompanying the event
+    --]]
+    (self.AdditionalPower.UpdateColor or UpdateColor) (self, ...)
 end
 
 local function ElementEnable(self)
-	local element = self.AdditionalPower
+    local element = self.AdditionalPower
 
-	if(element.frequentUpdates) then
-		self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
-	else
-		self:RegisterEvent('UNIT_POWER_UPDATE', Path)
-	end
+    if(element.frequentUpdates) then
+        self:RegisterEvent('UNIT_POWER_FREQUENT', Path)
+    else
+        self:RegisterEvent('UNIT_POWER_UPDATE', Path)
+    end
 
-	self:RegisterEvent('UNIT_MAXPOWER', Path)
+    self:RegisterEvent('UNIT_MAXPOWER', Path)
 
-	element:Show()
+    element:Show()
 
-	element.__isEnabled = true
-	Path(self, 'ElementEnable', 'player', ADDITIONAL_POWER_BAR_NAME)
+    element.__isEnabled = true
+    Path(self, 'ElementEnable', 'player', ADDITIONAL_POWER_BAR_NAME)
 end
 
 local function ElementDisable(self)
-	local element = self.AdditionalPower
+    local element = self.AdditionalPower
 
-	self:UnregisterEvent('UNIT_MAXPOWER', Path)
-	self:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
-	self:UnregisterEvent('UNIT_POWER_UPDATE', Path)
+    self:UnregisterEvent('UNIT_MAXPOWER', Path)
+    self:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
+    self:UnregisterEvent('UNIT_POWER_UPDATE', Path)
 
-	element:Hide()
+    element:Hide()
 
-	element.__isEnabled = false
-	Path(self, 'ElementDisable', 'player', ADDITIONAL_POWER_BAR_NAME)
+    element.__isEnabled = false
+    Path(self, 'ElementDisable', 'player', ADDITIONAL_POWER_BAR_NAME)
 end
 
 local function Visibility(self, event, unit)
-	local element = self.AdditionalPower
-	local shouldEnable
+    local element = self.AdditionalPower
+    local shouldEnable
 
-	if(not UnitHasVehicleUI('player')) then
-		if(UnitPowerMax(unit, ADDITIONAL_POWER_BAR_INDEX) ~= 0) then
-			if(element.displayPairs[playerClass]) then
-				local powerType = UnitPowerType(unit)
-				shouldEnable = element.displayPairs[playerClass][powerType]
-			end
-		end
-	end
+    if(not UnitHasVehicleUI('player')) then
+        if(UnitPowerMax(unit, ADDITIONAL_POWER_BAR_INDEX) ~= 0) then
+            if(element.displayPairs[playerClass]) then
+                local powerType = UnitPowerType(unit)
+                shouldEnable = element.displayPairs[playerClass][powerType]
+            end
+        end
+    end
 
-	local isEnabled = element.__isEnabled
+    local isEnabled = element.__isEnabled
 
-	if(shouldEnable and not isEnabled) then
-		ElementEnable(self)
+    if(shouldEnable and not isEnabled) then
+        ElementEnable(self)
 
-		--[[ Callback: AdditionalPower:PostVisibility(isVisible)
-		Called after the element's visibility has been changed.
+        --[[ Callback: AdditionalPower:PostVisibility(isVisible)
+        Called after the element's visibility has been changed.
 
-		* self      - the AdditionalPower element
-		* isVisible - the current visibility state of the element (boolean)
-		--]]
-		if(element.PostVisibility) then
-			element:PostVisibility(true)
-		end
-	elseif(not shouldEnable and (isEnabled or isEnabled == nil)) then
-		ElementDisable(self)
+        * self      - the AdditionalPower element
+        * isVisible - the current visibility state of the element (boolean)
+        --]]
+        if(element.PostVisibility) then
+            element:PostVisibility(true)
+        end
+    elseif(not shouldEnable and (isEnabled or isEnabled == nil)) then
+        ElementDisable(self)
 
-		if(element.PostVisibility) then
-			element:PostVisibility(false)
-		end
-	elseif(shouldEnable and isEnabled) then
-		Path(self, event, unit, ADDITIONAL_POWER_BAR_NAME)
-	end
+        if(element.PostVisibility) then
+            element:PostVisibility(false)
+        end
+    elseif(shouldEnable and isEnabled) then
+        Path(self, event, unit, ADDITIONAL_POWER_BAR_NAME)
+    end
 end
 
 local function VisibilityPath(self, ...)
-	--[[ Override: AdditionalPower.OverrideVisibility(self, event, unit)
-	Used to completely override the element's visibility update process.
+    --[[ Override: AdditionalPower.OverrideVisibility(self, event, unit)
+    Used to completely override the element's visibility update process.
 
-	* self  - the parent object
-	* event - the event triggering the update (string)
-	* unit  - the unit accompanying the event (string)
-	--]]
-	(self.AdditionalPower.OverrideVisibility or Visibility) (self, ...)
+    * self  - the parent object
+    * event - the event triggering the update (string)
+    * unit  - the unit accompanying the event (string)
+    --]]
+    (self.AdditionalPower.OverrideVisibility or Visibility) (self, ...)
 end
 
 local function ForceUpdate(element)
-	VisibilityPath(element.__owner, 'ForceUpdate', element.__owner.unit)
+    VisibilityPath(element.__owner, 'ForceUpdate', element.__owner.unit)
 end
 
 --[[ Power:SetFrequentUpdates(state, isForced)
@@ -251,46 +251,46 @@ Used to toggle frequent updates.
 * isForced - forces the event update even if the state wasn't changed (boolean)
 --]]
 local function SetFrequentUpdates(element, state, isForced)
-	if(element.frequentUpdates ~= state or isForced) then
-		element.frequentUpdates = state
-		if(state) then
-			element.__owner:UnregisterEvent('UNIT_POWER_UPDATE', Path)
-			element.__owner:RegisterEvent('UNIT_POWER_FREQUENT', Path)
-		else
-			element.__owner:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
-			element.__owner:RegisterEvent('UNIT_POWER_UPDATE', Path)
-		end
-	end
+    if(element.frequentUpdates ~= state or isForced) then
+        element.frequentUpdates = state
+        if(state) then
+            element.__owner:UnregisterEvent('UNIT_POWER_UPDATE', Path)
+            element.__owner:RegisterEvent('UNIT_POWER_FREQUENT', Path)
+        else
+            element.__owner:UnregisterEvent('UNIT_POWER_FREQUENT', Path)
+            element.__owner:RegisterEvent('UNIT_POWER_UPDATE', Path)
+        end
+    end
 end
 
 local function Enable(self, unit)
-	local element = self.AdditionalPower
-	if(element and UnitIsUnit(unit, 'player')) then
-		element.__owner = self
-		element.ForceUpdate = ForceUpdate
-		element.SetFrequentUpdates = SetFrequentUpdates
+    local element = self.AdditionalPower
+    if(element and UnitIsUnit(unit, 'player')) then
+        element.__owner = self
+        element.ForceUpdate = ForceUpdate
+        element.SetFrequentUpdates = SetFrequentUpdates
 
-		self:RegisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
+        self:RegisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
 
-		if(not element.displayPairs) then
-			element.displayPairs = CopyTable(ALT_POWER_BAR_PAIR_DISPLAY_INFO)
-		end
+        if(not element.displayPairs) then
+            element.displayPairs = CopyTable(ALT_POWER_BAR_PAIR_DISPLAY_INFO)
+        end
 
-		if(element:IsObjectType('StatusBar') and not element:GetStatusBarTexture()) then
-			element:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
-		end
+        if(element:IsObjectType('StatusBar') and not element:GetStatusBarTexture()) then
+            element:SetStatusBarTexture([[Interface\TargetingFrame\UI-StatusBar]])
+        end
 
-		return true
-	end
+        return true
+    end
 end
 
 local function Disable(self)
-	local element = self.AdditionalPower
-	if(element) then
-		ElementDisable(self)
+    local element = self.AdditionalPower
+    if(element) then
+        ElementDisable(self)
 
-		self:UnregisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
-	end
+        self:UnregisterEvent('UNIT_DISPLAYPOWER', VisibilityPath)
+    end
 end
 
 oUF:AddElement('AdditionalPower', VisibilityPath, Enable, Disable)

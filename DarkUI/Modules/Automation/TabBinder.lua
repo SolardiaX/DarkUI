@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.tab_binder then return end
 
 ----------------------------------------------------------------------------------------
---	Auto change Tab key to only target enemy players(RE/TabBinder by Veev/AcidWeb)
+--    Auto change Tab key to only target enemy players(RE/TabBinder by Veev/AcidWeb)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("TabBinder")
 

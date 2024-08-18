@@ -5,7 +5,7 @@ local cargBags = ns.cargBags
 if not C.bags.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Filters of Bags (modified from cargBags_Nivaya)
+--    Filters of Bags (modified from cargBags_Nivaya)
 ----------------------------------------------------------------------------------------
 
 local NumBagContainer = 5
@@ -38,7 +38,7 @@ cB_Filters.fHideEmpty = function(item) if _G.SavedStats.cBnivCfg.CompressEmpty t
 -- General Classification (cached)
 ------------------------------------
 cB_Filters.fItemClass = function(item, container)
-    if not item.id or not item.name then return false end	-- incomplete data (itemID or itemName missing), return (item that aren't loaded yet will get classified on the next successful call)
+    if not item.id or not item.name then return false end    -- incomplete data (itemID or itemName missing), return (item that aren't loaded yet will get classified on the next successful call)
     if not cB_ItemClass[item.id] or item.bagId == -2 then cbNivaya:ClassifyItem(item) end
     
     local t, bag = cB_ItemClass[item.id]
@@ -65,13 +65,13 @@ function cbNivaya:ClassifyItem(item)
 
     -- type based filters
     if item.type then
-        if		(item.type == L.BAG_ARMOR) or (item.type == L.BAG_WEAPON)	then cB_ItemClass[item.id] = "Armor"; return true
-        elseif	(item.type == L.BAG_GEM)									then cB_ItemClass[item.id] = "Gem"; return true
-        elseif	(item.type == L.BAG_QUEST)									then cB_ItemClass[item.id] = "Quest"; return true
-        elseif	(item.type == L.BAG_TRADES)									then cB_ItemClass[item.id] = "TradeGoods"; return true
-        elseif	(item.type == L.BAG_CONSUMABLES)							then cB_ItemClass[item.id] = "Consumables"; return true
-        elseif	(item.type == L.BAG_ARTIFACT_POWER)							then cB_ItemClass[item.id] = "ArtifactPower"; return true
-        elseif	(item.type == L.BAG_BATTLEPET)								then cB_ItemClass[item.id] = "BattlePet"; return true
+        if        (item.type == L.BAG_ARMOR) or (item.type == L.BAG_WEAPON)    then cB_ItemClass[item.id] = "Armor"; return true
+        elseif    (item.type == L.BAG_GEM)                                    then cB_ItemClass[item.id] = "Gem"; return true
+        elseif    (item.type == L.BAG_QUEST)                                    then cB_ItemClass[item.id] = "Quest"; return true
+        elseif    (item.type == L.BAG_TRADES)                                    then cB_ItemClass[item.id] = "TradeGoods"; return true
+        elseif    (item.type == L.BAG_CONSUMABLES)                            then cB_ItemClass[item.id] = "Consumables"; return true
+        elseif    (item.type == L.BAG_ARTIFACT_POWER)                            then cB_ItemClass[item.id] = "ArtifactPower"; return true
+        elseif    (item.type == L.BAG_BATTLEPET)                                then cB_ItemClass[item.id] = "BattlePet"; return true
         end
     end
     
@@ -86,7 +86,7 @@ cB_Filters.fNewItems = function(item)
     if not ((item.bagId >= 0) and (item.bagId <= NumBagContainer)) then return false end
     if not item.link then return false end
     if not  _G.SavedStatsPerChar.cB_KnownItems[item.id] then return true end
-    local t = GetItemCount(item.id)	--cbNivaya:getItemCount(item.id)
+    local t = GetItemCount(item.id)    --cbNivaya:getItemCount(item.id)
     return (t >  _G.SavedStatsPerChar.cB_KnownItems[item.id]) and true or false
 end
 

@@ -3,7 +3,7 @@
 if not C.misc.raid_utility.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Raid Utility(by Elv22)
+--    Raid Utility(by Elv22)
 ----------------------------------------------------------------------------------------
 
 local position = C.misc.raid_utility.position
@@ -77,10 +77,10 @@ RaidUtilityDisbandButton:SetScript("OnMouseUp", function() StaticPopup_Show("DIS
 CreateButton("RaidUtilityConvertButton", RaidUtilityPanel, "UIPanelButtonTemplate", RaidUtilityPanel:GetWidth() * 0.8, 18, "TOP", RaidUtilityDisbandButton, "BOTTOM", 0, -5, UnitInRaid("player") and CONVERT_TO_PARTY or CONVERT_TO_RAID)
 RaidUtilityConvertButton:SetScript("OnMouseUp", function()
     if UnitInRaid("player") then
-    	C_PartyInfo.ConvertToParty()
+        C_PartyInfo.ConvertToParty()
         RaidUtilityConvertButton.t:SetText(CONVERT_TO_RAID)
     elseif UnitInParty("player") then
-    	C_PartyInfo.ConvertToRaid()
+        C_PartyInfo.ConvertToRaid()
         RaidUtilityConvertButton.t:SetText(CONVERT_TO_PARTY)
     end
 end)
@@ -119,37 +119,37 @@ markersFrame:Hide()
 RaidUtilityMarkerToggle:SetScript("OnMouseUp", function() markersFrame:SetShown(not markersFrame:IsShown()) end)
 local ground = {5, 6, 3, 2, 7, 1, 4, 8}
 local iconTexture = {
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_1",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_2",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_3",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_4",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_5",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_6",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_7",
-	"Interface\\TargetingFrame\\UI-RaidTargetingIcon_8",
-	"Interface\\Buttons\\UI-GroupLoot-Pass-Up",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_2",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_3",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_4",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_5",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_6",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_7",
+    "Interface\\TargetingFrame\\UI-RaidTargetingIcon_8",
+    "Interface\\Buttons\\UI-GroupLoot-Pass-Up",
 }
 local prev
 for i = 1, 9 do
-	local b = CreateFrame("Button", "RaidUtilityPanelRaidMarkers", markersFrame, "SecureActionButtonTemplate")
-	b:ClearAllPoints()
-	if i == 1 then
-		b:SetPoint("TOPLEFT", RaidUtilityPanel, "TOPRIGHT", 5, -3)
-	else
-		b:SetPoint("TOP", prev, "BOTTOM", 0, -5)
-	end
-	b:SetSize(13, 13)
-	b:CreateBackdrop("Overlay")
-	b:SetNormalTexture(iconTexture[i])
-	b:RegisterForClicks("AnyUp", "AnyDown")
-	b:SetAttribute("type", "macro")
-	b:SetAttribute("macrotext", format(i == 9 and "/cwm 0" or "/cwm %d\n/wm %d", ground[i], ground[i]))
-	prev = b
+    local b = CreateFrame("Button", "RaidUtilityPanelRaidMarkers", markersFrame, "SecureActionButtonTemplate")
+    b:ClearAllPoints()
+    if i == 1 then
+        b:SetPoint("TOPLEFT", RaidUtilityPanel, "TOPRIGHT", 5, -3)
+    else
+        b:SetPoint("TOP", prev, "BOTTOM", 0, -5)
+    end
+    b:SetSize(13, 13)
+    b:CreateBackdrop("Overlay")
+    b:SetNormalTexture(iconTexture[i])
+    b:RegisterForClicks("AnyUp", "AnyDown")
+    b:SetAttribute("type", "macro")
+    b:SetAttribute("macrotext", format(i == 9 and "/cwm 0" or "/cwm %d\n/wm %d", ground[i], ground[i]))
+    prev = b
 end
 -- Raid Control Panel
 CreateButton("RaidUtilityRaidControlButton", RaidUtilityPanel, "UIPanelButtonTemplate", RaidUtilityRoleButton:GetWidth(), 18, "TOPLEFT", RaidUtilityReadyCheckButton, "BOTTOMLEFT", 0, -5, RAID_CONTROL)
 RaidUtilityRaidControlButton:SetScript("OnMouseUp", function()
-	ToggleFriendsFrame(3)
+    ToggleFriendsFrame(3)
 end)
 
 local function ToggleRaidUtil(self, event)

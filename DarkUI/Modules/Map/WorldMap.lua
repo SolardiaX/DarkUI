@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.map.worldmap.enable then return end
 
 ----------------------------------------------------------------------------------------
---	WorldMapFrame Styles
+--    WorldMapFrame Styles
 ----------------------------------------------------------------------------------------
 local module = E:Module("Map"):Sub("WorldMap")
 
@@ -26,10 +26,10 @@ local MAP_AND_QUEST_LOG = MAP_AND_QUEST_LOG
 local PLAYER = PLAYER
 
 function module:OnInit()
-    --	Font replacement
+    --    Font replacement
     MapQuestInfoRewardsFrame_XPFrame_Name:SetFont(STANDARD_TEXT_FONT, 12)
 
-    --	Change position
+    --    Change position
     hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", function()
         if CharacterFrame:IsShown() or 
             (PlayerTalentFrame and PlayerSpellsFrame:IsShown()) or 
@@ -47,7 +47,7 @@ function module:OnInit()
     end)
     WorldMapFrame:SetClampedToScreen(true)
 
-    --	Creating coordinate
+    --    Creating coordinate
     local coords = CreateFrame("Frame", "CoordsFrame", WorldMapFrame)
     coords:SetFrameLevel(WorldMapFrame.BorderFrame:GetFrameLevel() + 2)
     coords:SetFrameStrata(WorldMapFrame.BorderFrame:GetFrameStrata())

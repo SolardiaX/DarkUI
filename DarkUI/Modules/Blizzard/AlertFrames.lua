@@ -3,7 +3,7 @@
 if C_AddOns.IsAddOnLoaded("MoveAnything") or not C.blizzard.custom_position then return end
 
 ----------------------------------------------------------------------------------------
---	AlertFrameMove(by Gethe)
+--    AlertFrameMove(by Gethe)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Blizzard"):Sub("AlertFrames")
 

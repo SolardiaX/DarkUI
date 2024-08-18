@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.aura.enable and not C.aura.show_caster then return end
 
 ----------------------------------------------------------------------------------------
---	Tells you who cast a buff or debuff in its tooltip
+--    Tells you who cast a buff or debuff in its tooltip
 ----------------------------------------------------------------------------------------
 local module = E:Module("Aura"):Sub("Caster")
 

@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	EtraButton
+--    EtraButton
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("ExtraButton")
 local actionButton = LibStub("DarkUI-ActionButton")

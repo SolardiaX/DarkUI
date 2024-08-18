@@ -210,12 +210,12 @@ end
 module.classModule.classpowerbar.CreateDiablolicBar = function(self, ...)
     -- Classpowers
     --------------------------------------------
-    -- 	Supported class powers:
-    -- 	- All     - Combo Points
-    -- 	- Mage    - Arcane Charges
-    -- 	- Monk    - Chi Orbs
-    -- 	- Paladin - Holy Power
-    -- 	- Warlock - Soul Shards
+    --     Supported class powers:
+    --     - All     - Combo Points
+    --     - Mage    - Arcane Charges
+    --     - Monk    - Chi Orbs
+    --     - Paladin - Holy Power
+    --     - Warlock - Soul Shards
     --------------------------------------------
     local classpower = CreateFrame("Frame", nil, self)
     classpower:SetSize(210,42)

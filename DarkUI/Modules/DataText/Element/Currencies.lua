@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Currencies.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Currencies of DataText (modified from ShestakUI)
+--    Currencies of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

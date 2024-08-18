@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	ActionButton
+--    ActionButton
 ----------------------------------------------------------------------------------------
 local MAJOR, MINOR = "DarkUI-ActionButton", 1
 local actionButton = LibStub:NewLibrary(MAJOR, MINOR)

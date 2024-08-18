@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Core Mover Methods
+--    Core Mover Methods
 ----------------------------------------------------------------------------------------
 local string_format, math_abs = string.format, math.abs
 

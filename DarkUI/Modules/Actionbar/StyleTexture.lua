@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable or not C.actionbar.bars.texture then return end
 
 ----------------------------------------------------------------------------------------
---	Background Art for Actionbars
+--    Background Art for Actionbars
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("Texture")
 

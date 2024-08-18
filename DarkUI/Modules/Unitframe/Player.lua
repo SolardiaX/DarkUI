@@ -129,43 +129,43 @@ local createBar = function(self)
     abb:SetVertexColor(1, 1, 0, 0.2)
 
     local abbo = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-	abbo:SetAllPoints(abb)
-	abbo:SetTexture("Interface\\RaidFrame\\Shield-Overlay", true, true)
-	abbo.tileSize = 32
+    abbo:SetAllPoints(abb)
+    abbo:SetTexture("Interface\\RaidFrame\\Shield-Overlay", true, true)
+    abbo.tileSize = 32
 
     local oag = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-	oag:SetWidth(15)
-	oag:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
-	oag:SetBlendMode("ADD")
-	oag:SetAlpha(.7)
-	oag:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
-	oag:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
+    oag:SetWidth(15)
+    oag:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
+    oag:SetBlendMode("ADD")
+    oag:SetAlpha(.7)
+    oag:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
+    oag:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
 
-	local hab = CreateFrame("StatusBar", nil, self.Health)
-	hab:SetPoint("TOPLEFT", self.Health)
-	hab:SetPoint("BOTTOMRIGHT", self.Health:GetStatusBarTexture())
-	hab:SetReverseFill(true)
-	hab:SetStatusBarTexture(media.incoming_barTex)
-	hab:SetStatusBarColor(0, .5, .8, .5)
-	hab:SetFrameLevel(self.Health:GetFrameLevel())
+    local hab = CreateFrame("StatusBar", nil, self.Health)
+    hab:SetPoint("TOPLEFT", self.Health)
+    hab:SetPoint("BOTTOMRIGHT", self.Health:GetStatusBarTexture())
+    hab:SetReverseFill(true)
+    hab:SetStatusBarTexture(media.incoming_barTex)
+    hab:SetStatusBarColor(0, .5, .8, .5)
+    hab:SetFrameLevel(self.Health:GetFrameLevel())
 
-	local ohg = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-	ohg:SetWidth(15)
-	ohg:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
-	ohg:SetBlendMode("ADD")
-	ohg:SetAlpha(.5)
-	ohg:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
-	ohg:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
+    local ohg = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    ohg:SetWidth(15)
+    ohg:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
+    ohg:SetBlendMode("ADD")
+    ohg:SetAlpha(.5)
+    ohg:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
+    ohg:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
 
     self.HealPredictionAndAbsorb = {
         myBar = mhpb,
-		otherBar = ohpb,
-		absorbBar = abb,
-		absorbBarOverlay = abbo,
-		overAbsorbGlow = oag,
-		healAbsorbBar = hab,
-		overHealAbsorbGlow = ohg,
-		maxOverflow = 1,
+        otherBar = ohpb,
+        absorbBar = abb,
+        absorbBarOverlay = abbo,
+        overAbsorbGlow = oag,
+        healAbsorbBar = hab,
+        overHealAbsorbGlow = ohg,
+        maxOverflow = 1,
     }
 
     -- AdditionalPower
@@ -200,18 +200,18 @@ local createBar = function(self)
 
     self.AdditionalPower.colorPower = true
     self.AdditionalPower.displayPairs = {
-		["DRUID"] = {
-			[1] = true,
-			[3] = true,
-			[8] = true,
-		},
-		["SHAMAN"] = {
-			[11] = true,
-		},
-		["PRIEST"] = {
-			[13] = true,
-		}
-	}
+        ["DRUID"] = {
+            [1] = true,
+            [3] = true,
+            [8] = true,
+        },
+        ["SHAMAN"] = {
+            [11] = true,
+        },
+        ["PRIEST"] = {
+            [13] = true,
+        }
+    }
 end
 
 local createPortrait = function(self)

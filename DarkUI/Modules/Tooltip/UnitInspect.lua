@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.tooltip.enable ~= true or (C.tooltip.talents ~= true and C.tooltip.average_lvl ~= true) then return end
 
 ----------------------------------------------------------------------------------------
---	Target Inspect (based on TipTacTalents by Aezay)
+--    Target Inspect (based on TipTacTalents by Aezay)
 ----------------------------------------------------------------------------------------
 
 local LibFroznFunctions = LibStub:GetLibrary("LibFroznFunctions-1.0")

@@ -3,7 +3,7 @@
 if not C.chat.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Systems spam filter
+--    Systems spam filter
 ----------------------------------------------------------------------------------------
 
 local ChatFrame_AddMessageEventFilter = ChatFrame_AddMessageEventFilter
@@ -56,7 +56,7 @@ if cfg.filter == true then
 end
 
 ----------------------------------------------------------------------------------------
---	Players spam filter(by Evl, Elv22 and Affli)
+--    Players spam filter(by Evl, Elv22 and Affli)
 ----------------------------------------------------------------------------------------
 if cfg.spam == true then
     -- Repeat spam filter

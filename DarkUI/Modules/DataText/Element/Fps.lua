@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.FPS.enable then return end
 
 ----------------------------------------------------------------------------------------
---	FPS of DataText (modified from ShestakUI)
+--    FPS of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

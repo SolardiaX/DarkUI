@@ -118,7 +118,7 @@ local function styleTooltip(tip)
             tt.backdrop:SetPoint("BOTTOMRIGHT")
 
             tt.gradient:SetPoint("TOPLEFT", 2, -2)
-	        tt.gradient:SetPoint("BOTTOMRIGHT", tt, "TOPRIGHT", -2, -32)
+            tt.gradient:SetPoint("BOTTOMRIGHT", tt, "TOPRIGHT", -2, -32)
 
             tt.styled = true
         end
@@ -543,13 +543,13 @@ module:RegisterEvent("ADDON_LOADED PLAYER_LOGIN PLAYER_ENTERING_WORLD", function
         end
 
         hooksecurefunc(menuManagerProxy, "OpenMenu", setupMenu)
-	    hooksecurefunc(menuManagerProxy, "OpenContextMenu", setupMenu)
+        hooksecurefunc(menuManagerProxy, "OpenContextMenu", setupMenu)
     end
 end)
 
 
 ----------------------------------------------------------------------------------------
---	Fix compare tooltips(by Blizzard)(../FrameXML/GameTooltip.lua)
+--    Fix compare tooltips(by Blizzard)(../FrameXML/GameTooltip.lua)
 ----------------------------------------------------------------------------------------
 hooksecurefunc(TooltipComparisonManager, "AnchorShoppingTooltips", function(self, primaryShown, secondaryItemShown)
     local tooltip = self.tooltip;
@@ -580,7 +580,7 @@ hooksecurefunc(TooltipComparisonManager, "AnchorShoppingTooltips", function(self
 end)
 
 ----------------------------------------------------------------------------------------
---	Fix GameTooltipMoneyFrame font size
+--    Fix GameTooltipMoneyFrame font size
 ----------------------------------------------------------------------------------------
 hooksecurefunc("SetTooltipMoney", function()
     for i = 1, 2 do
@@ -604,7 +604,7 @@ hooksecurefunc("SetTooltipMoney", function()
 end)
 
 ----------------------------------------------------------------------------------------
---	Skin GameTooltip.ItemTooltip and EmbeddedItemTooltip
+--    Skin GameTooltip.ItemTooltip and EmbeddedItemTooltip
 ----------------------------------------------------------------------------------------
 GameTooltip.ItemTooltip.Icon:SetTexCoord(unpack(C.media.texCoord))
 
@@ -666,7 +666,7 @@ hooksecurefunc("GameTooltip_ShowProgressBar", function(tt)
 end)
 
 ----------------------------------------------------------------------------------------
---	Skin More Tooltips (modified from NDUI)
+--    Skin More Tooltips (modified from NDUI)
 ----------------------------------------------------------------------------------------
 
 module.rTips[E.addonName] = function()

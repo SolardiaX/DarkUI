@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.automation.auto_quest then return end
 
 ----------------------------------------------------------------------------------------
---	Quest automation(QuickQuest by p3lim)
+--    Quest automation(QuickQuest by p3lim)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("AutoQuest")
 
@@ -443,28 +443,28 @@ module:RegisterEvent('QUEST_PROGRESS', function()
         return
     end
 
-	if not IsQuestCompletable() then
+    if not IsQuestCompletable() then
         return
     end
 
-	local questID = GetQuestID()
-	if ignoredQuests[questID] then
+    local questID = GetQuestID()
+    if ignoredQuests[questID] then
         return
     end
 
     -- make sure the quest doesn't contain an ignored item
-	for index = 1, GetNumQuestItems() do
-		local _, _, _, _, _, itemID = GetQuestItemInfo('required', index)
-		if itemID then
-			if QuickQuestDB.blocklist.items[itemID] then
-				-- ignore this quest to prevent it from being selected again
-				ignoredQuests[questID] = true
-				return
-			end
-		end
-	end
+    for index = 1, GetNumQuestItems() do
+        local _, _, _, _, _, itemID = GetQuestItemInfo('required', index)
+        if itemID then
+            if QuickQuestDB.blocklist.items[itemID] then
+                -- ignore this quest to prevent it from being selected again
+                ignoredQuests[questID] = true
+                return
+            end
+        end
+    end
 
-	CompleteQuest()
+    CompleteQuest()
 end)
 
 module:RegisterEvent('QUEST_COMPLETE', function()
@@ -517,41 +517,41 @@ end)
 
 module:RegisterEvent('QUEST_LOG_UPDATE', function()
     -- triggered when the player's quest log has been altered
-	if paused then
-		return
-	end
+    if paused then
+        return
+    end
 
-	if WorldMapFrame:IsShown() then
-		-- https://github.com/p3lim-wow/QuickQuest/issues/45
-		return
-	end
+    if WorldMapFrame:IsShown() then
+        -- https://github.com/p3lim-wow/QuickQuest/issues/45
+        return
+    end
 
-	if QuestFrame:IsShown() then
-		-- don't try to deal with quests while we already deal with one
-		return
-	end
+    if QuestFrame:IsShown() then
+        -- don't try to deal with quests while we already deal with one
+        return
+    end
 
-	local numPopups = GetNumAutoQuestPopUps()
-	if numPopups == 0 then
-		return
-	end
+    local numPopups = GetNumAutoQuestPopUps()
+    if numPopups == 0 then
+        return
+    end
 
-	if UnitIsDeadOrGhost('player') then
-		-- can't accept quests while dead
-		module:Register('PLAYER_REGEN_ENABLED', 'QUEST_LOG_UPDATE')
-		return
-	end
-	module:UnregisterEvent('PLAYER_REGEN_ENABLED')
+    if UnitIsDeadOrGhost('player') then
+        -- can't accept quests while dead
+        module:Register('PLAYER_REGEN_ENABLED', 'QUEST_LOG_UPDATE')
+        return
+    end
+    module:UnregisterEvent('PLAYER_REGEN_ENABLED')
     module:UnregisterEvent('QUEST_LOG_UPDATE')
 
-	for index = 1, numPopups do
-		local questID, questType = GetAutoQuestPopUp(index)
-		if questType == 'OFFER' then
-			ShowQuestOffer(questID)
-		elseif questType == 'COMPLETE' then
-			ShowQuestComplete(questID)
-		end
-	end
+    for index = 1, numPopups do
+        local questID, questType = GetAutoQuestPopUp(index)
+        if questType == 'OFFER' then
+            ShowQuestOffer(questID)
+        elseif questType == 'COMPLETE' then
+            ShowQuestComplete(questID)
+        end
+    end
 end)
 
 module:RegisterEvent('QUEST_ACCEPT_CONFIRM', function()
@@ -565,24 +565,24 @@ end)
 
 module:RegisterEvent('QUEST_ACCEPTED', function(_, _, questID)
     -- triggered when a quest has been accepted by the player
-	if QuickQuestDB.general.share then
-		local questLogIndex = C_QuestLog.GetLogIndexForQuestID(questID)
-		if questLogIndex then
-			QuestLogPushQuest(questLogIndex)
-		end
-	end
+    if QuickQuestDB.general.share then
+        local questLogIndex = C_QuestLog.GetLogIndexForQuestID(questID)
+        if questLogIndex then
+            QuestLogPushQuest(questLogIndex)
+        end
+    end
 end)
 
 module:RegisterEvent('MODIFIER_STATE_CHANGED', function(_, _, key, state)
     -- triggered when the player clicks any modifier keys on the keyboard
-	if string.sub(key, 2) == QuickQuestDB.general.pausekey then
-		-- change the paused state
-		if QuickQuestDB.general.pausekeyreverse then
-			paused = state ~= 1
-		else
-			paused = state == 1
-		end
-	end
+    if string.sub(key, 2) == QuickQuestDB.general.pausekey then
+        -- change the paused state
+        if QuickQuestDB.general.pausekeyreverse then
+            paused = state ~= 1
+        else
+            paused = state == 1
+        end
+    end
 end)
 
 module:RegisterEvent('PLAYER_LOGIN', function()

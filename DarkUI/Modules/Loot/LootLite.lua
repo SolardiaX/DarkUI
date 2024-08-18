@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.loot.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Loot frame(addon by Haste)
+--    Loot frame(addon by Haste)
 ----------------------------------------------------------------------------------------
 
 local CreateFrame = CreateFrame
@@ -195,7 +195,7 @@ addon:SetScript("OnMouseDown", function(self, button)
     if IsAltKeyDown() or IsShiftKeyDown() then
         self:StartMoving()
     elseif IsControlKeyDown() and button == "RightButton" then
-	    self:ClearAllPoints()
+        self:ClearAllPoints()
         self:SetPoint(unpack(cfg.pos))
     end
 end)

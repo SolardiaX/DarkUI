@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.loot.enable then return end
 
 ----------------------------------------------------------------------------------------
---	MasterLoot by Ammo
+--    MasterLoot by Ammo
 ----------------------------------------------------------------------------------------
 
 local DoMasterLootRoll = DoMasterLootRoll

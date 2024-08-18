@@ -18,7 +18,7 @@ local headers = {
 }
 
 ----------------------------------------------------------------------------------------
---	Move ObjectiveTrackerFrame and hide background
+--    Move ObjectiveTrackerFrame and hide background
 ----------------------------------------------------------------------------------------
 local anchor = CreateFrame("Frame", "DarkUI_ObjectiveTrackerAnchor", UIParent)
 anchor:SetPoint(unpack(C.quest.quest_tracker_pos))
@@ -41,7 +41,7 @@ end)
 ObjectiveTrackerFrame.Header.Background:SetTexture(nil)
 
 ----------------------------------------------------------------------------------------
---	Skin ObjectiveTrackerFrame.HeaderMenu.MinimizeButton
+--    Skin ObjectiveTrackerFrame.HeaderMenu.MinimizeButton
 ----------------------------------------------------------------------------------------
 local button = ObjectiveTrackerFrame.Header.MinimizeButton
 button:SetSize(17, 17)
@@ -73,7 +73,7 @@ hooksecurefunc(ObjectiveTrackerFrame, "SetCollapsed", function(self, collapsed)
 end)
 
 ----------------------------------------------------------------------------------------
---	Difficulty color for quest headers
+--    Difficulty color for quest headers
 ----------------------------------------------------------------------------------------
 hooksecurefunc(QuestObjectiveTracker, "Update", function()
     for i = 1, C_QuestLog.GetNumQuestWatches() do
@@ -120,7 +120,7 @@ local function colorQuest(_, block)
 end
 
 ----------------------------------------------------------------------------------------
---	Skin quest item buttons
+--    Skin quest item buttons
 ----------------------------------------------------------------------------------------
 local function HotkeyShow(self)
     local item = self:GetParent()
@@ -222,34 +222,34 @@ end
 -- local frame = CreateFrame("Frame")
 -- frame:RegisterEvent("PLAYER_LOGIN")
 -- frame:SetScript("OnEvent", function()
--- 	if not C_AddOns.IsAddOnLoaded("WorldQuestsList") then return end
+--     if not C_AddOns.IsAddOnLoaded("WorldQuestsList") then return end
 
--- 	local orig = _G.WorldQuestList.ObjectiveTracker_Update_hook
--- 	local function orig_hook(...)
--- 		orig(...)
--- 		for _, b in pairs(WorldQuestList.LFG_objectiveTrackerButtons) do
--- 			if b and not b.skinned then
--- 				b:SetSize(20, 20)
--- 				b.texture:SetAtlas("socialqueuing-icon-eye")
--- 				b.texture:SetSize(12, 12)
--- 				b:SetHighlightTexture(0)
+--     local orig = _G.WorldQuestList.ObjectiveTracker_Update_hook
+--     local function orig_hook(...)
+--         orig(...)
+--         for _, b in pairs(WorldQuestList.LFG_objectiveTrackerButtons) do
+--             if b and not b.skinned then
+--                 b:SetSize(20, 20)
+--                 b.texture:SetAtlas("socialqueuing-icon-eye")
+--                 b.texture:SetSize(12, 12)
+--                 b:SetHighlightTexture(0)
 
--- 				local point, anchor, point2, x, y = b:GetPoint()
--- 				if x == -18 then
--- 					b:SetPoint(point, anchor, point2, -13, y)
--- 				end
+--                 local point, anchor, point2, x, y = b:GetPoint()
+--                 if x == -18 then
+--                     b:SetPoint(point, anchor, point2, -13, y)
+--                 end
 
--- 				E:ApplyOverlayBorder(b)
+--                 E:ApplyOverlayBorder(b)
 
--- 				b.skinned = true
--- 			end
--- 		end
--- 	end
--- 	_G.WorldQuestList.ObjectiveTracker_Update_hook = orig_hook
+--                 b.skinned = true
+--             end
+--         end
+--     end
+--     _G.WorldQuestList.ObjectiveTracker_Update_hook = orig_hook
 -- end)
 
 -- ----------------------------------------------------------------------------------------
--- --	Skin quest objective progress bar
+-- --    Skin quest objective progress bar
 -- ----------------------------------------------------------------------------------------
 local function SkinProgressBar(tracker, key)
     local progressBar = tracker.usedProgressBars[key]
@@ -273,12 +273,13 @@ local function SkinProgressBar(tracker, key)
         bar:SetStatusBarTexture(C.media.texture.status)
         bar:CreateBackdrop("Transparent")
 
-        local border = bar:CreateTexture(nil, "BORDER")
-        border:SetPoint("CENTER", bar, "CENTER", 0, 0)
-        border:SetTexture(bar_border)
-        border:SetSize(256 * bar:GetWidth() / 198, 64 * bar:GetHeight() / 12)
+        -- local border = bar:CreateTexture(nil, "BORDER")
+        -- border:SetPoint("CENTER", bar, "CENTER", 0, 0)
+        -- border:SetTexture(bar_border)
+        -- border:SetSize(256 * bar:GetWidth() / 198, 64 * bar:GetHeight() / 12)
 
-        bar.border = border
+        -- bar.border = border
+        bar:CreateBorder()
 
         label:ClearAllPoints()
         label:SetPoint("CENTER", 0, -1)
@@ -308,7 +309,7 @@ local function SkinProgressBar(tracker, key)
 end
 
 -- ----------------------------------------------------------------------------------------
--- --	Skin Timer bar
+-- --    Skin Timer bar
 -- ----------------------------------------------------------------------------------------
 local function SkinTimer(tracker, key)
     local timerBar = tracker.usedTimerBars[key]
@@ -334,7 +335,7 @@ local function SkinTimer(tracker, key)
 end
 
 -- ----------------------------------------------------------------------------------------
--- --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
+-- --    Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
 -- ----------------------------------------------------------------------------------------
 local function onClick(questID)
     if IsControlKeyDown() then
@@ -349,7 +350,7 @@ end
 hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self) onClick(self.questID) end)
 
 ----------------------------------------------------------------------------------------
---	Skin and hook all trackers
+--    Skin and hook all trackers
 ----------------------------------------------------------------------------------------
 local IsFramePositionedLeft = function(frame)
     local x = frame:GetCenter()
@@ -395,17 +396,21 @@ for i = 1, #headers do
 end
 
 ----------------------------------------------------------------------------------------
---	Skin Dungeon block
+--    Skin Dungeon block
 ----------------------------------------------------------------------------------------
 hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateStageBlock", function(block)
     if not block.backdrop then
-        block:CreateBackdrop("Overlay")
-        block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 3, -3)
-        block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 5)
+        block:CreateBackdrop("Blur")
+        block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 10, -8)
+        block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -10, 8)
 
-        block.NormalBG:SetAlpha(0)
-        block.FinalBG:SetAlpha(0)
-        block.GlowTexture:SetTexture("")
+        -- block:CreateBorder()
+        -- block.border:SetPoint("TOPLEFT", block.NormalBG, 3, -3)
+        -- block.border:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 5)
+
+        -- block.NormalBG:SetAlpha(0)
+        -- block.FinalBG:SetAlpha(0)
+        -- block.GlowTexture:SetTexture("")
     end
 end)
 
@@ -451,49 +456,49 @@ ScenarioObjectiveTracker.StageBlock:HookScript("OnEnter", function(self)
 end)
 
 -- ----------------------------------------------------------------------------------------
--- --	Skin Mythic+ block
+-- --    Skin Mythic+ block
 -- ----------------------------------------------------------------------------------------
 -- hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "Activate", function(block)
--- 	if not block.backdrop then
--- 		block:CreateBackdrop("Overlay")
--- 		block.backdrop:SetPoint("TOPLEFT", block, 3, -3)
--- 		block.backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
--- 		block.backdrop.overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
+--     if not block.backdrop then
+--         block:CreateBackdrop("Overlay")
+--         block.backdrop:SetPoint("TOPLEFT", block, 3, -3)
+--         block.backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
+--         block.backdrop.overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
 
--- 		local bg = select(3, block:GetRegions())
--- 		bg:SetAlpha(0)
+--         local bg = select(3, block:GetRegions())
+--         bg:SetAlpha(0)
 
--- 		block.TimerBGBack:SetAlpha(0)
--- 		block.TimerBG:SetAlpha(0)
+--         block.TimerBGBack:SetAlpha(0)
+--         block.TimerBG:SetAlpha(0)
 
--- 		block.StatusBar:SetStatusBarTexture(C.media.texture.status)
--- 		block.StatusBar:CreateBackdrop("Overlay")
--- 		block.StatusBar.backdrop:SetFrameLevel(block.backdrop:GetFrameLevel() + 1)
--- 		block.StatusBar:SetStatusBarColor(0, 0.6, 1)
--- 		block.StatusBar:SetFrameLevel(block.StatusBar:GetFrameLevel() + 3)
--- 	end
+--         block.StatusBar:SetStatusBarTexture(C.media.texture.status)
+--         block.StatusBar:CreateBackdrop("Overlay")
+--         block.StatusBar.backdrop:SetFrameLevel(block.backdrop:GetFrameLevel() + 1)
+--         block.StatusBar:SetStatusBarColor(0, 0.6, 1)
+--         block.StatusBar:SetFrameLevel(block.StatusBar:GetFrameLevel() + 3)
+--     end
 -- end)
 
 -- hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "SetUpAffixes", function(self)
--- 	for frame in self.affixPool:EnumerateActive() do
--- 		frame.Border:SetTexture(nil)
--- 		frame.Portrait:SetTexture(nil)
--- 		if not frame.styled then
--- 			E:ApplyOverlayBorder(frame)
--- 			frame.styled = true
--- 		end
+--     for frame in self.affixPool:EnumerateActive() do
+--         frame.Border:SetTexture(nil)
+--         frame.Portrait:SetTexture(nil)
+--         if not frame.styled then
+--             E:ApplyOverlayBorder(frame)
+--             frame.styled = true
+--         end
 
--- 		if frame.info then
--- 			frame.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
--- 		elseif frame.affixID then
--- 			local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
--- 			frame.Portrait:SetTexture(filedataid)
--- 		end
--- 	end
+--         if frame.info then
+--             frame.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[frame.info.key].texture)
+--         elseif frame.affixID then
+--             local _, _, filedataid = C_ChallengeMode.GetAffixInfo(frame.affixID)
+--             frame.Portrait:SetTexture(filedataid)
+--         end
+--     end
 -- end)
 
 -- ----------------------------------------------------------------------------------------
--- --	Skin Torghast ablities
+-- --    Skin Torghast ablities
 -- ----------------------------------------------------------------------------------------
 -- local Maw = ScenarioObjectiveTracker.MawBuffsBlock.Container
 -- Maw:SetPoint("TOPRIGHT", ScenarioObjectiveTracker.MawBuffsBlock, "TOPRIGHT", -23, 0)
@@ -503,25 +508,25 @@ end)
 -- E:StyleButton(Maw)
 
 -- Maw.List:HookScript("OnShow", function(self)
--- 	self.button:SetPushedTexture(0)
--- 	self.button:SetHighlightTexture(0)
--- 	self.button:SetWidth(234)
--- 	self.button:SetButtonState("NORMAL")
--- 	self.button:SetPushedTextOffset(0, 0)
--- 	self.button:SetButtonState("PUSHED", true)
+--     self.button:SetPushedTexture(0)
+--     self.button:SetHighlightTexture(0)
+--     self.button:SetWidth(234)
+--     self.button:SetButtonState("NORMAL")
+--     self.button:SetPushedTextOffset(0, 0)
+--     self.button:SetButtonState("PUSHED", true)
 -- end)
 
 -- Maw.List:HookScript("OnHide", function(self)
--- 	self.button:SetPushedTexture(0)
--- 	self.button:SetHighlightTexture(0)
--- 	self.button:SetWidth(234)
+--     self.button:SetPushedTexture(0)
+--     self.button:SetHighlightTexture(0)
+--     self.button:SetWidth(234)
 -- end)
 
 -- Maw:HookScript("OnClick", function(container)
--- 	container.List:ClearAllPoints()
--- 	if IsFramePositionedLeft(ObjectiveTrackerFrame) then
--- 		container.List:SetPoint("TOPLEFT", container, "TOPRIGHT", 30, 1)
--- 	else
--- 		container.List:SetPoint("TOPRIGHT", container, "TOPLEFT", -15, 1)
--- 	end
+--     container.List:ClearAllPoints()
+--     if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+--         container.List:SetPoint("TOPLEFT", container, "TOPRIGHT", 30, 1)
+--     else
+--         container.List:SetPoint("TOPRIGHT", container, "TOPLEFT", -15, 1)
+--     end
 -- end)

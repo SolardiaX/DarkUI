@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable or not C.actionbar.bars.exp.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Exp Bar
+--    Exp Bar
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("ExpRep")
 

@@ -3,7 +3,7 @@ local E, C, L = unpack(select(2, ...))
 if not C.quest.enable and not C.quest.quest_auto_button then return end
 
 ----------------------------------------------------------------------------------------
---	AutoButton for used items(by Elv22) (use macro /click AutoButton)
+--    AutoButton for used items(by Elv22) (use macro /click AutoButton)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Quest"):Sub("AutoButton")
 

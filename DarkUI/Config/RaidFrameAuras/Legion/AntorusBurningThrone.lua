@@ -21,14 +21,14 @@ module:RegisterDebuff(TIER, INSTANCE, BOSS, 244091)    -- 烧焦
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248815)    -- 点燃
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 254429)    -- 黑暗压迫
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248819)    -- 虹吸腐蚀
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 244055)	-- 暗影触痕
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 244054)	-- 烈焰触痕
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 244055)    -- 暗影触痕
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 244054)    -- 烈焰触痕
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 245022)    -- 炽然
 
 BOSS = 1997    -- 安托兰统帅议会
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 257974)    -- 混乱脉冲
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244892)    -- 弱点攻击
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 253290)	-- 熵能爆裂
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 253290)    -- 熵能爆裂
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244737)    -- 震荡手雷
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244748)    -- 震晕
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244172, 5)    -- 灵能突袭
@@ -83,10 +83,10 @@ module:RegisterDebuff(TIER, INSTANCE, BOSS, 243961)    -- 哀难
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244005)    -- 黑暗裂隙
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244094, 5)    -- 冥魂之拥
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248732)    -- 毁灭回响
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 243968)	-- 烈焰折磨
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 243977)	-- 冰霜折磨
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 243980)	-- 邪能折磨
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 243973)	-- 暗影折磨
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 243968)    -- 烈焰折磨
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 243977)    -- 冰霜折磨
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 243980)    -- 邪能折磨
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 243973)    -- 暗影折磨
 
 BOSS = 1986 -- 破坏魔女巫会
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 244899)    -- 火焰打击
@@ -96,9 +96,9 @@ module:RegisterDebuff(TIER, INSTANCE, BOSS, 253020)    -- 黑暗风暴
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 245518)    -- 快速冻结
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 245586)    -- 冷凝之血
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 250757)    -- 宇宙之光
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 253753)	-- 恐惧
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 253697)	-- 冰霜之球
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 250097)	-- 阿曼苏尔的诡诈
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 253753)    -- 恐惧
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 253697)    -- 冰霜之球
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 250097)    -- 阿曼苏尔的诡诈
 
 BOSS = 1984 -- 阿格拉玛
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 245990)    -- 泰沙拉克之触
@@ -113,10 +113,10 @@ BOSS = 2031 -- 寂灭者阿古斯
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248167)    -- 死亡之雾
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248396)    -- 灵魂凋零
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 248499)    -- 巨镰横扫
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 258646)	-- 天空之赐
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 253903)	-- 天空之力
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 258647)	-- 海洋之赐
---module:RegisterDebuff(TIER, INSTANCE, BOSS, 253901)	-- 海洋之力
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 258646)    -- 天空之赐
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 253903)    -- 天空之力
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 258647)    -- 海洋之赐
+--module:RegisterDebuff(TIER, INSTANCE, BOSS, 253901)    -- 海洋之力
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 250669)    -- 灵魂爆发
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 251570)    -- 灵魂炸弹
 module:RegisterDebuff(TIER, INSTANCE, BOSS, 255199)    -- 阿格拉玛的化身

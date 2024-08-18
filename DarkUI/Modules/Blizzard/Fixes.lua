@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Fix blank tooltip
+--    Fix blank tooltip
 ----------------------------------------------------------------------------------------
 -- local bug = nil
 -- local FixTooltip = CreateFrame("Frame")
@@ -32,12 +32,12 @@ local E, C, L = select(2, ...):unpack()
 -- end)
 
 ----------------------------------------------------------------------------------------
---	Fix RemoveTalent() taint
+--    Fix RemoveTalent() taint
 ----------------------------------------------------------------------------------------
 -- FCF_StartAlertFlash = E.Dummy
 
 ----------------------------------------------------------------------------------------
---	Fix SearchLFGLeave() taint
+--    Fix SearchLFGLeave() taint
 ----------------------------------------------------------------------------------------
 -- local TaintFix = CreateFrame("Frame")
 -- TaintFix:SetScript("OnUpdate", function()
@@ -47,7 +47,7 @@ local E, C, L = select(2, ...):unpack()
 -- end)
 
 ----------------------------------------------------------------------------------------
---	Collect garbage
+--    Collect garbage
 ----------------------------------------------------------------------------------------
 local eventcount = 0
 local Garbage = CreateFrame("Frame")
@@ -62,7 +62,7 @@ Garbage:SetScript("OnEvent", function(self, event)
 end)
 
 ----------------------------------------------------------------------------------------
---	Guild
+--    Guild
 ----------------------------------------------------------------------------------------
 if not GuildControlUIRankSettingsFrameRosterLabel then
     GuildControlUIRankSettingsFrameRosterLabel = CreateFrame("frame")
@@ -70,7 +70,7 @@ if not GuildControlUIRankSettingsFrameRosterLabel then
 end
 
 ----------------------------------------------------------------------------------------
---	Fix taint with Actionbars
+--    Fix taint with Actionbars
 ----------------------------------------------------------------------------------------
 -- local barsToUpdate = { MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight, StanceBar, PetActionBar, PossessActionBar, MultiBarRight, MultiBarLeft, MultiBar5, MultiBar6, MultiBar7 }
 -- for _, bar in ipairs(barsToUpdate) do

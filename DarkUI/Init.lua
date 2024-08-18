@@ -1,10 +1,10 @@
 --[[
-	~AddOn Engine~
-	To load the AddOn engine add this to the top of your file:
-		local E, C, L = unpack(select(2, ...)); --Import: Engine, Config, Locale
+    ~AddOn Engine~
+    To load the AddOn engine add this to the top of your file:
+        local E, C, L = unpack(select(2, ...)); --Import: Engine, Config, Locale
 
-	To load the AddOn engine inside another addon add this to the top of your file:
-		local E, C, L = unpack(DarkUI); --Import: Engine, Config, Locale
+    To load the AddOn engine inside another addon add this to the top of your file:
+        local E, C, L = unpack(DarkUI); --Import: Engine, Config, Locale
 ]]
 
 local addonName, ns = ...

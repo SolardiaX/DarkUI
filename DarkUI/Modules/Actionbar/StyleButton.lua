@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable and not C.actionbar.styles.enable then return end
 
 ----------------------------------------------------------------------------------------
---	ActionBar Button Style (modified from NDui)
+--    ActionBar Button Style (modified from NDui)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleButton")
 local LAB = LibStub("LibActionButton-1.0")
@@ -111,8 +111,8 @@ function module:OnActive()
             end
         end)
 
-		LAB.flyoutHandler.Background:Hide()
-	end
+        LAB.flyoutHandler.Background:Hide()
+    end
 
     -- LAB Equiped Callback
     LAB.RegisterCallback(module, "OnButtonUpdate", function(_, button)

@@ -3,18 +3,18 @@
 if not C.quest.enable and not C.quest.auto_collapse then return end
 
 ----------------------------------------------------------------------------------------
---	Auto collapse ObjectiveTrackerFrame in instance
+--    Auto collapse ObjectiveTrackerFrame in instance
 ----------------------------------------------------------------------------------------
 local module = E:Module("Quest"):Sub("AutoCollapse")
 
 local headers = {
-	CampaignQuestObjectiveTracker,
-	QuestObjectiveTracker,
-	AdventureObjectiveTracker,
-	AchievementObjectiveTracker,
-	MonthlyActivitiesObjectiveTracker,
-	ProfessionsRecipeTracker,
-	WorldQuestObjectiveTracker,
+    CampaignQuestObjectiveTracker,
+    QuestObjectiveTracker,
+    AdventureObjectiveTracker,
+    AchievementObjectiveTracker,
+    MonthlyActivitiesObjectiveTracker,
+    ProfessionsRecipeTracker,
+    WorldQuestObjectiveTracker,
 }
 
 module:RegisterEvent("PLAYER_ENTERING_WORLD", function()

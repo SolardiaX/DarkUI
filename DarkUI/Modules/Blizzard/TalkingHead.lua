@@ -2,7 +2,7 @@ local E, C, L = select(2, ...):unpack()
 
 if not C.blizzard.custom_position then return end
 ------------------------------------------------------------------------------------------
---	Set custom position for TalkingHeadFrame
+--    Set custom position for TalkingHeadFrame
 ------------------------------------------------------------------------------------------
 local module = E:Module("Blizzard"):Sub("TalkingHead")
 

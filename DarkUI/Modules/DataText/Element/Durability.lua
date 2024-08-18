@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Durability.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Durability of DataText (modified from ShestakUI)
+--    Durability of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

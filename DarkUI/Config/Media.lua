@@ -56,7 +56,7 @@ local config = {
 config.qualityColors = {}
 local qualityColors = BAG_ITEM_QUALITY_COLORS
 for index, value in pairs(qualityColors) do
-	config.qualityColors[index] = {r = value.r, g = value.g, b = value.b}
+    config.qualityColors[index] = {r = value.r, g = value.g, b = value.b}
 end
 config.qualityColors[-1] = {r = 0, g = 0, b = 0}
 config.qualityColors[Enum.ItemQuality.Poor] = {r = COMMON_GRAY_COLOR.r, g = COMMON_GRAY_COLOR.g, b = COMMON_GRAY_COLOR.b}

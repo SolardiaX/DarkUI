@@ -3,14 +3,14 @@
 if C.tooltip.enable ~= true or C.tooltip.item_icon ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Adds item icons to tooltips(Tipachu by Tuller)
+--    Adds item icons to tooltips(Tipachu by Tuller)
 ----------------------------------------------------------------------------------------
 
 local function setTooltipIcon(self, icon)
     local title = icon and _G[self:GetName() .. "TextLeft1"]
     local text = title:GetText()
-	if title and text and not text:find("|T"..icon) then
-		title:SetFormattedText("|T%s:20:20:0:0:64:64:5:59:5:59:%d|t %s", icon, 20, text)
+    if title and text and not text:find("|T"..icon) then
+        title:SetFormattedText("|T%s:20:20:0:0:64:64:5:59:5:59:%d|t %s", icon, 20, text)
     end
 end
 

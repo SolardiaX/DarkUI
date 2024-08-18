@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.misc.slot_itemlevel then return end
 
 ----------------------------------------------------------------------------------------
---	Item level on slot buttons in Character/InspectFrame(iLevel by Sanex)
+--    Item level on slot buttons in Character/InspectFrame(iLevel by Sanex)
 ----------------------------------------------------------------------------------------
 
 local minItemLevel = 375 -- For missing enchant and gems checking
@@ -217,7 +217,7 @@ end
 f:SetScript("OnEvent", OnEvent)
 
 ----------------------------------------------------------------------------------------
---	Item level on flyout buttons (by Merathilis)
+--    Item level on flyout buttons (by Merathilis)
 ----------------------------------------------------------------------------------------
 local ItemDB = {}
 local function _getRealItemLevel(link, bag, slot)

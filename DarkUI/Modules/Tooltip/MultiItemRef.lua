@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if C.tooltip.enable ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Multi ItemRefTooltip
+--    Multi ItemRefTooltip
 ----------------------------------------------------------------------------------------
 
 local _G = _G

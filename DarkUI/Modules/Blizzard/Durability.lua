@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.blizzard.slot_durability then return end
 
 ----------------------------------------------------------------------------------------
---	Durability value on slot buttons in CharacterFrame(tekability by Tekkub)
+--    Durability value on slot buttons in CharacterFrame(tekability by Tekkub)
 ----------------------------------------------------------------------------------------
 
 local SLOTIDS = {}

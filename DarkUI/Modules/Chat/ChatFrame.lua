@@ -3,7 +3,7 @@
 if not C.chat.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Style chat frame(by Tukz and p3lim)
+--    Style chat frame(by Tukz and p3lim)
 ----------------------------------------------------------------------------------------
 
 local _G = _G
@@ -103,17 +103,17 @@ local function SetChatStyle(frame)
     end
 
     -- Removes Default ChatFrame Tabs texture
-	_G[format("ChatFrame%sTab", id)].Left:Kill()
-	_G[format("ChatFrame%sTab", id)].Middle:Kill()
-	_G[format("ChatFrame%sTab", id)].Right:Kill()
+    _G[format("ChatFrame%sTab", id)].Left:Kill()
+    _G[format("ChatFrame%sTab", id)].Middle:Kill()
+    _G[format("ChatFrame%sTab", id)].Right:Kill()
 
-	_G[format("ChatFrame%sTab", id)].ActiveLeft:Kill()
-	_G[format("ChatFrame%sTab", id)].ActiveMiddle:Kill()
-	_G[format("ChatFrame%sTab", id)].ActiveRight:Kill()
+    _G[format("ChatFrame%sTab", id)].ActiveLeft:Kill()
+    _G[format("ChatFrame%sTab", id)].ActiveMiddle:Kill()
+    _G[format("ChatFrame%sTab", id)].ActiveRight:Kill()
 
-	_G[format("ChatFrame%sTab", id)].HighlightLeft:Kill()
-	_G[format("ChatFrame%sTab", id)].HighlightMiddle:Kill()
-	_G[format("ChatFrame%sTab", id)].HighlightRight:Kill()
+    _G[format("ChatFrame%sTab", id)].HighlightLeft:Kill()
+    _G[format("ChatFrame%sTab", id)].HighlightMiddle:Kill()
+    _G[format("ChatFrame%sTab", id)].HighlightRight:Kill()
 
     -- Killing off the new chat tab selected feature
 
@@ -322,14 +322,14 @@ local function SetupChatPosAndFont()
     end)
 
     -- /run BNToastFrame:AddToast(BN_TOAST_TYPE_ONLINE, 1)
-	hooksecurefunc(BNToastFrame, "ShowToast", function(self)
-		if not self.IsSkinned then
-			self.CloseButton:SetSize(16, 16)
+    hooksecurefunc(BNToastFrame, "ShowToast", function(self)
+        if not self.IsSkinned then
+            self.CloseButton:SetSize(16, 16)
             E:SkinCloseButton(self.CloseButton, self)
 
-			self.IsSkinned = true
-		end
-	end)
+            self.IsSkinned = true
+        end
+    end)
 end
 
 GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
@@ -378,7 +378,7 @@ end
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", RemoveRealmName)
 
 ----------------------------------------------------------------------------------------
---	Save slash command typo
+--    Save slash command typo
 ----------------------------------------------------------------------------------------
 local function TypoHistory_Posthook_AddMessage(chat, text)
     if strfind(text, HELP_TEXT_SIMPLE) then
@@ -393,95 +393,95 @@ for i = 1, NUM_CHAT_WINDOWS do
 end
 
 ----------------------------------------------------------------------------------------
---	Loot icons
+--    Loot icons
 ----------------------------------------------------------------------------------------
 if cfg.loot_icons == true then
-	local function AddLootIcons(_, _, message, ...)
-		local function Icon(link)
-			local texture = GetItemIcon(link)
-			return "\124T"..texture..":12:12:0:0:64:64:5:59:5:59\124t"..link
-		end
-		message = message:gsub("(\124c%x+\124Hitem:.-\124h\124r)", Icon)
-		return false, message, ...
-	end
-	ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)
+    local function AddLootIcons(_, _, message, ...)
+        local function Icon(link)
+            local texture = GetItemIcon(link)
+            return "\124T"..texture..":12:12:0:0:64:64:5:59:5:59\124t"..link
+        end
+        message = message:gsub("(\124c%x+\124Hitem:.-\124h\124r)", Icon)
+        return false, message, ...
+    end
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", AddLootIcons)
 end
 
 ----------------------------------------------------------------------------------------
---	Swith channels by Tab
+--    Swith channels by Tab
 ----------------------------------------------------------------------------------------
 local cycles = {
-	{chatType = "SAY", use = function() return 1 end},
-	{chatType = "PARTY", use = function() return not IsInRaid() and IsInGroup(LE_PARTY_CATEGORY_HOME) end},
-	{chatType = "RAID", use = function() return IsInRaid(LE_PARTY_CATEGORY_HOME) end},
-	{chatType = "INSTANCE_CHAT", use = function() return IsPartyLFG() end},
-	{chatType = "GUILD", use = function() return IsInGuild() end},
-	{chatType = "SAY", use = function() return 1 end},
+    {chatType = "SAY", use = function() return 1 end},
+    {chatType = "PARTY", use = function() return not IsInRaid() and IsInGroup(LE_PARTY_CATEGORY_HOME) end},
+    {chatType = "RAID", use = function() return IsInRaid(LE_PARTY_CATEGORY_HOME) end},
+    {chatType = "INSTANCE_CHAT", use = function() return IsPartyLFG() end},
+    {chatType = "GUILD", use = function() return IsInGuild() end},
+    {chatType = "SAY", use = function() return 1 end},
 }
 
 local function UpdateTabChannelSwitch(self)
-	if strsub(tostring(self:GetText()), 1, 1) == "/" then return end
-	local currChatType = self:GetAttribute("chatType")
-	for i, curr in ipairs(cycles) do
-		if curr.chatType == currChatType then
-			local h, r, step = i + 1, #cycles, 1
-			if IsShiftKeyDown() then h, r, step = i - 1, 1, -1 end
-			for j = h, r, step do
-				if cycles[j]:use(self, currChatType) then
-					self:SetAttribute("chatType", cycles[j].chatType)
-					ChatEdit_UpdateHeader(self)
-					return
-				end
-			end
-		end
-	end
+    if strsub(tostring(self:GetText()), 1, 1) == "/" then return end
+    local currChatType = self:GetAttribute("chatType")
+    for i, curr in ipairs(cycles) do
+        if curr.chatType == currChatType then
+            local h, r, step = i + 1, #cycles, 1
+            if IsShiftKeyDown() then h, r, step = i - 1, 1, -1 end
+            for j = h, r, step do
+                if cycles[j]:use(self, currChatType) then
+                    self:SetAttribute("chatType", cycles[j].chatType)
+                    ChatEdit_UpdateHeader(self)
+                    return
+                end
+            end
+        end
+    end
 end
 hooksecurefunc("ChatEdit_CustomTabPressed", UpdateTabChannelSwitch)
 
 ----------------------------------------------------------------------------------------
---	Role icons
+--    Role icons
 ----------------------------------------------------------------------------------------
 if cfg.role_icons == true then
-	local chats = {
-		CHAT_MSG_SAY = 1, CHAT_MSG_YELL = 1,
-		CHAT_MSG_WHISPER = 1, CHAT_MSG_WHISPER_INFORM = 1,
-		CHAT_MSG_PARTY = 1, CHAT_MSG_PARTY_LEADER = 1,
-		CHAT_MSG_INSTANCE_CHAT = 1, CHAT_MSG_INSTANCE_CHAT_LEADER = 1,
-		CHAT_MSG_RAID = 1, CHAT_MSG_RAID_LEADER = 1, CHAT_MSG_RAID_WARNING = 1,
-	}
-	local role_tex = {
-		TANK = "\124T"..C.media.path.."icon_tank.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
-		HEALER	= "\124T"..C.media.path.."icon_healer.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
-		DAMAGER = "\124T"..C.media.path.."icon_damager.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
-	}
-	local GetColoredName_orig = _G.GetColoredName
-	local function GetColoredName_hook(event, arg1, arg2, ...)
-		local ret = GetColoredName_orig(event, arg1, arg2, ...)
-		if chats[event] then
-			local role = UnitGroupRolesAssigned(arg2)
-			if role == "NONE" and arg2:match(" *- *"..GetRealmName().."$") then
-				role = UnitGroupRolesAssigned(arg2:gsub(" *-[^-]+$",""))
-			end
-			if role and role ~= "NONE" then
-				ret = role_tex[role]..""..ret
-			end
-		end
-		return ret
-	end
-	_G.GetColoredName = GetColoredName_hook
+    local chats = {
+        CHAT_MSG_SAY = 1, CHAT_MSG_YELL = 1,
+        CHAT_MSG_WHISPER = 1, CHAT_MSG_WHISPER_INFORM = 1,
+        CHAT_MSG_PARTY = 1, CHAT_MSG_PARTY_LEADER = 1,
+        CHAT_MSG_INSTANCE_CHAT = 1, CHAT_MSG_INSTANCE_CHAT_LEADER = 1,
+        CHAT_MSG_RAID = 1, CHAT_MSG_RAID_LEADER = 1, CHAT_MSG_RAID_WARNING = 1,
+    }
+    local role_tex = {
+        TANK = "\124T"..C.media.path.."icon_tank.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
+        HEALER    = "\124T"..C.media.path.."icon_healer.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
+        DAMAGER = "\124T"..C.media.path.."icon_damager.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
+    }
+    local GetColoredName_orig = _G.GetColoredName
+    local function GetColoredName_hook(event, arg1, arg2, ...)
+        local ret = GetColoredName_orig(event, arg1, arg2, ...)
+        if chats[event] then
+            local role = UnitGroupRolesAssigned(arg2)
+            if role == "NONE" and arg2:match(" *- *"..GetRealmName().."$") then
+                role = UnitGroupRolesAssigned(arg2:gsub(" *-[^-]+$",""))
+            end
+            if role and role ~= "NONE" then
+                ret = role_tex[role]..""..ret
+            end
+        end
+        return ret
+    end
+    _G.GetColoredName = GetColoredName_hook
 end
 
 ----------------------------------------------------------------------------------------
---	Prevent reposition ChatFrame
+--    Prevent reposition ChatFrame
 ----------------------------------------------------------------------------------------
 hooksecurefunc(ChatFrame1, "SetPoint", function(self, _, _, _, x)
-	if x ~= cfg.pos[4] then
-		self:ClearAllPoints()
-		self:SetSize(cfg.width, cfg.height)
-		if cfg.background == true then
+    if x ~= cfg.pos[4] then
+        self:ClearAllPoints()
+        self:SetSize(cfg.width, cfg.height)
+        if cfg.background == true then
             self:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5] + 4)
         else
             self:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5])
         end
-	end
+    end
 end)

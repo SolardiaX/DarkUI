@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Friends.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Friends of DataText (modified from ShestakUI)
+--    Friends of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 
@@ -83,22 +83,22 @@ end
 
 local clientTags = {
     ["WoW"] = "World of Warcraft",
-	["S2"] = "StarCraft 2",
-	["OSI"] = "Diablo II: Resurrected",
-	["D3"] = "Diablo 3",
-	["WTCG"] = "Hearthstone",
-	["App"] = "Battle.net Desktop App",
-	["BSAp"] = "Battle.net Mobile App",
-	["Hero"] = "Heroes of the Storm",
-	["Pro"] = "Overwatch",
-	["CLNT"] = "Battle.net Desktop App",
-	["S1"] = "StarCraft: Remastered",
-	["DST2"] = "Destiny 2",
-	["VIPR"] = "Call of Duty: Black Ops 4",
-	["ODIN"] = "Call of Duty: Modern Warfare",
-	["LAZR"] = "Call of Duty: Modern Warfare 2",
-	["ZEUS"] = "Call of Duty: Black Ops Cold War",
-	["W3"] = "Warcraft III: Reforged",
+    ["S2"] = "StarCraft 2",
+    ["OSI"] = "Diablo II: Resurrected",
+    ["D3"] = "Diablo 3",
+    ["WTCG"] = "Hearthstone",
+    ["App"] = "Battle.net Desktop App",
+    ["BSAp"] = "Battle.net Mobile App",
+    ["Hero"] = "Heroes of the Storm",
+    ["Pro"] = "Overwatch",
+    ["CLNT"] = "Battle.net Desktop App",
+    ["S1"] = "StarCraft: Remastered",
+    ["DST2"] = "Destiny 2",
+    ["VIPR"] = "Call of Duty: Black Ops 4",
+    ["ODIN"] = "Call of Duty: Modern Warfare",
+    ["LAZR"] = "Call of Duty: Modern Warfare 2",
+    ["ZEUS"] = "Call of Duty: Black Ops Cold War",
+    ["W3"] = "Warcraft III: Reforged",
 }
 
 module:Inject("Friends", {

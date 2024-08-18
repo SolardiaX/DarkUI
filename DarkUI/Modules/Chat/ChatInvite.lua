@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.chat.enable and not C.chat.alt_invite then return end
 
 ----------------------------------------------------------------------------------------
---	Alt Click to Invite player
+--    Alt Click to Invite player
 ----------------------------------------------------------------------------------------
 
 local IsAltKeyDown = IsAltKeyDown

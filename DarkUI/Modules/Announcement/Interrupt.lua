@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.announcement.interrupt.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Announce your interrupts (modified from Elv)
+--    Announce your interrupts (modified from Elv)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Announcement"):Sub("Interrupt")
 

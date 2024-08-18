@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.actionbar.bars.enable then return end
 
 ----------------------------------------------------------------------------------------
---	PetActionBar (modified from ShestakUI)
+--    PetActionBar (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("BarPet")
 

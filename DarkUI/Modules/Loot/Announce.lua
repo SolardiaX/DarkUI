@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.loot.enable or not _G["LootLite"] then return end
 
 ----------------------------------------------------------------------------------------
---	Announce loot(lcLoot by RustamIrzaev)
+--    Announce loot(lcLoot by RustamIrzaev)
 ----------------------------------------------------------------------------------------
 
 local CreateFrame = CreateFrame

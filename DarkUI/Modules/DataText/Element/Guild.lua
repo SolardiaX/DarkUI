@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.stats.enable or not C.stats.config.Guild.enable then return end
 
 ----------------------------------------------------------------------------------------
---	Guild of DataText (modified from ShestakUI)
+--    Guild of DataText (modified from ShestakUI)
 ----------------------------------------------------------------------------------------
 local module = E:Module("DataText")
 

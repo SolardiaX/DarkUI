@@ -7,12 +7,12 @@ if E.myClass ~= "DEATHKNIGHT" then return end
 local list = {
     ["Player Aura"]    = {        -- 玩家光环组
         { AuraID = 3714, UnitID = "player" }, -- 冰霜之路
-        {AuraID = 53365, UnitID = "player"},	-- 不洁之力
+        {AuraID = 53365, UnitID = "player"},    -- 不洁之力
         { AuraID = 59052, UnitID = "player" }, -- 白霜
-        {AuraID = 81340, UnitID = "player"},	-- 末日突降
-        {AuraID = 111673, UnitID = "pet"},		-- 控制亡灵
+        {AuraID = 81340, UnitID = "player"},    -- 末日突降
+        {AuraID = 111673, UnitID = "pet"},        -- 控制亡灵
         { AuraID = 215377, UnitID = "player" }, -- 巨口饿了
-        {AuraID = 219788, UnitID = "player"},	-- 埋骨之所
+        {AuraID = 219788, UnitID = "player"},    -- 埋骨之所
     },
     ["Target Aura"]    = {        -- 目标光环组
         { AuraID = 55078, UnitID = "target", Caster = "player" }, -- 血之疫病
@@ -29,12 +29,12 @@ local list = {
         { AuraID = 194310, UnitID = "target", Caster = "player" }, -- 溃烂之伤
         { AuraID = 156004, UnitID = "target", Caster = "player" }, -- 亵渎
         { AuraID = 191748, UnitID = "target", Caster = "player" }, -- 诸界之灾
-        {AuraID = 312202, UnitID = "target", Caster = "player"},	-- 失格者之梏
+        {AuraID = 312202, UnitID = "target", Caster = "player"},    -- 失格者之梏
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
         { AuraID = 63560, UnitID = "pet" }, -- 黑暗突变
-        {AuraID = 47568, UnitID = "player"},	-- 符文武器增效
-    {AuraID = 49039, UnitID = "player"},	-- 巫妖之躯
+        {AuraID = 47568, UnitID = "player"},    -- 符文武器增效
+    {AuraID = 49039, UnitID = "player"},    -- 巫妖之躯
         { AuraID = 81141, UnitID = "player" }, -- 赤色天灾
         { AuraID = 48265, UnitID = "player" }, -- 死亡脚步
         { AuraID = 55233, UnitID = "player" }, -- 吸血鬼之血
@@ -68,7 +68,7 @@ local list = {
         { AuraID = 273947, UnitID = "player", Stack = 5, Flash = true }, -- 鲜血禁闭
         { AuraID = 253595, UnitID = "player", Combat = true }, -- 酷寒突袭
         { AuraID = 281209, UnitID = "player", Combat = true }, -- 冷酷之心
-        {AuraID = 321995, UnitID = "player"},	-- 霜符灵气
+        {AuraID = 321995, UnitID = "player"},    -- 霜符灵气
     },
     ["Focus Aura"]     = {        -- 焦点光环组
         { AuraID = 55078, UnitID = "focus", Caster = "player" }, -- 血之疫病

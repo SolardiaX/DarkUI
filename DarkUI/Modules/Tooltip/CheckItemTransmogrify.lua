@@ -3,7 +3,7 @@
 if C.tooltip.enable ~= true or C.tooltip.item_transmogrify ~= true then return end
 
 ----------------------------------------------------------------------------------------
---	Displays items can not be transmogrified(Will It Mog by Nathanyel)
+--    Displays items can not be transmogrified(Will It Mog by Nathanyel)
 ----------------------------------------------------------------------------------------
 
 local GetItemInfo = GetItemInfo
@@ -43,7 +43,7 @@ local locs = {
 
 local WIMtooltip = function(self, _)
     local slot = self.slot
-	if not slot then return end
+    if not slot then return end
 
     local _, link = self:GetItem()
     if not link then return end

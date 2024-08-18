@@ -3,7 +3,7 @@ local E, C, L = select(2, ...):unpack()
 if not C.blizzard.custom_position then return end
 
 ----------------------------------------------------------------------------------------
---	Based on oMirrorBars(by Haste)
+--    Based on oMirrorBars(by Haste)
 ----------------------------------------------------------------------------------------
 local module = E:Module("Blizzard"):Sub("MirrorBar")
 

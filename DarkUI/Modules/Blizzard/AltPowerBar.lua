@@ -5,7 +5,7 @@ local oUF = ns.oUF or oUF
 if not C.blizzard.custom_position then return end
 
 ----------------------------------------------------------------------------------------
---	Skin AltPowerBar(by Tukz)
+--    Skin AltPowerBar(by Tukz)
 ----------------------------------------------------------------------------------------
 
 local CreateFrame = CreateFrame
@@ -107,7 +107,7 @@ status:SetScript("OnUpdate", function(self, elapsed)
         local cur = UnitPower("player", ALTERNATE_POWER_INDEX)
         local max = UnitPowerMax("player", ALTERNATE_POWER_INDEX)
         local texture, r, g, b = GetUnitPowerBarTextureInfo("player", 2, 0)
-		if not texture or (r == 1 and g == 1 and b == 1) then
+        if not texture or (r == 1 and g == 1 and b == 1) then
             r, g, b = oUF:ColorGradient(cur, max, 0.8, 0.2, 0.1, 1, 0.8, 0.1, 0.33, 0.59, 0.33)
         end
         self:SetMinMaxValues(0, max)

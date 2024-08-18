@@ -6,7 +6,7 @@ if C_AddOns.IsAddOnLoaded("OpenAll")
     or not C.blizzard.style then return end
 
 ----------------------------------------------------------------------------------------
---	Grab mail in 1 button(OpenAll by Kemayo)
+--    Grab mail in 1 button(OpenAll by Kemayo)
 ----------------------------------------------------------------------------------------
 
 local deletedelay, t = 0.5, 0
@@ -138,7 +138,7 @@ end)
 button2:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
 ----------------------------------------------------------------------------------------
---	Inbox scroll
+--    Inbox scroll
 ----------------------------------------------------------------------------------------
 MailFrame:EnableMouseWheel(true)
 MailFrame:SetScript("OnMouseWheel", function(self, d)

@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Configuration of CombatText AoeSpam
+--    Configuration of CombatText AoeSpam
 ----------------------------------------------------------------------------------------
 
 C.aoespam = {}
@@ -15,22 +15,22 @@ C.aoespam.healfilter[127802] = true        -- Touch of the Grave
 C.aoespam.merge = {}
 C.aoespam.aoespam = {}
 C.aoespam.aoespam[6603] = 3                -- Auto Attack
-C.aoespam.aoespam[195222] = 4			-- Stormlash [Shaman]
-C.aoespam.aoespam[195256] = 4			-- Stormlash [Shaman]
-C.aoespam.aoespam[259756] = 6			-- Entropic Embrace (Void Elves)
-C.aoespam.aoespam[321519] = 5			-- Paralytic Poison (Covenant Night Fae)
-C.aoespam.aoespam[344155] = 1			-- Gluttonous Spike (Trinket)
-C.aoespam.aoespam[356320] = 10			-- Siphon Essence (Unholy Shard)
-C.aoespam.aoespam[345466] = 3			-- Liquefying Ooze (Trinket)
-C.aoespam.aoespam[355759] = 3			-- Frozen Heart (Trinket)
-C.aoespam.aoespam[333526] = 3			-- Spiked Burrs (Night Fae Soulbind)
-C.aoespam.aoespam[355735] = 3			-- Winds of Winter (Frost Shard)
-C.aoespam.aoespam[355804] = 3			-- Blood Link (Blood Shard)
-C.aoespam.aoespam[355768] = 3			-- Blood Link (Blood Shard)
-C.aoespam.aoespam[355769] = 3			-- Blood Link (Blood Shard)
-C.aoespam.aoespam[355829] = 3			-- Chaos Bane (Unholy Shard)
-C.aoespam.aoespam[355605] = 3			-- Fusion Amplification (Trinket)
-C.aoespam.aoespam[351687] = 3			-- Mnemonic Equipment (Maldraxxus)
+C.aoespam.aoespam[195222] = 4            -- Stormlash [Shaman]
+C.aoespam.aoespam[195256] = 4            -- Stormlash [Shaman]
+C.aoespam.aoespam[259756] = 6            -- Entropic Embrace (Void Elves)
+C.aoespam.aoespam[321519] = 5            -- Paralytic Poison (Covenant Night Fae)
+C.aoespam.aoespam[344155] = 1            -- Gluttonous Spike (Trinket)
+C.aoespam.aoespam[356320] = 10            -- Siphon Essence (Unholy Shard)
+C.aoespam.aoespam[345466] = 3            -- Liquefying Ooze (Trinket)
+C.aoespam.aoespam[355759] = 3            -- Frozen Heart (Trinket)
+C.aoespam.aoespam[333526] = 3            -- Spiked Burrs (Night Fae Soulbind)
+C.aoespam.aoespam[355735] = 3            -- Winds of Winter (Frost Shard)
+C.aoespam.aoespam[355804] = 3            -- Blood Link (Blood Shard)
+C.aoespam.aoespam[355768] = 3            -- Blood Link (Blood Shard)
+C.aoespam.aoespam[355769] = 3            -- Blood Link (Blood Shard)
+C.aoespam.aoespam[355829] = 3            -- Chaos Bane (Unholy Shard)
+C.aoespam.aoespam[355605] = 3            -- Fusion Amplification (Trinket)
+C.aoespam.aoespam[351687] = 3            -- Mnemonic Equipment (Maldraxxus)
 
 
 -- Class config
@@ -74,10 +74,10 @@ if E.myClass == "DEATHKNIGHT" then
     C.aoespam.aoespam[156000] = 3        -- Defile
     C.aoespam.aoespam[155166] = 3        -- Mark of Sindragosa
     C.aoespam.aoespam[55090] = 0        -- Scourge Strike
-    C.aoespam.aoespam[319236] = 5		-- Unholy Pact
-    C.aoespam.aoespam[212423] = 6		-- Skulker Shot
-    C.aoespam.aoespam[311730] = 4		-- Swarming Mist (Covenant Venthyr)
-    C.aoespam.aoespam[323798] = 6		-- Abomination Limb (Covenant Necrolord)
+    C.aoespam.aoespam[319236] = 5        -- Unholy Pact
+    C.aoespam.aoespam[212423] = 6        -- Skulker Shot
+    C.aoespam.aoespam[311730] = 4        -- Swarming Mist (Covenant Venthyr)
+    C.aoespam.aoespam[323798] = 6        -- Abomination Limb (Covenant Necrolord)
     C.aoespam.merge[66198] = 222024        -- Obliterate Off-Hand
     C.aoespam.merge[66196] = 222026        -- Frost Strike Off-Hand
     C.aoespam.merge[66188] = 49998        -- Death Strike Off-Hand
@@ -114,7 +114,7 @@ elseif E.myClass == "DEMONHUNTER" then
     C.aoespam.aoespam[199552] = 2        -- Blade Dance (AOE, Multi)
     C.aoespam.merge[200685] = 199552    -- Blade Dance
     C.aoespam.aoespam[201789] = 4        -- Fury of the Illidari
-    C.aoespam.merge[201628] = 201789    -- Fury of the Illidari	Off-Hand
+    C.aoespam.merge[201628] = 201789    -- Fury of the Illidari    Off-Hand
     C.aoespam.aoespam[203796] = 4        -- Demon Blades
     C.aoespam.aoespam[192611] = 1        -- Fel Rush
     C.aoespam.aoespam[198030] = 3        -- Eye Beam
@@ -125,18 +125,18 @@ elseif E.myClass == "DEMONHUNTER" then
     C.aoespam.aoespam[207690] = 10        -- Bloodlet
     C.aoespam.aoespam[202446] = 1        -- Anguish
     C.aoespam.aoespam[211796] = 4        -- Chaos Blades
-    C.aoespam.merge[211797] = 211796    -- Chaos Blades	Off-Hand
+    C.aoespam.merge[211797] = 211796    -- Chaos Blades    Off-Hand
     C.aoespam.aoespam[227518] = 1.5        -- Annihilation
-    C.aoespam.merge[201428] = 227518    -- Annihilation	Off-Hand
+    C.aoespam.merge[201428] = 227518    -- Annihilation    Off-Hand
     C.aoespam.aoespam[210153] = 2        -- Death Sweep
-    C.aoespam.merge[210155] = 210153    -- Death Sweep	Off-Hand
+    C.aoespam.merge[210155] = 210153    -- Death Sweep    Off-Hand
     C.aoespam.aoespam[236237] = 2        -- Chaos Cleave
     C.aoespam.aoespam[203794] = 2        -- Consume Soul
-    C.aoespam.aoespam[307046] = 0		-- Elysian Decree (Covenant Kyrian)
-    C.aoespam.aoespam[345335] = 3		-- The Hunt (DoT)
-    C.aoespam.aoespam[345423] = 6		-- The Hunt (Heal)
-    C.aoespam.aoespam[342857] = 3		-- Glaive Tempest
-    C.aoespam.aoespam[346278] = 3		-- Burning Wound (Legendary)
+    C.aoespam.aoespam[307046] = 0        -- Elysian Decree (Covenant Kyrian)
+    C.aoespam.aoespam[345335] = 3        -- The Hunt (DoT)
+    C.aoespam.aoespam[345423] = 6        -- The Hunt (Heal)
+    C.aoespam.aoespam[342857] = 3        -- Glaive Tempest
+    C.aoespam.aoespam[346278] = 3        -- Burning Wound (Legendary)
 elseif E.myClass == "DRUID" then
     -- Healing spells
     C.aoespam.aoespam[207386] = 4        -- Spring Blossoms
@@ -238,15 +238,15 @@ elseif E.myClass == "HUNTER" then
     C.aoespam.aoespam[63900] = 1        -- Thunderstomp
     C.aoespam.aoespam[197465] = 1        -- Surge of the Stormgod
     C.aoespam.aoespam[207097] = 4        -- Titan's Thunder
-    C.aoespam.aoespam[269576] = 6		-- Master Marksman
-    C.aoespam.aoespam[328837] = 0.5		-- Wild Spirits (Covenant Night Fae)
-    C.aoespam.aoespam[328757] = 6		-- Wild Spirits (Covenant Night Fae)
+    C.aoespam.aoespam[269576] = 6        -- Master Marksman
+    C.aoespam.aoespam[328837] = 0.5        -- Wild Spirits (Covenant Night Fae)
+    C.aoespam.aoespam[328757] = 6        -- Wild Spirits (Covenant Night Fae)
     -- Healing spells
     C.aoespam.aoespam[199483] = 9        -- Camouflage
     C.aoespam.aoespam[136] = 9            -- Mend Pet
     C.aoespam.merge[214303] = 136        -- Mend Pet (Hati)
     C.aoespam.aoespam[197161] = 8        -- Mimiron's Shell Heal
-    C.aoespam.aoespam[339400] = 4		-- Rejuvenating Wind (Conduit)
+    C.aoespam.aoespam[339400] = 4        -- Rejuvenating Wind (Conduit)
     C.aoespam.healfilter[197205] = true    -- Spirit Bond
 elseif E.myClass == "MAGE" then
     C.aoespam.aoespam[217694] = 3.5        -- Living Bomb
@@ -298,8 +298,8 @@ elseif E.myClass == "MAGE" then
     C.aoespam.aoespam[211076] = 3        -- Mark of Aluneth
     C.aoespam.merge[210817] = 44425        -- Arcane Rebound
     C.aoespam.aoespam[44425] = 1.2        -- Arcane Barrage
-    C.aoespam.aoespam[277703] = 3		-- Trailing Embers
-    C.aoespam.aoespam[325130] = 1.9		-- Shifting Power (Covenant Night Fae)
+    C.aoespam.aoespam[277703] = 3        -- Trailing Embers
+    C.aoespam.aoespam[325130] = 1.9        -- Shifting Power (Covenant Night Fae)
 elseif E.myClass == "MONK" then
     -- Healing spells
     C.aoespam.aoespam[119611] = 3        -- Renewing Mist
@@ -351,7 +351,7 @@ elseif E.myClass == "PALADIN" then
     C.aoespam.aoespam[81297] = 3        -- Consecration
     C.aoespam.aoespam[53385] = 0        -- Divine Storm
     C.aoespam.aoespam[88263] = 1        -- Hammer of the Righteous
-    C.aoespam.merge[53595] = 88263		-- Hammer of the Righteous
+    C.aoespam.merge[53595] = 88263        -- Hammer of the Righteous
     C.aoespam.aoespam[31935] = .5        -- Avenger's Shield
     C.aoespam.aoespam[114871] = 0        -- Holy Prism
     C.aoespam.aoespam[114919] = 3        -- Arcing Light
@@ -364,7 +364,7 @@ elseif E.myClass == "PALADIN" then
     C.aoespam.aoespam[224239] = 1        -- Divine Storm
     C.aoespam.aoespam[20271] = 1        -- Judgment
     C.aoespam.aoespam[217020] = 1        -- Zeal
-    C.aoespam.aoespam[286232] = 1		-- Light's Decree
+    C.aoespam.aoespam[286232] = 1        -- Light's Decree
 elseif E.myClass == "PRIEST" then
     -- Healing spells
     C.aoespam.aoespam[204065] = 0        -- Shadow Covenant
@@ -439,7 +439,7 @@ elseif E.myClass == "ROGUE" then
     C.aoespam.aoespam[152150] = 3        -- Death from Above
     C.aoespam.aoespam[114014] = 3        -- Shuriken Toss
     C.aoespam.aoespam[319175] = 3        -- Black Powder
-    C.aoespam.aoespam[358126] = 3		-- Banshee's Blight [Edge of Night, Dagger]
+    C.aoespam.aoespam[358126] = 3        -- Banshee's Blight [Edge of Night, Dagger]
     C.aoespam.merge[27576] = 5374        -- Mutilate Off-Hand
     C.aoespam.merge[113780] = 2818        -- Deadly Poison
     C.aoespam.merge[57842] = 57841        -- Killing Spree Off-Hand
@@ -533,11 +533,11 @@ elseif E.myClass == "WARLOCK" then
     C.aoespam.aoespam[6262] = 3            -- Healthstone
     C.aoespam.aoespam[3716] = 3            -- Torment (Voidwalker)
     C.aoespam.merge[157736] = 348        -- Immolate (DoT)
-    C.aoespam.aoespam[312321] = 4		-- Scouring Tithe (Covenant Kyrian)
-    C.aoespam.aoespam[325640] = 3		-- Soul Rot (Covenant Night Fae)
-    C.aoespam.aoespam[327059] = 0.5		-- Decimating Bolt (Covenant Necrolord)
-    C.aoespam.aoespam[322167] = 2		-- Impending Catastrophe (Covenant Venthyr)
-    C.aoespam.aoespam[322170] = 3		-- Impending Catastrophe DoT (Covenant Venthyr)
+    C.aoespam.aoespam[312321] = 4        -- Scouring Tithe (Covenant Kyrian)
+    C.aoespam.aoespam[325640] = 3        -- Soul Rot (Covenant Night Fae)
+    C.aoespam.aoespam[327059] = 0.5        -- Decimating Bolt (Covenant Necrolord)
+    C.aoespam.aoespam[322167] = 2        -- Impending Catastrophe (Covenant Venthyr)
+    C.aoespam.aoespam[322170] = 3        -- Impending Catastrophe DoT (Covenant Venthyr)
     C.aoespam.healfilter[198590] = true    -- Drain Soul
     C.aoespam.healfilter[205246] = true    -- Phantom Singularity
     C.aoespam.healfilter[205179] = true    -- Phantom Singularity
@@ -550,7 +550,7 @@ elseif E.myClass == "WARRIOR" then
     C.aoespam.aoespam[167105] = 0.5        -- Colossus Smash (Arms Talent Sweeping Strikes)
     C.aoespam.aoespam[260798] = 0.5        -- Execute Arms (Arms Talent Sweeping Strikes)
     C.aoespam.aoespam[7384] = 0.5        -- Overpower (Arms Talent Sweeping Strikes)
-    C.aoespam.aoespam[315961] = 0.5		-- Dreadnaught (Arms Talent)
+    C.aoespam.aoespam[315961] = 0.5        -- Dreadnaught (Arms Talent)
     C.aoespam.aoespam[1464] = 0.5        -- Slam (Arms Talent Sweeping Strikes)
     C.aoespam.aoespam[12294] = 0.5        -- Mortal Strike (Arms Talent Sweeping Strikes)
     C.aoespam.aoespam[262115] = 3        -- Deep Wounds (Arms Mastery DoT)
@@ -565,8 +565,8 @@ elseif E.myClass == "WARRIOR" then
     C.aoespam.merge[201363] = 218617    -- Rampage 5th
     C.aoespam.aoespam[199667] = 1.5        -- Whirlwind (Fury)
     C.aoespam.merge[44949] = 199667        -- Whirlwind Off-Hand (Fury)
-    C.aoespam.merge[199851] = 199667	-- Whirlwind Off-Hand (Fury)
-    C.aoespam.merge[199852] = 199667	-- Whirlwind Off-Hand (Fury)
+    C.aoespam.merge[199851] = 199667    -- Whirlwind Off-Hand (Fury)
+    C.aoespam.merge[199852] = 199667    -- Whirlwind Off-Hand (Fury)
     C.aoespam.aoespam[46968] = 0        -- Shockwave
     C.aoespam.aoespam[6343] = 0            -- Thunder Clap
     C.aoespam.aoespam[115767] = 3        -- Deep Wounds
@@ -582,11 +582,11 @@ elseif E.myClass == "WARRIOR" then
     C.aoespam.merge[85384] = 96103        -- Raging Blow Off-Hand
     C.aoespam.merge[95738] = 50622        -- Bladestorm Off-Hand
     C.aoespam.merge[163558] = 280849        -- Execute Off-Hand
-    C.aoespam.aoespam[317488] = 0.5		-- Condemn (Covenant Venthyr)
-    C.aoespam.merge[317489] = 317488	-- Condemn Off-Hand (Fury) (Covenant Venthyr)
-    C.aoespam.aoespam[307871] = 2		-- Spear of Bastion (Covenant Kyrian)
-    C.aoespam.aoespam[325886] = 0		-- Ancient Aftershock (Covenant Night Fae)
-    C.aoespam.aoespam[326062] = 0		-- Ancient Aftershock Second (Covenant Night Fae)
+    C.aoespam.aoespam[317488] = 0.5        -- Condemn (Covenant Venthyr)
+    C.aoespam.merge[317489] = 317488    -- Condemn Off-Hand (Fury) (Covenant Venthyr)
+    C.aoespam.aoespam[307871] = 2        -- Spear of Bastion (Covenant Kyrian)
+    C.aoespam.aoespam[325886] = 0        -- Ancient Aftershock (Covenant Night Fae)
+    C.aoespam.aoespam[326062] = 0        -- Ancient Aftershock Second (Covenant Night Fae)
 
     C.aoespam.healfilter[117313] = true    -- Bloodthirst Heal
 end

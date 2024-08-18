@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---	Core Function Methods
+--    Core Function Methods
 ----------------------------------------------------------------------------------------
 
 local format = string.format
@@ -38,29 +38,29 @@ end
 -- Color Gradient
 ----------------------------------------------------------------------------------------
 function E:ColorGradient(a, b, ...)
-	local Percent
+    local Percent
 
-	if(b == 0) then
-		Percent = 0
-	else
-		Percent = a / b
-	end
+    if(b == 0) then
+        Percent = 0
+    else
+        Percent = a / b
+    end
 
-	if (Percent >= 1) then
-		local R, G, B = select(select("#", ...) - 2, ...)
+    if (Percent >= 1) then
+        local R, G, B = select(select("#", ...) - 2, ...)
 
-		return R, G, B
-	elseif (Percent <= 0) then
-		local R, G, B = ...
+        return R, G, B
+    elseif (Percent <= 0) then
+        local R, G, B = ...
 
-		return R, G, B
-	end
+        return R, G, B
+    end
 
-	local Num = (select("#", ...) / 3)
-	local Segment, RelPercent = modf(Percent * (Num - 1))
-	local R1, G1, B1, R2, G2, B2 = select((Segment * 3) + 1, ...)
+    local Num = (select("#", ...) / 3)
+    local Segment, RelPercent = modf(Percent * (Num - 1))
+    local R1, G1, B1, R2, G2, B2 = select((Segment * 3) + 1, ...)
 
-	return R1 + (R2 - R1) * RelPercent, G1 + (G2 - G1) * RelPercent, B1 + (B2 - B1) * RelPercent
+    return R1 + (R2 - R1) * RelPercent, G1 + (G2 - G1) * RelPercent, B1 + (B2 - B1) * RelPercent
 end
 
 ----------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ function E:UTF(string, i, dots)
 end
 
 ----------------------------------------------------------------------------------------
---	Number value function
+--    Number value function
 ----------------------------------------------------------------------------------------
 function E:Round(number, decimals)
     if not decimals then decimals = 0 end
@@ -130,7 +130,7 @@ function E:ShortValue(value)
 end
 
 ----------------------------------------------------------------------------------------
---	RGB To Hex function
+--    RGB To Hex function
 ----------------------------------------------------------------------------------------
 function E:RGBToHex(r, g, b, raw)
     if type(r) == 'table' then
@@ -143,7 +143,7 @@ function E:RGBToHex(r, g, b, raw)
 end
 
 ----------------------------------------------------------------------------------------
---	Chat channel check
+--    Chat channel check
 ----------------------------------------------------------------------------------------
 function E:CheckChat(warning)
     if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
@@ -161,7 +161,7 @@ function E:CheckChat(warning)
 end
 
 ----------------------------------------------------------------------------------------
---	Set Variable in game
+--    Set Variable in game
 ----------------------------------------------------------------------------------------
 function E:SetVariable(group, key, value)
     if not C_AddOns.IsAddOnLoaded("DarkUI_Options") then return end
