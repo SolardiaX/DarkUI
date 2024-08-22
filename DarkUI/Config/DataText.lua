@@ -34,6 +34,7 @@ local stats = {
     ["currency_cooking"]            = true, -- Show Cooking Awards under currencies tab
     ["currency_raid"]               = true, -- Show Seals under currencies tab
     ["currency_pvp"]                = true, -- Show PvP Currency under currencies tab
+    ["currency_other"]              = true, -- Show Other Currency under currencies tab
 }
 
 C.stats = stats

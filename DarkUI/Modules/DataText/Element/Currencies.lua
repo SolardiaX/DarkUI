@@ -11,6 +11,8 @@ local C_CurrencyInfo_GetCurrencyInfo = C_CurrencyInfo.GetCurrencyInfo
 local C_CurrencyInfo_GetBackpackCurrencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo
 local C_CurrencyInfo_GetCurrencyListSize = C_CurrencyInfo.GetCurrencyListSize
 local C_CurrencyInfo_GetCurrencyListInfo = C_CurrencyInfo.GetCurrencyListInfo
+local C_CurrencyInfo_ExpandCurrencyList = C_CurrencyInfo.ExpandCurrencyList
+local C_Bank_FetchDepositedMoney = C_Bank.FetchDepositedMoney
 local GetMoney = GetMoney
 local GetProfessions = GetProfessions
 local ToggleCharacter = ToggleCharacter
@@ -32,6 +34,8 @@ local GameTooltip = GameTooltip
 
 local t_icon = C.stats.icon_size or 20
 local cfg = C.stats.config.Currencies
+local tracking_group_index = 99999
+
 
 local function hasAvaliableChildren(list, withZero)
     if not list or #list == 0 then return false end
@@ -53,13 +57,16 @@ local function AddCurrenciesToTooltip(name, list, withZero)
         for _, info in ipairs(list) do
             local name, amount, tex, week, weekmax, maxed = info.name, info.quantity, info.iconFileID, info.canEarnPerWeek, info.maxWeeklyQuantity, info.maxQuantity
 
+            local r, g, b
+            if info.isShowInBackpack and info.quantity > 0 then r, g, b = 1, 1, 1 else r, g, b = 0.5, 0.5, 0.5 end
+
             if amount > 0 or withZero then
                 if week then
-                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", REFORGE_CURRENT..": ".. amount.." - "..WEEKLY..": "..week.." / "..weekmax, tex, t_icon), 1, 1, 1, 1, 1, 1)
+                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", REFORGE_CURRENT..": ".. amount.." - "..WEEKLY..": "..weekmax, tex, t_icon), r, g, b, 1, 1, 1)
                 elseif maxed > 0 then
-                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", amount.." / "..maxed, tex, t_icon), 1, 1, 1, 1, 1, 1)
+                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", amount.." / "..maxed, tex, t_icon), r, g, b, 1, 1, 1)
                 else
-                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", amount, tex, t_icon), 1, 1, 1, 1, 1, 1)
+                    GameTooltip:AddDoubleLine(name, format("%s |T%s:"..t_icon..":"..t_icon..":0:0:64:64:5:59:5:59:%d|t", amount, tex, t_icon), r, g, b, 1, 1, 1)
                 end
             end
         end
@@ -111,18 +118,23 @@ module:Inject("Currencies", {
             GameTooltip:AddDoubleLine(v[1], v[2], 1, 1, 1, 1, 1, 1)
             total = total + v[3]
         end
+        local accountmoney = C_Bank_FetchDepositedMoney(Enum.BankType.Account)
+        if accountmoney then
+            GameTooltip:AddDoubleLine(ACCOUNT_BANK_PANEL_TITLE, module:FormatGold(1, accountmoney), 1, 1, 1, 1, 1, 1)
+            total = total + accountmoney
+        end
         GameTooltip:AddDoubleLine(" ", "-----------------", 1, 1, 1, 0.5, 0.5, 0.5)
         GameTooltip:AddDoubleLine(TOTAL, module:FormatGold(5, total), module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1, 1, 1)
         GameTooltip:AddLine(" ")
 
         local currencies = {}
+        local collapsed = {}
         local header = nil
-        
-        local expansionName
 
-        for i = 1, C_CurrencyInfo_GetCurrencyListSize() do
+        local listSize, i = C_CurrencyInfo_GetCurrencyListSize(), 1
+
+        while listSize >= i do
             local info = C_CurrencyInfo_GetCurrencyListInfo(i)
-            if not info then break end
 
             if info.isShowInBackpack then
                 if not currencies[TRACKING] then
@@ -131,36 +143,22 @@ module:Inject("Currencies", {
 
                 table.insert(currencies[TRACKING], info)
             elseif info.isHeader then
-                if info.isHeaderExpanded then
-                    if C.stats.currency_cooking and info.name == OTHER then
-                        header = PROFESSIONS_COOKING
-                    elseif C.stats.currency_raid and info.name == DUNGEONS_AND_RAIDS then
-                        header = DUNGEONS_AND_RAIDS
-                    elseif C.stats.currency_pvp and info.name == PVP then
-                        header = PVP
-                    else
-                        if C.stats.currency_expansion then 
-                            if expansionName then
-                                break
-                            else
-                                header = info.name
-                                expansionName = header
-                            end
-                        else
-                            header = nil
-                        end
-                    end
+                header = info.name
+                currencies[header] = {}
 
-                    if header then currencies[header] = {} end
-                else
-                    header = nil
+                if not info.isHeaderExpanded then
+                    C_CurrencyInfo_ExpandCurrencyList(i, true)
+                    listSize = C_CurrencyInfo_GetCurrencyListSize()
+                    collapsed[header] = true
                 end
-            elseif header then
+            elseif header and currencies[header] then
                 table.insert(currencies[header], info)
             end
+
+            i = i + 1
         end
-        
-        if archaeology and C.stats.currency_archaeology then
+
+        if archaeology then
             local list = {}
 
             table.insert(list, C_CurrencyInfo_GetCurrencyInfo(384))    -- Dwarf Archaeology Fragment
@@ -187,26 +185,51 @@ module:Inject("Currencies", {
             currencies[PROFESSIONS_ARCHAEOLOGY] = list
         end
 
-        local tips = {
-            [1] = { name = DUNGEONS_AND_RAIDS, withZero = true },
-            [2] = { name = PVP, withZero = true },
-            [3] = { name = PROFESSIONS_COOKING, withZero = false },
-            [4] = { name = PROFESSIONS_ARCHAEOLOGY, withZero = false },
+        if cooking then
+            local list = {}
+            
+            table.insert(list, C_CurrencyInfo_GetCurrencyInfo(81))      -- Epicurean's Award
+            table.insert(list, C_CurrencyInfo_GetCurrencyInfo(402))     -- Ironpaw Token
+
+            currencies[PROFESSIONS_COOKING] = list
+        end
+
+        local orders = {
+            [1] = { name = TRACKING, withZero = true, visiable = C.stats.currency_tracking },
+            [2] = { name = CURRENT_EXPANSION, withZero = true, visiable = C.stats.currency_expansion },
+            [3] = { name = PROFESSIONS_ARCHAEOLOGY, withZero = false, visiable = C.stats.currency_expansion },
+            [4] = { name = PROFESSIONS_COOKING, withZero = false, visiable = C.stats.currency_cooking },
+            [5] = { name = DUNGEONS_AND_RAIDS, withZero = false, visiable = C.stats.currency_raid },
+            [6] = { name = PVP, withZero = false, visiable = C.stats.currency_pvp },
+            [7] = { name = OTHER, withZero = false, visiable = C.stats.currency_other },
         }
 
-        if C.stats.currency_expansion then
-            table.insert(tips, 1, { name = expansionName, withZero = true })
+        for index, tip in ipairs(orders) do
+            if tip.visiable and currencies[tip.name] then
+                AddCurrenciesToTooltip(tip.name, currencies[tip.name], tip.withZero)
+                currencies[tip.name] = nil
+            end
         end
+    
+        i = C_CurrencyInfo_GetCurrencyListSize()
+        while i > 0 do
+            local info = C_CurrencyInfo_GetCurrencyListInfo(i)
+            if info and info.isHeader then
+                if collapsed[info.name] then
+                    C_CurrencyInfo_ExpandCurrencyList(i, false)
+                    listSize = C_CurrencyInfo_GetCurrencyListSize()
+                elseif currencies[info.name] then
+                    if info.name ~= CURRENT_EXPANSION 
+                        and info.name ~= DUNGEONS_AND_RAIDS 
+                        and info.name ~= PVP 
+                        and info.name ~= OTHER 
+                    then
+                        AddCurrenciesToTooltip(info.name, currencies[info.name], true)
+                    end
+                end
+            end
 
-        if C.stats.currency_tracking then
-            table.insert(tips, { name = TRACKING, withZero = true })
-        end
-
-        for i = 1, #tips do
-            local tip = tips[i]
-            local name, withZero = tip.name, tip.withZero
-
-            AddCurrenciesToTooltip(name, currencies[name], withZero)
+            i = i - 1
         end
 
         GameTooltip:AddLine(" ")

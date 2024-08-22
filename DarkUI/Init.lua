@@ -33,3 +33,7 @@ end
 
 -- Allow other addons to use
 _G[addonName] = ns
+
+
+-- Global constants
+CURRENT_EXPANSION = EXPANSION_NAME9
