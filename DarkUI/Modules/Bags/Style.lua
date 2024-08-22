@@ -516,7 +516,7 @@ function MyContainer:OnCreate(name, settings)
             close:SetPoint("TOPRIGHT", 8, 8)
             close:SetScript("OnClick", function(container)
                 if cbNivaya:AtBank() then
-                    _G.CloseBankFrame()
+                    C_Bank.CloseBankFrame()
                 else
                     _G.CloseAllBags()
                 end
