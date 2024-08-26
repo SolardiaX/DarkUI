@@ -4,7 +4,7 @@
 ## Notes-zhCN: 整合插件 DarkUI
 ## Notes: DarkUI for World of Warcraft
 ## Author: SolardiaX
-## Version: 11.0.2-b1.0.2
+## Version: 11.0.2-b1.0.3
 ## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options
 ## SavedVariables: SavedStats
 ## SavedVariablesPerCharacter: SavedStatsPerChar
