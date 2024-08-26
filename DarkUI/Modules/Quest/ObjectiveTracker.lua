@@ -291,11 +291,12 @@ local function SkinProgressBar(tracker, key)
             icon:SetSize(20, 20)
             icon:SetMask("")
 
-            local border = CreateFrame("Frame", "$parentBorder", bar)
+            local border = CreateFrame("Frame", "$parentIconBorder", bar)
             border:SetAllPoints(icon)
-            border:SetTemplate("Transparent")
-            border:SetBackdropColor(0, 0, 0, 0)
+            -- border:SetTemplate("Transparent")
+            -- border:SetBackdropColor(0, 0, 0, 0)
             bar.newIconBg = border
+            E:ApplyOverlayBorder(border)
 
             hooksecurefunc(bar.AnimIn, "Play", function()
                 bar.AnimIn:Stop()
@@ -400,13 +401,13 @@ end
 ----------------------------------------------------------------------------------------
 hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateStageBlock", function(block)
     if not block.backdrop then
-        block:CreateBackdrop("Blur")
-        block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 10, -8)
-        block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -10, 8)
+        -- block:CreateBackdrop("Overlay")
+        -- block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 6, -8)
+        -- block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 8)
 
-        -- block:CreateBorder()
-        -- block.border:SetPoint("TOPLEFT", block.NormalBG, 3, -3)
-        -- block.border:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 5)
+        block:CreateBorder()
+        block.border:SetPoint("TOPLEFT", block.NormalBG, 9, -6)
+        block.border:SetPoint("BOTTOMRIGHT", block.NormalBG, -9, 6)
 
         -- block.NormalBG:SetAlpha(0)
         -- block.FinalBG:SetAlpha(0)
