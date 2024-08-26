@@ -8,6 +8,7 @@ if C.combat.combattext.enable ~= true then return end
 
 local cfg = C.combat.combattext
 
+local GetSpellInfo = C_Spell.GetSpellInfo
 local GetSpellTexture = C_Spell.GetSpellTexture
 
 -- Justify messages in frames

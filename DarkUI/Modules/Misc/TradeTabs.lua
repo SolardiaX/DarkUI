@@ -224,7 +224,7 @@ local function HandleProfession(object, professionID, hat)
         end
 
         if hat and PlayerHasToy(134020) and C_ToyBox.IsToyUsable(134020) then
-            UpdateTab(object, GetSpellInfo(67556), 236571, true)
+            UpdateTab(object, C_Spell.GetSpellInfo(67556), 236571, true)
         end
     end
 end
@@ -248,7 +248,7 @@ local function HandleTabs(object)
 
         for index = 1, #spells do
             if IsSpellKnown(spells[index]) then
-                local name, _, texture = GetSpellInfo(spells[index])
+                local name, _, texture = C_Spell.GetSpellInfo(spells[index])
                 UpdateTab(object, name, texture)
             end
         end
