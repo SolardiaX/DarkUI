@@ -6,7 +6,7 @@ local oUF = ns.oUF
 local E, C, L = ns:unpack()
 
 local class = select(2, UnitClass('player'))
-local RaidDebuffsIgnore, invalidPrio = {}, -1
+local RaidDebuffsIgnore, invalidPrio, bossDebuffPrio = {}, -1, 9999999
 
 local DispellColor = {
     ["Magic"]   = { .2, .6, 1 },
@@ -89,9 +89,8 @@ local function OnUpdate(self, elapsed)
     end
 end
 
-local function UpdateDebuffFrame(self, name, icon, count, debuffType, duration, expiration)
-    local rd = self.RaidDebuffs
-    if name then
+local UpdateDebuffFrame = function(rd, icon, count, debuffType, duration, expirationTime, spellId)
+    if rd.index and rd.type then
         if rd.icon then
             rd.icon:SetTexture(icon)
             rd.icon:Show()
@@ -110,6 +109,7 @@ local function UpdateDebuffFrame(self, name, icon, count, debuffType, duration, 
             rd.duration = duration
             if duration and duration > 0 then
                 rd.expiration = expiration
+                rd.nextUpdate = 0
                 rd:SetScript("OnUpdate", OnUpdate)
                 rd.timer:Show()
             else
@@ -120,7 +120,7 @@ local function UpdateDebuffFrame(self, name, icon, count, debuffType, duration, 
 
         if rd.cd then
             if duration and duration > 0 then
-                rd.cd:SetCooldown(expiration - duration, duration)
+                rd.cd:SetCooldown(expirationTime - duration, duration)
                 rd.cd:Show()
             else
                 rd.cd:Hide()
@@ -128,8 +128,8 @@ local function UpdateDebuffFrame(self, name, icon, count, debuffType, duration, 
         end
 
         local c = DispellColor[debuffType] or DispellColor.none
-    if rd.ShowDebuffBorder and rd.__shadow then
-        rd.__shadow:SetBackdropBorderColor(c[1], c[2], c[3])
+    if rd.ShowDebuffBorder and rd.shadow then
+        rd.shadow:SetBackdropBorderColor(c[1], c[2], c[3])
         end
 
         if rd.glowFrame then
@@ -160,48 +160,77 @@ local function Update(self, _, unit)
 
     local rd = self.RaidDebuffs
     rd.priority = invalidPrio
-    rd.filter = "HARMFUL"
 
-    local _name, _icon, _count, _debuffType, _duration, _expiration
+    local _icon, _count, _debuffType, _duration, _expirationTime, _spellId
     local debuffs = rd.Debuffs or {}
     local isCharmed = UnitIsCharmed(unit)
     local canAttack = UnitCanAttack("player", unit)
     local prio
 
-    for i = 1, 32 do
-        local name, icon, count, debuffType, duration, expiration, _, _, _, spellId = UnitAura(unit, i, rd.filter)
+    local i = 0
+    while(true) do
+        i = i + 1
+        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, index, 'HARMFUL'))
+
         if not name then break end
 
+        if rd.ShowBossDebuff and isBossDebuff then
+            prio = rd.BossDebuffPriority or bossDebuffPrio
+            if prio and prio > rd.priority then
+                rd.priority = prio
+                rd.index = i
+                rd.type = "Boss"
+
+                _icon, _count, _debuffType, _duration, _expirationTime, _spellId = icon, count, debuffType, duration, expirationTime, spellId
+            end
+        end
+
         if rd.ShowDispellableDebuff and debuffType and (not isCharmed) and (not canAttack) then
-            if rd.FilterDispellableDebuff then
-                prio = DispellFilter[debuffType] and (DispellPriority[debuffType] + 6) or 2
-                if prio == 2 then debuffType = nil end
+            local disPrio = rd.DispellPriority or DispellPriority
+            local disFilter = rd.DispellFilter or DispellFilter
+
+            if rd.FilterDispellableDebuff and disFilter then
+                prio = disFilter[debuffType] and disPrio[debuffType]
             else
-                prio = DispellPriority[debuffType]
+                prio = disPrio[debuffType]
+            end
+
+            if rd.FilterDispellableDebuff and disFilter then
+                prio = disFilter[debuffType] and disPrio[debuffType]
+            else
+                prio = disPrio[debuffType]
             end
 
             if prio and prio > rd.priority then
-                rd.priority, rd.index = prio, i
-                _name, _icon, _count, _debuffType, _duration, _expiration = name, icon, count, debuffType, duration, expiration
+                rd.priority = prio
+                rd.index = i
+                rd.type = "Dispel"
+
+                _icon, _count, _debuffType, _duration, _expirationTime, _spellId = icon, count, debuffType, duration, expirationTime, spellId
             end
         end
 
         local instPrio
-        if instName and debuffs[instName] then
-            instPrio = debuffs[instName][spellId]
+        if instName and C.aura.raidDebuffs[instName] then
+            instName = C.aura.raidDebuffs[instName][spellId]
         end
 
         if not RaidDebuffsIgnore[spellId] and instPrio and (instPrio == 6 or instPrio > rd.priority) then
-            rd.priority, rd.index = instPrio, i
-            _name, _icon, _count, _debuffType, _duration, _expiration = name, icon, count, debuffType, duration, expiration
+            rd.priority = prio
+            rd.index = i
+            rd.type = "Custom"
+            _icon, _count, _debuffType, _duration, _expirationTime, _spellId = icon, count, debuffType, duration, expirationTime, spellId
         end
     end
 
-    if rd.priority == invalidPrio then
-        rd.index, rd.spellID, _name = nil, nil, nil
-    end
+    
+	if rd.priority == invalidPrio then
+		rd.index = nil
+		rd.filter = nil
+		rd.type = nil
+	end
 
-    UpdateDebuffFrame(self, _name, _icon, _count, _debuffType, _duration, _expiration)
+	return UpdateDebuffFrame(rd, _icon, _count, _debuffType, _duration, _expirationTime, _spellId)
 end
 
 local function Path(self, ...)
