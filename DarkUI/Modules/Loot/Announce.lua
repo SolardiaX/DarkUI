@@ -95,7 +95,7 @@ local LDD = CreateFrame("Frame", "LootLiteLDD", LootLite, "UIDropDownMenuTemplat
 
 E:SkinCharButton(ann, LootLite, ">")
 
-ann:SetSize(14, 14)
+ann:SetSize(12, 12)
 ann:ClearAllPoints()
 ann:SetPoint("RIGHT", LootCloseButton, "LEFT", -4, 0)
 ann:SetFrameStrata("DIALOG")
