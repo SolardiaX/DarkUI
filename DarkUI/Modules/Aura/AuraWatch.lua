@@ -12,7 +12,6 @@ local LBG = LibStub("LibButtonGlow-1.0", true)
 local CreateFrame = CreateFrame
 local InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty = InCombatLockdown, UnitBuff, UnitDebuff, GetPlayerInfoByGUID, UnitInRaid, UnitInParty
 local GetTime = GetTime
-local GetSpellInfo = C_Spell.GetSpellInfo
 local GetSpellName = C_Spell.GetSpellName
 local GetSpellTexture = C_Spell.GetSpellTexture
 local GetSpellCooldown = C_Spell.GetSpellCooldown

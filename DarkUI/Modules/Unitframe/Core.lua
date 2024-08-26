@@ -8,7 +8,6 @@ if not C.unitframe.enable then return end
 local module = E:Module("UFCore")
 
 local _G = _G
-local GetSpellInfo, GetCombatRatingBonus = GetSpellInfo, GetCombatRatingBonus
 local UnitClass, UnitCastingInfo = UnitClass, UnitCastingInfo
 local UnitAura = UnitAura
 local UnitIsFriend, UnitIsPlayer, UnitIsUnit = UnitIsFriend, UnitIsPlayer, UnitIsUnit
