@@ -11,6 +11,7 @@ L.MAP_MOUSEOVER                                  = "Mouse"
 L.MAP_HIDE_TASK_POI                              = "Hide task POI"
 L.MAP_PLAYER                                     = "Player"
 L.MAP_BOUNDS                                     = "Out of Bounds"
+L.MINIMAP_SWITCHGARRISONTYPE                     = "Right click to switch garrisons"
 
 L.AURA_CAST_BY                                   = "CastBy"
 L.AURA_GET_OUT                                   = "GET OUT"

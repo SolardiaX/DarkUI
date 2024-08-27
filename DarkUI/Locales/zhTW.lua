@@ -23,6 +23,7 @@ L.MAP_MOUSEOVER                                  = "鼠標"
 L.MAP_HIDE_TASK_POI                              = "隱藏任務地點標記"
 L.MAP_PLAYER                                     = "玩家"
 L.MAP_BOUNDS                                     = "超出範圍"
+L.MINIMAP_SWITCHGARRISONTYPE                     = "右鍵點擊切換顯示"
 
 L.AURA_CAST_BY                                   = "來自"
 L.AURA_GET_OUT                                   = "離開人群"
