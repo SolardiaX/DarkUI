@@ -76,7 +76,7 @@ local function switcher_SetFactionIndexByName(faction_name)
 
     for i = 1, GetNumFactions() do
         local factionInfo = GetFactionInfo(i)
-        if factionInfo.name == faction_name then
+        if factionInfo and factionInfo.name == faction_name then
             if IsFactionActive(i) then
                 SetWatchedFactionIndex(i)
             end
