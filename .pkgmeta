@@ -1,8 +1,8 @@
 package-as: DarkUI
 
 move-folders:
-  - DarkUI/DarkUI: DarkUI
-  - DarkUI/DarkUI_Config: DarkUI_Config
+    DarkUI/DarkUI: DarkUI
+    DarkUI/DarkUI_Config: DarkUI_Config
 
 ignore:
   - .github/*
