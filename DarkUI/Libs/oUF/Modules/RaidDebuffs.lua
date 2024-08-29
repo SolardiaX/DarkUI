@@ -170,7 +170,7 @@ local function Update(self, _, unit)
     local i = 0
     while(true) do
         i = i + 1
-        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, index, 'HARMFUL'))
+        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, i, 'HARMFUL'))
 
         if not name then break end
 
