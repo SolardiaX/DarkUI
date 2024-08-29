@@ -212,7 +212,7 @@ local function GameTooltip_ShowStatusBar(self, name, min, max, value, text, r, g
         statusBar:SetBackdropColor(0, 0, 0, 0.5)
         statusBar:SetBackdropBorderColor(0, 0, 0, 0.5)
 
-        statusBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar") --(C.media.texture.status)
+        statusBar:SetStatusBarTexture(C.media.texture.status) --("Interface\\TargetingFrame\\UI-StatusBar")
         statusBar.text = statusBar.text or statusBar:CreateFontString(name .. "Text", 'OVERLAY', 'Tooltip_Small')
         statusBar.text:SetFont(STATUS_TEXT_TARGET, 9, "THINOUTLINE")
         statusBar.text:SetAllPoints()
@@ -281,7 +281,7 @@ local function onTooltipSetUnit(self)
     end
 
     local r, g, b = getUnitColor(unit)
-    _G["GameTooltipTextLeft1"]:SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, name or "")
+    _G["GameTooltipTextLeft1"]:SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, name or ameTooltipTextLeft1:GetText() or "")
     if realm and realm ~= "" and cfg.realm then
         self:AddLine(FRIENDS_LIST_REALM .. "|cffffffff" .. realm .. "|r")
     end
