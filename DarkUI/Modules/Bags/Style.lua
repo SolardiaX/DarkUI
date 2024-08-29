@@ -112,7 +112,7 @@ end
 local BagFrames, BankFrames =  {}, {}
 function MyContainer:OnContentsChanged(forced)
     local col, row = 0, 0
-    local yPosOffs = self.Caption and 20 or 0
+    local yPosOffs = self.Caption and 24 or 4
     local isEmpty = true
 
     local tName = self.name
@@ -151,7 +151,7 @@ function MyContainer:OnContentsChanged(forced)
         local button = v[3]
         button:ClearAllPoints()
 
-        local xPos = col * (itemSlotSize + 2) + 2
+        local xPos = col * (itemSlotSize + 2) + 4
         local yPos = (-1 * row * (itemSlotSize + 2)) - yPosOffs
 
         button:SetPoint("TOPLEFT", self, "TOPLEFT", xPos, yPos)
@@ -288,7 +288,7 @@ local UpdateDimensions = function(self)
     end
     if self.Caption then
         -- Space for captions
-        height = height + self.Caption:GetStringHeight() + 12
+        height = height + self.Caption:GetStringHeight() + 16
     end
     self:SetHeight(self.ContainerHeight + height)
 end
@@ -670,14 +670,6 @@ function MyContainer:OnCreate(name, settings)
         searchIcon:SetWidth(16)
         searchIcon:SetHeight(16)
 
-        -- Hint
-        self.hint = background:CreateFontString(nil, "OVERLAY", nil)
-        self.hint:SetPoint("BOTTOMLEFT", infoFrame, -0.5, 31.5)
-        self.hint:SetFont(_G.unpack(cfg.fonts.standard))
-        self.hint:SetTextColor(1, 1, 1, 0.4)
-        self.hint:SetText(L.BAG_CLICK_TO_SETCATEGORY)
-        self.hintShown = true
-
         -- The money display
         local money = self:SpawnPlugin("TagDisplay", "[money]", self)
         money:SetPoint("TOPRIGHT", self, -32, -2)
@@ -705,18 +697,9 @@ function MyButton:OnAdd()
             if not tID then return end
             
             local ctrl = IsControlKeyDown()
-            local shift = IsShiftKeyDown()
-            local alt = IsAltKeyDown()
             
-            if alt and ctrl then
-                cbNivCatDropDown.itemName = GetItemInfo(tID)
-                cbNivCatDropDown.itemID = tID
-                --ToggleDropDownMenu(1, nil, cbNivCatDropDown, self, 0, 0)
-                cbNivCatDropDown:Toggle(self, nil, nil, 0, 0)
-            elseif ctrl then
-                if cbNivaya:AtBank() then
-                    UseContainerItem(bagId, slotId, nil, true);
-                end
+            if ctrl and cbNivaya:AtBank() then
+                UseContainerItem(bagId, slotId, nil, true);
             end
         end
     end)
