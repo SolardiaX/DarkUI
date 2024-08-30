@@ -399,27 +399,27 @@ end
 ----------------------------------------------------------------------------------------
 --    Skin Dungeon block
 ----------------------------------------------------------------------------------------
-hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateStageBlock", function(block)
-    if not block.backdrop then
-        -- block:CreateBackdrop("Overlay")
-        -- block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 6, -8)
-        -- block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 8)
+-- hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateStageBlock", function(block)
+--     if not block.backdrop then
+--         -- block:CreateBackdrop("Overlay")
+--         -- block.backdrop:SetPoint("TOPLEFT", block.NormalBG, 6, -8)
+--         -- block.backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 8)
 
-        block:CreateBorder()
-        block.border:SetPoint("TOPLEFT", block.NormalBG, 9, -6)
-        block.border:SetPoint("BOTTOMRIGHT", block.NormalBG, -9, 6)
+--         block:CreateBorder()
+--         block.border:SetPoint("TOPLEFT", block.NormalBG, 9, -6)
+--         block.border:SetPoint("BOTTOMRIGHT", block.NormalBG, -9, 6)
 
-        -- block.NormalBG:SetAlpha(0)
-        -- block.FinalBG:SetAlpha(0)
-        -- block.GlowTexture:SetTexture("")
-    end
-end)
+--         -- block.NormalBG:SetAlpha(0)
+--         -- block.FinalBG:SetAlpha(0)
+--         -- block.GlowTexture:SetTexture("")
+--     end
+-- end)
 
 hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateWidgetRegistration", function(self)
     local widgetContainer = self.WidgetContainer
     if widgetContainer.widgetFrames then
         for _, widgetFrame in pairs(widgetContainer.widgetFrames) do
-            if widgetFrame.Frame then widgetFrame.Frame:SetAlpha(0) end
+            -- if widgetFrame.Frame then widgetFrame.Frame:SetAlpha(0) end
 
             local bar = widgetFrame.TimerBar
             if bar and not bar.styled then
@@ -440,7 +440,7 @@ hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateWidgetRegistration", 
             if widgetFrame.CurrencyContainer then
                 for currencyFrame in widgetFrame.currencyPool:EnumerateActive() do
                     if not currencyFrame.styled then
-                        currencyFrame.Icon:SkinIcon()
+                        E:StyleButton(currencyFrame.Icon)
                         currencyFrame.styled = true
                     end
                 end
@@ -449,12 +449,12 @@ hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateWidgetRegistration", 
     end
 end)
 
-ScenarioObjectiveTracker.StageBlock:HookScript("OnEnter", function(self)
-    if IsFramePositionedLeft(ObjectiveTrackerFrame) then
-        GameTooltip:ClearAllPoints()
-        GameTooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 50, -3)
-    end
-end)
+-- ScenarioObjectiveTracker.StageBlock:HookScript("OnEnter", function(self)
+--     if IsFramePositionedLeft(ObjectiveTrackerFrame) then
+--         GameTooltip:ClearAllPoints()
+--         GameTooltip:SetPoint("TOPLEFT", self, "TOPRIGHT", 50, -3)
+--     end
+-- end)
 
 -- ----------------------------------------------------------------------------------------
 -- --    Skin Mythic+ block
