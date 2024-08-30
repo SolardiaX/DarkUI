@@ -1,3 +1,13 @@
+## v11.0.2-b1.0.5 ##
+
+### Changed ###
+* [Tooltip] scenario block style
+* [Tooltip] statusbar texture
+* [Bag] remove unused hint
+
+### Fixed ###
+* [lib] ouf raid debuffs
+
 
 ## v11.0.2-b1.0.4 ##
 
