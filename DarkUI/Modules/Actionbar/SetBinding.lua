@@ -9,12 +9,13 @@ local IsModifiedClick = IsModifiedClick
 local GameTooltip_ShowCompareItem = GameTooltip_ShowCompareItem
 local GameTooltip, ShoppingTooltip1 = GameTooltip, ShoppingTooltip1
 local SpellBook_GetSpellBookSlot = SpellBook_GetSpellBookSlot
-local GetSpellBookItemName, GetMacroInfo = GetSpellBookItemName, GetMacroInfo
+local C_SpellBook_GetSpellBookItemName = C_SpellBook.GetSpellBookItemName
+local GetMacroInfo = GetMacroInfo
 local GetBindingKey, GetBindingByKey, RunBinding, SetBinding = GetBindingKey, GetBindingByKey, RunBinding, SetBinding
 local GetCurrentBindingSet = GetCurrentBindingSet
 local SaveBindings, LoadBindings = SaveBindings, LoadBindings
 local IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown = IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown
-local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
+local C_AddOns_IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local hooksecurefunc = hooksecurefunc
 local tonumber = tonumber
 local NUM_ACTIONBAR_BUTTONS = NUM_ACTIONBAR_BUTTONS
@@ -88,7 +89,7 @@ SlashCmdList.MOUSEOVERBIND = function()
             
             if spellmacro=="SPELL" then
                 self.button.id = SpellBook_GetSpellBookSlot(self.button)
-                self.button.name = GetSpellBookItemName(self.button.id, SpellBookFrame.bookType)
+                self.button.name = C_SpellBook_GetSpellBookItemName(self.button.id, Enum.SpellBookSpellBank.Player)
                 
                 GameTooltip:Show()
                 GameTooltip:SetScript("OnHide", function(self)
@@ -96,7 +97,6 @@ SlashCmdList.MOUSEOVERBIND = function()
                     self:SetPoint("BOTTOM", bind, "TOP", 0, 1)
                     self:AddLine(bind.button.name, 1, 1, 1)
                     bind.button.bindings = {GetBindingKey(spellmacro.." "..self.button.name)}
-                    print(self.button.bindings)
                     if #bind.button.bindings == 0 then
                         self:AddLine(L.ACTIONBAR_BINDING_NOBINDING, .6, .6, .6)
                     else
@@ -109,7 +109,7 @@ SlashCmdList.MOUSEOVERBIND = function()
                     self:SetScript("OnHide", nil)
                 end)
             elseif spellmacro=="MACRO" then
-                self.button.id = self.button:GetID()
+                self.button.id = self.button.selectionIndex or self.button:GetID()
                 
                 if localmacros == 1 then self.button.id = self.button.id + MAX_ACCOUNT_MACROS end
                 
@@ -172,7 +172,7 @@ SlashCmdList.MOUSEOVERBIND = function()
                     local modact = 1+(self.button.action-1)%12
                     if self.button.name == "ExtraActionButton1" then
                         self.button.bindstring = "EXTRAACTIONBUTTON1"
-                    elseif self.button.action < 25 or self.button.action > 72 then
+                    elseif self.button.action < 13 or self.button.action > 72 then
                         self.button.bindstring = "ACTIONBUTTON"..modact
                     elseif self.button.action < 73 and self.button.action > 60 then
                         self.button.bindstring = "MULTIACTIONBAR1BUTTON"..modact
@@ -182,6 +182,8 @@ SlashCmdList.MOUSEOVERBIND = function()
                         self.button.bindstring = "MULTIACTIONBAR4BUTTON"..modact
                     elseif self.button.action < 37 and self.button.action > 24 then
                         self.button.bindstring = "MULTIACTIONBAR3BUTTON"..modact
+                    elseif self.button.action < 25 and self.button.action > 12 then
+                        self.button.bindstring = "CLICK "..self.button.name..":LeftButton"
                     end
                 end
                 
@@ -262,11 +264,11 @@ SlashCmdList.MOUSEOVERBIND = function()
         function bind:Deactivate(save)
             local which = GetCurrentBindingSet()
             if save then
-                SaveBindings(2)
-                print(L.ACTIONBAR_BINDING_SAVE)
+                SaveBindings(which)
+                print("|cffffff00"..L.ACTIONBAR_BINDING_SAVE.."|r")
             else
-                LoadBindings(2)
-                print(L.ACTIONBAR_BINDING_DISCARDED)
+                LoadBindings(which)
+                print("|cffffff00"..L.ACTIONBAR_BINDING_DISCARDED.."|r")
             end
             self.enabled = false
             self:HideFrame()
@@ -306,11 +308,6 @@ SlashCmdList.MOUSEOVERBIND = function()
             local b = _G["PetActionButton"..i]
             b:HookScript("OnEnter", function(self) bind:Update(self, "PET") end)
         end
-
-        for i=1,12 do
-            local b = _G["SpellButton"..i]
-            b:HookScript("OnEnter", function(self) bind:Update(self, "SPELL") end)
-        end
         
         ExtraActionButton1:HookScript("OnEnter", function(self) bind:Update(self) end)
 
@@ -323,7 +320,7 @@ SlashCmdList.MOUSEOVERBIND = function()
             hooksecurefunc(MacroFrame, "Update", function(frame)
                 for _, button in next, {frame.MacroSelector.ScrollBox.ScrollTarget:GetChildren()} do
                     if button and not button.hook then
-                        button:HookScript("OnEnter", function(self) bind:Update(button, "MACRO") end)
+                        button:HookScript("OnEnter", function(self) bind:Update(self, "MACRO") end)
                         button.hook = true
                     end
                 end
@@ -332,15 +329,35 @@ SlashCmdList.MOUSEOVERBIND = function()
             MacroFrameTab2:HookScript("OnMouseUp", function() localmacros = 1 end)
         end
 
-        if not C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") then
-            hooksecurefunc("LoadAddOn", function(addon)
-                if addon=="Blizzard_MacroUI" then
-                    registermacro()
+        local function registerspell()
+            hooksecurefunc(PlayerSpellsFrame.SpellBookFrame.PagedSpellsFrame, "DisplayViewsForCurrentPage", function(self)
+                for _, frame in self:EnumerateFrames() do
+                    if frame.Button and not frame.Button.hook then
+                        frame.Button.id = frame.slotIndex
+                        frame.Button:HookScript("OnEnter", function(self) bind:Update(self, "SPELL") end)
+                        frame.Button.hook = true
+                    end
                 end
             end)
-        else
-            registermacro()
         end
+
+        if not C_AddOns_IsAddOnLoaded("Blizzard_MacroUI") or not C_AddOns_IsAddOnLoaded("Blizzard_PlayerSpells") then
+			local Load = CreateFrame("Frame")
+			Load:RegisterEvent("ADDON_LOADED")
+			Load:SetScript("OnEvent", function(self, _, addon)
+				if addon == "Blizzard_MacroUI" then
+					registermacro()
+				elseif addon == "Blizzard_PlayerSpells" then
+					registerspell()
+				end
+			end)
+		end
+		if C_AddOns_IsAddOnLoaded("Blizzard_MacroUI") then
+			registermacro()
+		elseif C_AddOns_IsAddOnLoaded("Blizzard_PlayerSpells") then
+			registerspell()
+		end
+
         bind.loaded = 1
     end
     if not bind.enabled then
