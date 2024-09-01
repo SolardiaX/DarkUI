@@ -26,15 +26,15 @@ module.classModule.classpowerbar = {}
 ------------------------------------------------------------------------
 
 -- override default blizzard event function for Druid
-module.classModule.blizzard["DRUID"] = function(self, ...)
-    ComboPointDruidPlayerFrame:Setup()
-    ComboPointDruidPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
-end
+-- module.classModule.blizzard["DRUID"] = function(self, ...)
+--     DruidComboPointBarFrame:Setup()
+--     DruidComboPointBarFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
+-- end
 
-module.classModule.blizzard["ROGUE"] = function(self, ...)
-    ComboPointPlayerFrame:Setup()
-    ComboPointPlayerFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
-end
+-- module.classModule.blizzard["ROGUE"] = function(self, ...)
+--     ComboFrame:Setup()
+--     ComboFrame:SetParent(PlayerFrameBottomManagedFramesContainer)
+-- end
 
 module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
     PlayerFrameBottomManagedFramesContainer:ClearAllPoints()
@@ -45,6 +45,15 @@ module.classModule.classpowerbar.ResetBlizzardBarPosition = function(self, ...)
 
     PlayerFrameBottomManagedFramesContainer.SetPoint = E.Dummy
     -- PlayerFrameBottomManagedFramesContainer.unit = "player"
+
+    if (PlayerFrame.classPowerBar) then
+		PlayerFrame.classPowerBar:Setup();
+	elseif (E.myClass == "SHAMAN") then
+		TotemFrame:Update(); 
+	elseif (E.myClass == "DEATHKNIGHT") then
+		RuneFrame:Show();
+	end
+	EssencePlayerFrame:Setup()
 end
 
 ------------------------------------------------------------------------
