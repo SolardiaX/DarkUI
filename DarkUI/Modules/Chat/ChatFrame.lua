@@ -210,10 +210,8 @@ local function SetChatStyle(frame)
         CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.backdrop, 2, -2)
         CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.backdrop, -2, 2)
         CombatLogQuickButtonFrame_CustomProgressBar:SetStatusBarTexture(C.media.texture.status_f)
-
-        if CombatLogQuickButtonFrameButton1 then
-            CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
-        end
+    
+        CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
     end
 
     if _G[chat] ~= _G["ChatFrame2"] then
@@ -296,6 +294,8 @@ local function SetupChatPosAndFont()
                 FCF_DockUpdate()
             end
         end
+
+        chat:SetScript("OnMouseWheel", FloatingChatFrame_OnMouseScroll)
     end
 
     -- Reposition Quick Join Toast and battle.net popup
@@ -306,7 +306,8 @@ local function SetupChatPosAndFont()
     QuickJoinToastButton.Toast:ClearAllPoints()
     QuickJoinToastButton.Toast:SetPoint(unpack(cfg.bn_popup))
     QuickJoinToastButton.Toast.Background:SetTexture("")
-    QuickJoinToastButton.Toast:CreateBackdrop("Transparent")
+    -- QuickJoinToastButton.Toast:CreateBackdrop("Shadow")
+    E:ApplyBackdrop(QuickJoinToastButton.Toast, true)
     QuickJoinToastButton.Toast.backdrop:SetPoint("TOPLEFT", 0, 0)
     QuickJoinToastButton.Toast.backdrop:SetPoint("BOTTOMRIGHT", 0, 0)
     QuickJoinToastButton.Toast.backdrop:Hide()
@@ -315,8 +316,13 @@ local function SetupChatPosAndFont()
 
     hooksecurefunc(QuickJoinToastButton, "ShowToast", function() QuickJoinToastButton.Toast.backdrop:Show() end)
     hooksecurefunc(QuickJoinToastButton, "HideToast", function() QuickJoinToastButton.Toast.backdrop:Hide() end)
+
+    -- Reposition Battle.net popup
+    BNToastFrame:ClearAllPoints()
+    BNToastFrame:SetPoint(unpack(cfg.bn_popup))
     hooksecurefunc(BNToastFrame, "SetPoint", function(self, _, anchor)
         if anchor == QuickJoinToastButton then
+            self:ClearAllPoints()
             self:SetPoint(unpack(cfg.bn_popup))
         end
     end)
@@ -346,11 +352,11 @@ UIChat:SetScript("OnEvent", function(self, event, addon)
     if event == "ADDON_LOADED" then
         if addon == "Blizzard_CombatLog" then
             self:UnregisterEvent("ADDON_LOADED")
-            SetupChat()
+            SetupChat(self)
         end
     elseif event == "PLAYER_ENTERING_WORLD" then
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-        SetupChatPosAndFont()
+        SetupChatPosAndFont(self)
     end
 end)
 
@@ -381,7 +387,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", RemoveRealmName)
 --    Save slash command typo
 ----------------------------------------------------------------------------------------
 local function TypoHistory_Posthook_AddMessage(chat, text)
-    if strfind(text, HELP_TEXT_SIMPLE) then
+    if text and strfind(text, HELP_TEXT_SIMPLE) then
         ChatEdit_AddHistory(chat.editBox)
     end
 end
@@ -450,9 +456,9 @@ if cfg.role_icons == true then
         CHAT_MSG_RAID = 1, CHAT_MSG_RAID_LEADER = 1, CHAT_MSG_RAID_WARNING = 1,
     }
     local role_tex = {
-        TANK = "\124T"..C.media.path.."icon_tank.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
-        HEALER    = "\124T"..C.media.path.."icon_healer.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
-        DAMAGER = "\124T"..C.media.path.."icon_damager.tga"..":12:12:0:0:64:64:5:59:5:59\124t",
+        TANK = "\124T"..C.media.path.."icon_tank"..":12:12:0:0:64:64:5:59:5:59\124t",
+        HEALER    = "\124T"..C.media.path.."icon_healer"..":12:12:0:0:64:64:5:59:5:59\124t",
+        DAMAGER = "\124T"..C.media.path.."icon_damager"..":12:12:0:0:64:64:5:59:5:59\124t",
     }
     local GetColoredName_orig = _G.GetColoredName
     local function GetColoredName_hook(event, arg1, arg2, ...)
