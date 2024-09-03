@@ -276,12 +276,12 @@ local function onTooltipSetUnit(self)
     elseif classification == "elite" then classification = "+"
     else classification = "" end
 
-    if titleName and cfg.title then
+    if isPlayer and titleName and cfg.title then
         name = titleName
     end
-
+  
     local r, g, b = getUnitColor(unit)
-    _G["GameTooltipTextLeft1"]:SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, name or ameTooltipTextLeft1:GetText() or "")
+    _G["GameTooltipTextLeft1"]:SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, name or gameTooltipTextLeft1:GetText() or "")
     if realm and realm ~= "" and cfg.realm then
         self:AddLine(FRIENDS_LIST_REALM .. "|cffffffff" .. realm .. "|r")
     end
