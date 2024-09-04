@@ -1,3 +1,15 @@
+## v11.0.2-b1.0.6 ##
+
+### Changed ###
+* [Misc] remove unused social tabs
+* [Chat] adjust chat frames style
+* [Locales] use enUS as default language
+
+### Fixed ###
+* [Misc] trade tabs for spec class
+* [Tooltip] missing npc name
+* [Unitframe] blizzard class power bar
+
 ## v11.0.2-b1.0.5 ##
 
 ### Changed ###
