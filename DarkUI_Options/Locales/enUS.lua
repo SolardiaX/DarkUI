@@ -206,7 +206,6 @@ L_OPT_COMBAT_DAMAGEMETER_MERGEHEALABSORBS = 'Merge heal and absorbs'
 
 L_OPT_MISC_BLIZZARD_SLOT_DURABILITY = 'Durability on character slot buttons'
 L_OPT_MISC_BLIZZARD_SHIFT_MARK = 'Marks mouseover target when you push Shift (only in group)'
-L_OPT_MISC_MISC_SOCIALTABS = 'Enable social tabs'
 L_OPT_MISC_PROFESSION_TABS = 'Enable profession tabs'
 L_OPT_MISC_MERCHANT_ITEMLEVEL = 'Show item level in merchant'
 L_OPT_MISC_SLOT_ITEMLEVEL = 'Iten level on character/inspect slot buttons'

@@ -6,7 +6,6 @@
     <Script file="LFGQueueTimer.lua" />
     <Script file="PvPQueueTimer.lua" />
     <Script file="TrainAll.lua" />
-    <Script file="SocialTabs.lua" />
     <Script file="TradeTabs.lua" />
     <Script file="Focuser.lua" />
     <Script file="Merchant.lua" />

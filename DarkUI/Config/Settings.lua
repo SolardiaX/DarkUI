@@ -488,12 +488,6 @@ C.map = {
 --  Configuration of Misc
 ----------------------------------------------------------------------------------------
 C.misc = {
-    socialtabs         = {
-        enable  = false,
-        lfguild = true, -- always show looking for guild tab
-        scale   = 1, -- scale of unified window
-        hookpve = true -- hook new 5.0 PvE frame
-    },
     raid_utility       = {
         enable   = true,
         position = { "TOPLEFT", UIParent, "TOPLEFT", 400, 1 }

@@ -14,7 +14,6 @@ ns.OptionList[13] = { -- Misc
     { 1, 'misc', 'slot_itemlevel', L_OPT_MISC_SLOT_ITEMLEVEL, false },
     { 1, 'blizzard', 'shift_mark', L_OPT_MISC_BLIZZARD_SHIFT_MARK, false },
     { 1, 'misc', 'raid_utility.enable', L_OPT_MISC_RAID_UTILITY, false },
-    { 1, 'misc', 'socialtabs.enable', L_OPT_MISC_MISC_SOCIALTABS, false },
     { 1, 'misc', 'profession_tabs', L_OPT_MISC_PROFESSION_TABS, false },
     { 1, 'misc', 'merchant_itemlevel', L_OPT_MISC_MERCHANT_ITEMLEVEL, false },
     { 1, 'misc', 'train_all', L_OPT_MISC_TRAIN_ALL, false },
