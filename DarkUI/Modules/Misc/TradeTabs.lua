@@ -117,6 +117,7 @@ local function UpdateSelectedTabs(object)
 
     for index = 1, #tabs[object] do
         local tab = tabs[object][index]
+        -- print(tab.name)
         tab:SetChecked(C_Spell.IsCurrentSpell(tab.name))
     end
 end
@@ -224,7 +225,8 @@ local function HandleProfession(object, professionID, hat)
         end
 
         if hat and PlayerHasToy(134020) and C_ToyBox.IsToyUsable(134020) then
-            UpdateTab(object, C_Spell.GetSpellInfo(67556), 236571, true)
+            local spellInfo = C_Spell.GetSpellInfo(67556)
+            UpdateTab(object, spellInfo.name, spellInfo.iconID, true)
         end
     end
 end
@@ -248,8 +250,8 @@ local function HandleTabs(object)
 
         for index = 1, #spells do
             if IsSpellKnown(spells[index]) then
-                local name, _, texture = C_Spell.GetSpellInfo(spells[index])
-                UpdateTab(object, name, texture)
+                local spellInfo = C_Spell.GetSpellInfo(spells[index])
+                UpdateTab(object, spellInfo.name, spellInfo.iconID)
             end
         end
     end
