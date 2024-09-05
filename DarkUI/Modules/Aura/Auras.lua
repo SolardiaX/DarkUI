@@ -35,17 +35,17 @@ end
 local day, hour, minute = 86400, 3600, 60
 local function formatAuraTime(s)
     if s >= day then
-        return E:FormatTime(s, true), s%day
+        return E:FormatTime(s, false), s%day
     elseif s >= 2*hour then
-        return E:FormatTime(s, true), s%hour
+        return E:FormatTime(s, false), s%hour
     elseif s >= 10*minute then
-        return E:FormatTime(s, true), s%minute
+        return E:FormatTime(s, false), s%minute
     elseif s >= minute then
-        return E:FormatTime(s, true), s - floor(s)
+        return E:FormatTime(s, false), s - floor(s)
     elseif s > 10 then
-        return E:FormatTime(s, true), s - floor(s)
+        return E:FormatTime(s, false), s - floor(s)
     elseif s > 5 then
-        return E:FormatTime(s, true), s - format("%.1f", s)
+        return E:FormatTime(s, false), s - format("%.1f", s)
     else
         return E:FormatTime(s, true), s - format("%.1f", s)
     end
@@ -150,8 +150,8 @@ module.UpdateAuras = function(self, button, index)
         end
     end
 
-    if auraData.count and auraData.count > 1 then
-        button.count:SetText(auraData.count)
+    if auraData.applications and auraData.applications > 1 then
+        button.count:SetText(auraData.applications)
     else
         button.count:SetText("")
     end
