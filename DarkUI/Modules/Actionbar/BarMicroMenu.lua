@@ -60,6 +60,12 @@ function module:OnInit()
             button:SetPoint("LEFT", previous, "RIGHT", cfg.button.space + 4, 0)
         end
 
+        button:HookScript("OnEnter", function(self)
+            print(GameTooltip:IsShown())
+            GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
+            GameTooltip_SetTitle(GameTooltip, self.tooltipText)
+        end)
+
         tinsert(bar.buttonList, button) --add the button object to the list
         previous = button
     end
