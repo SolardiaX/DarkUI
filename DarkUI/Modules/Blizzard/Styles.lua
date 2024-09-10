@@ -1523,7 +1523,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     ----------------------------------------------------------------------
 
     -- Specialization
-    if name == "Blizzard_TalentUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_TalentUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             PlayerTalentFrame.NineSlice.TopEdge,
             PlayerTalentFrame.NineSlice.RightEdge,
@@ -1566,7 +1566,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Collections
-    if name == "Blizzard_Collections" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_Collections" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             CollectionsJournal.NineSlice.TopEdge,
             CollectionsJournal.NineSlice.TopRightCorner,
@@ -1645,7 +1645,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AdventureGuide
-    if name == "Blizzard_EncounterJournal" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_EncounterJournal" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             EncounterJournal.NineSlice.TopEdge,
             EncounterJournal.NineSlice.RightEdge,
@@ -1670,7 +1670,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Communities
-    if name == "Blizzard_Communities" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_Communities" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             CommunitiesFrame.NineSlice.TopEdge,
             CommunitiesFrame.NineSlice.RightEdge,
@@ -1756,7 +1756,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Macro
-    if name == "Blizzard_MacroUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_MacroUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             MacroFrame.NineSlice.TopEdge,
             MacroFrame.NineSlice.RightEdge,
@@ -1780,7 +1780,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AuctionHouse
-    if name == "Blizzard_AuctionHouseUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_AuctionHouseUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             AuctionHouseFrame.NineSlice.TopEdge,
             AuctionHouseFrame.NineSlice.RightEdge,
@@ -1865,7 +1865,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- FlightMap
-    if name == "Blizzard_FlightMap" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_FlightMap" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             FlightMapFrame.BorderFrame.NineSlice.TopEdge,
             FlightMapFrame.BorderFrame.NineSlice.RightEdge,
@@ -1881,7 +1881,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- TradeSkill
-    if name == "Blizzard_TradeSkillUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_TradeSkillUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             TradeSkillFrame.NineSlice.TopEdge,
             TradeSkillFrame.NineSlice.RightEdge,
@@ -1910,7 +1910,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Inspect
-    if name == "Blizzard_InspectUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_InspectUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             InspectFrame.NineSlice.TopEdge,
             InspectFrame.NineSlice.RightEdge,
@@ -1965,7 +1965,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Wardrobe/Transmogrify
-    if name == "Blizzard_Collections" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_Collections" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             WardrobeFrame.NineSlice.TopEdge,
             WardrobeFrame.NineSlice.RightEdge,
@@ -1994,7 +1994,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ClassTrainer/FlightMaster
-    if name == "Blizzard_TrainerUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_TrainerUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             ClassTrainerFrame.NineSlice.TopEdge,
             ClassTrainerFrame.NineSlice.RightEdge,
@@ -2020,7 +2020,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Achievement
-    if name == "Blizzard_AchievementUI" and GetWoWVersion >= 30000 then
+    if addon == "Blizzard_AchievementUI" and GetWoWVersion >= 30000 then
         for i, v in pairs({ 
             AchievementFrameHeaderRight,
             AchievementFrameHeaderLeft,
@@ -2042,7 +2042,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Azerite
-    if name == "Blizzard_AzeriteUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_AzeriteUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             AzeriteEmpoweredItemUI.BorderFrame.NineSlice.TopEdge,
             AzeriteEmpoweredItemUI.BorderFrame.NineSlice.RightEdge,
@@ -2058,7 +2058,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AlliedRaces
-    if name == "Blizzard_AlliedRacesUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_AlliedRacesUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             AlliedRacesFrame.NineSlice.TopEdge,
             AlliedRacesFrame.NineSlice.RightEdge,
@@ -2083,7 +2083,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Inslands
-    if name == "Blizzard_IslandsQueueUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_IslandsQueueUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             IslandsQueueFrame.NineSlice.TopEdge,
             IslandsQueueFrame.NineSlice.RightEdge,
@@ -2100,7 +2100,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- GarrisonCapacitive
-    if name == "Blizzard_GarrisonUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_GarrisonUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             GarrisonCapacitiveDisplayFrame.NineSlice.TopEdge,
             GarrisonCapacitiveDisplayFrame.NineSlice.RightEdge,
@@ -2125,7 +2125,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Calendar
-    if name == "Blizzard_Calendar" and GetWoWVersion >= 30000 then
+    if addon == "Blizzard_Calendar" and GetWoWVersion >= 30000 then
         for i, v in pairs({ 
             CalendarFrameTopMiddleTexture,
             CalendarFrameRightTopTexture,
@@ -2178,7 +2178,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AzeriteRespec
-    if name == "Blizzard_AzeriteRespecUI" then
+    if addon == "Blizzard_AzeriteRespecUI" then
         for i, v in pairs({ 
             AzeriteRespecFrame.NineSlice.TopEdge,
             AzeriteRespecFrame.NineSlice.RightEdge,
@@ -2194,7 +2194,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ScrappingMachineFrame
-    if name == "Blizzard_ScrappingMachineUI" then
+    if addon == "Blizzard_ScrappingMachineUI" then
         for i, v in pairs({ 
             ScrappingMachineFrame.NineSlice.TopEdge,
             ScrappingMachineFrame.NineSlice.RightEdge,
@@ -2210,7 +2210,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- TimeManagerFrame
-    if name == "Blizzard_TimeManager" then
+    if addon == "Blizzard_TimeManager" then
         if (GetWoWVersion > 50600) then
             for i, v in pairs({ 
                 TimeManagerFrame.NineSlice.TopEdge,
@@ -2243,7 +2243,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AzeriteEssenceUI
-    if name == "Blizzard_AzeriteEssenceUI" then
+    if addon == "Blizzard_AzeriteEssenceUI" then
         for i, v in pairs({ 
             AzeriteEssenceUI.NineSlice.TopEdge,
             AzeriteEssenceUI.NineSlice.RightEdge,
@@ -2259,7 +2259,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- PvP UI
-    if name == "Blizzard_PVPUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_PVPUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             PVPQueueFrame.HonorInset.NineSlice,
             PVPQueueFrame.HonorInset.NineSlice.BottomLeftCorner,
@@ -2283,7 +2283,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Challenges
-    if name == "Blizzard_ChallengesUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_ChallengesUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             ChallengesFrameInset.NineSlice,
             ChallengesFrameInset.NineSlice.BottomLeftCorner,
@@ -2296,7 +2296,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
     
     -- Archaeology
-    if name == "Blizzard_ArchaeologyUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_ArchaeologyUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             ArchaeologyFrame.NineSlice.TopEdge,
             ArchaeologyFrame.NineSlice.RightEdge,
@@ -2321,7 +2321,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- KeybindOptions (Keybind)
-    if name == "Blizzard_BindingUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_BindingUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             KeyBindingFrame.BG.TopEdge,
             KeyBindingFrame.BG.RightEdge,
@@ -2340,7 +2340,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- OrderHallTalent
-    if name == "Blizzard_OrderHallUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_OrderHallUI" and GetWoWVersion > 50600 then
         for i, v in pairs({ 
             OrderHallTalentFrame.NineSlice.TopEdge,
             OrderHallTalentFrame.NineSlice.RightEdge,
@@ -2356,7 +2356,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- GarrisonRecruiterFrame
-    if name == "Blizzard_GarrisonUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_GarrisonUI" and GetWoWVersion > 50600 then
         for i, v in pairs({
             GarrisonRecruiterFrame.NineSlice.TopEdge,
             GarrisonRecruiterFrame.NineSlice.RightEdge,
@@ -2380,7 +2380,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ChromieTimeFrame
-    if name == "Blizzard_ChromieTimeUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_ChromieTimeUI" and GetWoWVersion > 50600 then
         for i, v in pairs({
             ChromieTimeFrame.NineSlice.TopEdge,
             ChromieTimeFrame.NineSlice.RightEdge,
@@ -2396,7 +2396,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- GuideFrame
-    if name == "Blizzard_NewPlayerExperienceGuide" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_NewPlayerExperienceGuide" and GetWoWVersion > 50600 then
         for i, v in pairs({
             GuideFrame.NineSlice.TopEdge,
             GuideFrame.NineSlice.RightEdge,
@@ -2412,7 +2412,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ItemSocketingFrame
-    if name == "Blizzard_ItemSocketingUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_ItemSocketingUI" and GetWoWVersion > 50600 then
         for i, v in pairs({
             ItemSocketingFrame.NineSlice.TopEdge,
             ItemSocketingFrame.NineSlice.RightEdge,
@@ -2428,7 +2428,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ItemUpgrade
-    if name == "Blizzard_ItemUpgradeUI" and GetWoWVersion > 50600 then
+    if addon == "Blizzard_ItemUpgradeUI" and GetWoWVersion > 50600 then
         for i, v in pairs({
             ItemUpgradeFrame.NineSlice.TopEdge,
             ItemUpgradeFrame.NineSlice.RightEdge,
@@ -2444,7 +2444,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- Communities
-    if name == "Blizzard_Communities" and GetWoWVersion > 30600 and GetWoWVersion < 90500 then
+    if addon == "Blizzard_Communities" and GetWoWVersion > 30600 and GetWoWVersion < 90500 then
         for i, v in pairs({ 
             CommunitiesFrameTopBorder,
             CommunitiesFrameRightBorder,
@@ -2463,7 +2463,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- AdventureGuide
-    if name == "Blizzard_EncounterJournal" and GetWoWVersion > 30600 then
+    if addon == "Blizzard_EncounterJournal" and GetWoWVersion > 30600 then
         for i, v in pairs({ 
             EncounterJournalTopBorder,
             EncounterJournalRightBorder,
@@ -2701,7 +2701,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
 
     ---------------------------- NewUI Functions ----------------------------------
     -- ClassTalentFrame
-    if name == "Blizzard_ClassTalentUI" and GetWoWVersion >= 90500 then
+    if addon == "Blizzard_ClassTalentUI" and GetWoWVersion >= 90500 then
         for i, v in pairs({ 
             ClassTalentFrame.NineSlice.RightEdge,
             ClassTalentFrame.NineSlice.LeftEdge,
@@ -2718,7 +2718,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- PlayerSpellsFrame
-    if name == "Blizzard_PlayerSpells" and GetWoWVersion >= 90500 then
+    if addon == "Blizzard_PlayerSpells" and GetWoWVersion >= 90500 then
         for i, v in pairs({ 
             PlayerSpellsFrame.NineSlice.TopEdge,
             PlayerSpellsFrame.NineSlice.RightEdge,
@@ -2736,7 +2736,7 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ProfessionsFrame
-      if name == "Blizzard_Professions" and GetWoWVersion >= 90500 then
+      if addon == "Blizzard_Professions" and GetWoWVersion >= 90500 then
         for i, v in pairs({ 
             ProfessionsFrame.NineSlice.TopEdge,
             ProfessionsFrame.NineSlice.RightEdge,
