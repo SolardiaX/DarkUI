@@ -136,6 +136,7 @@ function module:OnLogin()
     -- Add all items from quest to our table
     hooksecurefunc(QuestObjectiveTracker, "UpdateSingle", function(_, quest)
         local questLogIndex = quest:GetQuestLogIndex()
+        if not questLogIndex then return end
         local link = GetQuestLogSpecialItemInfo(questLogIndex)
         if link then
             local _, itemID = strsplit(":", link)
