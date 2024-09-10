@@ -81,51 +81,51 @@ function addon:LOOT_OPENED(_, ...)
                 item, texture, quantity, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, quantity, item, texture, quality)
             end
 
+            local color = ITEM_QUALITY_COLORS[quality]
+            local r, g, b = color.r, color.g, color.b
+
+            if GetLootSlotType(i) == Enum.LootSlotType.Money then
+                item = item:gsub("\n", ", ")
+            end
+
+            if quantity and quantity > 1 then
+                slot.count:SetText(quantity)
+                slot.count:Show()
+            else
+                slot.count:Hide()
+            end
+
+            if questId and not isActive then
+                slot.quest:Show()
+            else
+                slot.quest:Hide()
+            end
+
+            if color or questId or isQuestItem then
+                if questId or isQuestItem then
+                    r, g, b = 1, 1, 0.2
+                end
+
+                slot.iconFrame:SetBackdropBorderColor(r, g, b)
+                -- slot.iconFrame:SetBackdropColor(r, g, b)
+                slot.drop:SetVertexColor(r, g, b)
+            end
+            slot.drop:Show()
+
+            slot.isQuestItem = isQuestItem
+            slot.quality = quality
+
+            slot.name:SetText(item)
+            if color then
+                slot.name:SetTextColor(r, g, b)
+            end
+            slot.icon:SetTexture(texture)
+
+            if quality then
+                m = max(m, quality)
+            end
+
             if texture then
-                local color = ITEM_QUALITY_COLORS[quality]
-                local r, g, b = color.r, color.g, color.b
-
-                if GetLootSlotType(i) == Enum.LootSlotType.Money then
-                    item = item:gsub("\n", ", ")
-                end
-
-                if quantity and quantity > 1 then
-                    slot.count:SetText(quantity)
-                    slot.count:Show()
-                else
-                    slot.count:Hide()
-                end
-
-                if questId and not isActive then
-                    slot.quest:Show()
-                else
-                    slot.quest:Hide()
-                end
-
-                if color or questId or isQuestItem then
-                    if questId or isQuestItem then
-                        r, g, b = 1, 1, 0.2
-                    end
-
-                    slot.iconFrame:SetBackdropBorderColor(r, g, b)
-                    -- slot.iconFrame:SetBackdropColor(r, g, b)
-                    slot.drop:SetVertexColor(r, g, b)
-                end
-                slot.drop:Show()
-
-                slot.isQuestItem = isQuestItem
-                slot.quality = quality
-
-                slot.name:SetText(item)
-                if color then
-                    slot.name:SetTextColor(r, g, b)
-                end
-                slot.icon:SetTexture(texture)
-
-                if quality then
-                    m = max(m, quality)
-                end
-
                 slot:Enable()
                 slot:Show()
             end
