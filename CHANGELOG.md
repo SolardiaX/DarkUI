@@ -1,6 +1,18 @@
 ## v11.0.2-b1.0.6 ##
 
 ### Changed ###
+[Actionbar] adjust tooltip pos of micromenu
+[Aura] adjust aura style
+
+### Fixed ###
+[Aura] count of buff/debuff
+[Blizzard] default ui style
+[Loot] empty slot with fast loot
+[Quest] auto button issue
+
+## v11.0.2-b1.0.6 ##
+
+### Changed ###
 * [Misc] remove unused social tabs
 * [Chat] adjust chat frames style
 * [Locales] use enUS as default language
