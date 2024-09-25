@@ -201,7 +201,7 @@ local function updateTarget(self)
         end
 
         self:SetAlpha(1)
-        self.arrow:Show()
+        if self.arrow then self.arrow:Show() end
     else
         self:SetSize(cfg.width * E.noscalemult, cfg.height * E.noscalemult)
         self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - (cfg.height * E.noscalemult))
@@ -215,7 +215,7 @@ local function updateTarget(self)
             self:SetAlpha(1)
         end
 
-        self.arrow:Hide()
+        if self.arrow then self.arrow:Hide() end
     end
 
     self.Health.border:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
