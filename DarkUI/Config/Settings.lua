@@ -479,7 +479,7 @@ C.map = {
         enable     = true, -- enable/disable worldmap modules
         iconSize   = 28, -- party/raid member icon size on worldmap
         removeFog  = true, -- enable/disable remove fog
-        rewardIcon = true, -- eanble/disable the Reward Quest Item Icon
+        rewardIcon = true, -- enable/disable the Reward Quest Item Icon
         position   = { "BOTTOM", UIParent, "BOTTOM", 0, 320 }, -- worldmap position
     }
 }
@@ -508,7 +508,7 @@ C.misc = {
 C.quest = {
     enable            = true,
     auto_collapse     = true,
-    quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", -60, -60 },
+    quest_tracker_pos = { "TOPRIGHT", Minimap, "BOTTOMRIGHT", 0, -60 },
     auto_button       = true,
     auto_button_pos   = { "CENTER", UIParent, "CENTER", 0, -240 },
 }

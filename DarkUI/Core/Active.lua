@@ -46,3 +46,7 @@ if not C.actionbar.bars.bar3.enable then
     C.actionbar.bars.barpet.pos[2] = C.actionbar.bars.bar2.enable and "DarkUI_ActionBar2" or "DarkUI_ActionBar1"
     C.actionbar.bars.barstance.pos[2] = C.actionbar.bars.bar2.enable and "DarkUI_ActionBar2" or "DarkUI_ActionBar1"
 end
+
+for i = 4, 6 do
+    if C.actionbar.bars["bar" .. i].enable then C.quest.quest_tracker_pos[4] = C.quest.quest_tracker_pos[4] - 30 end
+end

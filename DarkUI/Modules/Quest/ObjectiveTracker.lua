@@ -24,9 +24,9 @@ local anchor = CreateFrame("Frame", "DarkUI_ObjectiveTrackerAnchor", UIParent)
 anchor:SetPoint(unpack(C.quest.quest_tracker_pos))
 anchor:SetSize(224, 150)
 
-ObjectiveTrackerFrame:SetClampedToScreen(false)
+ObjectiveTrackerFrame:SetClampedToScreen(true)
 ObjectiveTrackerFrame:ClearAllPoints()
-ObjectiveTrackerFrame:SetPoint("TOP", frame, "TOP")
+ObjectiveTrackerFrame:SetPoint("TOP", anchor, "TOP")
 ObjectiveTrackerFrame.IsUserPlaced = function() return true end
 ObjectiveTrackerFrame.ignoreFramePositionManager = true
 ObjectiveTrackerFrame.ignoreFrameLayout = true
