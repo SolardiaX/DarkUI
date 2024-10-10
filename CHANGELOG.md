@@ -1,4 +1,13 @@
-## v11.0.2-b1.0.6 ##
+## v11.0.5-b1.0.0 ##
+
+### Changed ###
+[Actionbar] options for right actionbars
+[Actionbar] options for addition actionbars
+
+### Fixed ###
+[Unitframe] target arrow enable/disable
+
+## v11.0.2-b1.0.7 ##
 
 ### Changed ###
 [Actionbar] adjust tooltip pos of micromenu
