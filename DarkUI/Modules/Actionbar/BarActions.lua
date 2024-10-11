@@ -242,14 +242,16 @@ function module:OnInit()
         hooksecurefunc(_G.SettingsPanel.Container.SettingsList.ScrollBox, 'Update', function(frame)
             for _, child in next, { frame.ScrollTarget:GetChildren() } do
                 local option = child.data and child.data.setting
-                local variable = option and option.variable
-                if variable and strsub(variable, 0, -3) == 'PROXY_SHOW_ACTIONBAR' then
-                    child:DisplayEnabled(false)
+                    local variable = option and option.variable
+                    if variable and strsub(variable, 0, -3) == 'PROXY_SHOW_ACTIONBAR' then
+                        child:DisplayEnabled(false)
 
-                    child.CheckBox:SetEnabled(false)
-                    child.CheckBox:SetScript('OnEnter', nil)
-                    child.Tooltip:SetScript('OnEnter', nil)
-                end
+                        if child.CheckBox then
+                            child.CheckBox:SetEnabled(false)
+                            child.CheckBox:SetScript('OnEnter', nil)
+                        end
+                        child.Tooltip:SetScript('OnEnter', nil)
+                    end
             end
         end)
     end)
