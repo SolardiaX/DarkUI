@@ -1,3 +1,11 @@
+## v11.0.5-b1.0.0a1 ##
+
+### Changed ###
+[Aura] update instance auras
+
+### Fixed ###
+[Aura] bar durition time
+
 ## v11.0.5-b1.0.0 ##
 
 ### Changed ###
