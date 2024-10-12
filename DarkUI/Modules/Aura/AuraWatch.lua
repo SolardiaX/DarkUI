@@ -77,6 +77,7 @@ local function InsertData(index, target)
         target[spellID] = v
     end
 end
+
 local function ConvertTable()
     for i = 1, 10 do
         myTable[i] = {}
@@ -316,7 +317,7 @@ end
 local function SetupAnchor()
     for key, VALUE in pairs(FrameList) do
         local value = AuraList[key]
-        if not value then return end
+        -- if not value then print(key); return end
         local direction, interval = value.Direction, value.Interval
         -- check whether using CENTER direction
         if value.Mode == "BAR" and direction == "CENTER" then
@@ -367,7 +368,7 @@ function module:AuraWatch_UpdateTimer()
     else
         self.elapsed = self.start + self.duration - GetTime()
     end
-
+    
     local timer = self.elapsed
     if timer < 0 then
         if self.Time then self.Time:SetText("N/A") end
@@ -470,8 +471,7 @@ end
 function module:AuraWatch_SetupAura(KEY, unit, index, filter, name, icon, count, duration, expires, spellID, flash)
     if not KEY then return end
 
-    local frames = FrameList[index]
-    if frames == nil then return end
+    local frames = FrameList[KEY]
     local frame = frames[frames.Index]
     if frame then frame:Show() end
     if frame.Icon then frame.Icon:SetTexture(icon) end
