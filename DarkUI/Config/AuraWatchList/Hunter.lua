@@ -66,6 +66,7 @@ local list = {
         {AuraID = 333526, UnitID = "target", Caster = "player"},    -- 尖刺果实
         {AuraID = 375893, UnitID = "target", Caster = "player"},    -- 死亡飞轮
         {AuraID = 424567, UnitID = "target", Caster = "player", Flash = true},    -- 狂野本能
+        {AuraID = 430703, UnitID = "target", Caster = "player"},	-- 黑蚀箭
         {AuraID = 410167, UnitID = "target", Caster = "player"},    -- 破甲，生存4T
     },
     ["Special Aura"]   = {    -- 玩家重要光环组
@@ -138,6 +139,7 @@ local list = {
         { SlotID = 14 }, -- 饰品2
         { SpellID = 186265 }, -- 灵龟守护
         { SpellID = 147362 }, -- 反制射击
+        {SpellID = 288613},	-- 百发百中
     },
 }
 

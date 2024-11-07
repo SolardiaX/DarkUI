@@ -1,6 +1,31 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
+-- 大米词缀及赛季相关
+local SEASON_SPELLS = {
+	--[209858] = 2, -- 死疽
+	--[240443] = 2, -- 爆裂
+	--[240559] = 1, -- 重伤
+	--[408556] = 2, -- 缠绕
+	--[342494] = 2, -- 狂妄吹嘘，S1
+	--[355732] = 2, -- 融化灵魂，S2
+	--[356666] = 2, -- 刺骨之寒，S2
+	--[356667] = 2, -- 刺骨之寒，S2
+	--[356925] = 2, -- 屠戮，S2
+	--[358777] = 2, -- 痛苦之链，S2
+	--[366288] = 2, -- 猛力砸击，S3
+	--[366297] = 2, -- 解构，S3
+	--[396364] = 2, -- 狂风标记，DF S1
+	--[396369] = 2, -- 闪电标记，DF S1
+	[440313] = 2, -- 虚空裂隙，TWW S1
+}
+
+function module:RegisterSeasonSpells(tier, instance)
+	for spellID, priority in pairs(SEASON_SPELLS) do
+		module:RegisterDebuff(tier, instance, 0, spellID, priority)
+	end
+end
+
 -- 团队框体职业相关Buffs
 local list = {
     ["ALL"]      = {                -- 全职业
@@ -48,23 +73,3 @@ local list = {
 
 module:AddClassSpells(list)
 
--- 大米词缀及赛季相关
-local SEASON_SPELLS = {
-    [209858] = 2, -- 死疽
-    [240443] = 2, -- 爆裂
-    [240559] = 1, -- 重伤
-    [342494] = 2, -- 狂妄吹嘘，S1
-    [355732] = 2, -- 融化灵魂，S2
-    [356666] = 2, -- 刺骨之寒，S2
-    [356667] = 2, -- 刺骨之寒，S2
-    [356925] = 2, -- 屠戮，S2
-    [358777] = 2, -- 痛苦之链，S2
-    [366288] = 2, -- 猛力砸击，S3
-    [366297] = 2, -- 解构，S3
-}
-
-function module:RegisterSeasonSpells(tier, instance)
-    for spellID, priority in pairs(SEASON_SPELLS) do
-        module:RegisterDebuff(tier, instance, 0, spellID, priority)
-    end
-end
