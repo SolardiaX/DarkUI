@@ -81,7 +81,7 @@ function addon:LOOT_OPENED(_, ...)
                 item, texture, quantity, quality = CurrencyContainerUtil.GetCurrencyContainerInfo(currencyID, quantity, item, texture, quality)
             end
 
-            local color = ITEM_QUALITY_COLORS[quality]
+            local color = ITEM_QUALITY_COLORS[quality] or {r = 1, g = 1, b = 1}
             local r, g, b = color.r, color.g, color.b
 
             if GetLootSlotType(i) == Enum.LootSlotType.Money then
