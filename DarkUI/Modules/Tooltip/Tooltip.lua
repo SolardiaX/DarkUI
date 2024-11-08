@@ -780,7 +780,7 @@ module.rTips["Blizzard_Calendar"] = function()
 end
 
 module.rTips["Blizzard_IslandsQueueUI"] = function()
-    local tooltip = IslandsQueueFrameTooltip:GetParent()
+    local tooltip = IslandsQueueFrame.WeeklyQuest.QuestReward.Tooltip
     tooltip.IconBorder:SetAlpha(0)
     tooltip.Icon:SetTexCoord(unpack(C.media.texCoord))
     styleTooltip(tooltip:GetParent())
