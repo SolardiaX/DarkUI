@@ -113,13 +113,13 @@ end
 
 local function updateBar(statusbar, isrep)
     if not isrep then
-        local min, max = UnitXP("player"), UnitXPMax("player")
+        local barMin, barMax = UnitXP("player"), UnitXPMax("player")
         local exhaustion = GetXPExhaustion() or 0
 
-        statusbar:SetMinMaxValues(0, max)
-        statusbar:SetValue(min)
-        statusbar.rest:SetMinMaxValues(0, max)
-        statusbar.rest:SetValue(math_min(min + exhaustion, max))
+        statusbar:SetMinMaxValues(0, barMax)
+        statusbar:SetValue(barMin)
+        statusbar.rest:SetMinMaxValues(0, barMax)
+        statusbar.rest:SetValue(math_min(barMin + exhaustion, barMax))
     else
         local factionData = C_Reputation_GetWatchedFactionData()
         if not factionData then
@@ -128,15 +128,15 @@ local function updateBar(statusbar, isrep)
         end
 
         local standing = factionData.reaction
-        local min = factionData.currentReactionThreshold
-        local max = factionData.nextReactionThreshold
+        local barMin = factionData.currentReactionThreshold
+        local barMax = factionData.nextReactionThreshold
         local value = factionData.currentStanding
         local factionID = factionData.factionID
 
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             value = majorFactionData.renownReputationEarned or 0
-            min, max = 0, majorFactionData.renownLevelThreshold
+            barMin, barMax = 0, majorFactionData.renownLevelThreshold
             standing = majorFactionData.renownLevel
         else
             local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
@@ -147,23 +147,23 @@ local function updateBar(statusbar, isrep)
             if C_Reputation_IsFactionParagon(factionID) then
                 local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
                 currentValue = mod(currentValue, threshold)
-                min, max, value = 0, threshold, currentValue
+                barMin, barMax, value = 0, threshold, currentValue
             elseif friendID and friendID ~= 0 then
                 if nextFriendThreshold then
-                    min, max, value = friendThreshold, nextFriendThreshold, friendRep
+                  barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
                 else
-                    min, max, value = 0, 1, 1
+                  barMin, barMax, value = 0, 1, 1
                 end
                 standing = 5
             else
-                if standing == MAX_REPUTATION_REACTION then min, max, value = 0, 1, 1 end
+                if standing == MAX_REPUTATION_REACTION then barMin, barMax, value = 0, 1, 1 end
             end
         end
 
         local color = FACTION_BAR_COLORS[standing or 4] or {r=.8, g=.7, b=0}
         statusbar:SetStatusBarColor(color.r, color.g, color.b)
-        statusbar:SetMinMaxValues(0, max - min)
-        statusbar:SetValue(value - min)
+        statusbar:SetMinMaxValues(0, barMax - barMin)
+        statusbar:SetValue(value - barMin)
     end
 end
 
@@ -254,8 +254,8 @@ local function bar_OnEnter()
 
     if factionData then
         local standing = factionData.reaction
-        local min = factionData.currentReactionThreshold
-        local max = factionData.nextReactionThreshold
+        local barMin = factionData.currentReactionThreshold
+        local barMax = factionData.nextReactionThreshold
         local value = factionData.currentStanding
         local factionID = factionData.factionID
 
