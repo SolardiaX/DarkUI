@@ -60,8 +60,8 @@ module:Inject("Guild", {
     text     = {
         string = function()
             if IsInGuild() then
-                local total, _, online = GetNumGuildMembers()
-                return format(cfg.fmt, online, total)
+                local total, numOnline, allOnline = GetNumGuildMembers()
+                return format(cfg.fmt, allOnline or numOnline, total)
             else return LOOKINGFORGUILD end
         end, update = 5
     },
@@ -154,8 +154,10 @@ module:Inject("Guild", {
             self.hovered = true
             C_GuildInfo_GuildRoster()
             local name, rank, level, zone, note, officernote, connected, status, class, isMobile, zone_r, zone_g, zone_b, classc, levelc, grouped
-            local total, _, online = GetNumGuildMembers()
+            local total, numOnline, allOnline = GetNumGuildMembers()
             local gmotd = GetGuildRosterMOTD()
+
+            local online = allOnline or numOnline
 
             GameTooltip:SetOwner(self, "ANCHOR_NONE")
             GameTooltip:ClearAllPoints()
