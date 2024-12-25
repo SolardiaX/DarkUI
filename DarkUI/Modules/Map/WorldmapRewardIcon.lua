@@ -16,9 +16,9 @@ local PARENT_MAPS = {
         [2215] = true, -- Hallowfall
         [2214] = true, -- The Ringing Deeps
         [2255] = true, -- Azj-Kahet
-        [2256] = true, -- Azj-Kahet - Lower (don't know how this works yet)
-        [2213] = true, -- City of Threads (not really representable on Algar, TBD)
-        [2216] = true, -- City of Threads - Lower (again, don't know how this works)
+        [2256] = true, -- Azj-Kahet - Lower
+        [2213] = true, -- City of Threads
+        [2216] = true, -- City of Threads - Lower
     },
     [1978] = { -- Dragon Isles
         [2022] = true, -- The Walking Shores
@@ -44,6 +44,9 @@ local PARENT_MAPS = {
         [790] = true, -- Eye of Azshara (world version)
         [646] = true, -- Broken Shore
     },
+    [424] = { -- Pandaria
+        [1530] = true, -- Vale of Eternal Blossoms (BfA)
+    },
     [875] = { -- Zandalar
         [862] = true, -- Zuldazar
         [864] = true, -- Vol'Dun
@@ -59,12 +62,38 @@ local PARENT_MAPS = {
     },
     [12] = { -- Kalimdor
         [62] = true, -- Darkshore (Warfronts)
+        [1527] = true, -- Uldum (BfA)
+    },
+    [947] = { -- Azeroth
+        [13] = true, -- Eastern Kingdoms
+        [12] = true, -- Kalimdor
+        [619] = true, -- Broken Isles
+        [875] = true, -- Zandalar
+        [876] = true, -- Kul Tiras
+        [424] = true, -- Pandaria
+        [1978] = true, -- Dragon Isles
+        [2274] = true, -- Khaz Algar
     },
 }
 
 local FACTION_ASSAULT_ATLAS = UnitFactionGroup('player') == 'Horde' and 'worldquest-icon-horde' or 'worldquest-icon-alliance'
 local disabled = false
 local mapScale, parentScale, zoomFactor = 1.25, 1, 0.5
+
+local function IsParentMap(mapID)
+    return not not PARENT_MAPS[mapID]
+end
+
+local function IsChildMap(parentMapID, mapID)
+	local mapInfo = C_Map.GetMapInfo(mapID)
+	return parentMapID and mapID and mapInfo and mapInfo.parentMapID and mapInfo.parentMapID == parentMapID
+end
+
+local function TranslatePosition(position, fromMapID, toMapID)
+	local continentID, worldPos = C_Map.GetWorldPosFromMapPos(fromMapID, position)
+	local _, newPos = C_Map.GetMapPosFromWorldPos(continentID, worldPos, toMapID)
+	return newPos
+end
 
 -- create a new data provider that will display the world quests on zones from the list above,
 -- based on WorldMap_WorldQuestDataProviderMixin
@@ -78,9 +107,27 @@ function DataProvider:GetPinTemplate()
     return 'BetterWorldQuestPinTemplate'
 end
 
-function DataProvider:ShouldOverrideShowQuest(mapID) --, questInfo)
-    local mapInfo = C_Map.GetMapInfo(mapID)
-    return mapInfo.mapType == Enum.UIMapType.Continent
+function DataProvider:ShouldOverrideShowQuest()
+    -- just nop so we don't hit the default
+end
+
+function DataProvider:ShouldShowQuest(questInfo)
+	local mapID = self:GetMap():GetMapID()
+	if mapID == 947 then
+		-- TODO: change option to only show when there's few?
+		return showAzeroth
+	end
+
+	if WorldQuestDataProviderMixin.ShouldShowQuest(self, questInfo) then -- super
+		return true
+	end
+
+	local mapInfo = C_Map.GetMapInfo(mapID)
+	if mapInfo.mapType == Enum.UIMapType.Continent then
+		return true
+	end
+
+	return IsChildMap(mapID, questInfo.mapID)
 end
 
 BetterWorldQuestPinMixin = CreateFromMixins(WorldMap_WorldQuestPinMixin)
@@ -135,10 +182,6 @@ function BetterWorldQuestPinMixin:OnLoad()
     self.Bounty = Bounty
 end
 
-local function IsParentMap(mapID)
-    return not not PARENT_MAPS[mapID]
-end
-
 function BetterWorldQuestPinMixin:RefreshVisuals()
     WorldMap_WorldQuestPinMixin.RefreshVisuals(self)
 
@@ -150,11 +193,14 @@ function BetterWorldQuestPinMixin:RefreshVisuals()
     self.Display.Icon:Hide()
 
     -- update scale
-    if IsParentMap(self:GetMap():GetMapID()) then
-        self:SetScalingLimits(1, parentScale, parentScale + zoomFactor)
-    else
-        self:SetScalingLimits(1, mapScale, mapScale + zoomFactor)
-    end
+    local mapID = self:GetMap():GetMapID()
+	if mapID == 947 then
+		self:SetScalingLimits(1, parentScale / 2, (parentScale / 2) + zoomFactor)
+	elseif IsParentMap(mapID) then
+		self:SetScalingLimits(1, parentScale, parentScale + zoomFactor)
+	else
+		self:SetScalingLimits(1, mapScale, mapScale + zoomFactor)
+	end
 
     -- uniform coloring
     if self:IsSelected() then
@@ -235,6 +281,14 @@ function BetterWorldQuestPinMixin:RefreshVisuals()
     end
 end
 
+function BetterWorldQuestPinMixin:AddIconWidgets()
+	-- remove the obnoxious glow behind world bosses
+end
+
+function BetterWorldQuestPinMixin:SetPassThroughButtons()
+	-- https://github.com/Stanzilla/WoWUIBugs/issues/453
+end
+
 local function togglePinsVisibility(state)
     for pin in WorldMapFrame:EnumeratePinsByTemplate(DataProvider:GetPinTemplate()) do
         pin:SetShown(state)
@@ -242,14 +296,17 @@ local function togglePinsVisibility(state)
 end
 
 function module:OnInit()
-    WorldMapFrame:AddDataProvider(DataProvider)
-
     -- remove the default provider
     for dp in next, WorldMapFrame.dataProviders do
-        if dp.GetPinTemplate and dp.GetPinTemplate() == 'WorldMap_WorldQuestPinTemplate' then
-            WorldMapFrame:RemoveDataProvider(dp)
+        if not dp.GetPinTemplates and type(dp.GetPinTemplate) == 'function' then
+            if dp:GetPinTemplate() == 'WorldMap_WorldQuestPinTemplate' then
+                WorldMapFrame:RemoveDataProvider(dp)
+                break
+            end
         end
     end
+
+    WorldMapFrame:AddDataProvider(DataProvider)
     
     module:RegisterEvent('MODIFIER_STATE_CHANGED', function()
         if WorldMapFrame:IsShown() then
