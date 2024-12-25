@@ -317,7 +317,7 @@ end
 local function SetupAnchor()
     for key, VALUE in pairs(FrameList) do
         local value = AuraList[key]
-        -- if not value then print(key); return end
+        if not value then return end
         local direction, interval = value.Direction, value.Interval
         -- check whether using CENTER direction
         if value.Mode == "BAR" and direction == "CENTER" then
