@@ -104,6 +104,8 @@ function module:OnInit()
                 else
                     spellButton:SetPoint("BOTTOM", previous, "TOP", 0, 5)
                 end
+
+                spellButton.__styled = true
             end
         end
     end)

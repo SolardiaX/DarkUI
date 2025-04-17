@@ -50,6 +50,27 @@ function E:ApplyBackdrop(frame, gradient)
     frame.styled = true
 end
 
+function E:SkinIcon(icon, t, parent)
+	parent = parent or icon:GetParent()
+
+	if t then
+		icon.b = CreateFrame("Frame", nil, parent)
+		icon.b:SetTemplate("Default")
+		icon.b:SetOutside(icon)
+	else
+		parent:CreateBackdrop("Default")
+		parent.backdrop:SetOutside(icon)
+	end
+
+	icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	icon:SetParent(t and icon.b or parent)
+end
+
+function E:CropIcon(icon)
+	icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	icon:SetInside()
+end
+
 function E:SkinCheckBox(frame)
     local lvl = frame:GetFrameLevel()
 

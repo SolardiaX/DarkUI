@@ -440,7 +440,7 @@ hooksecurefunc(ScenarioObjectiveTracker.StageBlock, "UpdateWidgetRegistration", 
             if widgetFrame.CurrencyContainer then
                 for currencyFrame in widgetFrame.currencyPool:EnumerateActive() do
                     if not currencyFrame.styled then
-                        E:StyleButton(currencyFrame.Icon)
+                        E:SkinIcon(currencyFrame.Icon)
                         currencyFrame.styled = true
                     end
                 end
