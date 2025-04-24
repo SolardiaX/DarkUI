@@ -207,3 +207,35 @@ function EasyMenu(menuList, menuFrame, anchor, x, y, displayMode, autoHideDelay)
 	UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
 	ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
 end
+
+----------------------------------------------------------------------------------------
+--    Restore old function
+----------------------------------------------------------------------------------------
+GetContainerItemInfo = function(bagIndex, slotIndex)
+	local info = C_Container.GetContainerItemInfo(bagIndex, slotIndex)
+	if info then
+		return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
+	end
+end
+
+UnitAura = function(unit, auraIndex, filter)
+	return AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, auraIndex, filter))
+end
+
+UnitBuff = function(unit, auraIndex, filter)
+	return AuraUtil.UnpackAuraData(C_UnitAuras.GetBuffDataByIndex(unit, auraIndex, filter))
+end
+
+GetSpellInfo = function(data)
+	local spellInfo = C_Spell.GetSpellInfo(data)
+	if spellInfo then
+		return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID
+	end
+end
+
+GetSpellCooldown = function(data)
+	local info = C_Spell.GetSpellCooldown(data)
+	if info then
+		return info.startTime, info.duration, info.isEnabled, info.modRate
+	end
+end
