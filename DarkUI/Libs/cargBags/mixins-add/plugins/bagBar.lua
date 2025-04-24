@@ -77,30 +77,7 @@ function BagButton:Create(bagID)
     button:RegisterForDrag("LeftButton", "RightButton")
     button:RegisterForClicks("AnyUp")
     button:SetSize(32, 32)
-    
-    local checked = button:CreateTexture(nil, "OVERLAY")
-    checked:SetTexture(self.checkedTex)
-    checked:SetVertexColor(1, 0.8, 0, 0.8)
-    checked:SetBlendMode("ADD")
-    checked:SetAllPoints()
-    button.checked = checked
-
-    button.Icon =     _G[name.."IconTexture"]
-    button.Border = _G[name.."NormalTexture"]
-
-    button.bg = CreateFrame("Frame", nil, button, BackdropTemplate)
-    button.bg:SetAllPoints(button)
-    button.bg:SetBackdrop({
-        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        tile = false, tileSize = 16, edgeSize = 1,
-    })
-    button.bg:SetBackdropColor(1, 1, 1, 0)
-    button.bg:SetBackdropBorderColor(0, 0, 0, 1)
-    
-    button.Icon:SetTexCoord(.08, .92, .08, .92)
-    button.Icon:SetVertexColor(0.8, 0.8, 0.8)
-    button.Border:SetAlpha(0)
+    button.Icon = _G[name.."IconTexture"]
 
     cargBags.SetScriptHandlers(button, "OnClick", "OnReceiveDrag", "OnEnter", "OnLeave", "OnDragStart")
 
@@ -123,8 +100,6 @@ function BagButton:UpdateButton()
             self.Icon:SetVertexColor(1, 0, 0)
         end
     end
-
-    self.checked:SetShown(not self.hidden and not self.notBought)
 
     if(self.OnUpdateButton) then self:OnUpdateButton() end
 end

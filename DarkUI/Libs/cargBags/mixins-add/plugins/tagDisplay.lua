@@ -112,8 +112,12 @@ local function GetNumFreeSlots(name)
         return GetContainerNumFreeSlots(-3)
     elseif name == "BagReagent" then
         return GetContainerNumFreeSlots(5)
-    elseif name == "AccountBank" then
-        return GetContainerNumFreeSlots(cargBags.selectedTabID + 12)
+    elseif name == "Account" then
+        local numFreeSlots = 0
+        for bagID = 13, 17 do
+            numFreeSlots = numFreeSlots + GetContainerNumFreeSlots(bagID)
+        end
+        return numFreeSlots
     end
 end
 
@@ -133,10 +137,10 @@ tagPool["item"] = function(self, item)
 end
 
 tagPool["currency"] = function(self, id)
-    local _, count, icon = GetBackpackCurrencyInfo(id)
+    local currencyInfo = C_CurrencyInfo.GetBackpackCurrencyInfo(id)
 
-    if(count) then
-        return count .. createIcon(icon, self.iconValues)
+    if currencyInfo then
+        return currencyInfo.quantity..createIcon(currencyInfo.iconFileID, self.iconValues)
     end
 end
 tagEvents["currency"] = { "CURRENCY_DISPLAY_UPDATE" }
