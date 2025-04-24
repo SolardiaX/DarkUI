@@ -51,10 +51,10 @@ function module:startScanningBags()
         for s = 1, C_Container.GetContainerNumSlots(b) do
             local itemID = C_Container.GetContainerItemID(b, s)
             itemID = tonumber(itemID)
-            if C.autobutton[itemID] then
+            if C.autobutton[itemID] and not C.autobuttonIgnore[itemID] then
                 local itemName = C_Item.GetItemInfo(itemID)
-                local count = C_Item.GetItemCount(itemID)
-                local itemIcon = C_Item.GetItemIcon(itemID)
+				local count = C_Item.GetItemCount(itemID)
+				local itemIcon = C_Item.GetItemIconByID(itemID)
 
                 -- Set our texture to the item found in bags
                 self.AutoButton.t:SetTexture(itemIcon)
@@ -130,13 +130,13 @@ function module:OnLogin()
         if link then
             local itemID = link:match("item:(%d+)")
             itemID = tonumber(itemID) or 0
-            if not T.ABItems[itemID] then
-                T.ABItems[itemID] = true
-                startScanningBags()
+            if not C.autobutton[itemID] then
+                C.autobutton[itemID] = true
+                module:startScanningBags()
             end
             if quest:IsComplete() then
-                T.ABItems[itemID] = false
-                startScanningBags()
+                C.autobutton[itemID] = false
+                module:startScanningBags()
             end
         end
     end
