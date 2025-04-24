@@ -218,6 +218,8 @@ local QUEST_GOSSIP = {
     [109275] = true, -- Soridormi - begin time rift
     [120619] = true, -- Big Dig task
     [120620] = true, -- Big Dig task
+    [120555] = true, -- Awakening The Machine
+    [120733] = true, -- Theater Troupe
 
     -- Darkmoon Faire
     [40563] = true, -- whack
@@ -235,18 +237,38 @@ local QUEST_GOSSIP = {
 local IGNORE_GOSSIP = {
     -- when we don't want to automate gossip because it's counter-intuitive
     [122442] = true, -- leave the dungeon in remix
+
+    -- avoid accidental teleports
+    [44733] = true,
+    [125350] = true, -- siren isle
+    [125351] = true, -- siren isle
+    [131324] = true, -- winter veil hillsbrad
+    [131325] = true, -- winter veil hillsbrad
 }
 
-local function IsQuestIgnored(questID)
+local function IsQuestIgnored(questID, title, override)
     if ignoredQuests[questID] then
         return true
     end
+
     if C_QuestLog.IsWorldQuest(questID) then
         return true
     end
+
+    if override then
+        -- this is so we can override popup quests that are not being tracked, as they can
+        -- get quite annoying
+        return false
+    end
+
     if C_QuestLog.IsQuestTrivial(questID) and not C_Minimap.IsTrackingHiddenQuests() then
         return true
     end
+
+    if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) and not C_Minimap.IsTrackingAccountCompletedQuests() then
+        return true
+    end
+
     local questTitle = tonumber(questID) and C_QuestLog.GetTitleForQuestID(questID) or ''
     for key in next, QuickQuestDB.blocklist.quests do
         if key == questID or questTitle:lower():find(tostring(key):lower()) then
@@ -271,15 +293,33 @@ module:RegisterEvent('GOSSIP_SHOW', function()
     -- don't annoy taxi addons
         return
     end
+
+    -- need to iterate all the options first before we can select them
+    local gossipQuests = {}
+    local gossipSkips = {}
+
     local gossip = C_GossipInfo.GetOptions()
     for _, info in next, gossip do
         if DARKMOON_GOSSIP[info.gossipOptionID] and QuickQuestDB.general.paydarkmoonfaire then
+            -- we can select this one directly since it never interferes with the others
             C_GossipInfo.SelectOption(info.gossipOptionID, '', true)
-        elseif QUEST_GOSSIP[info.gossipOptionID] and QuickQuestDB.general.skipgossip then
-            C_GossipInfo.SelectOption(info.gossipOptionID)
-        elseif FlagsUtil.IsSet(info.flags, Enum.GossipOptionRecFlags.QuestLabelPrepend) and QuickQuestDB.general.skipgossip then
-            C_GossipInfo.SelectOption(info.gossipOptionID)
+            return
+        elseif QUEST_GOSSIP[info.gossipOptionID] then
+            table.insert(gossipQuests, info.gossipOptionID)
+        elseif FlagsUtil.IsSet(info.flags, Enum.GossipOptionRecFlags.QuestLabelPrepend) then
+            table.insert(gossipQuests, info.gossipOptionID)
+        elseif info.name:sub(1, 11) == '|cFFFF0000<' then
+            -- TODO: this might get a flag in the future
+            table.insert(gossipSkips, info.gossipOptionID)
         end
+    end
+
+    if #gossipSkips == 1 then
+        C_GossipInfo.SelectOption(gossipSkips[1])
+        return
+    elseif #gossipQuests == 1 then
+        C_GossipInfo.SelectOption(gossipQuests[1])
+        return
     end
 
     if (C_GossipInfo.GetNumActiveQuests() + C_GossipInfo.GetNumAvailableQuests()) > 0 then
@@ -328,114 +368,120 @@ local function WaitForItemData(itemID, callback)
     Item:CreateFromItemID(itemID):ContinueOnItemLoad(callback)
 end
 
-module:RegisterEvent('GOSSIP_SHOW', function()
-    -- triggered when the player interacts with an NPC that presents dialogue
-    local handleGossipShow = function()
-        if paused then
-            return
-        end
-    
-        if QuickQuestDB.blocklist.npcs[GetNPCID()] then
-            return
-        end
-    
-        for _, questInfo in next, C_GossipInfo.GetActiveQuests() do
-            if not questInfo.questLevel or questInfo.questLevel == 0 then
-                -- not cached yet
-                WaitForQuestData(questInfo.questID, handleGossipShow)
-            elseif IsQuestIgnored(questInfo.questID) then
-                -- ignore
-            elseif questInfo.isComplete then
-                C_GossipInfo.SelectActiveQuest(questInfo.questID)
-            end
-        end
-    
-        for _, questInfo in next, C_GossipInfo.GetAvailableQuests() do
-            if not questInfo.questLevel or questInfo.questLevel == 0 then
-                -- not cached yet
-                WaitForQuestData(questInfo.questID, handleGossipShow)
-            elseif questInfo.isRepeatable then
-                -- ignore
-            elseif not IsQuestIgnored(questInfo.questID) then
-                C_GossipInfo.SelectAvailableQuest(questInfo.questID)
-            end
+-- triggered when the player interacts with an NPC that presents dialogue
+local function handleGossipQuests()
+    if paused then
+        return
+    end
+
+    if QuickQuestDB.blocklist.npcs[GetNPCID()] then
+        return
+    end
+
+    for _, questInfo in next, C_GossipInfo.GetActiveQuests() do
+        if not questInfo.questLevel or questInfo.questLevel == 0 then
+            -- not cached yet
+            WaitForQuestData(questInfo.questID, handleGossipShow)
+        elseif IsQuestIgnored(questInfo.questID) then
+            -- ignore
+        elseif questInfo.isComplete then
+            C_GossipInfo.SelectActiveQuest(questInfo.questID)
         end
     end
 
-    handleGossipShow()
-end)
+    for _, questInfo in next, C_GossipInfo.GetAvailableQuests() do
+        if questInfo.questID == 82449 then
+            -- "The Call of the Worldsoul"
+            -- this quest is buggy, it's repeatable (weekly) but the APIs don't report that,
+            -- and all this quest does is open an option of other quests, so we should
+            -- automatically accept it
+            C_GossipInfo.SelectAvailableQuest(questInfo.questID)
+        elseif not questInfo.questLevel or questInfo.questLevel == 0 then
+            -- not cached yet
+            WaitForQuestData(questInfo.questID, handleGossipQuests)
+        elseif questInfo.isRepeatable then
+            -- ignore
+        elseif not IsQuestIgnored(questInfo.questID) then
+            C_GossipInfo.SelectAvailableQuest(questInfo.questID)
+        end
+    end
+end
 
-module:RegisterEvent('QUEST_GREETING', function()
+module:RegisterEvent('GOSSIP_SHOW', handleGossipQuests)
+
+local function handleQuestList()
     -- triggered when the player interacts with an NPC that hands in/out quests
-    local handleQuestList = function()
-        if paused then
-            return
-        end
+    if paused then
+        return
+    end
 
-        if QuickQuestDB.blocklist.npcs[GetNPCID()] then
-            return
-        end
+    if QuickQuestDB.blocklist.npcs[GetNPCID()] then
+        return
+    end
 
-        for index = 1, GetNumActiveQuests() do
-            local questID = GetActiveQuestID(index)
-            local title, isComplete = GetActiveTitle(index)
-            if isComplete and not IsQuestIgnored(questID) then
-                SelectActiveQuest(index)
-            end
-        end
-
-        for index = 1, GetNumAvailableQuests() do
-            local _, _, isRepeatable, _, questID = GetAvailableQuestInfo(index)
-            local questLevel = GetAvailableLevel(index)
-            if not questLevel or questLevel == 0 then
-                -- not cached yet, invalid isTrivial flag
-                WaitForQuestData(questID, handleQuestList)
-            elseif IsQuestIgnored(questID) then
-                -- ignore
-            elseif isRepeatable then
-                -- ignore
-            else
-                SelectAvailableQuest(index)
-            end
+    for index = 1, GetNumActiveQuests() do
+        local questID = GetActiveQuestID(index)
+        local title, isComplete = GetActiveTitle(index)
+        if isComplete and not IsQuestIgnored(questID) then
+            SelectActiveQuest(index)
         end
     end
 
-    handleQuestList()
-end)
-
-module:RegisterEvent('QUEST_DETAIL', function(_, _, questItemID)
-    -- triggered when the information about an available quest is available
-    local handleQuestDetail = function()
-        if paused then
-            return
-        end
-
-        local questID = GetQuestID()
-        if not questID or questID == 0 then
-            return
-        end
-
-        local questLevel = C_QuestLog.GetQuestDifficultyLevel(questID)
+    for index = 1, GetNumAvailableQuests() do
+        local _, _, isRepeatable, _, questID = GetAvailableQuestInfo(index)
+        local questLevel = GetAvailableLevel(index)
         if not questLevel or questLevel == 0 then
-            WaitForQuestData(questID, handleQuestDetail)
-            return
-        end
-
-        if QuestGetAutoAccept() then
-            -- these kinds of quests are already accepted, the popup only exists to notify the user
-            AcknowledgeAutoAcceptQuest()
-            RemoveAutoQuestPopUp(questID)
-        elseif QuestIsFromAreaTrigger() then
-            -- when not triggered in combination with QuestGetAutoAccept-style quests this is just
-            -- a normal quest popup, as if it was shared by an unknown player, so we'll just accept it
-            AcceptQuest()
-        elseif not IsQuestIgnored(questID) then
-            AcceptQuest()
+            -- not cached yet, invalid isTrivial flag
+            WaitForQuestData(questID, handleQuestList)
+        elseif IsQuestIgnored(questID) then
+            -- ignore
+        elseif isRepeatable then
+            -- ignore
+        else
+            SelectAvailableQuest(index)
         end
     end
+end
 
-    handleQuestDetail()
-end)
+module:RegisterEvent('QUEST_GREETING', handleQuestList)
+
+local popups = {}
+local function handleQuestDetail()
+    -- triggered when the information about an available quest is available
+    if paused then
+        return
+    end
+
+    local questID = GetQuestID()
+    if not questID or questID == 0 then
+        return
+    end
+
+    local questLevel = C_QuestLog.GetQuestDifficultyLevel(questID)
+    if not questLevel or questLevel == 0 then
+        WaitForQuestData(questID, handleQuestDetail)
+        return
+    end
+
+    if QuestGetAutoAccept() then
+        -- these kinds of quests are already accepted, the popup only exists to notify the user
+        AcknowledgeAutoAcceptQuest()
+        RemoveAutoQuestPopUp(questID)
+    elseif QuestIsFromAreaTrigger() then
+        -- when not triggered in combination with QuestGetAutoAccept-style quests this is just
+        -- a normal quest popup, as if it was shared by an unknown player, so we'll just accept it
+        AcceptQuest()
+    elseif not IsQuestIgnored(questID, nil, popups[questID]) then
+        AcceptQuest()
+    end
+
+    if popups[questID] then
+        -- just remove the already accepted/completed quest from the tracker
+        RemoveAutoQuestPopUp(questID)
+    end
+end
+
+module:RegisterEvent('QUEST_DETAIL', handleQuestDetail)
 
 module:RegisterEvent('QUEST_PROGRESS', function()
     -- triggered when an active quest is selected during turn-in
@@ -473,7 +519,7 @@ module:RegisterEvent('QUEST_COMPLETE', function()
         return
     end
 
-    if GetNumQuestChoices() <= 1 then
+    if GetNumQuestChoices() <= 1 and not IsQuestIgnored(GetQuestID()) then
         -- complete the quest by accepting the first item
         GetQuestReward(1)
     end
@@ -507,6 +553,10 @@ module:RegisterEvent('QUEST_COMPLETE', function()
         end
 
         if highestValueIndex then
+            if not (QuestInfoRewardsFrame and QuestInfoRewardsFrame.RewardButtons and QuestInfoRewardsFrame.RewardButtons[highestValueIndex]) then
+                return
+            end
+	    
             -- "intrusive" action
             QuestInfoItem_OnClick(QuestInfoRewardsFrame.RewardButtons[highestValueIndex])
         end
@@ -538,7 +588,7 @@ module:RegisterEvent('QUEST_LOG_UPDATE', function()
 
     if UnitIsDeadOrGhost('player') then
         -- can't accept quests while dead
-        module:Register('PLAYER_REGEN_ENABLED', 'QUEST_LOG_UPDATE')
+        module:RegisterEvent('PLAYER_REGEN_ENABLED, QUEST_LOG_UPDATE')
         return
     end
     module:UnregisterEvent('PLAYER_REGEN_ENABLED')
@@ -546,10 +596,16 @@ module:RegisterEvent('QUEST_LOG_UPDATE', function()
 
     for index = 1, numPopups do
         local questID, questType = GetAutoQuestPopUp(index)
-        if questType == 'OFFER' then
-            ShowQuestOffer(questID)
-        elseif questType == 'COMPLETE' then
-            ShowQuestComplete(questID)
+        if questID then
+            popups[questID] = true
+
+            if questType == 'OFFER' then
+                ShowQuestOffer(questID)
+            elseif questType == 'COMPLETE' then
+                ShowQuestComplete(questID)
+            end
+        else
+            WaitForQuestData(questID, handleQuestPopup)
         end
     end
 end)

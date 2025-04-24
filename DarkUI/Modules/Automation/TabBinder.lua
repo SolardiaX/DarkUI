@@ -7,10 +7,6 @@ if not C.automation.tab_binder then return end
 ----------------------------------------------------------------------------------------
 local module = E:Module("Automation"):Sub("TabBinder")
 
-local GetCurrentBindingSet, GetBindingKey = GetCurrentBindingSet, GetBindingKey
-local GetBindingAction, SetBinding, SaveBindings = GetBindingAction, SetBinding, SaveBindings
-local InCombatLockdown, GetZonePVPInfo, IsInInstance = InCombatLockdown, GetZonePVPInfo, IsInInstance
-local ERR_DUEL_REQUESTED = ERR_DUEL_REQUESTED
 
 local RTB_Fail, RTB_DefaultKey, LastTargetKey, TargetKey, CurrentBind, Success = false, true, nil, nil, nil, false
 
@@ -30,7 +26,7 @@ module:RegisterEvent("PLAYER_ENTERING_WORLD ZONE_CHANGED_NEW_AREA PLAYER_REGEN_E
             return
         end
 
-        local PVPType = GetZonePVPInfo()
+        local PVPType = C_PvP.GetZonePVPInfo()
         local _, ZoneType = IsInInstance()
 
         TargetKey = GetBindingKey("TARGETNEARESTENEMYPLAYER")
