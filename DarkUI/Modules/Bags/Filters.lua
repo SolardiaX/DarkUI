@@ -11,6 +11,8 @@ if not C.bags.enable then return end
 local NumBagContainer = 5
 local BankContainerStartID = NumBagContainer + 1
 local MaxNumContainer = 12
+local AccountBankContainer = 13
+local AccountBankContainerMaxNum = 17
 
 local cbNivaya = cargBags:NewImplementation("Nivaya")
 cbNivaya:RegisterBlizzard()
@@ -22,7 +24,7 @@ cB_Filters = {}
 cBniv_CatInfo = {}
 cB_ItemClass = {}
 
-cB_existsBankBag = { Armor = true, Gem = true, Quest = true, TradeGoods = true, Consumables = true, ArtifactPower = true, BattlePet = true }
+cB_existsBankBag = { Armor = true, Gem = true, Quest = true, TradeGoods = true, Consumables = true, ArtifactPower = true, BattlePet = true, Junk = true }
 cB_filterEnabled = { Armor = true, Gem = true, Quest = true, TradeGoods = true, Consumables = true, Keyring = true, Junk = true, Stuff = true, ItemSets = true, ArtifactPower = true, BattlePet = true }
 
 --------------------
@@ -155,17 +157,15 @@ if IR then
 end
 
 -- Outfitter related
-local pLevel = UnitLevel("player")
-local function createItemString(i) return string.format("item:%d:%d:%d:%d:%d:%d:%d:%d:%d", i.Code, i.EnchantCode or 0, i.JewelCode1 or 0, i.JewelCode2 or 0, i.JewelCode3 or 0, i.JewelCode4 or 0, i.SubCode or 0, i.UniqueID or 0, pLevel) end
-
-local function cacheSetsOF()
-    cbNivaya:UpdateBags()
-end
-
-local function checkOFinit()
-    OFisInitialized = Outfitter:IsInitialized()
-end
 if OF then
+    local function cacheSetsOF()
+        cbNivaya:UpdateBags()
+    end
+    
+    local function checkOFinit()
+        OFisInitialized = Outfitter:IsInitialized()
+    end
+    
     Outfitter_RegisterOutfitEvent("ADD_OUTFIT", cacheSetsOF)
     Outfitter_RegisterOutfitEvent("DELETE_OUTFIT", cacheSetsOF)
     Outfitter_RegisterOutfitEvent("EDIT_OUTFIT", cacheSetsOF)

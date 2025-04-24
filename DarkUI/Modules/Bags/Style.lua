@@ -232,8 +232,14 @@ local function restackItems(self)
     --local loc = tBank and "bank" or "bags"
     if tBank then
         SortBankBags()
+
         if _G.IsReagentBankUnlocked() then
-            SortReagentBankBags()
+            -- SortReagentBankBags()
+            EventUtil.RegisterOnceFrameEventAndCallback('ITEM_UNLOCKED', function()
+                C_Timer.After(0, function()
+                    SortReagentBankBags()
+                end)
+            end)
         end
     elseif tBag then
         SortBags()
