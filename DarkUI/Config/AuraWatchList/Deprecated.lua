@@ -33,10 +33,10 @@ local list = {
         {AuraID = 348139, UnitID = "player"},    -- 导师的圣钟
         {AuraID = 311444, UnitID = "player", Value = true},    -- 不屈套牌
         {AuraID = 336465, UnitID = "player", Value = true},    -- 脉冲光辉护盾
-        {AuraID = 330366, UnitID = "player", Text = L["Crit"]},    -- 不可思议的量子装置，暴击
-        {AuraID = 330367, UnitID = "player", Text = L["Versa"]},    -- 不可思议的量子装置，全能
-        {AuraID = 330368, UnitID = "player", Text = L["Haste"]},    -- 不可思议的量子装置，急速
-        {AuraID = 330380, UnitID = "player", Text = L["Mastery"]},    -- 不可思议的量子装置，精通
+        {AuraID = 330366, UnitID = "player", Text = L.AURA_CRIT},    -- 不可思议的量子装置，暴击
+        {AuraID = 330367, UnitID = "player", Text = L.AURA_VERSA},    -- 不可思议的量子装置，全能
+        {AuraID = 330368, UnitID = "player", Text = L.AURA_HASTE },    -- 不可思议的量子装置，急速
+        {AuraID = 330380, UnitID = "player", Text = L.AURA_MASTERY},    -- 不可思议的量子装置，精通
         {AuraID = 351872, UnitID = "player"},    -- 钢铁尖刺
         {AuraID = 355316, UnitID = "player"},    -- 安海尔德之盾
         {AuraID = 356326, UnitID = "player"},    -- 折磨洞察
@@ -117,14 +117,14 @@ local list = {
         {AuraID = 268439, UnitID = "player"},    -- 共鸣之心
         {AuraID = 278225, UnitID = "player"},    -- 缚魂巫毒瘤节
         {AuraID = 278388, UnitID = "player"},    -- 永冻护壳之心
-        {AuraID = 274430, UnitID = "player", Text = L["Haste"]},    -- 永不间断的时钟，急速
-        {AuraID = 274431, UnitID = "player", Text = L["Mastery"]},    -- 精通
-        --{AuraID = 267325, UnitID = "player", Text = L["Mastery"]},    -- 注铅骰子，精通
-        --{AuraID = 267326, UnitID = "player", Text = L["Mastery"]},    -- 精通
-        --{AuraID = 267327, UnitID = "player", Text = L["Haste"]},    -- 急速
-        --{AuraID = 267329, UnitID = "player", Text = L["Haste"]},    -- 急速
-        --{AuraID = 267330, UnitID = "player", Text = L["Crit"]},    -- 爆击
-        --{AuraID = 267331, UnitID = "player", Text = L["Crit"]},    -- 爆击
+        {AuraID = 274430, UnitID = "player", Text = L.AURA_HASTE },    -- 永不间断的时钟，急速
+        {AuraID = 274431, UnitID = "player", Text = L.AURA_MASTERY},    -- 精通
+        --{AuraID = 267325, UnitID = "player", Text = L.AURA_MASTERY},    -- 注铅骰子，精通
+        --{AuraID = 267326, UnitID = "player", Text = L.AURA_MASTERY},    -- 精通
+        --{AuraID = 267327, UnitID = "player", Text = L.AURA_HASTE },    -- 急速
+        --{AuraID = 267329, UnitID = "player", Text = L.AURA_HASTE },    -- 急速
+        --{AuraID = 267330, UnitID = "player", Text = L.AURA_CRIT},    -- 爆击
+        --{AuraID = 267331, UnitID = "player", Text = L.AURA_CRIT},    -- 爆击
         {AuraID = 280573, UnitID = "player", Combat = true},    -- 重组阵列
         {AuraID = 289523, UnitID = "player", Combat = true},    -- 耀辉之光
         {AuraID = 295408, UnitID = "player"},    -- 险恶赐福
@@ -202,8 +202,8 @@ local list = {
         -- 9.0赛季词缀
         {AuraID = 366288, UnitID = "player"},    -- 解构
         {AuraID = 368239, UnitID = "player", Flash = true, Text = "CD"},    -- 减CD密文
-        {AuraID = 368240, UnitID = "player", Flash = true, Text = L["Haste"]},    -- 急速密文
-        {AuraID = 368241, UnitID = "player", Flash = true, Text = L["Speed"]},    -- 移速密文
+        {AuraID = 368240, UnitID = "player", Flash = true, Text = L.AURA_HASTE },    -- 急速密文
+        {AuraID = 368241, UnitID = "player", Flash = true, Text = L.AURA_SPEED},    -- 移速密文
         {AuraID = 358777, UnitID = "player"},    -- 痛苦之链
         {AuraID = 355732, UnitID = "player"},    -- 融化灵魂
         {AuraID = 356667, UnitID = "player"},    -- 刺骨之寒
@@ -296,7 +296,7 @@ local list = {
         {AuraID = 271640, UnitID = "player"},    -- 黑暗启示，诸王
         {AuraID = 274507, UnitID = "player"},    -- 湿滑肥皂，自由镇
         {AuraID = 266923, UnitID = "player"},    -- 充电，神庙
-        {AuraID = 273563, UnitID = "player", Text = L["Freeze"]},    -- 神经毒素，神庙
+        {AuraID = 273563, UnitID = "player", Text = L.AURA_FREEZE},    -- 神经毒素，神庙
         {AuraID = 269686, UnitID = "player"},    -- 瘟疫，神庙
         {AuraID = 257407, UnitID = "player"},    -- 追踪，阿塔达萨
         {AuraID = 250585, UnitID = "player", Flash = true},    -- 剧毒之池，阿塔达萨
@@ -310,7 +310,7 @@ local list = {
         {AuraID = 274438, UnitID = "player", Flash = true},    -- 风暴
         {AuraID = 276286, UnitID = "player"},    -- 切割旋风
         {AuraID = 267818, UnitID = "player"},    -- 切割冲击
-        {AuraID = 268086, UnitID = "player", Text = L["Move"]},    -- 恐怖光环，庄园
+        {AuraID = 268086, UnitID = "player", Text = L.AURA_MOVE},    -- 恐怖光环，庄园
         {AuraID = 298602, UnitID = "player"},    -- 烟云，麦卡贡
         {AuraID = 293724, UnitID = "player"},    -- 护盾发生器
         {AuraID = 297257, UnitID = "player"},    -- 电荷充能
@@ -321,7 +321,6 @@ local list = {
         {AuraID = 302274, UnitID = "player"},    -- 爆裂冲击
         {AuraID = 298669, UnitID = "player"},    -- 跳电
         {AuraID = 294929, UnitID = "player"},    -- 烈焰撕咬
-        {AuraID = 291937, UnitID = "player", Flash = true},    -- 垃圾掩体
         {AuraID = 259533, UnitID = "player", Flash = true},    -- 艾泽里特催化剂，暴富
     -- 尼奥罗萨
         -- 黑龙帝王拉希奥
@@ -356,7 +355,7 @@ local list = {
         {AuraID = 306928, UnitID = "player"},    -- 幽影吐息
         {AuraID = 306930, UnitID = "player"},    -- 熵能暗息
         {AuraID = 314736, UnitID = "player", Flash = true},    -- 气泡流溢
-        {AuraID = 318078, UnitID = "player", Flash = true, Text = L["Get Out"]},    -- 锁定
+        {AuraID = 318078, UnitID = "player", Flash = true, Text = L.AURA_GET_OUT },    -- 锁定
         -- 德雷阿佳丝
         {AuraID = 310277, UnitID = "player"},    -- 动荡之种
         {AuraID = 310309, UnitID = "player"},    -- 动荡易伤
@@ -417,8 +416,8 @@ local list = {
         {AuraID = 317112, UnitID = "player"},    -- 激荡痛楚
     -- 永恒王宫
         -- 深渊指挥官西瓦拉
-        {AuraID = 295795, UnitID = "player", Flash = true, Text = L["Move"]},    -- 冻结之血
-        {AuraID = 295796, UnitID = "player", Flash = true, Text = L["Freeze"]},    -- 漫毒之血
+        {AuraID = 295795, UnitID = "player", Flash = true, Text = L.AURA_MOVE},    -- 冻结之血
+        {AuraID = 295796, UnitID = "player", Flash = true, Text = L.AURA_FREEZE},    -- 漫毒之血
         {AuraID = 295807, UnitID = "player"},    -- 冻结之血
         {AuraID = 295850, UnitID = "player"},    -- 癫狂
         {AuraID = 294847, UnitID = "player"},    -- 不稳定混合物
@@ -464,12 +463,12 @@ local list = {
         {AuraID = 297585, UnitID = "player"}, -- 服从或受苦
         {AuraID = 301830, UnitID = "player"}, -- 帕什玛之触
         {AuraID = 301832, UnitID = "player"}, -- 疯狂热诚
-        {AuraID = 296851, UnitID = "player", Flash = true, Text = L["Get Out"]}, -- 狂热裁决
+        {AuraID = 296851, UnitID = "player", Flash = true, Text = L.AURA_GET_OUT }, -- 狂热裁决
         {AuraID = 299914, UnitID = "player"}, -- 狂热冲锋
         {AuraID = 300545, UnitID = "player"}, -- 力量决裂
         {AuraID = 304409, UnitID = "player", Flash = true}, -- 重复行动
         {AuraID = 304410, UnitID = "player", Flash = true}, -- 重复行动
-        {AuraID = 304128, UnitID = "player", Text = L["Move"]}, -- 缓刑
+        {AuraID = 304128, UnitID = "player", Text = L.AURA_MOVE}, -- 缓刑
         {AuraID = 297586, UnitID = "player", Flash = true}, -- 承受折磨
         -- 扎库尔，尼奥罗萨先驱
         {AuraID = 298192, UnitID = "player", Flash = true}, -- 黑暗虚空
@@ -501,7 +500,7 @@ local list = {
         {AuraID = 282384, UnitID = "player"},    -- 精神割裂，无眠秘党
         {AuraID = 282566, UnitID = "player"},    -- 力量应许
         {AuraID = 282561, UnitID = "player"},    -- 黑暗通报者
-        {AuraID = 282432, UnitID = "player", Text = L["Get Out"]},    -- 粉碎之疑
+        {AuraID = 282432, UnitID = "player", Text = L.AURA_GET_OUT },    -- 粉碎之疑
         {AuraID = 282621, UnitID = "player"},    -- 终焉见证
         {AuraID = 282743, UnitID = "player"},    -- 风暴湮灭
         {AuraID = 282738, UnitID = "player"},    -- 虚空之拥
@@ -539,25 +538,25 @@ local list = {
         {AuraID = 284802, UnitID = "player", Flash = true},    -- 闪耀光环
         {AuraID = 284817, UnitID = "player"},    -- 地之根系
         {AuraID = 284881, UnitID = "player"},    -- 怒意释放
-        {AuraID = 283507, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 爆裂充能
-        {AuraID = 287648, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 爆裂充能
-        {AuraID = 287072, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 液态黄金
+        {AuraID = 283507, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 爆裂充能
+        {AuraID = 287648, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 爆裂充能
+        {AuraID = 287072, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 液态黄金
         {AuraID = 284424, UnitID = "player", Flash = true},    -- 灼烧之地
         {AuraID = 285014, UnitID = "player", Flash = true},    -- 金币雨
         {AuraID = 285479, UnitID = "player", Flash = true},    -- 烈焰喷射
         {AuraID = 283947, UnitID = "player", Flash = true},    -- 烈焰喷射
         {AuraID = 289383, UnitID = "player", Flash = true},    -- 混沌位移
-        {AuraID = 291146, UnitID = "player", Text = L["Freeze"], Flash = true},    -- 混沌位移
-        {AuraID = 284470, UnitID = "player", Text = L["Freeze"], Flash = true},    -- 昏睡妖术
+        {AuraID = 291146, UnitID = "player", Text = L.AURA_FREEZE, Flash = true},    -- 混沌位移
+        {AuraID = 284470, UnitID = "player", Text = L.AURA_FREEZE, Flash = true},    -- 昏睡妖术
         {AuraID = 282444, UnitID = "player"},    -- 裂爪猛击，神选者教团
         {AuraID = 286838, UnitID = "player"},    -- 静电之球
         {AuraID = 285879, UnitID = "player"},    -- 记忆清除
         {AuraID = 282135, UnitID = "player"},    -- 恶意妖术
         {AuraID = 282209, UnitID = "player", Flash = true},    -- 掠食印记
-        {AuraID = 286821, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 阿昆达的愤怒
-        {AuraID = 284831, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 炽焰引爆，拉斯塔哈大王
-        {AuraID = 284662, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 净化之印
-        {AuraID = 290450, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 净化之印
+        {AuraID = 286821, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 阿昆达的愤怒
+        {AuraID = 284831, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 炽焰引爆，拉斯塔哈大王
+        {AuraID = 284662, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 净化之印
+        {AuraID = 290450, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 净化之印
         {AuraID = 289858, UnitID = "player"},    -- 碾压
         {AuraID = 284740, UnitID = "player"},    -- 重斧掷击
         {AuraID = 284781, UnitID = "player"},    -- 重斧掷击
@@ -572,7 +571,7 @@ local list = {
         {AuraID = 286480, UnitID = "player"},    -- 反干涉震击
         {AuraID = 287167, UnitID = "player"},    -- 基因解组
         {AuraID = 286105, UnitID = "player"},    -- 干涉
-        {AuraID = 286646, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 千兆伏特充能
+        {AuraID = 286646, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 千兆伏特充能
         {AuraID = 285075, UnitID = "player", Flash = true},    -- 冰封潮汐池，风暴之墙阻击战
         {AuraID = 284121, UnitID = "player", Flash = true},    -- 雷霆轰鸣
         {AuraID = 285000, UnitID = "player"},    -- 海藻缠裹
@@ -585,15 +584,15 @@ local list = {
         {AuraID = 288212, UnitID = "player"},    -- 舷侧攻击
         {AuraID = 288374, UnitID = "player"},    -- 破城者炮击
     -- 奥迪尔
-        {AuraID = 271224, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 赤红迸发，塔罗克
-        {AuraID = 271225, UnitID = "player", Text = L["Get Out"], Flash = true},
-        {AuraID = 278888, UnitID = "player", Text = L["Get Out"], Flash = true},
-        {AuraID = 278889, UnitID = "player", Text = L["Get Out"], Flash = true},
+        {AuraID = 271224, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 赤红迸发，塔罗克
+        {AuraID = 271225, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},
+        {AuraID = 278888, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},
+        {AuraID = 278889, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},
         {AuraID = 267787, UnitID = "player"},    -- 消毒打击，纯净圣母
         {AuraID = 262313, UnitID = "player"},    -- 恶臭沼气，腐臭吞噬者
         {AuraID = 265237, UnitID = "player"},    -- 粉碎，泽克沃兹
         {AuraID = 265264, UnitID = "player"},    -- 虚空鞭笞，泽克沃兹
-        {AuraID = 265360, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 翻滚欺诈，泽克沃兹
+        {AuraID = 265360, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 翻滚欺诈，泽克沃兹
         {AuraID = 265662, UnitID = "player"},    -- 腐化者的契约，泽克沃兹
         {AuraID = 265127, UnitID = "player"},    -- 持续感染，维克提斯
         {AuraID = 265129, UnitID = "player"},    -- 终极菌体，维克提斯
@@ -602,10 +601,10 @@ local list = {
         {AuraID = 274990, UnitID = "player", Flash = true},    -- 破裂损伤，维克提斯
         {AuraID = 273434, UnitID = "player"},    -- 绝望深渊，祖尔
         {AuraID = 274271, UnitID = "player"},    -- 死亡之愿，祖尔
-        {AuraID = 273365, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 黑暗启示，祖尔
+        {AuraID = 273365, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 黑暗启示，祖尔
         {AuraID = 272146, UnitID = "player"},    -- 毁灭，拆解者
-        {AuraID = 272536, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 毁灭迫近，拆解者
-        {AuraID = 274262, UnitID = "player", Text = L["Get Out"], Flash = true},    -- 爆炸腐蚀，戈霍恩
+        {AuraID = 272536, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 毁灭迫近，拆解者
+        {AuraID = 274262, UnitID = "player", Text = L.AURA_GET_OUT , Flash = true},    -- 爆炸腐蚀，戈霍恩
         {AuraID = 267409, UnitID = "player"},    -- 黑暗交易，戈霍恩
         {AuraID = 263227, UnitID = "player"},    -- 腐败之血，戈霍恩
         {AuraID = 267700, UnitID = "player"},    -- 戈霍恩的凝视，戈霍恩
@@ -681,7 +680,7 @@ local list = {
         { AuraID = 204483, UnitID = "player" }, -- 聚焦冲击
         -- 时空畸体
         { AuraID = 212099, UnitID = "player" }, -- 时光充能
-        {AuraID = 206617, UnitID = "player", Text = L["Get Out"]},    -- 时间炸弹
+        {AuraID = 206617, UnitID = "player", Text = L.AURA_GET_OUT },    -- 时间炸弹
         { AuraID = 219964, UnitID = "player" }, -- 时间释放
         { AuraID = 219965, UnitID = "player" }, -- 时间释放
         { AuraID = 219966, UnitID = "player" }, -- 时间释放
@@ -856,7 +855,7 @@ local list = {
         { AuraID = 247687, UnitID = "player" }, -- 撕裂
         { AuraID = 247565, UnitID = "player" }, -- 催眠毒气
         { AuraID = 250224, UnitID = "player" }, -- 震晕
-        {AuraID = 255029, UnitID = "player", Text = L["Get Out"]},    -- 催眠气罐
+        {AuraID = 255029, UnitID = "player", Text = L.AURA_GET_OUT },    -- 催眠气罐
         -- 金加洛斯
         { AuraID = 254919, UnitID = "player" }, -- 熔铸之击
         { AuraID = 253384, UnitID = "player" }, -- 屠杀
@@ -864,7 +863,7 @@ local list = {
         -- 瓦里玛萨斯
         { AuraID = 244042, UnitID = "player" }, -- 被标记的猎物
         { AuraID = 248732, UnitID = "player" }, -- 毁灭回响
-        {AuraID = 244094, UnitID = "player", Text = L["Get Out"]},    -- 冥魂之拥
+        {AuraID = 244094, UnitID = "player", Text = L.AURA_GET_OUT },    -- 冥魂之拥
         -- 破坏魔女巫会
         { AuraID = 244899, UnitID = "player" }, -- 火焰打击
         { AuraID = 245518, UnitID = "player" }, -- 快速冻结
@@ -886,8 +885,8 @@ local list = {
         { AuraID = 258647, UnitID = "player" }, -- 海洋之赐
         { AuraID = 255199, UnitID = "player" }, -- 阿格拉玛的化身
         { AuraID = 252729, UnitID = "player" }, -- 宇宙射线
-        {AuraID = 248396, UnitID = "player", Text = L["Get Out"]},    -- 灵魂凋零
-        {AuraID = 250669, UnitID = "player", Text = L["Get Out"]},    -- 灵魂爆发
+        {AuraID = 248396, UnitID = "player", Text = L.AURA_GET_OUT },    -- 灵魂凋零
+        {AuraID = 250669, UnitID = "player", Text = L.AURA_GET_OUT },    -- 灵魂爆发
     },
     ["Warning"]      = {            -- 目标重要光环组
     -- 9.0 词缀
