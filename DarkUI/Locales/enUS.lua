@@ -27,6 +27,7 @@ L.AURA_ATTACKSPEED                               = "ATTACKSPEED"
 L.AURA_CD                                        = "COOLDOWN"
 L.AURA_STRIKE                                    = "STRIKE"
 L.AURA_POWER                                     = "POWER"
+L.AURA_SPEED                                     = "SPEED"
 
 L.UNITFRAME_DEAD                                 = "Dead"
 L.UNITFRAME_GHOST                                = "Ghost"

@@ -39,6 +39,7 @@ L.AURA_ATTACKSPEED                               = "攻速"
 L.AURA_CD                                        = "冷却"
 L.AURA_STRIKE                                    = "影袭"
 L.AURA_POWER                                     = "能量"
+L.AURA_SPEED                                     = "速度"
 
 L.UNITFRAME_DEAD                                 = "死亡"
 L.UNITFRAME_GHOST                                = "灵魂"
