@@ -106,7 +106,7 @@ CreateButton("RaidUtilityReadyCheckButton", RaidUtilityPanel, "UIPanelButtonTemp
 RaidUtilityReadyCheckButton:SetScript("OnMouseUp", function() DoReadyCheck() end)
 
 -- World Marker button
-CreateButton("RaidUtilityMarkerToggle", RaidUtilityPanel, "UIPanelButtonTemplate", 18, 18, "TOPRIGHT", RaidUtilityMainAssistButton, "BOTTOMRIGHT", 0, -5)
+CreateButton("RaidUtilityMarkerToggle", RaidUtilityPanel, "UIPanelButtonTemplate, SecureHandlerClickTemplate", 18, 18, "TOPRIGHT", RaidUtilityMainAssistButton, "BOTTOMRIGHT", 0, -5)
 
 local MarkTexture = RaidUtilityMarkerToggle:CreateTexture(nil, "OVERLAY")
 MarkTexture:SetTexture("Interface\\RaidFrame\\Raid-WorldPing")
@@ -116,7 +116,16 @@ local markersFrame = CreateFrame("Frame", "RaidUtilityPanelmarkers", RaidUtility
 markersFrame:SetSize(100, 200)
 markersFrame:SetPoint("TOPLEFT", RaidUtilityMarkerToggle, "TOPRIGHT")
 markersFrame:Hide()
-RaidUtilityMarkerToggle:SetScript("OnMouseUp", function() markersFrame:SetShown(not markersFrame:IsShown()) end)
+RaidUtilityMarkerToggle:RegisterForClicks("AnyUp")
+RaidUtilityMarkerToggle:SetFrameRef("RaidUtilityPanelMarkers", markersFrame)
+RaidUtilityMarkerToggle:SetAttribute("_onclick", [=[
+    local frame = self:GetFrameRef("RaidUtilityPanelMarkers");
+    if frame:IsShown() then
+        frame:Hide()
+    else
+        frame:Show()
+    end
+]=])
 local ground = {5, 6, 3, 2, 7, 1, 4, 8}
 local iconTexture = {
     "Interface\\TargetingFrame\\UI-RaidTargetingIcon_1",

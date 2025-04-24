@@ -5,11 +5,13 @@ local E, C, L = ns:unpack()
 --    Colorizes recipes/mounts/pets/toys that is already known(AlreadyKnown by Villiv)
 ----------------------------------------------------------------------------------------
 local color = {r = 0.1, g = 1, b = 0.1}
-local knowns, lines = {}, {}
+local knowns = {}
 local recipe = Enum.ItemClass.Recipe
 local pet = Enum.ItemMiscellaneousSubclass.CompanionPet
 local mount = Enum.ItemMiscellaneousSubclass.Mount
-local knowables = {[recipe] = true, [pet] = true, [mount] = true}
+local illusion = Enum.ItemConsumableSubclass.Other -- Cosmitic Illusions
+local knowablesClass = {[recipe] = true}
+local knowablesSubclass = {[pet] = true, [mount] = true, [illusion] = true}
 
 local pattern = ITEM_PET_KNOWN:gsub("%(", "%%(")
 pattern = pattern:gsub("%)", "%%)")
@@ -46,8 +48,8 @@ local function IsKnown(itemLink)
         return true
     end
 
-    local _, _, _, _, _, _, _, _, _, _, _, class, subClass = GetItemInfo(itemID)
-    if not (knowables[class] or knowables[subClass]) then return end
+    local _, _, _, _, _, _, _, _, _, _, _, class, subClass = C_Item.GetItemInfo(itemID)
+    if not (knowablesClass[class] or knowablesSubclass[subClass]) then return end
 
     tooltip:ClearLines()
     tooltip:SetHyperlink(itemLink)
@@ -91,8 +93,8 @@ local function MerchantFrame_UpdateMerchantInfo()
 
         local button = _G["MerchantItem"..i.."ItemButton"]
         if button and button:IsShown() then
-            local _, _, _, _, _, isUsable = GetMerchantItemInfo(index)
-            if isUsable and IsKnown(GetMerchantItemLink(index)) then
+            local info = C_MerchantFrame.GetItemInfo(index)
+            if info and info.isUsable and IsKnown(GetMerchantItemLink(index)) then
                 SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
             end
         end
@@ -187,7 +189,7 @@ local function GuildRewards_Update()
         if button and button:IsShown() then
             local achievementID, itemID, itemName, _, repLevel = GetGuildRewardInfo(offset + i)
             if itemName and not (achievementID and achievementID > 0) and repLevel <= standingID then
-                local _, itemLink = GetItemInfo(itemID)
+                local _, itemLink = C_Item.GetItemInfo(itemID)
                 if IsKnown(itemLink) then
                     button.icon:SetVertexColor(color.r, color.g, color.b)
                 end
@@ -290,6 +292,7 @@ if C_AddOns.IsAddOnLoaded("Blizzard_BlackMarketUI") then
 end
 
 -- LoD addons
+local isBlizzard_AuctionUILoaded
 if not (isBlizzard_GuildUILoaded and isBlizzard_GuildBankUILoaded and isBlizzard_AuctionUILoaded and isBlizzard_BlackMarketUILoaded) then
     local function OnEvent(self, event, addon)
         if addon == "Blizzard_GuildUI" then

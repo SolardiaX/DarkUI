@@ -6,10 +6,6 @@ if not C.misc.profession_tabs then return end
 --    Professions tabs on tradeskill frame(ProfessionTabs by Beoko)
 ----------------------------------------------------------------------------------------
 
-local IsCurrentSpell = IsCurrentSpell
-local format = string.format
-local next = next
-local ranks = PROFESSION_RANKS
 local tabs, spells = {}, {}
 
 local handler = CreateFrame("Frame")
@@ -38,7 +34,7 @@ end
 
 local buttons = {}
 for index, value in pairs(buttonList) do
-    local button = CreateFrame("Button", nil, ProfessionsFrame.CraftingPage, "BackdropTemplate")
+    local button = CreateFrame("Button", nil, ProfessionsFrame.CraftingPage.RecipeList, "BackdropTemplate")
     button:SetSize(22, 22)
     button:SetPoint("BOTTOMRIGHT", ProfessionsFrame.CraftingPage.RecipeList.FilterButton, "TOPRIGHT", -(index-1)*27, 10)
     button:SetTemplate("Overlay")
@@ -51,14 +47,20 @@ for index, value in pairs(buttonList) do
     button.Icon:SetPoint("TOPLEFT", button, 2, -2)
     button.Icon:SetPoint("BOTTOMRIGHT", button, -2, 2)
 
-    local tooltip_hide = function()
+    local tooltip_hide = function(self)
         GameTooltip:Hide()
+        if self.overlay then
+            self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+        end
     end
 
     local tooltip_show = function(self)
         GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT", 0, 3)
         GameTooltip:ClearLines()
         GameTooltip:SetText(value[2])
+        if self.overlay then
+            self.overlay:SetVertexColor(1, 1, 1, 0.3)
+        end
     end
     button:SetScript("OnEnter", tooltip_show)
     button:SetScript("OnLeave", tooltip_hide)
@@ -110,7 +112,13 @@ local function UpdateSelectedTabs(object)
 
     for index = 1, #tabs[object] do
         local tab = tabs[object][index]
-        tab:SetChecked(IsCurrentSpell(tab.name))
+        if tab.spellID and C_Spell.IsCurrentSpell(tab.spellID) then
+            tab:Disable()
+            tab:SetChecked(true)
+        else
+            tab:Enable()
+            tab:SetChecked(false)
+        end
     end
 end
 
@@ -122,87 +130,86 @@ local function ResetTabs(object)
     tabs[object].index = 0
 end
 
-local function UpdateTab(object, name, rank, texture, hat)
+local function UpdateTab(object, name, texture, spellID)
     local index = tabs[object].index + 1
-    local tab = tabs[object][index] or CreateFrame("CheckButton", "ProTabs"..tabs[object].index, object, "SpellBookSkillLineTabTemplate, SecureActionButtonTemplate")
-
+    local tab = tabs[object][index] or CreateFrame("CheckButton", "ProTabs"..tabs[object].index, object, "SecureActionButtonTemplate")
+    tab:RegisterForClicks("LeftButtonUp", "LeftButtonDown")
+    
+    tab:SetSize(36, 36)
     tab:ClearAllPoints()
+
+    if not tab.icon then
+        tab.icon = tab:CreateTexture("$parentIcon")
+        tab.icon:SetAllPoints()
+
+        tab:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square")
+        tab:GetHighlightTexture():SetBlendMode("ADD")
+        tab:SetCheckedTexture("Interface\\Buttons\\CheckButtonHilight")
+        tab:GetCheckedTexture():SetBlendMode("ADD")
+    end
 
     if C_AddOns.IsAddOnLoaded("Aurora") then
         tab:SetPoint("TOPLEFT", object, "TOPRIGHT", 11, (-44 * index) + 10)
 
-        tab:DisableDrawLayer("BACKGROUND")
-        tab:SetNormalTexture(texture)
-        tab:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
         local F, C = unpack(Aurora)
-        tab:SetCheckedTexture(C.media.checked)
-        tab:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.3)
-        tab:GetHighlightTexture():SetAllPoints(tab:GetNormalTexture())
         F.CreateBG(tab)
     else
         tab:SetPoint("TOPLEFT", object, "TOPRIGHT", 0, (-44 * index) + 18)
-        tab:SetNormalTexture(texture)
+        E:StyleButton(tab)
     end
 
-    if hat then
+    tab.icon:SetTexture(texture)
+
+    if texture == 236571 then	-- Chef's Hat
         tab:SetAttribute("type", "toy")
         tab:SetAttribute("toy", 134020)
-    elseif texture == 135805 then    -- Cooking Fire
+    elseif texture == 135805 then	-- Cooking Fire
         tab:SetAttribute("type", "macro")
         tab:SetAttribute("macrotext", "/cast [@player]"..name)
     else
         tab:SetAttribute("type", "spell")
-        tab:SetAttribute("spell", name)
+        tab:SetAttribute("spell", spellID or name)
     end
 
     tab:Show()
 
     tab.name = name
-    tab.tooltip = rank and (rank ~= "" and rank ~= name) and format("%s (%s)", name, rank) or name
+    tab.spellID = spellID
 
+    tab:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 5, -7)
+        GameTooltip:SetText(name)
+        GameTooltip:Show()
+    end)
+
+    tab:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
     tabs[object][index] = tabs[object][index] or tab
     tabs[object].index = tabs[object].index + 1
 end
 
-local function GetProfessionRank(currentSkill, skillLineName)
-    if skillLineName then
-        return skillLineName
-    end
-
-    if currentSkill <= 74 then
-        return APPRENTICE
-    end
-
-    for index = #ranks, 1, -1 do
-        local requiredSkill, title = ranks[index][1], ranks[index][2]
-
-        if currentSkill >= requiredSkill then
-            return title
-        end
-    end
-end
-
 local function HandleProfession(object, professionID, hat)
     if professionID then
-        local _, _, currentSkill, _, numAbilities, offset, skillID, _, _, _, skillLineName = GetProfessionInfo(professionID)
+        local _, _, _, _, numAbilities, offset, skillID = GetProfessionInfo(professionID)
 
         if defaults[skillID] then
             for index = 1, numAbilities do
                 if defaults[skillID][index] then
-                    local name = GetSpellBookItemName(offset + index, "profession")
-                    local rank = GetProfessionRank(currentSkill, skillLineName)
-                    local texture = GetSpellBookItemTexture(offset + index, "profession")
+                    local name = C_SpellBook.GetSpellBookItemName(offset + index, 0)
+                    local texture = C_SpellBook.GetSpellBookItemTexture(offset + index, 0)
+                    local spellID = C_SpellBook.GetSpellBookItemInfo(offset + index, 0).spellID
 
-                    if name and rank and texture then
-                        UpdateTab(object, name, rank, texture)
+                    if name and texture then
+                        UpdateTab(object, name, texture, spellID)
                     end
                 end
             end
         end
 
         if hat and PlayerHasToy(134020) and C_ToyBox.IsToyUsable(134020) then
-            UpdateTab(object, C_Spell.GetSpellInfo(67556), nil, 236571, true)
+            UpdateTab(object, GetSpellInfo(67556), 236571, 134020)
         end
     end
 end
@@ -224,10 +231,11 @@ local function HandleTabs(object)
         HandleProfession(object, fishing)
         HandleProfession(object, cooking, true)
 
+        -- Runuforging and Pick Lock
         for index = 1, #spells do
             if IsSpellKnown(spells[index]) then
-                local name, rank, texture = C_Spell.GetSpellInfo(spells[index])
-                UpdateTab(object, name, rank, texture)
+                local name, _, texture = GetSpellInfo(spells[index])
+        UpdateTab(object, name, texture, spells[index])
             end
         end
     end
@@ -235,6 +243,7 @@ local function HandleTabs(object)
     UpdateSelectedTabs(object)
 end
 
+local isLoaded
 function handler:TRADE_SKILL_SHOW(event)
     local owner = ATSWFrame or MRTSkillFrame or SkilletFrame or ProfessionsFrame
 
@@ -242,7 +251,11 @@ function handler:TRADE_SKILL_SHOW(event)
         self:UnregisterEvent(event)
     else
         HandleTabs(owner)
-        self[event] = function() for object in next, tabs do UpdateSelectedTabs(object) end end
+        UpdateSelectedTabs(owner)
+        if not isLoaded then
+            FilterIcons()
+            isLoaded = true
+        end    
     end
 end
 
