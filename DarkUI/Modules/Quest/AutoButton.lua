@@ -7,19 +7,6 @@ if not C.quest.enable and not C.quest.quest_auto_button then return end
 ----------------------------------------------------------------------------------------
 local module = E:Module("Quest"):Sub("AutoButton")
 
-local CreateFrame = CreateFrame
-local InCombatLockdown = InCombatLockdown
-local GetQuestLogSpecialItemInfo = GetQuestLogSpecialItemInfo
-local C_Container = C_Container
-local GetItemInfo, GetItemCount, GetItemIcon = GetItemInfo, GetItemCount, GetItemIcon
-local CooldownFrame_Set = CooldownFrame_Set
-local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
-local tonumber = tonumber
-local unpack = unpack
-local strsplit = strsplit
-local hooksecurefunc = hooksecurefunc
-local NUM_BAG_SLOTS = NUM_BAG_SLOTS
-
 function module:HideButton()
     self.AutoButton:SetAlpha(0)
     if not InCombatLockdown() then
@@ -65,9 +52,9 @@ function module:startScanningBags()
             local itemID = C_Container.GetContainerItemID(b, s)
             itemID = tonumber(itemID)
             if C.autobutton[itemID] then
-                local itemName = GetItemInfo(itemID)
-                local count = GetItemCount(itemID)
-                local itemIcon = GetItemIcon(itemID)
+                local itemName = C_Item.GetItemInfo(itemID)
+                local count = C_Item.GetItemCount(itemID)
+                local itemIcon = C_Item.GetItemIcon(itemID)
 
                 -- Set our texture to the item found in bags
                 self.AutoButton.t:SetTexture(itemIcon)
@@ -91,6 +78,7 @@ function module:startScanningBags()
                 end)
 
                 self.AutoButton:SetScript("OnLeave", GameTooltip_Hide)
+                self.AutoButton.id = itemID
 
                 self:ShowButton(itemName)
             end
@@ -100,16 +88,18 @@ end
 
 function module:OnLogin()
     -- Create anchor
-    local AutoButtonAnchor = CreateFrame("Frame", "AutoButtonAnchor", UIParent)
+    local AutoButtonAnchor = CreateFrame("Frame", "DarkUI_AutoButtonAnchor", UIParent)
     AutoButtonAnchor:SetPoint(unpack(C.quest.auto_button_pos))
     AutoButtonAnchor:SetSize(40, 40)
 
     -- Create button
-    local AutoButton = CreateFrame("Button", "AutoButton", UIParent, "SecureActionButtonTemplate")
+    local AutoButton = CreateFrame("Button", "DarkUI_AutoButton", UIParent, "SecureActionButtonTemplate")
     AutoButton:SetSize(40, 40)
     AutoButton:SetPoint("CENTER", AutoButtonAnchor, "CENTER", 0, 0)
     AutoButton:RegisterForClicks("AnyUp", "AnyDown")
-    AutoButton:SetAttribute("type", "item")
+    AutoButton:SetAttribute("type1", "item")
+    AutoButton:SetAttribute("type2", "item")
+    AutoButton:SetAttribute("type3", "macro")
 
     E:StyleButton(AutoButton)
 
@@ -134,17 +124,25 @@ function module:OnLogin()
     self:HideButton()
 
     -- Add all items from quest to our table
-    hooksecurefunc(QuestObjectiveTracker, "UpdateSingle", function(_, quest)
+    local function UpdateSingle(_, quest)
         local questLogIndex = quest:GetQuestLogIndex()
-        if not questLogIndex then return end
         local link = GetQuestLogSpecialItemInfo(questLogIndex)
         if link then
-            local _, itemID = strsplit(":", link)
-            itemID = tonumber(itemID)
-            C.autobutton[itemID] = true
-            module:startScanningBags()
+            local itemID = link:match("item:(%d+)")
+            itemID = tonumber(itemID) or 0
+            if not T.ABItems[itemID] then
+                T.ABItems[itemID] = true
+                startScanningBags()
+            end
+            if quest:IsComplete() then
+                T.ABItems[itemID] = false
+                startScanningBags()
+            end
         end
-    end)
+    end
+
+    hooksecurefunc(QuestObjectiveTracker, "UpdateSingle", UpdateSingle)
+    hooksecurefunc(CampaignQuestObjectiveTracker, "UpdateSingle", UpdateSingle)
 
     self:RegisterEvent("BAG_UPDATE UNIT_INVENTORY_CHANGED", function()
         module:startScanningBags()
