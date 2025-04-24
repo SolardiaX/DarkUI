@@ -222,8 +222,8 @@ function module:OnActive()
             self:UpdateButtonFlashing(button)
         end
 
-        local function petButton_OnUpdate(button)
-            -- button:SetScript("OnUpdate", nil)
+        local function petButton_Setup(button)
+            button:SetScript("OnUpdate", nil)
             button:HookScript("OnShow", petButton_OnShowHide)
             button:HookScript("OnHide", petButton_OnShowHide)
             self:UpdatePetActionButtonWatched(button)
@@ -262,7 +262,8 @@ function module:OnActive()
         local buttons = PetActionBar.actionButtons
         if type(buttons) == "table" then
             for _, button in pairs(PetActionBar.actionButtons) do
-                hooksecurefunc(button, "OnUpdate", petButton_OnUpdate)
+                -- hooksecurefunc(button, "UpdateUsable", petButton_OnUpdate)
+                petButton_Setup(button)
                 hooksecurefunc(button, "StartFlash", function(button)
                     if button:IsVisible() then
                         self:StartButtonFlashing(button)
