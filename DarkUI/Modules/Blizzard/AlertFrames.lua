@@ -95,6 +95,8 @@ local function ReplaceAnchors(alertFrameSubSystem)
 end
 
 local function SetUpAlert()
+    GroupLootContainer:EnableMouse(false)
+    
     hooksecurefunc(AlertFrame, "UpdateAnchors", function(self)
         CheckGrow()
         self:ClearAllPoints()
