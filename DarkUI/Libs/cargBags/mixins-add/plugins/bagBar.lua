@@ -33,6 +33,7 @@ CALLBACKS
 ]]
 
 local addon, ns = ...
+local E, C, L = ns:unpack()
 local cargBags = ns.cargBags
 local Implementation = cargBags.classes.Implementation
 
@@ -47,7 +48,6 @@ end
 local BagButton = cargBags:NewClass("BagButton", nil, "ItemButton")
 
 -- Default attributes
-BagButton.checkedTex = [[Interface\AddOns\DarkUI\media\bag_highlight]]
 BagButton.bgTex = [[Interface\Paperdoll\UI-PaperDoll-Slot-Bag]]
 BagButton.itemFadeAlpha = 0.2
 
@@ -77,7 +77,12 @@ function BagButton:Create(bagID)
     button:RegisterForDrag("LeftButton", "RightButton")
     button:RegisterForClicks("AnyUp")
     button:SetSize(32, 32)
+
     button.Icon = _G[name.."IconTexture"]
+    button.Icon:SetInside(button)
+
+    E:StyleButton(button)
+    E:ApplyBackdrop(button)
 
     cargBags.SetScriptHandlers(button, "OnClick", "OnReceiveDrag", "OnEnter", "OnLeave", "OnDragStart")
 

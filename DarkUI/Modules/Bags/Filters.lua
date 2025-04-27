@@ -12,13 +12,13 @@ local NumBagContainer = 5
 local BankContainerStartID = NumBagContainer + 1
 local MaxNumContainer = 12
 local AccountBankContainer = 13
-local AccountBankContainerMaxNum = 17
+local AccountBankContainerNum = 5
 
 local cbNivaya = cargBags:NewImplementation("Nivaya")
 cbNivaya:RegisterBlizzard()
 cbNivaya:HookScript("OnShow", function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end)
 cbNivaya:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
-function cbNivaya:UpdateBags() for i = -3, MaxNumContainer do cbNivaya:UpdateBag(i) end end
+function cbNivaya:UpdateBags() for i = -3, MaxNumContainer + AccountBankContainerNum do cbNivaya:UpdateBag(i) end end
 
 cB_Filters = {}
 cBniv_CatInfo = {}
@@ -32,6 +32,7 @@ cB_filterEnabled = { Armor = true, Gem = true, Quest = true, TradeGoods = true, 
 --------------------
 cB_Filters.fBags = function(item) return item.bagId >= 0 and item.bagId <= NumBagContainer end
 cB_Filters.fBank = function(item) return item.bagId == -1 or item.bagId >= BankContainerStartID and item.bagId <= MaxNumContainer end
+cB_Filters.fBankAccount = function(item) return item.bagId >= AccountBankContainer and item.bagId <= AccountBankContainer + AccountBankContainerNum - 1 end
 cB_Filters.fBankReagent = function(item) return item.bagId == -3 end
 cB_Filters.fBankFilter = function() return _G.SavedStats.cBnivCfg.FilterBank end
 cB_Filters.fHideEmpty = function(item) if _G.SavedStats.cBnivCfg.CompressEmpty then return item.link ~= nil else return true end end
@@ -45,8 +46,12 @@ cB_Filters.fItemClass = function(item, container)
     
     local t, bag = cB_ItemClass[item.id]
     local isBankBag = item.bagId == -1 or (item.bagId >= BankContainerStartID and item.bagId <= MaxNumContainer)
+    local isBankAccountBag = item.bagId >= AccountBankContainer and item.bagId <= AccountBankContainer + AccountBankContainerNum - 1
+
     if isBankBag then
         bag = (cB_existsBankBag[t] and _G.SavedStats.cBnivCfg.FilterBank and cB_filterEnabled[t]) and "Bank"..t or "Bank"
+    elseif isBankAccountBag then
+        bag = "BankAccount"
     else
         bag = (t ~= "NoClass" and cB_filterEnabled[t]) and t or "Bag"
     end

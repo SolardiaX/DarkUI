@@ -74,8 +74,6 @@ local function toggleBag(forceopen)    cargBags.blizzard:Toggle(forceopen)    en
 local function toggleNoForce() cargBags.blizzard:Toggle() end
 local function closeBag() cargBags.blizzard:Hide() end
 
-local hideFrame = CreateFrame("Frame")
-hideFrame:Hide()
 --- Overwrites Blizzards Bag-Toggle-Functions with the implementation's ones
 --  @param name <string> The name of the implementation [optional]
 function cargBags:ReplaceBlizzard(name)
@@ -93,7 +91,6 @@ function cargBags:ReplaceBlizzard(name)
     CloseBackpack = closeBag
     OpenBag = toggleBag        -- fixed the loot won alert frame
 
-    BankFrame:SetParent(hideFrame)
     BankFrame:UnregisterAllEvents()
 end
 

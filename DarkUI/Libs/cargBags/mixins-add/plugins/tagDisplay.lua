@@ -92,37 +92,43 @@ local function createIcon(icon, iconValues)
 end
 
 -- Tags
-local function GetNumFreeSlots(name)
+local function GetNumFreeSlots(name, bagId)
     if name == "Bag" then
         local totalFree, freeSlots, bagFamily = 0, 0, 0
         for i = 0, 4 do -- reagent bank excluded
-            freeSlots, bagFamily = GetContainerNumFreeSlots(i)
-            if bagFamily == 0 then
-                totalFree = totalFree + freeSlots
+            if not bagId or bagId == i then
+                freeSlots, bagFamily = GetContainerNumFreeSlots(i)
+                if bagFamily == 0 then
+                    totalFree = totalFree + freeSlots
+                end
             end
         end
         return totalFree
     elseif name == "Bank" then
         local numFreeSlots = GetContainerNumFreeSlots(-1)
         for bagID = 6, 12 do
-            numFreeSlots = numFreeSlots + GetContainerNumFreeSlots(bagID)
+            if not bagId or bagId == bagID then
+                numFreeSlots = numFreeSlots + GetContainerNumFreeSlots(bagID)
+            end
         end
         return numFreeSlots
-    elseif name == "Reagent" then
+    elseif name == "BankReagent" then
         return GetContainerNumFreeSlots(-3)
     elseif name == "BagReagent" then
         return GetContainerNumFreeSlots(5)
-    elseif name == "Account" then
+    elseif name == "BankAccount" then
         local numFreeSlots = 0
         for bagID = 13, 17 do
-            numFreeSlots = numFreeSlots + GetContainerNumFreeSlots(bagID)
+            if not bagId or bagId == bagID then
+                numFreeSlots = numFreeSlots + GetContainerNumFreeSlots(bagID)
+            end
         end
         return numFreeSlots
     end
 end
 
 tagPool["space"] = function(self)
-    local str = GetNumFreeSlots(self.__name)
+    local str = GetNumFreeSlots(self.__type, self.__bagId)
     return str
 end
 
