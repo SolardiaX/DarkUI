@@ -2736,7 +2736,22 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, addon)
     end
 
     -- ProfessionsFrame
-      if addon == "Blizzard_Professions" and GetWoWVersion >= 90500 then
+    if name == "Blizzard_ProfessionsBook" and GetWoWVersion >= 90500 then
+        for i, v in pairs({ 
+            ProfessionsBookFrame.NineSlice.TopEdge,
+            ProfessionsBookFrame.NineSlice.RightEdge,
+            ProfessionsBookFrame.NineSlice.BottomEdge,
+            ProfessionsBookFrame.NineSlice.LeftEdge,
+            ProfessionsBookFrame.NineSlice.TopRightCorner,
+            ProfessionsBookFrame.NineSlice.TopLeftCorner,
+            ProfessionsBookFrame.NineSlice.BottomLeftCorner,
+            ProfessionsBookFrame.NineSlice.BottomRightCorner,
+         }) do
+            AbyssUI_ColorizationFrameFunction(v)
+        end
+    end
+    
+    if addon == "Blizzard_Professions" and GetWoWVersion >= 90500 then
         for i, v in pairs({ 
             ProfessionsFrame.NineSlice.TopEdge,
             ProfessionsFrame.NineSlice.RightEdge,

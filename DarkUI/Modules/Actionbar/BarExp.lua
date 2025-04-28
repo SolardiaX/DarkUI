@@ -57,6 +57,10 @@ local cfg = C.actionbar.bars.exp
 ------------------------------------------------------
 -- / Auto Rep Switch FUNCs / --
 ------------------------------------------------------
+local function IsAzeriteAvailable()
+	local itemLocation = C_AzeriteItem.FindActiveAzeriteItem()
+	return itemLocation and itemLocation:IsEquipmentSlot() and not C_AzeriteItem_IsAzeriteItemAtMaxLevel()
+end
 
 local faction_standing_msg = {
     gsub(FACTION_STANDING_INCREASED, "%%s", "(.+)"),
@@ -253,6 +257,7 @@ local function bar_OnEnter()
     end
 
     if factionData then
+        local name = factionData.name
         local standing = factionData.reaction
         local barMin = factionData.currentReactionThreshold
         local barMax = factionData.nextReactionThreshold
@@ -263,15 +268,20 @@ local function bar_OnEnter()
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             name = majorFactionData.name
-            value = majorFactionData.renownReputationEarned or 0
-            barMin, barMax = 0, majorFactionData.renownLevelThreshold
             standingtext = RENOWN_LEVEL_LABEL..majorFactionData.renownLevel
+
+            local isMaxRenown = C_MajorFactions.HasMaximumRenown(factionID)
+			if isMaxRenown then
+				barMin, barMax, value = 0, 1, 1
+			else
+				value = majorFactionData.renownReputationEarned or 0
+				barMin, barMax = 0, majorFactionData.renownLevelThreshold
+			end
         else
             local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
             local friendID, friendRep, friendThreshold, nextFriendThreshold, friendTextLevel = repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold, repInfo.text
             local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
             local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
-            local name = repInfo.name
             if friendID and friendID ~= 0 then
                 if maxRank > 0 then
                     name = name.." ("..currentRank.." / "..maxRank..")"
@@ -354,6 +364,36 @@ local function bar_OnEnter()
         end
         GameTooltip:AddDoubleLine(HONOR_POINTS .. LEVEL .. level, text, .6, .8, 1, 1, 1, 1)
     end
+
+    if IsAzeriteAvailable() then
+		local azeriteItemLocation = C_AzeriteItem.FindActiveAzeriteItem()
+		local azeriteItem = Item:CreateFromItemLocation(azeriteItemLocation)
+		local xp, totalLevelXP = C_AzeriteItem.GetAzeriteItemXPInfo(azeriteItemLocation)
+		local currentLevel = C_AzeriteItem.GetPowerLevel(azeriteItemLocation)
+		azeriteItem:ContinueWithCancelOnItemLoad(function()
+			GameTooltip:AddLine(" ")
+			GameTooltip:AddLine(azeriteItem:GetItemName().." ("..format(SPELLBOOK_AVAILABLE_AT, currentLevel)..")", 0,.6,1)
+			GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(totalLevelXP).." ("..floor(xp/totalLevelXP*100).."%)", .6,.8,1, 1,1,1)
+		end)
+	end
+
+	if HasArtifactEquipped() then
+		local _, _, name, _, totalXP, pointsSpent, _, _, _, _, _, _, artifactTier = C_ArtifactUI.GetEquippedArtifactInfo()
+		local num, xp, xpForNextPoint = ArtifactBarGetNumArtifactTraitsPurchasableFromXP(pointsSpent, totalXP, artifactTier)
+		GameTooltip:AddLine(" ")
+		if C_ArtifactUI.IsEquippedArtifactDisabled() then
+			GameTooltip:AddLine(name, 0,.6,1)
+			GameTooltip:AddLine(ARTIFACT_RETIRED, .6,.8,1, 1)
+		else
+			GameTooltip:AddLine(name.." ("..format(SPELLBOOK_AVAILABLE_AT, pointsSpent)..")", 0,.6,1)
+			local numText = num > 0 and " ("..num..")" or ""
+			GameTooltip:AddDoubleLine(ARTIFACT_POWER, BreakUpLargeNumbers(totalXP)..numText, .6,.8,1, 1,1,1)
+			if xpForNextPoint ~= 0 then
+				local perc = " ("..floor(xp/xpForNextPoint*100).."%)"
+				GameTooltip:AddDoubleLine(L["Next Trait"], BreakUpLargeNumbers(xp).." / "..BreakUpLargeNumbers(xpForNextPoint)..perc, .6,.8,1, 1,1,1)
+			end
+		end
+	end
 
     GameTooltip:Show()
 end
