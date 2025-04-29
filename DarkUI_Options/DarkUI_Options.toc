@@ -1,14 +1,19 @@
-## Interface: 110107
+## Interface: 110107, 110105
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - Options
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - 配置管理
-## Notes-zhCN: DarkUI - 配置管理
 ## Notes: DarkUI - Options GUI
+## Notes-zhCN: DarkUI - 配置管理
+## Notes-ruRU: DarkUI - Управление конфигурацией
 ## Author: SolardiaX
-## Version: 11.1.5-b1.0.4
+## Version: 11.1.5-b1.0.5
 ## RequiredDeps: DarkUI
 ## SavedVariables: SavedOptions
 ## SavedVariablesPerCharacter: SavedOptionsPerChar
 ## X-Credits: Elv, Shestak, Tuller, zork
+## Category-enUS: UI Overhaul
+## Category-ruRU: Переработка интерфейса
+## Category-zhCN: UI重构
+## Category-zhTW: UI重構
 
 Locales\load.xml
 
