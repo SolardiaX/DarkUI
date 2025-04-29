@@ -302,7 +302,7 @@ function E:StyleButton(button, margin)
         button:SetCheckedTexture(checked)
     end
 
-    local cooldown = button:GetName() and _G[button:GetName().."Cooldown"]
+    local cooldown = button:GetName() and _G[button:GetName().."Cooldown"] or button.Cooldown
     if cooldown then
         cooldown:SetInside(button, margin, margin)
     end
@@ -565,14 +565,13 @@ function E:StyleActionButton(button, force)
 
     local buttonName = button:GetName()
     local icon = button.icon or _G[buttonName.."Icon"]
-    local cooldown = button.cooldown or _G[buttonName.."Cooldown"]
     local hotkey = button.HotKey or _G[buttonName.."HotKey"]
     local count = button.Count or _G[buttonName.."Count"]
     local name = button.Name or _G[buttonName.."Name"]
     local flash = button.Flash or _G[buttonName.."Flash"]
     local border = button.Border or _G[buttonName.."Border"]
     local autoCastable = button.AutoCastable or _G[buttonName.."AutoCastable"]
-    local cooldown = button.cooldown or _G[buttonName.."Cooldown"]
+    local cooldown = button.cooldown or _G[buttonName.."Cooldown"] or button.Cooldown
     local normal = button.NormalTexture or button:GetNormalTexture()
     local pushed = button.PushedTexture or button:GetPushedTexture()
     local checked = button.CheckedTexture or (button.GetCheckedTexture and button:GetCheckedTexture() or nil)

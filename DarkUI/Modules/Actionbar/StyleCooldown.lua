@@ -129,6 +129,11 @@ local function Timer_Create(cooldown)
     scaler:SetScript("OnSizeChanged", function(_, ...) Timer_OnSizeChanged(timer, ...) end)
 
     cooldown.timer = timer
+
+    if cooldown.SetHideCountdownNumbers then
+		cooldown:SetHideCountdownNumbers(true)
+    end
+
     return timer
 end
 
@@ -148,38 +153,44 @@ local function setHideCooldownNumbers(cooldown, hide)
     end
 end
 
+local function onCooldown(cooldown, start, duration, modRate)
+    if cooldown.noCooldownCount or cooldown:IsForbidden() or module.hideNumbers[cooldown] then return end
+
+    local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
+
+    if show then
+        cooldown:SetDrawBling(cfg.drawBling)
+        cooldown:SetDrawSwipe(cfg.drawSwipe)
+        cooldown:SetDrawEdge(cfg.drawEdge)
+        
+        local parent = cooldown:GetParent()
+        if parent and parent.chargeCooldown == cooldown then return end
+
+        local timer = cooldown.timer or Timer_Create(cooldown)
+        timer.start = start
+        timer.duration = duration
+        timer.enabled = true
+        timer.nextUpdate = 0
+        if timer.fontScale >= cfg.minScale then timer:Show() end
+    else
+        deactivateDisplay(cooldown)
+    end
+end
+
 function module:OnActive()
     local Cooldown_MT = getmetatable(_G.ActionButton1Cooldown).__index
 
     hooksecurefunc(Cooldown_MT, "SetCooldown", function(cooldown, start, duration, modRate)
-        if cooldown.noCooldownCount or cooldown:IsForbidden() or module.hideNumbers[cooldown] then return end
+        onCooldown(cooldown, start, duration, modRate)
+    end)
 
-        local show = (start and start > 0) and (duration and duration > cfg.minDuration) and (modRate == nil or modRate > 0)
-
-        if show then
-            cooldown:SetDrawBling(cfg.drawBling)
-            cooldown:SetDrawSwipe(cfg.drawSwipe)
-            cooldown:SetDrawEdge(cfg.drawEdge)
-            
-            local parent = cooldown:GetParent()
-            if parent and parent.chargeCooldown == cooldown then return end
-
-            local timer = cooldown.timer or Timer_Create(cooldown)
-            timer.start = start
-            timer.duration = duration
-            timer.enabled = true
-            timer.nextUpdate = 0
-            if timer.fontScale >= cfg.minScale then timer:Show() end
-        else
-            deactivateDisplay(cooldown)
-        end
+    hooksecurefunc(Cooldown_MT, "SetCooldownDuration", function(cooldown, duration, modRate)
+        onCooldown(cooldown, cooldown:GetCooldownTimes(), duration. modRate)
     end)
 
     hooksecurefunc(Cooldown_MT, "Clear", deactivateDisplay)
 
-    hooksecurefunc(Cooldown_MT, "SetHideCountdownNumbers", setHideCooldownNumbers)
-
-    hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function(cooldown)
-        setHideCooldownNumbers(cooldown, true)
+    hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function()
+        setHideCooldownNumbers(self, true)
     end)
 end

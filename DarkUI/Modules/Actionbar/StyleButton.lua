@@ -18,7 +18,11 @@ local NUM_PET_ACTION_SLOTS = NUM_PET_ACTION_SLOTS
 local cfg = C.actionbar.styles.buttons
 
 local function styleButton(button)
+    if not button then return end
+
     E:StyleActionButton(button, true)
+
+    local buttonName = button:GetName()
 
     if not cfg.showMacroName then
         local name = button.Name or _G[buttonName.."Name"]
@@ -26,7 +30,7 @@ local function styleButton(button)
     end
 
     if not cfg.showCooldown then
-        local cooldown = button.cooldown or _G[buttonName.."Cooldown"]
+        local cooldown = button.cooldown or _G[buttonName.."Cooldown"] or button.Cooldown
         if cooldown then cooldown:SetAlpha(0) end
     end
 

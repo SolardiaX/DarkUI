@@ -226,7 +226,7 @@ function lib.ShowOverlayGlow(frame)
         overlay:SetFrameLevel(frame:GetFrameLevel() + 5)
         overlay:ClearAllPoints()
         --Make the height/width available before the next frame:
-        overlay:SetSize(frameWidth * 1.4, frameHeight * 1.4)
+        overlay:SetSize(frameWidth * 1.2, frameHeight * 1.2)
         overlay:SetPoint("TOPLEFT", frame, "TOPLEFT", -frameWidth * 0.2, frameHeight * 0.2)
         overlay:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", frameWidth * 0.2, -frameHeight * 0.2)
         overlay.animIn:Play()
