@@ -28,6 +28,8 @@ local MIN_DELAY = 0.01
 local cfg = C.actionbar.styles.cooldown
 
 module.hideNumbers = {}
+module.active = {}
+module.hooked = {}
 
 --returns both what text to display, and how long until the next update
 local function getTimeText(s)
@@ -137,6 +139,17 @@ local function Timer_Create(cooldown)
     return timer
 end
 
+local function RegisterActionButton(button)
+	local cooldown = button.cooldown
+
+	if not module.hooked[cooldown] then
+		cooldown:HookScript("OnShow", function() module.active[cooldown] = true end)
+		cooldown:HookScript("OnHide", function() module.active[cooldown] = nil end)
+
+		module.hooked[cooldown] = true
+	end
+end
+
 local function deactivateDisplay(cooldown)
     local timer = cooldown.timer
     if timer then
@@ -177,6 +190,14 @@ local function onCooldown(cooldown, start, duration, modRate)
     end
 end
 
+local function shouldUpdateTimer(cooldown, start)
+	local timer = cooldown.timer
+	if not timer then
+		return true
+	end
+	return timer.start ~= start
+end
+
 function module:OnActive()
     local Cooldown_MT = getmetatable(_G.ActionButton1Cooldown).__index
 
@@ -192,5 +213,24 @@ function module:OnActive()
 
     hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", function()
         setHideCooldownNumbers(self, true)
+    end)
+
+    if _G["ActionBarButtonEventsFrame"].frames then
+		for _, frame in pairs(_G["ActionBarButtonEventsFrame"].frames) do
+			RegisterActionButton(frame)
+		end
+	end
+
+    hooksecurefunc(ActionBarButtonEventsFrameMixin, "RegisterFrame", RegisterActionButton)
+
+    module:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN", function()
+        for cooldown in pairs(module.active) do
+            local button = cooldown:GetParent()
+            local start, duration, _, modRate = GetActionCooldown(button.action)
+
+            if shouldUpdateTimer(cooldown, start) then
+                onCooldown(cooldown, start, duration, modRate)
+            end
+        end
     end)
 end
