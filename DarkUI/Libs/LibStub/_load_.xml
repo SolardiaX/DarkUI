@@ -7,6 +7,6 @@
     <Script file="LibBossIDs-1.0.lua"/>
     <Script file="LibDataBroker-1.1.lua"/>
     <Script file="LibFroznFunctions-1.0.lua"/>
-    <Script file="LibShowUIPanel-1.0.lua"/>
+    <!-- <Script file="LibShowUIPanel-1.0.lua"/> -->
     <Script file="LibSmoothBar-1.0.lua"/>
 </Ui>

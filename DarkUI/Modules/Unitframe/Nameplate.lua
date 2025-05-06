@@ -427,9 +427,12 @@ local AurasPostCreateIcon = function(element, button)
     button.remaining:SetJustifyH("CENTER")
 
     button.Cooldown.noCooldownCount = true
+    if button.Cooldown.SetHideCountdownNumbers then
+		button.Cooldown:SetHideCountdownNumbers(true)
+    end
 
-    button.Count:SetPoint("BOTTOMRIGHT", button, "TOPRIGHT", 0, -8)
-    button.Count:SetJustifyH("RIGHT")
+    button.Count:SetPoint("BOTTOM", button, "TOP", 0, -8)
+    button.Count:SetJustifyH("CENTER")
     button.Count:SetFont(STANDARD_TEXT_FONT, 8, "THINOUTLINE")
 
     if cfg.show_spiral == true then
