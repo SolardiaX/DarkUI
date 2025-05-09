@@ -112,6 +112,10 @@ module:RegisterEvent("ADDON_LOADED", function(self, event, name)
         SetCVar("nameplateShowAll", 1)
         SetCVar("nameplateShowEnemies", 1)
         
+        -- disable addon profiler from 11.1
+        RegisterCVar("addonProfilerEnabled", "1")
+        SetCVar("addonProfilerEnabled", "0")
+        
         -- force use keyUp to trigger actionbar buttion
         -- SetCVar("ActionButtonUseKeyDown", 0)
         -- Hide blizz options
