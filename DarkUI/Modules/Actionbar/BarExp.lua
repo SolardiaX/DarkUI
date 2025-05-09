@@ -141,7 +141,7 @@ local function updateBar(statusbar, isrep)
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             value = majorFactionData.renownReputationEarned or 0
             barMin, barMax = 0, majorFactionData.renownLevelThreshold
-            standing = majorFactionData.renownLevel
+            -- standing = majorFactionData.renownLevel
         else
             local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
             local friendID, friendRep, friendThreshold, nextFriendThreshold
@@ -164,7 +164,7 @@ local function updateBar(statusbar, isrep)
             end
         end
 
-        local color = FACTION_BAR_COLORS[standing or 4] or {r=.8, g=.7, b=0}
+        local color = FACTION_BAR_COLORS[standing or 5]
         statusbar:SetStatusBarColor(color.r, color.g, color.b)
         statusbar:SetMinMaxValues(0, barMax - barMin)
         statusbar:SetValue(value - barMin)
@@ -268,7 +268,7 @@ local function bar_OnEnter()
         if factionID and C_Reputation_IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             name = majorFactionData.name
-            standingtext = RENOWN_LEVEL_LABEL..majorFactionData.renownLevel
+            standingtext = format(RENOWN_LEVEL_LABEL, majorFactionData.renownLevel)
 
             local isMaxRenown = C_MajorFactions.HasMaximumRenown(factionID)
 			if isMaxRenown then
@@ -303,13 +303,14 @@ local function bar_OnEnter()
         end
 
         if withXp then GameTooltip:AddLine(" ") end
+
         GameTooltip:AddLine(L.ACTIONBAR_REP)
         GameTooltip:AddLine(" ")
 
         GameTooltip:AddDoubleLine(FACTION, name, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1, 1, 1)
         GameTooltip:AddDoubleLine(
                 STANDING,
-                _G["FACTION_STANDING_LABEL" .. standing],
+                standingtext,
                 NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b,
                 FACTION_BAR_COLORS[standing].r, FACTION_BAR_COLORS[standing].g, FACTION_BAR_COLORS[standing].b
         )
