@@ -124,7 +124,7 @@ end
 local function CreateTab(parent, i, name)
     local tab = CreateFrame("Button", nil, parent)
     tab:SetPoint("TOPLEFT", 20, -30 * i - 20 + E.mult)
-    tab:SetSize(130, 28)
+    tab:SetSize(200, 28)
     tab:SetTemplate("Default", nil, 0)
 
     tab:CreateFontText(14, name, false, "LEFT", 10, 0)
@@ -142,15 +142,15 @@ ns.CreateTab = CreateTab
 
 local function CreatePage(parent, i)
     local page = CreateFrame("ScrollFrame", nil, parent, "UIPanelScrollFrameTemplate")
-    page:SetPoint("TOPLEFT", 160, -50)
-    page:SetSize(610, 500)
+    page:SetPoint("TOPLEFT", 240, -50)
+    page:SetSize(754, 500)
 
     page:CreateBackground()
     page.bg:CreateBackdrop()
 
     page:Hide()
     page.child = CreateFrame("Frame", nil, page)
-    page.child:SetSize(610, 1)
+    page.child:SetSize(754, 1)
 
     page:SetScrollChild(page.child)
 
@@ -513,7 +513,7 @@ local function CreateOption(i)
         else
             local l = CreateFrame("Frame", nil, parent)
             l:SetPoint("TOPLEFT", 25, -offset - 12)
-            CreateGradient(l, 560, E.mult, "Horizontal", 1, 1, 1, .25, .25)
+            CreateGradient(l, 700, E.mult, "Horizontal", 1, 1, 1, .25, .25)
             offset = offset + 35
         end
     end

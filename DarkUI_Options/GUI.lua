@@ -18,7 +18,7 @@ local function OpenGUI()
     end
 
     console = CreateFrame("Frame", "DarkUIConsole", UIParent)
-    console:SetSize(800, 600)
+    console:SetSize(1024, 600)
     console:SetPoint("CENTER")
     console:SetFrameStrata("HIGH")
     console:SetFrameLevel(5)
