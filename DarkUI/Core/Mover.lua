@@ -6,15 +6,17 @@ local E, C, L = select(2, ...):unpack()
 local string_format, math_abs = string.format, math.abs
 
 local Colors = {
-    highlight = {250/255, 250/255, 250/255},
-    green = {25/255, 178/255, 25/255},
-    normal = {229/255, 178/255, 38/255}
+    highlight = { 250 / 255, 250 / 255, 250 / 255 },
+    green = { 25 / 255, 178 / 255, 25 / 255 },
+    normal = { 229 / 255, 178 / 255, 38 / 255 },
 }
 
 local function getVariable(t, vkey)
     for k in gmatch(vkey, "([^.%s]+)") do
         t = t[k]
-        if t == nil then return end
+        if t == nil then
+            return
+        end
     end
 
     return t
@@ -24,7 +26,7 @@ end
 -- relative to UIParent and the frame's scale.
 local getPosition = function(frame)
     -- Retrieve UI coordinates, convert to unscaled screen coordinates
-    local worldHeight = WorldFrame:GetHeight() -- 768 -- 
+    local worldHeight = WorldFrame:GetHeight() -- 768 --
     local worldWidth = WorldFrame:GetWidth()
     local uiScale = UIParent:GetEffectiveScale()
     local uiWidth = UIParent:GetWidth() * uiScale
@@ -36,7 +38,9 @@ local getPosition = function(frame)
 
     -- Retrieve frame coordinates, convert to unscaled screen coordinates
     local frameScale = frame:GetEffectiveScale()
-    local x, y = frame:GetCenter(); x = x * frameScale; y = y * frameScale
+    local x, y = frame:GetCenter()
+    x = x * frameScale
+    y = y * frameScale
     local bottom = frame:GetBottom() * frameScale
     local left = frame:GetLeft() * frameScale
     local top = frame:GetTop() * frameScale - worldHeight -- use values relative to edges, not origin
@@ -50,29 +54,29 @@ local getPosition = function(frame)
 
     -- Figure out the point within the given coordinate space,
     -- return values converted to the frame's own scale.
-    if (y < uiHeight * 1/3) then
-        if (x < uiWidth * 1/3) then
+    if y < uiHeight * 1 / 3 then
+        if x < uiWidth * 1 / 3 then
             return "BOTTOMLEFT", left / frameScale, bottom / frameScale
-        elseif (x > uiWidth * 2/3) then
+        elseif x > uiWidth * 2 / 3 then
             return "BOTTOMRIGHT", right / frameScale, bottom / frameScale
         else
-            return "BOTTOM", (x - uiWidth/2) / frameScale, bottom / frameScale
+            return "BOTTOM", (x - uiWidth / 2) / frameScale, bottom / frameScale
         end
-    elseif (y > uiHeight * 2/3) then
-        if (x < uiWidth * 1/3) then
+    elseif y > uiHeight * 2 / 3 then
+        if x < uiWidth * 1 / 3 then
             return "TOPLEFT", left / frameScale, top / frameScale
-        elseif x > uiWidth * 2/3 then
+        elseif x > uiWidth * 2 / 3 then
             return "TOPRIGHT", right / frameScale, top / frameScale
         else
-            return "TOP", (x - uiWidth/2) / frameScale, top / frameScale
+            return "TOP", (x - uiWidth / 2) / frameScale, top / frameScale
         end
     else
-        if (x < uiWidth * 1/3) then
-            return "LEFT", left / frameScale, (y - uiHeight/2) / frameScale
-        elseif (x > uiWidth * 2/3) then
-            return "RIGHT", right / frameScale, (y - uiHeight/2) / frameScale
+        if x < uiWidth * 1 / 3 then
+            return "LEFT", left / frameScale, (y - uiHeight / 2) / frameScale
+        elseif x > uiWidth * 2 / 3 then
+            return "RIGHT", right / frameScale, (y - uiHeight / 2) / frameScale
         else
-            return "CENTER", (x - uiWidth/2) / frameScale, (y - uiHeight/2) / frameScale
+            return "CENTER", (x - uiWidth / 2) / frameScale, (y - uiHeight / 2) / frameScale
         end
     end
 end
@@ -97,7 +101,7 @@ Anchor.Create = function(self, frame, name, vkey)
     anchor:SetFrameLevel(1000)
     anchor:SetAllPoints(frame)
     anchor:SetMovable(true)
-    anchor:SetHitRectInsets(-20,-20,-20,-20)
+    anchor:SetHitRectInsets(-20, -20, -20, -20)
     anchor:RegisterForDrag("LeftButton")
     anchor:RegisterForClicks("AnyUp")
     anchor:SetScript("OnDragStart", self.OnDragStart)
@@ -111,15 +115,15 @@ Anchor.Create = function(self, frame, name, vkey)
     local overlay = CreateFrame("Frame", nil, anchor, "BackdropTemplate")
     overlay:SetAllPoints()
     overlay:SetBackdrop({
-        bgFile =[[Interface\Tooltips\UI-Tooltip-Background]],
+        bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
         tile = true,
         tileSize = 16,
         edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
         edgeSize = 16,
-        insets = { left = 5, right = 3, top = 3, bottom = 5 }
+        insets = { left = 5, right = 3, top = 3, bottom = 5 },
     })
-    overlay:SetBackdropColor(.5, 1, .5, .75)
-    overlay:SetBackdropBorderColor(.5, 1, .5, 1)
+    overlay:SetBackdropColor(0.5, 1, 0.5, 0.75)
+    overlay:SetBackdropBorderColor(0.5, 1, 0.5, 1)
     anchor.overlay = overlay
 
     anchor.name = overlay:CreateFontText(13, "")
@@ -161,9 +165,9 @@ Anchor.SetEnabled = function(self, enable)
 end
 
 Anchor.UpdateHint = function(self)
-    local msg = string_format(E:RGBToHex(Colors.highlight).."%s, %.0f, %.0f|r", unpack(self.position))
-    msg = msg .. E:RGBToHex(Colors.green) .."\n<Left-Click and drag to move>|r"
-    msg = msg .. E:RGBToHex(Colors.green) .."\n<Right-Click to undo change>|r"
+    local msg = string_format(E:RGBToHex(Colors.highlight) .. "%s, %.0f, %.0f|r", unpack(self.position))
+    msg = msg .. E:RGBToHex(Colors.green) .. "\n<Left-Click and drag to move>|r"
+    msg = msg .. E:RGBToHex(Colors.green) .. "\n<Right-Click to undo change>|r"
 
     self.hint:SetText(msg)
     self.hint:Show()
@@ -186,7 +190,7 @@ Anchor.OnDragStop = function(self)
 end
 
 Anchor.OnClick = function(self, button)
-    if (button == "RightButton") then
+    if button == "RightButton" then
         self.frame:ClearAllPoints()
         self.frame:SetPoint(unpack(getVariable(C, self.vkey)))
     end
@@ -194,7 +198,7 @@ end
 
 Anchor.OnShow = function(self)
     self:SetFrameLevel(50)
-    self:SetAlpha(.75)
+    self:SetAlpha(0.75)
 end
 
 Anchor.OnHide = function(self)
@@ -209,12 +213,12 @@ end
 
 Anchor.OnLeave = function(self)
     self:UpdateHint()
-    self:SetAlpha(.75)
+    self:SetAlpha(0.75)
 end
 
 Anchor.OnUpdate = function(self, elapsed)
     self.elapsed = self.elapsed + elapsed
-    if (self.elapsed < 0.02) then
+    if self.elapsed < 0.02 then
         return
     end
     self.elapsed = 0

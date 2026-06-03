@@ -15,13 +15,13 @@ function E:FormatTime(seconds, raw)
     local d, h, m, str = 86400, 3600, 60, ""
     if seconds >= d then
         -- str = format("%d" .. E.myColorString .. "d", seconds / d + .5)
-        str = format("%dd", seconds / d + .5)
+        str = format("%dd", seconds / d + 0.5)
     elseif seconds >= h then
         -- str = format("%d" .. E.myColorString .. "h", seconds / h + .5)
-        str = format("%dh", seconds / h + .5)
+        str = format("%dh", seconds / h + 0.5)
     elseif seconds >= m then
         -- str = format("%d" .. E.myColorString .. "m", seconds / m + .5)
-        str = format("%dm", seconds / m + .5)
+        str = format("%dm", seconds / m + 0.5)
     else
         if seconds <= 5 then
             str = format("|cffff0000%.1f|r", seconds) -- red
@@ -40,17 +40,17 @@ end
 function E:ColorGradient(a, b, ...)
     local Percent
 
-    if(b == 0) then
+    if b == 0 then
         Percent = 0
     else
         Percent = a / b
     end
 
-    if (Percent >= 1) then
+    if Percent >= 1 then
         local R, G, B = select(select("#", ...) - 2, ...)
 
         return R, G, B
-    elseif (Percent <= 0) then
+    elseif Percent <= 0 then
         local R, G, B = ...
 
         return R, G, B
@@ -67,13 +67,15 @@ end
 --  UTF functions
 ----------------------------------------------------------------------------------------
 function E:UTF(string, i, dots)
-    if not string then return end
+    if not string then
+        return
+    end
     local bytes = string:len()
     if bytes <= i then
         return string
     else
         local len, pos = 0, 1
-        while (pos <= bytes) do
+        while pos <= bytes do
             len = len + 1
             local c = string:byte(pos)
             if c > 0 and c <= 127 then
@@ -85,7 +87,9 @@ function E:UTF(string, i, dots)
             elseif c >= 240 and c <= 247 then
                 pos = pos + 4
             end
-            if len == i then break end
+            if len == i then
+                break
+            end
         end
         if len == i and pos <= bytes then
             return string:sub(1, pos - 1) .. (dots and "..." or "")
@@ -99,12 +103,14 @@ end
 --    Number value function
 ----------------------------------------------------------------------------------------
 function E:Round(number, decimals)
-    if not decimals then decimals = 0 end
+    if not decimals then
+        decimals = 0
+    end
     return (("%%.%df"):format(decimals)):format(number)
 end
 
 function E:ShortValue(value)
-    if C.general.locale_valueformat and type(L.ValueFormat) == 'function' then
+    if C.general.locale_valueformat and type(L.ValueFormat) == "function" then
         return L.ValueFormat(value)
     end
 
@@ -133,8 +139,12 @@ end
 --    RGB To Hex function
 ----------------------------------------------------------------------------------------
 function E:RGBToHex(r, g, b, raw)
-    if type(r) == 'table' then
-        if r.r then r, g, b = r.r, r.g, r.b else r, g, b = unpack(r) end
+    if type(r) == "table" then
+        if r.r then
+            r, g, b = r.r, r.g, r.b
+        else
+            r, g, b = unpack(r)
+        end
     end
     r = tonumber(r) <= 1 and tonumber(r) >= 0 and tonumber(r) or 0
     g = tonumber(g) <= tonumber(g) and tonumber(g) >= 0 and tonumber(g) or 0
@@ -161,81 +171,32 @@ function E:CheckChat(warning)
 end
 
 ----------------------------------------------------------------------------------------
---    Set Variable in game
+--    Set Variable in game (delegates to Database system)
 ----------------------------------------------------------------------------------------
 function E:SetVariable(group, key, value)
-    if not C_AddOns.IsAddOnLoaded("DarkUI_Options") then return end
-    
-    local t = SavedOptions.global and SavedOptions or SavedOptionsPerChar
-    
-    if not t[group] then t[group] = {} end
-
-    t = t[group]
-
-    local deep = select(2, string.gsub(key, "([^.%s]+)", ""))
-    local index = 1
-
-    for k in gmatch(key, "([^.%s]+)") do
-        if index < deep then
-            if t[k] == nil then t[k] = {} end
-            t = t[k]
-        elseif index == deep then
-            t[k] = value
-        end
-
-        index = index + 1
-    end
+    local path = group .. "." .. key
+    E.db:Set(path, value)
 end
 
 ----------------------------------------------------------------------------------------
 --    Global EasyMenu function
 ----------------------------------------------------------------------------------------
 local function EasyMenu_Initialize(frame, level, menuList)
-	for index = 1, #menuList do
-		local value = menuList[index]
-		if value.text then
-			value.index = index
-			UIDropDownMenu_AddButton(value, level)
-		end
-	end
+    for index = 1, #menuList do
+        local value = menuList[index]
+        if value.text then
+            value.index = index
+            UIDropDownMenu_AddButton(value, level)
+        end
+    end
 end
 
 function EasyMenu(menuList, menuFrame, anchor, x, y, displayMode, autoHideDelay)
-	if displayMode == "MENU"  then
-		menuFrame.displayMode = displayMode
-	end
-	UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
-	ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
+    if displayMode == "MENU" then
+        menuFrame.displayMode = displayMode
+    end
+    UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
+    ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
 end
 
-----------------------------------------------------------------------------------------
---    Restore old function
-----------------------------------------------------------------------------------------
-GetContainerItemInfo = function(bagIndex, slotIndex)
-	local info = C_Container.GetContainerItemInfo(bagIndex, slotIndex)
-	if info then
-		return info.iconFileID, info.stackCount, info.isLocked, info.quality, info.isReadable, info.hasLoot, info.hyperlink, info.isFiltered, info.hasNoValue, info.itemID, info.isBound
-	end
-end
-
-UnitAura = function(unit, auraIndex, filter)
-	return AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, auraIndex, filter))
-end
-
-UnitBuff = function(unit, auraIndex, filter)
-	return AuraUtil.UnpackAuraData(C_UnitAuras.GetBuffDataByIndex(unit, auraIndex, filter))
-end
-
-GetSpellInfo = function(data)
-	local spellInfo = C_Spell.GetSpellInfo(data)
-	if spellInfo then
-		return spellInfo.name, nil, spellInfo.iconID, spellInfo.castTime, spellInfo.minRange, spellInfo.maxRange, spellInfo.spellID, spellInfo.originalIconID
-	end
-end
-
-GetSpellCooldown = function(data)
-	local info = C_Spell.GetSpellCooldown(data)
-	if info then
-		return info.startTime, info.duration, info.isEnabled, info.modRate
-	end
-end
+-- Legacy polyfills removed: now handled by Core/Compat.lua

@@ -1,45 +1,28 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.actionbar.bars.enable then return end
-
-----------------------------------------------------------------------------------------
---    StanceBar (modified from ShestakUI)
-----------------------------------------------------------------------------------------
+-- StanceBar
 local module = E:Module("Actionbar"):Sub("BarStance")
 
-local _G = _G
-local CreateFrame = CreateFrame
-local GetShapeshiftFormInfo, GetShapeshiftFormCooldown = GetShapeshiftFormInfo, GetShapeshiftFormCooldown
-local CooldownFrame_Set = CooldownFrame_Set
-local InCombatLockdown = InCombatLockdown
-local RegisterStateDriver = RegisterStateDriver
-local unpack, tinsert = unpack, tinsert
-local UIParent = _G.UIParent
-local StanceBar = _G.StanceBar
+local cfg = C.actionbar.bars.barstance
 local NUM_STANCE_SLOTS = NUM_STANCE_SLOTS or 10
 
-local cfg = C.actionbar.bars.barstance
-
-local shiftBarUpdate = function()
+local function shiftBarUpdate()
     local numForms = GetNumShapeshiftForms()
-    local texture, isActive, isCastable
-    local button, icon, cooldown
-    local start, duration, enable
     for i = 1, NUM_STANCE_SLOTS do
-        button = _G["StanceButton"..i]
-        icon = _G["StanceButton"..i.."Icon"]
+        local button = _G["StanceButton" .. i]
+        local icon = _G["StanceButton" .. i .. "Icon"]
         if i <= numForms then
-            texture, isActive, isCastable = GetShapeshiftFormInfo(i)
+            local texture, isActive, isCastable = GetShapeshiftFormInfo(i)
             icon:SetTexture(texture)
 
-            cooldown = _G["StanceButton"..i.."Cooldown"]
+            local cooldown = _G["StanceButton" .. i .. "Cooldown"]
             if texture then
                 cooldown:SetAlpha(1)
             else
                 cooldown:SetAlpha(0)
             end
 
-            start, duration, enable = GetShapeshiftFormCooldown(i)
+            local start, duration, enable = GetShapeshiftFormCooldown(i)
             CooldownFrame_Set(cooldown, start, duration, enable)
 
             if isActive then
@@ -81,7 +64,7 @@ function module:OnInit()
 
             for i = 1, NUM_STANCE_SLOTS do
                 local button = _G["StanceButton" .. i]
-                tinsert(bar.buttonList, button) --add the button object to the list
+                tinsert(bar.buttonList, button)
                 button:SetSize(cfg.button.size, cfg.button.size)
                 button:SetParent(bar)
                 button:ClearAllPoints()
@@ -100,23 +83,22 @@ function module:OnInit()
                 end
             end
 
-            --show/hide the frame on a given state driver
             bar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
             RegisterStateDriver(bar, "visibility", bar.frameVisibility)
 
-            --create the mouseover functionality
             if cfg.fader_mouseover then
                 E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
             end
 
-            --create the combat fader
             if cfg.fader_combat then
                 E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
             end
         elseif event == "UPDATE_SHAPESHIFT_FORMS" then
-            if InCombatLockdown() then return end
+            if InCombatLockdown() then
+                return
+            end
             for i = 1, NUM_STANCE_SLOTS do
-                local button = _G["StanceButton"..i]
+                local button = _G["StanceButton" .. i]
                 local icon = GetShapeshiftFormInfo(i)
                 if icon then
                     button:Show()

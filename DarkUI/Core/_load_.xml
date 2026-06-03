@@ -1,15 +1,18 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
-    <Script file="Active.lua"/>
-
-    <Script file="API.lua"/>
-    <Script file="Cmd.lua"/>
-    <Script file="Fader.lua"/>
-    <Script file="Function.lua"/>
-
+    <!-- Foundation: Event system must load first -->
+    <Script file="Event.lua"/>
+    <Script file="Database.lua"/>
     <Script file="Module.lua"/>
+
+    <!-- API layer -->
+    <Script file="API.lua"/>
+    <Script file="Compat.lua"/>
+
+    <!-- Utilities -->
+    <Script file="Function.lua"/>
     <Script file="Style.lua"/>
-
-    <Script file="Variable.lua"/>
-
-    <Script file="Mover.lua" />
+    <Script file="Skin.lua"/>
+    <Script file="Fader.lua"/>
+    <Script file="Mover.lua"/>
+    <Script file="Cmd.lua"/>
 </Ui>

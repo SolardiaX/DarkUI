@@ -1,4 +1,0 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/">
-    <Script file="LitePanels.lua" />
-    <!-- <Script file="Layout.lua" /> -->
-</Ui>

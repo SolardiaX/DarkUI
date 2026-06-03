@@ -1,6 +1,8 @@
 /*
 
 !/.gitignore
+!/.stylua.toml
+!/.styluaignore
 !/.pkgmeta
 !/LICENSE
 !/CHANGELOG.md

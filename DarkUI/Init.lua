@@ -1,39 +1,56 @@
 --[[
-    ~AddOn Engine~
-    To load the AddOn engine add this to the top of your file:
-        local E, C, L = unpack(select(2, ...)); --Import: Engine, Config, Locale
+    DarkUI Engine
+    Usage in any file:
+        local E, C, L = select(2, ...):unpack()
 
-    To load the AddOn engine inside another addon add this to the top of your file:
-        local E, C, L = unpack(DarkUI); --Import: Engine, Config, Locale
+    Usage from another addon:
+        local E, C, L = unpack(DarkUI)
 ]]
 
 local addonName, ns = ...
 
-ns[1] = {}            -- E, Engine
-ns[2] = {}            -- C, Config
-ns[3] = {}            -- L, Locale
+ns[1] = {} -- E, Engine
+ns[2] = {} -- C, Config
+ns[3] = {} -- L, Locale
 
-ns[1].screenWidth, ns[1].screenHeight = GetPhysicalScreenSize()
-ns[1].locale = GetLocale()
-ns[1].realm = GetRealmName()
-ns[1].version = C_AddOns.GetAddOnMetadata(addonName, "Version")
-ns[1].addonName = addonName
+local E = ns[1]
 
-ns[1].myClass = select(2, UnitClass('player'))
-ns[1].myRace = select(2, UnitRace("player"))
-ns[1].myName = UnitName("player")
-ns[1].myLevel = UnitLevel("player")
-ns[1].myGuid = UnitGUID('player')
-ns[1].myColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[ns[1].myClass]
-ns[1].myColorString = format('|cff%02x%02x%02x', ns[1].myColor.r * 255, ns[1].myColor.g * 255, ns[1].myColor.b * 255)
+E.screenWidth, E.screenHeight = GetPhysicalScreenSize()
+E.locale = GetLocale()
+E.realm = GetRealmName()
+E.version = C_AddOns.GetAddOnMetadata(addonName, "Version")
+E.addonName = addonName
+
+E.myClass = select(2, UnitClass("player"))
+E.myRace = select(2, UnitRace("player"))
+E.myName = UnitName("player")
+E.myLevel = UnitLevel("player")
+E.myGuid = UnitGUID("player")
+E.myColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[E.myClass]
+E.myColorString = format("|cff%02x%02x%02x", E.myColor.r * 255, E.myColor.g * 255, E.myColor.b * 255)
 
 function ns:unpack()
     return self[1], self[2], self[3]
 end
 
--- Allow other addons to use
 _G[addonName] = ns
 
+----------------------------------------------------------------------------------------
+--    Bootstrap: Database init + Module lifecycle
+--    Fires after all files are loaded via TOC order
+----------------------------------------------------------------------------------------
 
--- Global constants
-CURRENT_EXPANSION = EXPANSION_NAME10
+local bootstrap = CreateFrame("Frame")
+bootstrap:RegisterEvent("ADDON_LOADED")
+bootstrap:RegisterEvent("PLAYER_LOGIN")
+bootstrap:SetScript("OnEvent", function(_, event, arg1)
+    if event == "ADDON_LOADED" and arg1 == addonName then
+        E.db:Initialize()
+        E:InitializeModules()
+        bootstrap:UnregisterEvent("ADDON_LOADED")
+    elseif event == "PLAYER_LOGIN" then
+        E:UIScale()
+        E:EnableModules()
+        bootstrap:UnregisterEvent("PLAYER_LOGIN")
+    end
+end)

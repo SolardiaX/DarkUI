@@ -1,219 +1,228 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Core Module Methods
+--    Module System
+--    Provides lifecycle management (OnInit/OnEnable/OnDisable), combat-guarded
+--    Enable/Disable, and automatic event cleanup via the central Event dispatcher.
 ----------------------------------------------------------------------------------------
-local CreateFrame = CreateFrame
-local tinsert, pairs, gmatch = tinsert, pairs, string.gmatch
+
 local modules = {}
+local moduleOrder = {}
+local InCombatLockdown = InCombatLockdown
+local ipairs, pairs, type = ipairs, pairs, type
 
-local function checkEventHost(module)
-    if not module.host then
-        module.host = CreateFrame("Frame")
-        module.host.events = {}
+----------------------------------------------------------------------------------------
+--    Module Factory
+----------------------------------------------------------------------------------------
 
-        module.host:SetScript("OnEvent", function(self, event, ...)
-             if self.OnEvent ~= nil then
-                local onEvent = self.OnEvent
-
-                if type(onEvent) == "function" then
-                    onEvent(module, event, ...)
-                elseif type(onEvent) == "string" then
-                    onEvent = module[onEvent]
-                    if onEvent and type(onEvent) == "function" then
-                        onEvent(module, event, ...)
-                    end
-                end
-            end
-
-            if not self.events[event] then return end
-
-            local funcs = self.events[event]
-
-            local function trigger(event, ...)
-                local f = module[event]
-                if f and type(f) == "function" then
-                    f(module, event, ...)
-                end
-
-                for _, v in next, funcs do
-                    if type(v) == 'string' then
-                        local f = module[v]
-                        if f and type(f) == "function" then
-                            f(module, event, ...)
-                        end
-                        trigger(v, ...)
-                    else
-                        v(module, event, ...)
-                    end
-                end
-            end
-
-            trigger(event, ...)
-        end)
-    end
-end
-
-local function registerEvent(module, event, func)
-    checkEventHost(module)
-
-    for e in gmatch(event, "([^,%s]+)") do
-        if not module.host.events[e] then
-            module.host.events[e] = {}
-            module.host:RegisterEvent(e)
-        end
-
-        if func then
-            tinsert(module.host.events[e], func)
-        end
-    end
-end
-
-local function registerAllEvents(module, func)
-    if not module.host then
-        module.host = CreateFrame("Frame")
-        module.host.events = {}
-    end
-
-    module.host:SetScript("OnEvent", func)
-    module.host:RegisterAllEvents()
-end
-
-local function unregisterEvent(module, event, func)
-    if not module.host then return end
-
-    local events = module.host.events[event]
-
-    if events then
-        if func == nil then
-            module.host.events[event] = {}
-            return
-        end
-
-        for i, v in pairs(events) do
-            if v == func then
-                module.host.events[event][i] = nil
-            end
-        end
-    end
-end
-
-local function registerEventOnce(module, event, func)
-    registerEvent(module, event, function(_, e, ...)
-        if type(func) == "function" then
-            func(module, e, ...)
-        elseif type(func) == "string" then
-            module.hosts.events[func](module, e, ...)
-        end
-        unregisterEvent(module, e)
-    end)
-end
-
-local function setScript(module, event, func)
-    if event == "OnEvent" then
-        checkEventHost(module)
-        module.host.OnEvent = func
-    else
-        module.host:SetScript(event, function(_, ...)
-            func(module, ...)
-        end)
-    end
-end
-
-local function createModule(name)
-    local module = {}
-    module.name = name
-
-    -- add methods
-    module.RegisterEvent = registerEvent
-    module.RegisterAllEvents = registerAllEvents
-    module.RegisterEventOnce = registerEventOnce
-    module.UnregisterEvent = unregisterEvent
-    module.SetScript = setScript
-
-    return module
-end
-
--- Create or get module with name
 function E:Module(name)
-    if modules[name] then return modules[name] end
+    if modules[name] then
+        return modules[name]
+    end
 
-    local module = createModule(name)
+    local module = {
+        name = name,
+        enabled = false,
+        _secure = false,
+        _subs = {},
+        _subOrder = {},
+        _configKey = nil, -- set via module:SetConfigKey("tooltip")
+    }
 
+    -- Event shortcuts (delegate to central dispatcher)
+    function module:RegisterEvent(event, handler)
+        E.Event:Register(event, handler, self)
+    end
+
+    function module:UnregisterEvent(event, handler)
+        E.Event:Unregister(event, handler, self)
+    end
+
+    function module:UnregisterAllEvents()
+        E.Event:UnregisterAll(self)
+    end
+
+    function module:RegisterEventOnce(event, handler)
+        E.Event:RegisterOnce(event, handler, self)
+    end
+
+    -- Sub-module creation
     function module:Sub(subName)
-        if not self.sub then
-            self.sub = {}
-            self.suborders = {}
+        if self._subs[subName] then
+            return self._subs[subName]
         end
 
-        if self.sub[subName] then return self.sub[subName] end
+        local sub = {
+            name = subName,
+            parent = self,
+            enabled = false,
+            _secure = false,
+        }
+        sub.RegisterEvent = module.RegisterEvent
+        sub.UnregisterEvent = module.UnregisterEvent
+        sub.UnregisterAllEvents = module.UnregisterAllEvents
+        sub.RegisterEventOnce = module.RegisterEventOnce
 
-        local sub = createModule(subName)
+        function sub:SetSecure()
+            self._secure = true
+        end
 
-        self.sub[subName] = sub
-        tinsert(self.suborders, subName)
+        function sub:IsEnabled()
+            return self.enabled
+        end
+
+        self._subs[subName] = sub
+        self._subOrder[#self._subOrder + 1] = subName
         return sub
     end
 
+    -- Mark module as containing secure frames
+    function module:SetSecure()
+        self._secure = true
+    end
+
+    -- Set which config key controls this module's enable state
+    -- e.g. module:SetConfigKey("tooltip") → checks C.tooltip.enable
+    function module:SetConfigKey(key)
+        self._configKey = key
+    end
+
+    -- Check if the module should be enabled based on config
+    function module:ShouldEnable()
+        if not self._configKey then
+            return true
+        end
+        local cfg = C
+        for segment in self._configKey:gmatch("[^.]+") do
+            if type(cfg) ~= "table" then
+                return true
+            end
+            cfg = cfg[segment]
+        end
+        if type(cfg) == "table" then
+            return cfg.enable ~= false
+        end
+        return true
+    end
+
+    -- Enable module and its sub-modules
+    function module:Enable()
+        if self.enabled then
+            return
+        end
+
+        if InCombatLockdown() and self._secure then
+            E.Event:RegisterOnce("PLAYER_REGEN_ENABLED", function()
+                self:Enable()
+            end)
+            return
+        end
+
+        self.enabled = true
+        if self.OnEnable then
+            self:OnEnable()
+        end
+
+        for _, subName in ipairs(self._subOrder) do
+            local sub = self._subs[subName]
+            if sub.OnEnable then
+                sub:OnEnable()
+            end
+            sub.enabled = true
+        end
+    end
+
+    -- Disable module and its sub-modules
+    function module:Disable()
+        if not self.enabled then
+            return
+        end
+
+        if InCombatLockdown() and self._secure then
+            E.Event:RegisterOnce("PLAYER_REGEN_ENABLED", function()
+                self:Disable()
+            end)
+            return
+        end
+
+        -- Disable sub-modules first (reverse order)
+        for i = #self._subOrder, 1, -1 do
+            local sub = self._subs[self._subOrder[i]]
+            if sub.enabled then
+                if sub.OnDisable then
+                    sub:OnDisable()
+                end
+                sub:UnregisterAllEvents()
+                sub.enabled = false
+            end
+        end
+
+        if self.OnDisable then
+            self:OnDisable()
+        end
+        self:UnregisterAllEvents()
+        self.enabled = false
+    end
+
+    function module:IsEnabled()
+        return self.enabled
+    end
+
+    -- Toggle (convenience for GUI)
+    function module:Toggle()
+        if self.enabled then
+            self:Disable()
+        else
+            self:Enable()
+        end
+    end
+
     modules[name] = module
+    moduleOrder[#moduleOrder + 1] = name
     return module
 end
 
-----------------------------------------------------------------------------------------
---    Collect garbage
-----------------------------------------------------------------------------------------
-local eventcount = 0
-local InCombatLockdown = InCombatLockdown
-local collectgarbage = collectgarbage
+function E:GetModule(name)
+    return modules[name]
+end
 
-local Garbage = E:Module("Garbage")
-Garbage:RegisterAllEvents(function(_, event)
-    eventcount = eventcount + 1
-
-    if (InCombatLockdown() and eventcount > 25000)
-            or (not InCombatLockdown() and eventcount > 10000)
-            or event == "PLAYER_ENTERING_WORLD" or event == "PLAYER_REGEN_ENABLED"
-    then
-        collectgarbage()
-        eventcount = 0
-    end
-end)
-
-----------------------------------------------------------------------------------------
---    Load all Modules
-----------------------------------------------------------------------------------------
-local ipairs = ipairs
-
-local function callByName(module, name, ...)
-    if module and name and module[name] then
-        module[name](module, ...)
-    end
-
-    if module and module.sub then
-        for _, sub in ipairs(module.suborders) do
-            callByName(module.sub[sub], name, ...)
+function E:IterateModules()
+    local i = 0
+    return function()
+        i = i + 1
+        local name = moduleOrder[i]
+        if name then
+            return name, modules[name]
         end
     end
 end
 
-local Loader = E:Module("Loader")
-Loader:RegisterEvent("ADDON_LOADED PLAYER_LOGIN PLAYER_ENTERING_WORLD", function(_, event, addon)
-    if event == "ADDON_LOADED" and addon == E.addonName then
-        if not SavedStats then SavedStats = {} end
-        if not SavedStatsPerChar then SavedStatsPerChar = {} end
+----------------------------------------------------------------------------------------
+--    Bootstrap (replaces old Loader module)
+--    Called from Init.lua via event registration
+----------------------------------------------------------------------------------------
 
-        for _, module in next, modules do
-            callByName(module, "OnInit")
+function E:InitializeModules()
+    for _, name in ipairs(moduleOrder) do
+        local module = modules[name]
+        if module.OnInit then
+            module:OnInit()
         end
-    elseif event == "PLAYER_LOGIN" then
-        for _, module in next, modules do
-            callByName(module, "OnLogin")
+        -- Also call OnInit for sub-modules
+        for _, subName in ipairs(module._subOrder) do
+            local sub = module._subs[subName]
+            if sub.OnInit then
+                sub:OnInit()
+            end
         end
-    elseif event == "PLAYER_ENTERING_WORLD" then
-        for _, module in next, modules do
-            callByName(module, "OnActive")
-        end
-
-        collectgarbage("collect")
     end
-end)
+end
+
+function E:EnableModules()
+    for _, name in ipairs(moduleOrder) do
+        local module = modules[name]
+        if module:ShouldEnable() then
+            module:Enable()
+        end
+    end
+end

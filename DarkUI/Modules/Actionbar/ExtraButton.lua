@@ -1,52 +1,46 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
---    EtraButton
-----------------------------------------------------------------------------------------
+-- Extra Buttons
 local module = E:Module("Actionbar"):Sub("ExtraButton")
 local actionButton = LibStub("DarkUI-ActionButton")
 local LAB = LibStub("LibActionButton-1.0")
 
-local _G = _G
-local CreateFrame = CreateFrame
-local InCombatLockdown = InCombatLockdown
-local HasAction = HasAction
-local GetCVar = GetCVar
 local C_PetBattles_IsInBattle = C_PetBattles.IsInBattle
-local GameTooltip = _G.GameTooltip
-local hooksecurefunc = hooksecurefunc
-local unpack, pairs, tonumber, tinsert, twipe = unpack, pairs, tonumber, table.insert, table.wipe
 
 local ExtraButtons_PREFIX = "DarkUIExtraButtons_"
 local ExtraButtons = {
     [1] = {
-        name   = "MainLeft",
-        bindName = "DarkUIExtraButtonsMainLeftButton", flyout="LEFT",
+        name = "MainLeft",
+        bindName = "DarkUIExtraButtonsMainLeftButton",
+        flyout = "LEFT",
         parent = "DarkUI_ActionBar1",
-        pos    = { "TOPRIGHT", "DarkUI_ActionBar1Button1", "TOPLEFT", -10, 7 },
-        size   = 56
+        pos = { "TOPRIGHT", "DarkUI_ActionBar1Button1", "TOPLEFT", -10, 7 },
+        size = 56,
     },
     [2] = {
-        name   = "MainRight",
-        bindName = "DarkUIExtraButtonsMainRightButton", flyout="RIGHT",
+        name = "MainRight",
+        bindName = "DarkUIExtraButtonsMainRightButton",
+        flyout = "RIGHT",
         parent = "DarkUI_ActionBar1",
-        pos    = { "TOPLEFT", "DarkUI_ActionBar1Button12", "TOPRIGHT", 11, 7 },
-        size   = 56
+        pos = { "TOPLEFT", "DarkUI_ActionBar1Button12", "TOPRIGHT", 11, 7 },
+        size = 56,
     },
     [3] = {
-        name   = "TopLeft",
-        bindName = "DarkUIExtraButtonsTopLeftButton", flyout="UP",
+        name = "TopLeft",
+        bindName = "DarkUIExtraButtonsTopLeftButton",
+        flyout = "UP",
         parent = "DarkUI_ActionBar2",
-        pos    = { "BOTTOMRIGHT", "DarkUIExtraButtons_MainLeftBar", "TOPLEFT", -11, -3 },
-        size   = 56
+        pos = { "BOTTOMRIGHT", "DarkUIExtraButtons_MainLeftBar", "TOPLEFT", -11, -3 },
+        size = 56,
     },
     [4] = {
-        name   = "TopRight",
-        bindName = "DarkUIExtraButtonsTopRightButton", flyout="UP",
+        name = "TopRight",
+        bindName = "DarkUIExtraButtonsTopRightButton",
+        flyout = "UP",
         parent = "DarkUI_ActionBar2",
-        pos    = { "BOTTOMLEFT", "DarkUIExtraButtons_MainRightBar", "TOPRIGHT", 7, -3 },
-        size   = 56
-    }
+        pos = { "BOTTOMLEFT", "DarkUIExtraButtons_MainRightBar", "TOPRIGHT", 7, -3 },
+        size = 56,
+    },
 }
 
 local ExtraButtons_Lite_Pos = {
@@ -63,8 +57,10 @@ local ExtraButtons_Lite_Size = {
     [4] = 50,
 }
 
-local function createBar(cfg, index)
-    if not _G[cfg.parent] then return end
+local function createExtraBar(cfg, index)
+    if not _G[cfg.parent] then
+        return
+    end
 
     local name = ExtraButtons_PREFIX .. cfg.name
     local bar = CreateFrame("Frame", name .. "Bar", _G[cfg.parent], "SecureHandlerStateTemplate")
@@ -77,16 +73,19 @@ local function createBar(cfg, index)
 
     local button = actionButton:CreateButton(bar, index, cfg.size, cfg.bindName, name .. "Button")
     button:SetAllPoints(bar)
-    
+
     tinsert(bar.buttons, button)
 
-    bar:SetAttribute("_onstate-page", [[
+    bar:SetAttribute(
+        "_onstate-page",
+        [[
         self:SetAttribute("state", newstate)
         control:ChildUpdate("state", newstate)
-    ]])
+    ]]
+    )
 
-    LAB.RegisterCallback(bar, "OnButtonUpdate", function(_, button)
-        button:SetAlpha(1)
+    LAB.RegisterCallback(bar, "OnButtonUpdate", function(_, btn)
+        btn:SetAlpha(1)
     end)
 
     return bar
@@ -95,44 +94,46 @@ end
 function module:OnInit()
     self.bars = {}
 
-    local locked = GetCVar("lockActionBars")
     local index = E.myClass == "DRUID" and 92 or 107
 
     for i = 1, 4 do
-        local cfg = ExtraButtons[i]
+        local btnCfg = ExtraButtons[i]
 
         if C.general.liteMode then
-            cfg.pos = ExtraButtons_Lite_Pos[i]
-            cfg.size = ExtraButtons_Lite_Size[i]
+            btnCfg.pos = ExtraButtons_Lite_Pos[i]
+            btnCfg.size = ExtraButtons_Lite_Size[i]
         end
-        
-        local bar = createBar(cfg, i+index)
-        
-        self.bars[cfg.name] = bar
+
+        local bar = createExtraBar(btnCfg, i + index)
+        self.bars[btnCfg.name] = bar
     end
 
     actionButton:UpdateBarConfig(self.bars)
+end
 
+function module:OnEnable()
     if C_PetBattles_IsInBattle() then
         actionButton:ClearBindings(self.bars)
     else
         actionButton:ReassignBindings(self.bars)
     end
 
-    self:RegisterEvent("CVAR_UPDATE", function(_, _, var, value)
+    self:RegisterEvent("CVAR_UPDATE", function(_, _, var)
         if var == "lockActionBars" then
             if InCombatLockdown() then
                 self:RegisterEventOnce("PLAYER_REGEN_ENABLED", function()
                     actionButton:UpdateBarConfig(self.bars)
-                    -- toggleLock(value)
                 end)
             else
                 actionButton:UpdateBarConfig(self.bars)
-                -- toggleLock(value)
             end
         end
     end)
 
-    self:RegisterEvent("UPDATE_BINDINGS PET_BATTLE_CLOSE", function() actionButton:ReassignBindings(self.bars) end)
-    self:RegisterEvent("PET_BATTLE_OPENING_DONE", function() actionButton:ClearBindings(self.bars) end)
+    self:RegisterEvent("UPDATE_BINDINGS PET_BATTLE_CLOSE", function()
+        actionButton:ReassignBindings(self.bars)
+    end)
+    self:RegisterEvent("PET_BATTLE_OPENING_DONE", function()
+        actionButton:ClearBindings(self.bars)
+    end)
 end

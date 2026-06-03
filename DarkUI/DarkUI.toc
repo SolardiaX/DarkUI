@@ -1,14 +1,14 @@
-## Interface: 110107, 110105
+## Interface: 120000
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Notes: DarkUI for World of Warcraft
 ## Notes-zhCN: DarkUI 整合插件
 ## Notes-ruRU: DarkUI Интеграционные плагины
 ## Author: SolardiaX
-## Version: 11.1.5-b1.0.6
-## OptionalDeps: Blizzard_CombatText, Blizzard_ArtifactUI, DarkUI_Options
-## SavedVariables: SavedStats
-## SavedVariablesPerCharacter: SavedStatsPerChar
+## Version: 12.0.0-2.0.0
+## OptionalDeps: DarkUI_Options
+## SavedVariables: DarkUI_DB
+## SavedVariablesPerCharacter: DarkUI_CharDB
 ## X-Credits: Aezay, Elv, GoldpawsStuff, Silverband, Siwai, Tuller, Tuz, Zork, p3lim
 ## Category-enUS: UI Overhaul
 ## Category-ruRU: Переработка интерфейса

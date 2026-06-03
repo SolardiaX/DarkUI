@@ -1,32 +1,32 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.actionbar.bars.enable or not C.actionbar.bars.texture then return end
-
-----------------------------------------------------------------------------------------
---    Background Art for Actionbars
-----------------------------------------------------------------------------------------
+-- Background Art for Actionbars
 local module = E:Module("Actionbar"):Sub("Texture")
 
-local _G = _G
-local CreateFrame = CreateFrame
-
-local media = {
-    mainbar_bg                      = C.media.path .. "bar_mainbar_bg",
-    mainbar                         = C.media.path .. C.general.style .. "\\" .. "bar_mainbar" .. (C.general.liteMode and "_lite" or ""),
-    leftbar                         = C.media.path .. C.general.style .. "\\" .. "bar_leftbar" .. (C.general.liteMode and "_lite" or ""),
-    rightbar                        = C.media.path .. C.general.style .. "\\" .. "bar_rightbar" .. (C.general.liteMode and "_lite" or ""),
-    mainbar_statusbar_overlay       = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_overlay",
-    mainbar_statusbar_topfill       = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_bottom_fill",
-    mainbar_statusbar_bottomfill    = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_top_fill",
-}
+local function getMedia()
+    return {
+        mainbar_bg = C.media.path .. "bar_mainbar_bg",
+        mainbar = C.media.path .. C.general.style .. "\\" .. "bar_mainbar" .. (C.general.liteMode and "_lite" or ""),
+        leftbar = C.media.path .. C.general.style .. "\\" .. "bar_leftbar" .. (C.general.liteMode and "_lite" or ""),
+        rightbar = C.media.path .. C.general.style .. "\\" .. "bar_rightbar" .. (C.general.liteMode and "_lite" or ""),
+        mainbar_statusbar_overlay = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_overlay",
+        mainbar_statusbar_topfill = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_bottom_fill",
+        mainbar_statusbar_bottomfill = C.media.path .. C.general.style .. "\\" .. "bar_mainbar_bar_top_fill",
+    }
+end
 
 function module:OnInit()
+    if not C.actionbar.bars.texture then
+        return
+    end
+
+    local media = getMedia()
+
     local MainMenuBarBG = CreateFrame("Frame", "DarkUI_ActionBar1BG", _G["DarkUI_ActionBar1"])
     MainMenuBarBG:SetFrameStrata("BACKGROUND")
     MainMenuBarBG:SetFrameLevel(2)
     MainMenuBarBG:SetSize(1024, 128)
     MainMenuBarBG:SetPoint("BOTTOM", _G["DarkUI_ActionBar1"], -3, -50)
-    -- MainMenuBarBG:SetScale(.98)
 
     MainMenuBarBG.texture = MainMenuBarBG:CreateTexture(nil, "BACKGROUND")
     MainMenuBarBG.texture:SetTexture(media.mainbar)
@@ -42,7 +42,6 @@ function module:OnInit()
         else
             BarBottomLeftBG:SetPoint("BOTTOM", _G["DarkUI_ActionBar2"], -1, -127)
         end
-        -- BarBottomLeftBG:SetScale(0.98)
 
         BarBottomLeftBG.texture = BarBottomLeftBG:CreateTexture(nil, "OVERLAY")
         BarBottomLeftBG.texture:SetTexture(media.leftbar)
@@ -54,7 +53,6 @@ function module:OnInit()
         BarBottomRightBG:SetFrameStrata("BACKGROUND")
         BarBottomRightBG:SetFrameLevel(C.general.style == "cold" and 4 or 3)
         BarBottomRightBG:SetSize(1026, 128)
-        -- BarBottomRightBG:SetScale(0.98)
         if C.general.liteMode then
             BarBottomRightBG:SetPoint("BOTTOM", _G["DarkUI_ActionBar3"], 1, -50)
         else
@@ -76,7 +74,7 @@ function module:OnInit()
     MainMenuBarBGFill.texture:SetTexture(media.mainbar_bg)
     MainMenuBarBGFill.texture:SetAllPoints(MainMenuBarBGFill)
 
-    if C.actionbar.bars.exp.enable then
+    if C.actionbar.bars.exp and C.actionbar.bars.exp.enable then
         local StatusBarTopOverlay = CreateFrame("Frame", "DarkUI_StatusBarTopOverlay", MainMenuBarBG)
         StatusBarTopOverlay:SetFrameStrata("BACKGROUND")
         StatusBarTopOverlay:SetFrameLevel(4)
@@ -98,25 +96,14 @@ function module:OnInit()
         StatusBarTopFill.texture:SetAllPoints(StatusBarTopFill)
     end
 
-    if C.actionbar.bars.artifact.enable then
-        local MainMenuBarBottomOverlay = CreateFrame("Frame", "DarkUI_ActionBar1BarBottomOverlay", MainMenuBarBG)
-        MainMenuBarBottomOverlay:SetFrameStrata("BACKGROUND")
-        MainMenuBarBottomOverlay:SetFrameLevel(4)
-        MainMenuBarBottomOverlay:SetSize(512, 16)
-        MainMenuBarBottomOverlay:SetPoint("CENTER", _G["DarkUI_ArtifactBar"], 1, 0)
+    -- Bottom fill (artifact bar slot removed, always show fill)
+    local MainMenuBarBottomFill = CreateFrame("Frame", "DarkUI_ActionBar1BarBottomFill", MainMenuBarBG)
+    MainMenuBarBottomFill:SetFrameStrata("BACKGROUND")
+    MainMenuBarBottomFill:SetFrameLevel(4)
+    MainMenuBarBottomFill:SetSize(512, 16)
+    MainMenuBarBottomFill:SetPoint("BOTTOM", MainMenuBarBG, 4, 21)
 
-        MainMenuBarBottomOverlay.texture = MainMenuBarBottomOverlay:CreateTexture(nil, "BACKGROUND")
-        MainMenuBarBottomOverlay.texture:SetTexture(media.mainbar_statusbar_overlay)
-        MainMenuBarBottomOverlay.texture:SetAllPoints(MainMenuBarBottomOverlay)
-    else
-        local MainMenuBarBottomFill = CreateFrame("Frame", "DarkUI_ActionBar1BarBottomFill", MainMenuBarBG)
-        MainMenuBarBottomFill:SetFrameStrata("BACKGROUND")
-        MainMenuBarBottomFill:SetFrameLevel(4)
-        MainMenuBarBottomFill:SetSize(512, 16)
-        MainMenuBarBottomFill:SetPoint("BOTTOM", MainMenuBarBG, 4, 21)
-
-        MainMenuBarBottomFill.texture = MainMenuBarBottomFill:CreateTexture(nil, "BACKGROUND")
-        MainMenuBarBottomFill.texture:SetTexture(media.mainbar_statusbar_bottomfill)
-        MainMenuBarBottomFill.texture:SetAllPoints(MainMenuBarBottomFill)
-    end
+    MainMenuBarBottomFill.texture = MainMenuBarBottomFill:CreateTexture(nil, "BACKGROUND")
+    MainMenuBarBottomFill.texture:SetTexture(media.mainbar_statusbar_bottomfill)
+    MainMenuBarBottomFill.texture:SetAllPoints(MainMenuBarBottomFill)
 end
