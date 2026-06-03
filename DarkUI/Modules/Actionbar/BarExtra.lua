@@ -31,12 +31,14 @@ function module:OnInit()
     button:SetSize(cfg.button.size, cfg.button.size)
     E:StyleButton(button, 2)
 
-    button.style:SetTexture(nil)
-    hooksecurefunc(button.style, "SetTexture", function(style, texture)
-        if texture then
-            style:SetTexture(nil)
-        end
-    end)
+    if button.style then
+        button.style:SetTexture(nil)
+        hooksecurefunc(button.style, "SetTexture", function(style, texture)
+            if texture then
+                style:SetTexture(nil)
+            end
+        end)
+    end
 
     tinsert(extraBar.buttonList, button)
 

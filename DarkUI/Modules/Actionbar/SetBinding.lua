@@ -5,452 +5,338 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("SetBinding")
 
+local tonumber, pairs, strfind, strupper, format = tonumber, pairs, strfind, strupper, format
+local InCombatLockdown = InCombatLockdown
+local GetBindingKey, SetBinding, SaveBindings, LoadBindings = GetBindingKey, SetBinding, SaveBindings, LoadBindings
+local IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown, IsMetaKeyDown = IsAltKeyDown, IsControlKeyDown, IsShiftKeyDown, IsMetaKeyDown
+
 local bind
-local oneBind = true
-local localmacros = 0
+local macroInit
+
+local ignoreKeys = {
+    ["LALT"] = true,
+    ["RALT"] = true,
+    ["LCTRL"] = true,
+    ["RCTRL"] = true,
+    ["LSHIFT"] = true,
+    ["RSHIFT"] = true,
+    ["UNKNOWN"] = true,
+    ["LeftButton"] = true,
+}
+
+local function hookActionButton(self)
+    local pet = self.commandName and strfind(self.commandName, "^BONUSACTION") and "PET"
+    local stance = self.commandName and strfind(self.commandName, "^SHAPESHIFT") and "STANCE"
+    module:UpdateBind(self, pet or stance or nil)
+end
+
+local function hookMacroButton(self)
+    module:UpdateBind(self, "MACRO")
+end
+
+local function hookSpellButton(self)
+    module:UpdateBind(self, "SPELL")
+end
+
+function module:RegisterButton(button)
+    if button.IsProtected and button.IsObjectType and button:IsObjectType("CheckButton") and button:IsProtected() then
+        button:HookScript("OnEnter", hookActionButton)
+    end
+end
+
+function module:RegisterMacro(addon)
+    if addon ~= "Blizzard_MacroUI" then
+        return
+    end
+    if macroInit then
+        return
+    end
+
+    hooksecurefunc(MacroFrame.MacroSelector.ScrollBox, "Update", function(self)
+        for i = 1, self.ScrollTarget:GetNumChildren() do
+            local button = select(i, self.ScrollTarget:GetChildren())
+            if not button.bindHooked then
+                button:HookScript("OnEnter", hookMacroButton)
+                button.bindHooked = true
+            end
+        end
+    end)
+
+    macroInit = true
+end
+
+function module:UpdateBind(button, spellmacro)
+    if not bind or not bind.enabled or InCombatLockdown() then
+        return
+    end
+
+    bind.button = button
+    bind.spellmacro = spellmacro
+    bind:ClearAllPoints()
+    bind:SetAllPoints(button)
+    bind:Show()
+
+    if spellmacro == "SPELL" then
+        bind.id = button.slotIndex or button:GetID()
+        bind.name = C_SpellBook.GetSpellBookItemName(bind.id, Enum.SpellBookSpellBank.Player)
+        bind.bindings = { GetBindingKey(spellmacro .. " " .. bind.name) }
+    elseif spellmacro == "MACRO" then
+        bind.id = button.selectionIndex or button:GetID()
+        if MacroFrame and MacroFrame.selectedTab == 2 then
+            bind.id = bind.id + MAX_ACCOUNT_MACROS
+        end
+        bind.name = GetMacroInfo(bind.id)
+        bind.bindings = { GetBindingKey(spellmacro .. " " .. bind.name) }
+    elseif spellmacro == "STANCE" or spellmacro == "PET" then
+        bind.name = button:GetName()
+        if not bind.name then
+            return
+        end
+        bind.tipName = button.commandName and GetBindingName(button.commandName)
+
+        bind.id = tonumber(button:GetID())
+        if not bind.id or bind.id < 1 or bind.id > (spellmacro == "STANCE" and 10 or 12) then
+            bind.bindstring = "CLICK " .. bind.name .. ":LeftButton"
+        else
+            bind.bindstring = (spellmacro == "STANCE" and "SHAPESHIFTBUTTON" or "BONUSACTIONBUTTON") .. bind.id
+        end
+        bind.bindings = { GetBindingKey(bind.bindstring) }
+    else
+        bind.name = button:GetName()
+        if not bind.name then
+            return
+        end
+        bind.tipName = button.commandName and GetBindingName(button.commandName)
+
+        bind.action = tonumber(button.action)
+        if button.keyBoundTarget then
+            bind.bindstring = button.keyBoundTarget
+        elseif not bind.action or bind.action < 1 or bind.action > 180 then
+            bind.bindstring = "CLICK " .. bind.name .. ":LeftButton"
+        else
+            local modact = 1 + (bind.action - 1) % 12
+            if bind.name == "ExtraActionButton1" then
+                bind.bindstring = "EXTRAACTIONBUTTON1"
+            elseif bind.action < 25 or bind.action > 72 then
+                bind.bindstring = "ACTIONBUTTON" .. modact
+            elseif bind.action < 73 and bind.action > 60 then
+                bind.bindstring = "MULTIACTIONBAR1BUTTON" .. modact
+            elseif bind.action < 61 and bind.action > 48 then
+                bind.bindstring = "MULTIACTIONBAR2BUTTON" .. modact
+            elseif bind.action < 49 and bind.action > 36 then
+                bind.bindstring = "MULTIACTIONBAR4BUTTON" .. modact
+            elseif bind.action < 37 and bind.action > 24 then
+                bind.bindstring = "MULTIACTIONBAR3BUTTON" .. modact
+            end
+        end
+        bind.bindings = { GetBindingKey(bind.bindstring) }
+    end
+
+    bind:GetScript("OnEnter")()
+end
+
+function module:Listener(key)
+    if key == "ESCAPE" or key == "RightButton" then
+        if bind.bindings then
+            for i = 1, #bind.bindings do
+                SetBinding(bind.bindings[i])
+            end
+        end
+        print(format(L.ACTIONBAR_BINDING_ALLCLEAR or "Cleared bindings for %s", bind.tipName or bind.name))
+        module:UpdateBind(bind.button, bind.spellmacro)
+        return
+    end
+
+    if ignoreKeys[key] then
+        return
+    end
+
+    if key == "MiddleButton" then
+        key = "BUTTON3"
+    end
+    if strfind(key, "Button%d") then
+        key = strupper(key)
+    end
+
+    local alt = IsAltKeyDown() and "ALT-" or ""
+    local ctrl = IsControlKeyDown() and "CTRL-" or ""
+    local shift = IsShiftKeyDown() and "SHIFT-" or ""
+    local meta = IsMetaKeyDown() and "META-" or ""
+
+    if not bind.spellmacro or bind.spellmacro == "PET" or bind.spellmacro == "STANCE" then
+        SetBinding(alt .. ctrl .. shift .. meta .. key, bind.bindstring)
+    else
+        SetBinding(alt .. ctrl .. shift .. meta .. key, bind.spellmacro .. " " .. bind.name)
+    end
+
+    print(format(L.ACTIONBAR_BINDING_BINDTO or "Bound %s to %s", alt .. ctrl .. shift .. meta .. key, bind.tipName or bind.name))
+    module:UpdateBind(bind.button, bind.spellmacro)
+end
+
+function module:HideFrame()
+    bind:ClearAllPoints()
+    bind:Hide()
+    GameTooltip:Hide()
+end
+
+function module:Activate()
+    bind.enabled = true
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
+        module:Deactivate(false)
+    end)
+end
+
+function module:Deactivate(save)
+    local which = GetCurrentBindingSet()
+    if save then
+        SaveBindings(which)
+        print("|cffffff00" .. (L.ACTIONBAR_BINDING_SAVE or "Bindings saved") .. "|r")
+    else
+        LoadBindings(which)
+        print("|cffffff00" .. (L.ACTIONBAR_BINDING_DISCARDED or "Bindings discarded") .. "|r")
+    end
+
+    bind.enabled = false
+    module:HideFrame()
+    self:UnregisterEvent("PLAYER_REGEN_DISABLED")
+    StaticPopup_Hide("DARKUI_KEYBIND_MODE")
+end
 
 function module:OnInit()
     if not C.actionbar.hover_binding then
         return
     end
 
-    bind = CreateFrame("Frame", "HoverBind", UIParent)
+    bind = CreateFrame("Frame", "DarkUI_HoverBind", UIParent)
+    bind:SetFrameStrata("DIALOG")
+    bind:EnableMouse(true)
+    bind:EnableKeyboard(true)
+    bind:EnableMouseWheel(true)
+    bind.texture = bind:CreateTexture()
+    bind.texture:SetPoint("TOPLEFT", bind, 2, -2)
+    bind.texture:SetPoint("BOTTOMRIGHT", bind, -2, 2)
+    bind.texture:SetColorTexture(1, 1, 1, 0.3)
+    bind:Hide()
 
-    SlashCmdList.MOUSEOVERBIND = function()
+    bind:SetScript("OnEnter", function()
+        GameTooltip:SetOwner(bind, "ANCHOR_NONE")
+        GameTooltip:SetPoint("BOTTOM", bind, "TOP", 0, 2)
+        GameTooltip:AddLine(bind.tipName or bind.name, 0.6, 0.8, 1)
+
+        if not bind.bindings or #bind.bindings == 0 then
+            GameTooltip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or NOT_BOUND, 1, 0, 0)
+        else
+            GameTooltip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
+            for i = 1, #bind.bindings do
+                GameTooltip:AddDoubleLine(i, bind.bindings[i], 1, 1, 1, 0, 1, 0)
+            end
+        end
+        GameTooltip:Show()
+    end)
+    bind:SetScript("OnLeave", function()
+        module:HideFrame()
+    end)
+    bind:SetScript("OnKeyUp", function(_, key)
+        module:Listener(key)
+    end)
+    bind:SetScript("OnMouseUp", function(_, key)
+        module:Listener(key)
+    end)
+    bind:SetScript("OnMouseWheel", function(_, delta)
+        if delta > 0 then
+            module:Listener("MOUSEWHEELUP")
+        else
+            module:Listener("MOUSEWHEELDOWN")
+        end
+    end)
+
+    -- Register all actionbar buttons via commandName detection
+    local parentModule = E:GetModule("Actionbar")
+    local bars = parentModule and parentModule._subs["Bars"]
+    if bars and bars.bars then
+        for _, bar in next, bars.bars do
+            if bar and bar.buttons then
+                for _, button in next, bar.buttons do
+                    module:RegisterButton(button)
+                end
+            end
+        end
+    end
+
+    -- Extra buttons
+    local extraBars = parentModule and parentModule._subs["ExtraButton"]
+    if extraBars and extraBars.bars then
+        for _, bar in next, extraBars.bars do
+            if bar and bar.buttons then
+                for _, button in next, bar.buttons do
+                    module:RegisterButton(button)
+                end
+            end
+        end
+    end
+
+    -- Stance/Pet buttons via commandName
+    for i = 1, 10 do
+        local b = _G["StanceButton" .. i]
+        if b then
+            module:RegisterButton(b)
+        end
+    end
+    for i = 1, 10 do
+        local b = _G["PetActionButton" .. i]
+        if b then
+            module:RegisterButton(b)
+        end
+    end
+
+    if ExtraActionButton1 then
+        module:RegisterButton(ExtraActionButton1)
+    end
+
+    -- Spellbook buttons
+    for i = 1, 12 do
+        local b = _G["SpellButton" .. i]
+        if b then
+            b:HookScript("OnEnter", hookSpellButton)
+        end
+    end
+
+    -- Macro UI (lazy load)
+    if not C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") then
+        hooksecurefunc(C_AddOns, "LoadAddOn", function(addon)
+            module:RegisterMacro(addon)
+        end)
+    else
+        module:RegisterMacro("Blizzard_MacroUI")
+    end
+
+    -- Static popup
+    StaticPopupDialogs["DARKUI_KEYBIND_MODE"] = {
+        text = L.ACTIONBAR_BINDING_MODETEXT or "Hover over a button and press a key to bind it. Press ESC to clear.",
+        button1 = SAVE,
+        button2 = CANCEL,
+        OnAccept = function()
+            module:Deactivate(true)
+        end,
+        OnCancel = function()
+            module:Deactivate(false)
+        end,
+        timeout = 0,
+        whileDead = 1,
+        hideOnEscape = false,
+        preferredIndex = 5,
+    }
+
+    -- Slash command
+    SlashCmdList.DARKUI_KEYBIND = function()
         if InCombatLockdown() then
             print(L.ACTIONBAR_BINDING_INCOMBATLOCKDOWN or "Cannot bind in combat")
             return
         end
-        if not bind.loaded then
-            bind:SetFrameStrata("DIALOG")
-            bind:EnableMouse(true)
-            bind:EnableKeyboard(true)
-            bind:EnableMouseWheel(true)
-            bind.texture = bind:CreateTexture()
-            bind.texture:SetPoint("TOPLEFT", bind, 2, -2)
-            bind.texture:SetPoint("BOTTOMRIGHT", bind, -2, 2)
-            bind.texture:SetColorTexture(1, 1, 1, 0.3)
-            bind:Hide()
-
-            local elapsed = 0
-            GameTooltip:HookScript("OnUpdate", function(self, e)
-                elapsed = elapsed + e
-                if elapsed < 0.2 then
-                    return
-                else
-                    elapsed = 0
-                end
-                if not self.comparing and IsModifiedClick("COMPAREITEMS") then
-                    GameTooltip_ShowCompareItem(self)
-                    self.comparing = true
-                elseif self.comparing and not IsModifiedClick("COMPAREITEMS") then
-                    for _, frame in pairs(self.shoppingTooltips) do
-                        frame:Hide()
-                    end
-                    self.comparing = false
-                end
-            end)
-            hooksecurefunc(GameTooltip, "Hide", function(self)
-                for _, tt in pairs(self.shoppingTooltips) do
-                    tt:Hide()
-                end
-            end)
-
-            bind:SetScript("OnEnter", function()
-                GameTooltip:SetOwner(bind, "ANCHOR_NONE")
-                GameTooltip:SetPoint("BOTTOM", bind, "TOP", 0, 2)
-                GameTooltip:AddLine(bind.button.name, 1, 1, 1)
-
-                if #bind.button.bindings == 0 then
-                    GameTooltip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or "No binding", 0.6, 0.6, 0.6)
-                else
-                    GameTooltip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
-                    for i = 1, #bind.button.bindings do
-                        GameTooltip:AddDoubleLine(i, bind.button.bindings[i])
-                    end
-                end
-                GameTooltip:Show()
-            end)
-
-            bind:SetScript("OnEvent", function(self)
-                self:Deactivate(false)
-            end)
-            bind:SetScript("OnLeave", function(self)
-                self:HideFrame()
-            end)
-            bind:SetScript("OnKeyDown", function(self, key)
-                self:Listener(key)
-            end)
-            bind:SetScript("OnMouseDown", function(self, key)
-                self:Listener(key)
-            end)
-            bind:SetScript("OnMouseWheel", function(self, delta)
-                if delta > 0 then
-                    self:Listener("MOUSEWHEELUP")
-                else
-                    self:Listener("MOUSEWHEELDOWN")
-                end
-            end)
-
-            function bind:Update(b, spellmacro)
-                if not self.enabled or InCombatLockdown() then
-                    return
-                end
-                self.button = b
-                self.spellmacro = spellmacro
-
-                self:ClearAllPoints()
-                self:SetAllPoints(b)
-                self:Show()
-
-                ShoppingTooltip1:Hide()
-
-                if spellmacro == "SPELL" then
-                    self.button.id = b.slotIndex or b:GetID()
-                    self.button.name = C_SpellBook.GetSpellBookItemName(self.button.id, Enum.SpellBookSpellBank.Player)
-
-                    GameTooltip:Show()
-                    GameTooltip:SetScript("OnHide", function(tip)
-                        tip:SetOwner(bind, "ANCHOR_NONE")
-                        tip:SetPoint("BOTTOM", bind, "TOP", 0, 1)
-                        tip:AddLine(bind.button.name, 1, 1, 1)
-                        bind.button.bindings = { GetBindingKey(spellmacro .. " " .. bind.button.name) }
-                        if #bind.button.bindings == 0 then
-                            tip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or "No binding", 0.6, 0.6, 0.6)
-                        else
-                            tip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
-                            for i = 1, #bind.button.bindings do
-                                tip:AddDoubleLine(i, bind.button.bindings[i])
-                            end
-                        end
-                        tip:Show()
-                        tip:SetScript("OnHide", nil)
-                    end)
-                elseif spellmacro == "MACRO" then
-                    self.button.id = self.button.selectionIndex or self.button:GetID()
-                    if localmacros == 1 then
-                        self.button.id = self.button.id + MAX_ACCOUNT_MACROS
-                    end
-
-                    self.button.name = GetMacroInfo(self.button.id)
-
-                    GameTooltip:SetOwner(bind, "ANCHOR_NONE")
-                    GameTooltip:SetPoint("BOTTOM", bind, "TOP", 0, 1)
-                    GameTooltip:AddLine(bind.button.name, 1, 1, 1)
-
-                    bind.button.bindings = { GetBindingKey(spellmacro .. " " .. bind.button.name) }
-                    if #bind.button.bindings == 0 then
-                        GameTooltip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or "No binding", 0.6, 0.6, 0.6)
-                    else
-                        GameTooltip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
-                        for i = 1, #bind.button.bindings do
-                            GameTooltip:AddDoubleLine(i, bind.button.bindings[i], 1, 1, 1)
-                        end
-                    end
-                    GameTooltip:Show()
-                elseif spellmacro == "STANCE" or spellmacro == "PET" then
-                    self.button.id = tonumber(b:GetID())
-                    self.button.name = b:GetName()
-                    if not self.button.name then
-                        return
-                    end
-
-                    if not self.button.id or self.button.id < 1 or self.button.id > (spellmacro == "STANCE" and 10 or 12) then
-                        self.button.bindstring = "CLICK " .. self.button.name .. ":LeftButton"
-                    else
-                        self.button.bindstring = (spellmacro == "STANCE" and "SHAPESHIFTBUTTON" or "BONUSACTIONBUTTON") .. self.button.id
-                    end
-
-                    GameTooltip:Show()
-                    GameTooltip:SetScript("OnHide", function(tip)
-                        tip:SetOwner(bind, "ANCHOR_NONE")
-                        tip:SetPoint("BOTTOM", bind, "TOP", 0, 1)
-                        tip:AddLine(bind.button.name, 1, 1, 1)
-                        bind.button.bindings = { GetBindingKey(bind.button.bindstring) }
-                        if #bind.button.bindings == 0 then
-                            tip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or "No binding", 0.6, 0.6, 0.6)
-                        else
-                            tip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
-                            for i = 1, #bind.button.bindings do
-                                tip:AddDoubleLine(i, bind.button.bindings[i])
-                            end
-                        end
-                        tip:Show()
-                        tip:SetScript("OnHide", nil)
-                    end)
-                else
-                    self.button.action = tonumber(b.action)
-                    self.button.name = b:GetName()
-                    if not self.button.name then
-                        return
-                    end
-
-                    if self.button.keyBoundTarget then
-                        self.button.bindstring = self.button.keyBoundTarget
-                    elseif not self.button.action or self.button.action < 1 or self.button.action > 180 then
-                        self.button.bindstring = "CLICK " .. self.button.name .. ":LeftButton"
-                    else
-                        local modact = 1 + (self.button.action - 1) % 12
-                        if self.button.name == "ExtraActionButton1" then
-                            self.button.bindstring = "EXTRAACTIONBUTTON1"
-                        elseif self.button.action < 13 or self.button.action > 72 then
-                            self.button.bindstring = "ACTIONBUTTON" .. modact
-                        elseif self.button.action < 73 and self.button.action > 60 then
-                            self.button.bindstring = "MULTIACTIONBAR1BUTTON" .. modact
-                        elseif self.button.action < 61 and self.button.action > 48 then
-                            self.button.bindstring = "MULTIACTIONBAR2BUTTON" .. modact
-                        elseif self.button.action < 49 and self.button.action > 36 then
-                            self.button.bindstring = "MULTIACTIONBAR4BUTTON" .. modact
-                        elseif self.button.action < 37 and self.button.action > 24 then
-                            self.button.bindstring = "MULTIACTIONBAR3BUTTON" .. modact
-                        elseif self.button.action < 25 and self.button.action > 12 then
-                            self.button.bindstring = "CLICK " .. self.button.name .. ":LeftButton"
-                        end
-                    end
-
-                    GameTooltip:AddLine(bind.button.name)
-                    GameTooltip:Show()
-                    bind.button.bindings = { GetBindingKey(bind.button.bindstring) }
-                    GameTooltip:SetScript("OnHide", function(tip)
-                        tip:SetOwner(bind, "ANCHOR_NONE")
-                        tip:SetPoint("BOTTOM", bind, "TOP", 0, 1)
-                        tip:AddLine(bind.button.name, 1, 1, 1)
-                        if #bind.button.bindings == 0 then
-                            tip:AddLine(L.ACTIONBAR_BINDING_NOBINDING or "No binding", 0.6, 0.6, 0.6)
-                        else
-                            tip:AddDoubleLine(L.ACTIONBAR_BINDING_BINDING or "Binding", L.ACTIONBAR_BINDING_KEY or "Key", 0.6, 0.6, 0.6, 0.6, 0.6, 0.6)
-                            for i = 1, #bind.button.bindings do
-                                tip:AddDoubleLine(i, bind.button.bindings[i])
-                            end
-                        end
-                        tip:Show()
-                        tip:SetScript("OnHide", nil)
-                    end)
-                end
-            end
-
-            function bind:Listener(key)
-                if GetBindingKey(key) == "OPENCHAT" then
-                    DEFAULT_CHAT_FRAME.editBox:Show()
-                    return
-                end
-                if GetBindingByKey(key) == "SCREENSHOT" then
-                    RunBinding("SCREENSHOT")
-                    return
-                end
-                if #self.button.bindings > 0 and oneBind then
-                    for i = 1, #self.button.bindings do
-                        SetBinding(self.button.bindings[i])
-                    end
-                    self:Update(self.button, self.spellmacro)
-                    if self.spellmacro ~= "MACRO" then
-                        GameTooltip:Hide()
-                    end
-                end
-                if key == "ESCAPE" or key == "RightButton" then
-                    for i = 1, #self.button.bindings do
-                        SetBinding(self.button.bindings[i])
-                    end
-                    print(string.format(L.ACTIONBAR_BINDING_ALLCLEAR or "Cleared bindings for %s", self.button.name))
-                    self:Update(self.button, self.spellmacro)
-                    if self.spellmacro ~= "MACRO" then
-                        GameTooltip:Hide()
-                    end
-                    return
-                end
-
-                if
-                    key == "LSHIFT"
-                    or key == "RSHIFT"
-                    or key == "LCTRL"
-                    or key == "RCTRL"
-                    or key == "LALT"
-                    or key == "RALT"
-                    or key == "UNKNOWN"
-                    or key == "LeftButton"
-                then
-                    return
-                end
-                if key == "MiddleButton" then
-                    key = "BUTTON3"
-                end
-                if key:find("Button%d") then
-                    key = key:upper()
-                end
-
-                local alt = IsAltKeyDown() and "ALT-" or ""
-                local ctrl = IsControlKeyDown() and "CTRL-" or ""
-                local shift = IsShiftKeyDown() and "SHIFT-" or ""
-
-                if not self.spellmacro or self.spellmacro == "PET" or self.spellmacro == "STANCE" then
-                    SetBinding(alt .. ctrl .. shift .. key, self.button.bindstring)
-                else
-                    SetBinding(alt .. ctrl .. shift .. key, self.spellmacro .. " " .. self.button.name)
-                end
-                print(string.format(L.ACTIONBAR_BINDING_BINDTO or "Bound %s to %s", alt .. ctrl .. shift .. key, self.button.name))
-                self:Update(self.button, self.spellmacro)
-                if self.spellmacro ~= "MACRO" then
-                    GameTooltip:Hide()
-                end
-            end
-
-            function bind:HideFrame()
-                self:ClearAllPoints()
-                self:Hide()
-                GameTooltip:Hide()
-            end
-
-            function bind:Activate()
-                self.enabled = true
-                self:RegisterEvent("PLAYER_REGEN_DISABLED")
-            end
-
-            function bind:Deactivate(save)
-                local which = GetCurrentBindingSet()
-                if save then
-                    SaveBindings(which)
-                    print("|cffffff00" .. (L.ACTIONBAR_BINDING_SAVE or "Bindings saved") .. "|r")
-                else
-                    LoadBindings(which)
-                    print("|cffffff00" .. (L.ACTIONBAR_BINDING_DISCARDED or "Bindings discarded") .. "|r")
-                end
-                self.enabled = false
-                self:HideFrame()
-                self:UnregisterEvent("PLAYER_REGEN_DISABLED")
-                StaticPopup_Hide("KEYBIND_MODE")
-            end
-
-            StaticPopupDialogs["KEYBIND_MODE"] = {
-                text = L.ACTIONBAR_BINDING_MODETEXT or "Hover over a button and press a key to bind it. Press ESC to clear.",
-                button1 = L.ACTIONBAR_BINDING_SAVEBTN or SAVE,
-                button2 = L.ACTIONBAR_BINDING_DISCARDEBTN or CANCEL,
-                OnAccept = function()
-                    bind:Deactivate(true)
-                end,
-                OnCancel = function()
-                    bind:Deactivate(false)
-                end,
-                timeout = 0,
-                whileDead = 1,
-                hideOnEscape = false,
-                preferredIndex = 5,
-            }
-
-            -- Register action buttons
-            for i = 1, 8 do
-                for j = 1, NUM_ACTIONBAR_BUTTONS do
-                    local b = _G["DarkUI_ActionBar" .. i .. "Button" .. j]
-                    if b then
-                        b:HookScript("OnEnter", function(self)
-                            bind:Update(self)
-                        end)
-                    end
-                end
-            end
-
-            for i = 1, NUM_STANCE_SLOTS do
-                local b = _G["StanceButton" .. i]
-                if b then
-                    b:HookScript("OnEnter", function(self)
-                        bind:Update(self, "STANCE")
-                    end)
-                end
-            end
-
-            for i = 1, NUM_PET_ACTION_SLOTS do
-                local b = _G["PetActionButton" .. i]
-                if b then
-                    b:HookScript("OnEnter", function(self)
-                        bind:Update(self, "PET")
-                    end)
-                end
-            end
-
-            if ExtraActionButton1 then
-                ExtraActionButton1:HookScript("OnEnter", function(self)
-                    bind:Update(self)
-                end)
-            end
-
-            local extraBtns = {
-                "DarkUIExtraButtons_MainLeftButton",
-                "DarkUIExtraButtons_MainRightButton",
-                "DarkUIExtraButtons_TopLeftButton",
-                "DarkUIExtraButtons_TopRightButton",
-            }
-            for _, name in next, extraBtns do
-                local b = _G[name]
-                if b then
-                    b:HookScript("OnEnter", function(self)
-                        bind:Update(self)
-                    end)
-                end
-            end
-
-            local function registermacro()
-                if not MacroFrame then
-                    return
-                end
-                hooksecurefunc(MacroFrame, "Update", function(frame)
-                    for _, button in next, { frame.MacroSelector.ScrollBox.ScrollTarget:GetChildren() } do
-                        if button and not button.hook then
-                            button:HookScript("OnEnter", function(self)
-                                bind:Update(self, "MACRO")
-                            end)
-                            button.hook = true
-                        end
-                    end
-                end)
-                MacroFrameTab1:HookScript("OnMouseUp", function()
-                    localmacros = 0
-                end)
-                MacroFrameTab2:HookScript("OnMouseUp", function()
-                    localmacros = 1
-                end)
-            end
-
-            local function registerspell()
-                if not PlayerSpellsFrame then
-                    return
-                end
-                hooksecurefunc(PlayerSpellsFrame.SpellBookFrame.PagedSpellsFrame, "DisplayViewsForCurrentPage", function(self)
-                    for _, frame in self:EnumerateFrames() do
-                        if frame.Button and not frame.Button.hook then
-                            frame.Button.id = frame.slotIndex
-                            frame.Button:HookScript("OnEnter", function(self)
-                                bind:Update(self, "SPELL")
-                            end)
-                            frame.Button.hook = true
-                        end
-                    end
-                end)
-            end
-
-            if not C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") or not C_AddOns.IsAddOnLoaded("Blizzard_PlayerSpells") then
-                local Load = CreateFrame("Frame")
-                Load:RegisterEvent("ADDON_LOADED")
-                Load:SetScript("OnEvent", function(self, _, addon)
-                    if addon == "Blizzard_MacroUI" then
-                        registermacro()
-                    elseif addon == "Blizzard_PlayerSpells" then
-                        registerspell()
-                    end
-                end)
-            end
-            if C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") then
-                registermacro()
-            end
-            if C_AddOns.IsAddOnLoaded("Blizzard_PlayerSpells") then
-                registerspell()
-            end
-
-            bind.loaded = 1
-        end
         if not bind.enabled then
-            bind:Activate()
-            StaticPopup_Show("KEYBIND_MODE")
+            module:Activate()
+            StaticPopup_Show("DARKUI_KEYBIND_MODE")
         end
     end
-
-    SLASH_MOUSEOVERBIND1 = "/hvb"
+    SLASH_DARKUI_KEYBIND1 = "/hvb"
 end

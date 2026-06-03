@@ -1,5 +1,9 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
+-- Style
+----------------------------------------------------------------------------------------
+
 local styles = {
     backdrop = {
         bgFile = C.media.texture.blank,
@@ -37,7 +41,7 @@ function E:ApplyBackdrop(frame, gradient)
     frame.styled = true
 end
 
-function E:SkinIcon(icon, t, parent)
+function E:StyleIcon(icon, t, parent)
     parent = parent or icon:GetParent()
 
     if t then
@@ -58,7 +62,7 @@ function E:CropIcon(icon)
     icon:SetInside()
 end
 
-function E:SkinCheckBox(frame)
+function E:StyleCheckBox(frame)
     local lvl = frame:GetFrameLevel()
 
     frame:SetNormalTexture("")
@@ -81,7 +85,7 @@ function E:SkinCheckBox(frame)
     frame.ch:SetVertexColor(E.myColor.r, E.myColor.g, E.myColor.b)
 end
 
-function E:SkinCharButton(f, point, text)
+function E:StyleCharButton(f, point, text)
     f:StripTextures()
     f:SetSize(18, 18)
     f:SetTemplate("Overlay")
@@ -113,28 +117,6 @@ function E:SkinCharButton(f, point, text)
         self:SetBackdropBorderColor(unpack(C.media.border_color))
         self.border:SetVertexColor(0.1, 0.1, 0.1, 1)
     end)
-end
-
-function E:SkinCloseButton(f, point)
-    if point then
-        f:SetPoint("TOPRIGHT", point, "TOPRIGHT", -2, -2)
-    end
-
-    if f.SetDisabledTexture then
-        f:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled")
-    end
-
-    if f.SetNormalTexture then
-        f:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
-    end
-
-    if f.SetPushedTexture then
-        f:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
-    end
-
-    if f.SetHighlightTexture then
-        f:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight", "ADD")
-    end
 end
 
 function E:ApplyOverlayBorder(f, margin)

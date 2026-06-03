@@ -13,13 +13,13 @@ local buttonList = {
     "PlayerSpellsMicroButton",
     "AchievementMicroButton",
     "QuestLogMicroButton",
+    "HousingMicroButton",
     "GuildMicroButton",
     "LFDMicroButton",
     "EJMicroButton",
     "CollectionsMicroButton",
     "StoreMicroButton",
     "MainMenuMicroButton",
-    "HelpMicroButton",
 }
 
 local num = #buttonList
@@ -81,5 +81,8 @@ function module:OnInit()
             MainMenuMicroButton.MainMenuBarPerformanceBar:Kill()
         end
         MainMenuMicroButton:SetScript("OnUpdate", nil)
+    end
+    if MicroMenu and MicroMenu.UpdateHelpTicketButtonAnchor then
+        MicroMenu.UpdateHelpTicketButtonAnchor = E.Dummy
     end
 end

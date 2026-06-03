@@ -228,7 +228,7 @@ function module:OnEnable()
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
         for i = 3, 8 do
-            Settings.SetValue("PROXY_SHOW_ACTIONBAR_" .. i - 1, C.actionbar.bars["bar" .. i].enable)
+            Settings.SetValue("PROXY_SHOW_ACTIONBAR_" .. (i - 1), C.actionbar.bars["bar" .. i].enable)
         end
 
         hooksecurefunc(SettingsPanel.Container.SettingsList.ScrollBox, "Update", function(frame)
