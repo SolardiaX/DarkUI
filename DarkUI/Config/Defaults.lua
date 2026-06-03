@@ -145,6 +145,9 @@ defaults.actionbar = {
         },
         cooldown = {
             enable = true,
+            minDuration = 2,
+            effect = "shine",
+            minEffectDuration = 30,
         },
         range = {
             enable = true,
