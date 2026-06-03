@@ -1,16 +1,12 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Core Function Methods
+-- Core Functions
 ----------------------------------------------------------------------------------------
 
 local format = string.format
 local tonumber = tonumber
 local modf = math.modf
-
-----------------------------------------------------------------------------------------
---  Time format functions
-----------------------------------------------------------------------------------------
 function E:FormatTime(seconds, raw)
     local d, h, m, str = 86400, 3600, 60, ""
     if seconds >= d then
@@ -34,9 +30,7 @@ function E:FormatTime(seconds, raw)
     return str
 end
 
-----------------------------------------------------------------------------------------
 -- Color Gradient
-----------------------------------------------------------------------------------------
 function E:ColorGradient(a, b, ...)
     local Percent
 
@@ -63,9 +57,7 @@ function E:ColorGradient(a, b, ...)
     return R1 + (R2 - R1) * RelPercent, G1 + (G2 - G1) * RelPercent, B1 + (B2 - B1) * RelPercent
 end
 
-----------------------------------------------------------------------------------------
 --  UTF functions
-----------------------------------------------------------------------------------------
 function E:UTF(string, i, dots)
     if not string then
         return
@@ -99,9 +91,7 @@ function E:UTF(string, i, dots)
     end
 end
 
-----------------------------------------------------------------------------------------
---    Number value function
-----------------------------------------------------------------------------------------
+-- Number value function
 function E:Round(number, decimals)
     if not decimals then
         decimals = 0
@@ -135,9 +125,7 @@ function E:ShortValue(value)
     end
 end
 
-----------------------------------------------------------------------------------------
---    RGB To Hex function
-----------------------------------------------------------------------------------------
+-- RGB To Hex function
 function E:RGBToHex(r, g, b, raw)
     if type(r) == "table" then
         if r.r then
@@ -152,9 +140,7 @@ function E:RGBToHex(r, g, b, raw)
     return format(raw and "%02x%02x%02x" or "|cff%02x%02x%02x", r * 255, g * 255, b * 255)
 end
 
-----------------------------------------------------------------------------------------
---    Chat channel check
-----------------------------------------------------------------------------------------
+-- Chat channel check
 function E:CheckChat(warning)
     if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
         return "INSTANCE_CHAT"
@@ -170,17 +156,13 @@ function E:CheckChat(warning)
     return "SAY"
 end
 
-----------------------------------------------------------------------------------------
---    Set Variable in game (delegates to Database system)
-----------------------------------------------------------------------------------------
+-- Set Variable in game (delegates to Database system)
 function E:SetVariable(group, key, value)
     local path = group .. "." .. key
     E.db:Set(path, value)
 end
 
-----------------------------------------------------------------------------------------
---    Global EasyMenu function
-----------------------------------------------------------------------------------------
+-- Global EasyMenu function
 local function EasyMenu_Initialize(frame, level, menuList)
     for index = 1, #menuList do
         local value = menuList[index]

@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Cooldown
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleCooldown")
 
 local GetTime = GetTime
@@ -16,9 +18,9 @@ local HALFDAYISH, HALFHOURISH, HALFMINUTEISH = DAY / 2 + 0.5, HOUR / 2 + 0.5, MI
 
 local cfg = C.actionbar.styles.cooldown
 
-module.hideNumbers = {}
-module.active = {}
-module.hooked = {}
+local hideNumbers = {}
+local active = {}
+local hooked = {}
 
 local function getTimeText(s)
     if s < MINUTEISH then
@@ -37,12 +39,12 @@ local function getTimeText(s)
     end
 end
 
-local function Timer_Stop(self)
+local function timerStop(self)
     self.enabled = nil
     self:Hide()
 end
 
-local function Timer_OnUpdate(self, elapsed)
+local function timerOnUpdate(self, elapsed)
     if self.nextUpdate > 0 then
         self.nextUpdate = self.nextUpdate - elapsed
     else
@@ -57,18 +59,18 @@ local function Timer_OnUpdate(self, elapsed)
                 self.text:SetFormattedText(formatStr, time)
                 self.nextUpdate = timeUntilNextUpdate
             else
-                Timer_Stop(self)
+                timerStop(self)
             end
         end
     end
 end
 
-local function Timer_ForceUpdate(self)
+local function timerForceUpdate(self)
     self.nextUpdate = 0
     self:Show()
 end
 
-local function Timer_OnSizeChanged(self, width)
+local function timerOnSizeChanged(self, width)
     local fontScale = round(width) / ICON_SIZE
     if fontScale == self.fontScale then
         return
@@ -82,28 +84,28 @@ local function Timer_OnSizeChanged(self, width)
         self.text:SetShadowColor(0, 0, 0, 0.8)
         self.text:SetShadowOffset(1, -1)
         if self.enabled then
-            Timer_ForceUpdate(self)
+            timerForceUpdate(self)
         end
     end
 end
 
-local function Timer_Create(cooldown)
+local function timerCreate(cooldown)
     local scaler = CreateFrame("Frame", nil, cooldown)
     scaler:SetAllPoints(cooldown)
 
     local timer = CreateFrame("Frame", nil, scaler)
     timer:Hide()
     timer:SetAllPoints(scaler)
-    timer:SetScript("OnUpdate", Timer_OnUpdate)
+    timer:SetScript("OnUpdate", timerOnUpdate)
 
     local text = timer:CreateFontString(nil, "OVERLAY")
     text:SetPoint("CENTER", 0, 0)
     text:SetFont(cfg.fontFace, cfg.fontSize, "OUTLINE")
     timer.text = text
 
-    Timer_OnSizeChanged(timer, scaler:GetSize())
+    timerOnSizeChanged(timer, scaler:GetSize())
     scaler:SetScript("OnSizeChanged", function(_, ...)
-        Timer_OnSizeChanged(timer, ...)
+        timerOnSizeChanged(timer, ...)
     end)
 
     cooldown.timer = timer
@@ -118,21 +120,21 @@ end
 local function deactivateDisplay(cooldown)
     local timer = cooldown.timer
     if timer then
-        Timer_Stop(timer)
+        timerStop(timer)
     end
 end
 
 local function setHideCooldownNumbers(cooldown, hide)
     if hide then
-        module.hideNumbers[cooldown] = true
+        hideNumbers[cooldown] = true
         deactivateDisplay(cooldown)
     else
-        module.hideNumbers[cooldown] = nil
+        hideNumbers[cooldown] = nil
     end
 end
 
 local function onCooldown(cooldown, start, duration, modRate)
-    if cooldown:IsForbidden() or cooldown.noCooldownCount or module.hideNumbers[cooldown] then
+    if cooldown:IsForbidden() or cooldown.noCooldownCount or hideNumbers[cooldown] then
         return
     end
 
@@ -147,7 +149,7 @@ local function onCooldown(cooldown, start, duration, modRate)
         cooldown:SetDrawSwipe(cfg.drawSwipe)
         cooldown:SetDrawEdge(cfg.drawEdge)
 
-        local timer = cooldown.timer or Timer_Create(cooldown)
+        local timer = cooldown.timer or timerCreate(cooldown)
         timer.start = start
         timer.duration = duration
         timer.modRate = modRate
@@ -158,7 +160,7 @@ local function onCooldown(cooldown, start, duration, modRate)
         local charge = parent and parent.chargeCooldown
         local chargeTimer = charge and charge.timer
         if chargeTimer and chargeTimer ~= timer then
-            Timer_Stop(chargeTimer)
+            timerStop(chargeTimer)
         end
 
         if timer.fontScale >= cfg.minScale then
@@ -167,7 +169,7 @@ local function onCooldown(cooldown, start, duration, modRate)
     else
         local timer = cooldown.timer
         if timer then
-            Timer_Stop(timer)
+            timerStop(timer)
         end
     end
 end

@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Core Mover Methods
+-- Mover
 ----------------------------------------------------------------------------------------
 local string_format, math_abs = string.format, math.abs
 
@@ -82,7 +82,6 @@ local getPosition = function(frame)
 end
 
 -- Anchor Template
---------------------------------------
 local Anchor = {}
 
 -- Constructor
@@ -174,7 +173,6 @@ Anchor.UpdateHint = function(self)
 end
 
 -- Anchor Script Handlers
---------------------------------------
 Anchor.OnDragStart = function(self, button)
     self:StartMoving()
     self:SetUserPlaced(false)

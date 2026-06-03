@@ -1,7 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---  Core API Methods
+-- Core API
 ----------------------------------------------------------------------------------------
 E.UIScale = function()
     -- if C.general.autoScale then
@@ -33,30 +33,22 @@ end
 
 local Mult = E.mult
 
-----------------------------------------------------------------------------------------
 --  Dummy object
-----------------------------------------------------------------------------------------
 E.Dummy = function()
     return
 end
 
-----------------------------------------------------------------------------------------
---    Frame Hider
-----------------------------------------------------------------------------------------
+-- Frame Hider
 E.FrameHider = CreateFrame("Frame")
 E.FrameHider:Hide()
 
-----------------------------------------------------------------------------------------
---    Pet Battle Hider
-----------------------------------------------------------------------------------------
+-- Pet Battle Hider
 E.PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
 E.PetBattleFrameHider:SetAllPoints()
 E.PetBattleFrameHider:SetFrameStrata("LOW")
 RegisterStateDriver(E.PetBattleFrameHider, "visibility", "[petbattle] hide; show")
 
-----------------------------------------------------------------------------------------
 --  Kill object function
-----------------------------------------------------------------------------------------
 
 local kill = function(object)
     if object.UnregisterAllEvents then
@@ -68,9 +60,7 @@ local kill = function(object)
     object:Hide()
 end
 
-----------------------------------------------------------------------------------------
 --  Core API function
-----------------------------------------------------------------------------------------
 local stripTexturesBlizzFrames = {
     "Inset",
     "inset",
@@ -386,9 +376,7 @@ local function fadeOut(f)
     E:UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
 end
 
-----------------------------------------------------------------------------------------
 --  Apply API to base metatables (no EnumerateFrames needed)
-----------------------------------------------------------------------------------------
 local function addapi(object)
     local mt = getmetatable(object).__index
     if mt._darkui then
@@ -442,7 +430,22 @@ addapi(frame:CreateTexture())
 addapi(frame:CreateFontString())
 addapi(frame:CreateMaskTexture())
 
+local button = CreateFrame("Button")
+if getmetatable(button).__index ~= getmetatable(frame).__index then
+    addapi(button)
+end
+
+local checkButton = CreateFrame("CheckButton")
+if getmetatable(checkButton).__index ~= getmetatable(frame).__index then
+    addapi(checkButton)
+end
+
 local statusBar = CreateFrame("StatusBar")
 if getmetatable(statusBar).__index ~= getmetatable(frame).__index then
     addapi(statusBar)
+end
+
+local cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
+if getmetatable(cooldown).__index ~= getmetatable(frame).__index then
+    addapi(cooldown)
 end

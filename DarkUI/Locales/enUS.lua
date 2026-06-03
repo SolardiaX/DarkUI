@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
--- if E.locale ~= "enUS" then return end
+----------------------------------------------------------------------------------------
+-- enUS (base locale)
+----------------------------------------------------------------------------------------
 
 L.WELCOME_LINE = "Welcome to DarkUI "
 L.POPUP_INSTALLUI = "You are the first time to use DarkUI. Require RELOAD UI to complete setup."

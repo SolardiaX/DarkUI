@@ -161,9 +161,7 @@ function E:ApplyOverlayBorder(f, margin)
     f:CreateShadow()
 end
 
-----------------------------------------------------------------------------------------
 -- Sample Button Style Methods
-----------------------------------------------------------------------------------------
 local setModifiedBackdrop = function(self)
     if self:IsEnabled() then
         self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
@@ -250,9 +248,7 @@ function E:StyleTextButton(f, strip)
     f:HookScript("OnLeave", setOriginalBackdrop)
 end
 
-----------------------------------------------------------------------------------------
 --  Normal Button Style Methods
-----------------------------------------------------------------------------------------
 function E:StyleButton(button, margin)
     local overlay = button:CreateTexture(nil, "OVERLAY")
     overlay:SetOutside(button, margin, margin)
@@ -293,9 +289,7 @@ function E:StyleButton(button, margin)
     end
 end
 
-----------------------------------------------------------------------------------------
 --  ActionButton Style Methods
-----------------------------------------------------------------------------------------
 local hooksecurefunc = hooksecurefunc
 local unpack, pairs, gsub = unpack, pairs, gsub
 local RANGE_INDICATOR = RANGE_INDICATOR

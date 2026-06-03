@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- ActionButton Helper Library
+----------------------------------------------------------------------------------------
 local MAJOR, MINOR = "DarkUI-ActionButton", 1
 local actionButton = LibStub:NewLibrary(MAJOR, MINOR)
 
@@ -55,7 +57,7 @@ function actionButton:ReassignBindings(headers)
     end
 
     for _, bar in next, headers do
-        if bar then
+        if bar and bar.buttons then
             for _, button in next, bar.buttons do
                 for _, key in next, { GetBindingKey(button.keyBoundTarget) } do
                     if key and key ~= "" then

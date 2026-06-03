@@ -1,17 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
---[[
-    DarkUI Slash Commands:
-    /rl     - reload ui
-    /rc     - raid ready check
-    /gm     - call gm help
-    --
-    /frame  - get frame info on mouse hover or with global name
-    /align  - toggle align grid on WorldFrame
-]]
-
 ----------------------------------------------------------------------------------------
---    Core SlashCMD Methods
+-- Slash Commands
 ----------------------------------------------------------------------------------------
 SlashCmdList["RELOADUI"] = function()
     ReloadUI()
@@ -28,9 +18,7 @@ SlashCmdList["TICKET"] = function()
 end
 SLASH_TICKET1 = "/gm"
 
-----------------------------------------------------------------------------------------
 -- Align by Akeru @wowinterface
-----------------------------------------------------------------------------------------
 
 local grid
 local boxSize = 32
@@ -117,9 +105,7 @@ SlashCmdList["TOGGLEGRID"] = function(arg)
     end
 end
 
-----------------------------------------------------------------------------------------
 --  Command to show frame you currently have mouseovered
-----------------------------------------------------------------------------------------
 SlashCmdList["FRAME"] = function(arg)
     if arg ~= "" then
         arg = _G[arg]

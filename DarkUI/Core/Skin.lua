@@ -1,12 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Skin Engine
---    Provides unified methods to reskin Blizzard frames into dark style,
---    and a Theme registry to hook on-demand loaded addons.
---
---    All colors come from C.media — single source of truth.
---    All visual methods use Core/API.lua's injected frame methods.
+-- Skin Engine
 ----------------------------------------------------------------------------------------
 
 local _G = _G
@@ -16,10 +11,6 @@ local CreateFrame = CreateFrame
 local unpack = unpack
 
 local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
-
-----------------------------------------------------------------------------------------
---    Theme Registry
-----------------------------------------------------------------------------------------
 
 local themes = {} -- ["Blizzard_AchievementUI"] = func
 local skinQueue = {} -- skins waiting for ADDON_LOADED
@@ -55,9 +46,7 @@ end
 
 E.Event:Register("ADDON_LOADED", onAddonLoaded, E)
 
-----------------------------------------------------------------------------------------
---    Skin Utilities (internal)
-----------------------------------------------------------------------------------------
+-- Skin Utilities (internal)
 
 local function setModifiedBackdrop(self)
     if self:IsEnabled() then
@@ -69,10 +58,8 @@ local function setOriginalBackdrop(self)
     self:SetBackdropBorderColor(unpack(C.media.border_color))
 end
 
-----------------------------------------------------------------------------------------
---    E:Skin(frame) — Generic frame skin
---    Strips textures, applies dark backdrop + shadow
-----------------------------------------------------------------------------------------
+-- E:Skin(frame) — Generic frame skin
+-- Strips textures, applies dark backdrop + shadow
 
 function E:Skin(frame)
     if not frame or frame.__skinned then
@@ -89,10 +76,8 @@ function E:Skin(frame)
     frame.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinButton(button) — Button skin
---    Strips textures, dark overlay backdrop, hover highlight with class color
-----------------------------------------------------------------------------------------
+-- E:SkinButton(button) — Button skin
+-- Strips textures, dark overlay backdrop, hover highlight with class color
 
 function E:SkinButton(button)
     if not button or button.__skinned then
@@ -135,9 +120,7 @@ function E:SkinButton(button)
     button.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinCloseButton(button) — Close button (X)
-----------------------------------------------------------------------------------------
+-- E:SkinCloseButton(button) — Close button (X)
 
 function E:SkinCloseButton(button, anchor)
     if not button or button.__skinned then
@@ -164,9 +147,7 @@ function E:SkinCloseButton(button, anchor)
     button.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinTab(tab) — Tab button
-----------------------------------------------------------------------------------------
+-- E:SkinTab(tab) — Tab button
 
 function E:SkinTab(tab)
     if not tab or tab.__skinned then
@@ -194,9 +175,7 @@ function E:SkinTab(tab)
     tab.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinScrollBar(scrollBar) — Scrollbar
-----------------------------------------------------------------------------------------
+-- E:SkinScrollBar(scrollBar) — Scrollbar
 
 function E:SkinScrollBar(scrollBar)
     if not scrollBar or scrollBar.__skinned then
@@ -218,9 +197,7 @@ function E:SkinScrollBar(scrollBar)
     scrollBar.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinEditBox(editbox) — Input field
-----------------------------------------------------------------------------------------
+-- E:SkinEditBox(editbox) — Input field
 
 function E:SkinEditBox(editbox)
     if not editbox or editbox.__skinned then
@@ -236,9 +213,7 @@ function E:SkinEditBox(editbox)
     editbox.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinSlider(slider) — Slider control
-----------------------------------------------------------------------------------------
+-- E:SkinSlider(slider) — Slider control
 
 function E:SkinSlider(slider)
     if not slider or slider.__skinned then
@@ -261,9 +236,7 @@ function E:SkinSlider(slider)
     slider.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinDropDown(dropdown) — Dropdown menu
-----------------------------------------------------------------------------------------
+-- E:SkinDropDown(dropdown) — Dropdown menu
 
 function E:SkinDropDown(dropdown)
     if not dropdown or dropdown.__skinned then
@@ -287,9 +260,7 @@ function E:SkinDropDown(dropdown)
     dropdown.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinStatusBar(bar) — Status/progress bar
-----------------------------------------------------------------------------------------
+-- E:SkinStatusBar(bar) — Status/progress bar
 
 function E:SkinStatusBar(bar)
     if not bar or bar.__skinned then
@@ -310,10 +281,8 @@ function E:SkinStatusBar(bar)
     bar.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinPortrait(frame) — Portrait frame (character panel style)
---    Strips portrait decorations, applies standard frame skin
-----------------------------------------------------------------------------------------
+-- E:SkinPortrait(frame) — Portrait frame (character panel style)
+-- Strips portrait decorations, applies standard frame skin
 
 function E:SkinPortrait(frame)
     if not frame or frame.__skinned then
@@ -340,16 +309,12 @@ function E:SkinPortrait(frame)
     frame.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinCheckBox(checkbox) — Already exists in Style.lua, re-export for consistency
---    (see Core/Style.lua E:SkinCheckBox)
-----------------------------------------------------------------------------------------
+-- E:SkinCheckBox(checkbox) — Already exists in Style.lua, re-export for consistency
+-- (see Core/Style.lua E:SkinCheckBox)
 
 -- E:SkinCheckBox is already defined in Style.lua, no need to redefine here
 
-----------------------------------------------------------------------------------------
---    E:SkinNavBar(navBar) — Navigation breadcrumb bar
-----------------------------------------------------------------------------------------
+-- E:SkinNavBar(navBar) — Navigation breadcrumb bar
 
 function E:SkinNavBar(navBar)
     if not navBar or navBar.__skinned then
@@ -370,9 +335,7 @@ function E:SkinNavBar(navBar)
     navBar.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinTrimScrollBar(scrollBar) — New-style TrimScrollBar (12.0+)
-----------------------------------------------------------------------------------------
+-- E:SkinTrimScrollBar(scrollBar) — New-style TrimScrollBar (12.0+)
 
 function E:SkinTrimScrollBar(scrollBar)
     if not scrollBar or scrollBar.__skinned then
@@ -402,9 +365,7 @@ function E:SkinTrimScrollBar(scrollBar)
     scrollBar.__skinned = true
 end
 
-----------------------------------------------------------------------------------------
---    E:SkinInsetFrame(frame) — Inset panels within larger frames
-----------------------------------------------------------------------------------------
+-- E:SkinInsetFrame(frame) — Inset panels within larger frames
 
 function E:SkinInsetFrame(frame)
     if not frame or frame.__skinned then

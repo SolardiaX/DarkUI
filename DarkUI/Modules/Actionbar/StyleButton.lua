@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Button Style
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleButton")
 local LAB = LibStub("LibActionButton-1.0")
 

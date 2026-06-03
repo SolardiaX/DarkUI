@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- ActionBar
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar")
 module:SetSecure()
 module:SetConfigKey("actionbar.bars")
@@ -19,7 +21,7 @@ local scripts = {
 }
 
 local framesToHide = {
-    MainMenuBar,
+    MainActionBar,
     MultiBarBottomLeft,
     MultiBarBottomRight,
     MultiBarLeft,
@@ -30,10 +32,11 @@ local framesToHide = {
     OverrideActionBar,
     PossessActionBar,
     PetActionBar,
+    StanceBar,
 }
 
 local framesToDisable = {
-    MainMenuBar,
+    MainActionBar,
     MultiBarBottomLeft,
     MultiBarBottomRight,
     MultiBarLeft,
@@ -43,8 +46,10 @@ local framesToDisable = {
     MultiBar7,
     PossessActionBar,
     PetActionBar,
+    StanceBar,
     MicroButtonAndBagsBar,
     StatusTrackingBarManager,
+    MainMenuBarVehicleLeaveButton,
     OverrideActionBar,
     OverrideActionBarExpBar,
     OverrideActionBarHealthBar,
@@ -77,10 +82,6 @@ local function buttonEventsRegisterFrame(self, added)
 end
 
 local function disableDefaultBarEvents()
-    MainMenuBar.SetPositionForStatusBars = E.Dummy
-    MultiActionBar_HideAllGrids = E.Dummy
-    MultiActionBar_ShowAllGrids = E.Dummy
-
     ActionBarController:UnregisterAllEvents()
     ActionBarController:RegisterEvent("SETTINGS_LOADED")
     ActionBarController:RegisterEvent("UPDATE_EXTRA_ACTIONBAR")
@@ -89,35 +90,28 @@ local function disableDefaultBarEvents()
     ActionBarButtonEventsFrame:UnregisterAllEvents()
     ActionBarButtonEventsFrame:RegisterEvent("ACTIONBAR_SLOT_CHANGED")
     ActionBarButtonEventsFrame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
-
     hooksecurefunc(ActionBarButtonEventsFrame, "RegisterFrame", buttonEventsRegisterFrame)
     buttonEventsRegisterFrame(ActionBarButtonEventsFrame)
 
-    SettingsPanel.TransitionBackOpeningPanel = HideUIPanel
+    MultiActionBar_ShowAllGrids = E.Dummy
 end
 
 function module:OnInit()
     for _, frame in next, framesToHide do
-        if frame then
-            frame:SetParent(E.FrameHider)
-        end
+        frame:SetParent(E.FrameHider)
     end
 
     for _, frame in next, framesToDisable do
-        if frame then
-            frame:UnregisterAllEvents()
-            disableAllScripts(frame)
-        end
+        frame:UnregisterAllEvents()
+        disableAllScripts(frame)
     end
 
     disableDefaultBarEvents()
 
     MainMenuBarVehicleLeaveButton:RegisterEvent("PLAYER_ENTERING_WORLD")
 
-    if StatusTrackingBarManager then
-        StatusTrackingBarManager:UnregisterAllEvents()
-        StatusTrackingBarManager:Hide()
-    end
+    StatusTrackingBarManager:UnregisterAllEvents()
+    StatusTrackingBarManager:Hide()
 end
 
 function module:OnEnable()

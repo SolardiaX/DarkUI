@@ -1,11 +1,11 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- ActionBars
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("Bars")
 local actionButton = LibStub("DarkUI-ActionButton")
 local LAB = LibStub("LibActionButton-1.0")
-
-local C_PetBattles_IsInBattle = C_PetBattles.IsInBattle
 
 local num = NUM_ACTIONBAR_BUTTONS
 
@@ -201,7 +201,7 @@ function module:OnInit()
 end
 
 function module:OnEnable()
-    if C_PetBattles_IsInBattle() then
+    if C_PetBattles.IsInBattle() then
         actionButton:ClearBindings(self.bars)
     else
         actionButton:ReassignBindings(self.bars)

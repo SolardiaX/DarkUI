@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- StanceBar
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("BarStance")
 
 local cfg = C.actionbar.bars.barstance

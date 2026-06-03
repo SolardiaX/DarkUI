@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- PetActionBar
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("BarPet")
 
 local cfg = C.actionbar.bars.barpet

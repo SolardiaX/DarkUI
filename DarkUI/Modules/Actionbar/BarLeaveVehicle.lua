@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Leave Vehicle
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("LeaveVehicle")
 
 local cfg = C.actionbar.bars.leave_vehicle

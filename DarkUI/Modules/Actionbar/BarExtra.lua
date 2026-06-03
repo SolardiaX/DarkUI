@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- ExtraActionBar
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("BarExtra")
 
 local cfg = C.actionbar.bars.barextra

@@ -1,12 +1,11 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    WoW 12.0 Compatibility Layer
---    Provides polyfills for removed globals and Secret Values utilities.
+-- WoW 12.0 Compatibility Layer
 ----------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------
---    Secret Values
+-- Secret Values
 ----------------------------------------------------------------------------------------
 
 function E:IsSecret(value)
@@ -24,7 +23,7 @@ function E:SafeValue(value, fallback)
 end
 
 ----------------------------------------------------------------------------------------
---    Polyfills for removed globals (only those used by DarkUI modules)
+-- Polyfills
 ----------------------------------------------------------------------------------------
 
 -- GetVehicleBarIndex → C_ActionBar.GetVehicleBarIndex

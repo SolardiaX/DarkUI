@@ -1,9 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Database System
---    Dual-layer config: read-only defaults + user overrides (global or per-char).
---    The C table is rebuilt as a proxy on Initialize for backward-compatible reads.
+-- Database System
 ----------------------------------------------------------------------------------------
 
 local Database = {}
@@ -15,10 +13,6 @@ local overrides = {}
 local wipe = wipe
 local type, pairs, tonumber = type, pairs, tonumber
 local format = string.format
-
-----------------------------------------------------------------------------------------
---    Internal Utilities
-----------------------------------------------------------------------------------------
 
 local function deepCopy(src)
     if type(src) ~= "table" then
@@ -97,7 +91,7 @@ local function cleanEmpty(root, path)
 end
 
 ----------------------------------------------------------------------------------------
---    Public API
+-- Public API
 ----------------------------------------------------------------------------------------
 
 function Database:RegisterDefaults(tbl)
@@ -193,7 +187,7 @@ function Database:IsGlobal()
 end
 
 ----------------------------------------------------------------------------------------
---    Build the C proxy table (backward compat: modules read C.module.key)
+-- Proxy Builder
 ----------------------------------------------------------------------------------------
 
 function Database:BuildProxy()
@@ -216,7 +210,7 @@ function Database:BuildProxy()
 end
 
 ----------------------------------------------------------------------------------------
---    Initialization (called from bootstrap on ADDON_LOADED)
+-- Initialization
 ----------------------------------------------------------------------------------------
 
 function Database:Initialize()
@@ -241,4 +235,10 @@ function Database:Initialize()
 
     -- Build C table for module reads
     self:BuildProxy()
+end
+
+-- Early init: populate C with defaults so subsequent file loads can read config
+if E.defaults then
+    Database:RegisterDefaults(E.defaults)
+    Database:BuildProxy()
 end

@@ -1,8 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Central Event Dispatcher
---    Single frame handles all events; modules register/unregister through this system.
+-- Central Event Dispatcher
 ----------------------------------------------------------------------------------------
 
 local Event = {}

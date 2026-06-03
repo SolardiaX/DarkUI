@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Background Art for Actionbars
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("Texture")
 
 local function getMedia()

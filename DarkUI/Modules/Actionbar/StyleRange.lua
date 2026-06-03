@@ -1,12 +1,12 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Out of Range
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleRange")
 local LAB = LibStub("LibActionButton-1.0")
 
 local cfg = C.actionbar.styles.range
-
-module.flashAnimations = {}
 
 local function getPetActionButtonState(button)
     local slot = button:GetID() or 0
@@ -77,7 +77,7 @@ local function getActionButtonState(button)
     return "normal"
 end
 
-local function alpha_OnFinished(self)
+local function alphaOnFinished(self)
     local owner = self.owner
     if owner.flashing ~= 1 then
         module:StopButtonFlashing(owner)
@@ -95,7 +95,7 @@ function module:StartButtonFlashing(button)
         alpha:SetDuration(cfg.flashDuration)
         alpha:SetFromAlpha(0)
         alpha:SetToAlpha(1)
-        alpha:SetScript("OnFinished", alpha_OnFinished)
+        alpha:SetScript("OnFinished", alphaOnFinished)
         alpha.owner = button
 
         self.flashAnimations[button] = animation
@@ -146,6 +146,8 @@ function module:UpdatePetActionButtonStates()
 end
 
 function module:OnEnable()
+    self.flashAnimations = {}
+
     local function registerCallback(header)
         if not header then
             return

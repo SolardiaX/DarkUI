@@ -1,11 +1,6 @@
---[[
-    DarkUI Engine
-    Usage in any file:
-        local E, C, L = select(2, ...):unpack()
-
-    Usage from another addon:
-        local E, C, L = unpack(DarkUI)
-]]
+----------------------------------------------------------------------------------------
+-- DarkUI Engine
+----------------------------------------------------------------------------------------
 
 local addonName, ns = ...
 
@@ -36,8 +31,7 @@ end
 _G[addonName] = ns
 
 ----------------------------------------------------------------------------------------
---    Bootstrap: Database init + Module lifecycle
---    Fires after all files are loaded via TOC order
+-- Bootstrap
 ----------------------------------------------------------------------------------------
 
 local bootstrap = CreateFrame("Frame")

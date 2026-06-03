@@ -1,19 +1,13 @@
 local E, C, L = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
---    Module System
---    Provides lifecycle management (OnInit/OnEnable/OnDisable), combat-guarded
---    Enable/Disable, and automatic event cleanup via the central Event dispatcher.
+-- Module System
 ----------------------------------------------------------------------------------------
 
 local modules = {}
 local moduleOrder = {}
 local InCombatLockdown = InCombatLockdown
 local ipairs, pairs, type = ipairs, pairs, type
-
-----------------------------------------------------------------------------------------
---    Module Factory
-----------------------------------------------------------------------------------------
 
 function E:Module(name)
     if modules[name] then
@@ -198,8 +192,7 @@ function E:IterateModules()
 end
 
 ----------------------------------------------------------------------------------------
---    Bootstrap (replaces old Loader module)
---    Called from Init.lua via event registration
+-- Bootstrap
 ----------------------------------------------------------------------------------------
 
 function E:InitializeModules()

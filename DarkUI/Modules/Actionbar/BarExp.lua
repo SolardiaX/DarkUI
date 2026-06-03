@@ -1,27 +1,15 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- Exp/Rep Bar
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("ExpRep")
 
-local C_GossipInfo_GetFriendshipReputation = C_GossipInfo.GetFriendshipReputation
-local C_GossipInfo_GetFriendshipReputationRanks = C_GossipInfo.GetFriendshipReputationRanks
-local C_Reputation_GetWatchedFactionData = C_Reputation.GetWatchedFactionData
-local C_Reputation_IsFactionParagon = C_Reputation.IsFactionParagon
-local C_Reputation_IsMajorFaction = C_Reputation.IsMajorFaction
-local C_Reputation_GetFactionParagonInfo = C_Reputation.GetFactionParagonInfo
-local GetNumFactions = C_Reputation.GetNumFactions
-local GetFactionInfo = C_Reputation.GetFactionDataByIndex
-local IsFactionActive = C_Reputation.IsFactionActive
-local SetWatchedFactionIndex = C_Reputation.SetWatchedFactionByIndex
-
 local gsub, smatch = string.gsub, string.match
-local math_min, floor, mod = math.min, math.floor, mod
+local floor = math.floor
 
 local cfg = C.actionbar.bars.exp
 
-------------------------------------------------------
--- Auto Rep Switch
-------------------------------------------------------
 local faction_standing_msg = {
     gsub(FACTION_STANDING_INCREASED, "%%s", "(.+)"),
     gsub(FACTION_STANDING_INCREASED_GENERIC, "%%s", "(.+)"),
@@ -32,22 +20,22 @@ local faction_standing_msg = {
     gsub(FACTION_STANDING_INCREASED_DOUBLE_BONUS, "%%s", "(.+)"),
 }
 
-local function switcher_SetFactionIndexByName(faction_name)
+local function switcherSetFactionByName(faction_name)
     if faction_name == "Guild" then
         faction_name = GetGuildInfo("player")
     end
 
-    for i = 1, GetNumFactions() do
-        local factionInfo = GetFactionInfo(i)
+    for i = 1, C_Reputation.GetNumFactions() do
+        local factionInfo = C_Reputation.GetFactionDataByIndex(i)
         if factionInfo and factionInfo.name == faction_name then
-            if IsFactionActive(i) then
-                SetWatchedFactionIndex(i)
+            if C_Reputation.IsFactionActive(i) then
+                C_Reputation.SetWatchedFactionByIndex(i)
             end
         end
     end
 end
 
-local function switcher_OnEvent(_, event, ...)
+local function switcherOnEvent(_, event, ...)
     if cfg.autoswitch ~= true then
         return
     end
@@ -61,7 +49,7 @@ local function switcher_OnEvent(_, event, ...)
             i = i + 1
         end
         if faction_name ~= nil then
-            switcher_SetFactionIndexByName(faction_name)
+            switcherSetFactionByName(faction_name)
         end
     end
 end
@@ -74,9 +62,9 @@ local function updateBar(statusbar, isrep)
         statusbar:SetMinMaxValues(0, barMax)
         statusbar:SetValue(barMin)
         statusbar.rest:SetMinMaxValues(0, barMax)
-        statusbar.rest:SetValue(math_min(barMin + exhaustion, barMax))
+        statusbar.rest:SetValue(math.min(barMin + exhaustion, barMax))
     else
-        local factionData = C_Reputation_GetWatchedFactionData()
+        local factionData = C_Reputation.GetWatchedFactionData()
         if not factionData then
             statusbar:Hide()
             return
@@ -88,19 +76,19 @@ local function updateBar(statusbar, isrep)
         local value = factionData.currentStanding
         local factionID = factionData.factionID
 
-        if factionID and C_Reputation_IsMajorFaction(factionID) then
+        if factionID and C_Reputation.IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             value = majorFactionData.renownReputationEarned or 0
             barMin, barMax = 0, majorFactionData.renownLevelThreshold
         else
-            local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
+            local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
             local friendID, friendRep, friendThreshold, nextFriendThreshold
             if repInfo then
                 friendID, friendRep, friendThreshold, nextFriendThreshold =
                     repInfo.friendshipFactionID, repInfo.standing, repInfo.reactionThreshold, repInfo.nextThreshold
             end
-            if C_Reputation_IsFactionParagon(factionID) then
-                local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+            if C_Reputation.IsFactionParagon(factionID) then
+                local currentValue, threshold = C_Reputation.GetFactionParagonInfo(factionID)
                 currentValue = mod(currentValue, threshold)
                 barMin, barMax, value = 0, threshold, currentValue
             elseif friendID and friendID ~= 0 then
@@ -124,7 +112,7 @@ local function updateBar(statusbar, isrep)
     end
 end
 
-local function bar_showXP(statusbar)
+local function barShowXP(statusbar)
     statusbar:Show()
     statusbar:SetStatusBarColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.85)
     statusbar.background:SetVertexColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.3)
@@ -132,48 +120,47 @@ local function bar_showXP(statusbar)
     updateBar(statusbar)
 end
 
-local function bar_showRep(statusbar)
+local function barShowRep(statusbar)
     statusbar:Show()
     statusbar.rest:Hide()
     updateBar(statusbar, true)
 end
 
-local function bar_OnEvent(self, event, arg1)
+local function barOnEvent(self, event, arg1, arg2)
     if event == "PLAYER_ENTERING_WORLD" then
         if IsPlayerAtEffectiveMaxLevel() then
-            bar_showRep(self)
+            barShowRep(self)
         else
-            bar_showXP(self)
+            barShowXP(self)
         end
     elseif event == "PLAYER_XP_UPDATE" and arg1 == "player" then
         updateBar(self)
     elseif event == "PLAYER_LEVEL_UP" then
         if IsPlayerAtEffectiveMaxLevel() then
-            bar_showRep(self)
+            barShowRep(self)
         else
-            bar_showXP(self)
+            barShowXP(self)
         end
     elseif event == "MODIFIER_STATE_CHANGED" then
         if arg1 == "LCTRL" or arg1 == "RCTRL" then
-            local arg2 = select(2, ...)
             if arg2 == 1 then
-                bar_showRep(self)
+                barShowRep(self)
             elseif not IsPlayerAtEffectiveMaxLevel() then
-                bar_showXP(self)
+                barShowXP(self)
             end
         end
     elseif event == "UPDATE_FACTION" then
         if IsPlayerAtEffectiveMaxLevel() then
-            bar_showRep(self)
+            barShowRep(self)
         end
     end
 end
 
-local function bar_OnEnter()
+local function barOnEnter()
     local mxp = UnitXPMax("player")
     local xp = UnitXP("player")
     local rxp = GetXPExhaustion()
-    local factionData = C_Reputation_GetWatchedFactionData()
+    local factionData = C_Reputation.GetWatchedFactionData()
     local withXp = false
 
     GameTooltip:SetOwner(UIParent, "ANCHOR_CURSOR")
@@ -223,7 +210,7 @@ local function bar_OnEnter()
         local factionID = factionData.factionID
 
         local standingtext
-        if factionID and C_Reputation_IsMajorFaction(factionID) then
+        if factionID and C_Reputation.IsMajorFaction(factionID) then
             local majorFactionData = C_MajorFactions.GetMajorFactionData(factionID)
             name = majorFactionData.name
             standingtext = format(RENOWN_LEVEL_LABEL, majorFactionData.renownLevel)
@@ -236,7 +223,7 @@ local function bar_OnEnter()
                 barMin, barMax = 0, majorFactionData.renownLevelThreshold
             end
         else
-            local repInfo = C_GossipInfo_GetFriendshipReputation(factionID)
+            local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
             local friendID, friendRep, friendThreshold, nextFriendThreshold, friendTextLevel
             if repInfo then
                 friendID = repInfo.friendshipFactionID
@@ -245,7 +232,7 @@ local function bar_OnEnter()
                 nextFriendThreshold = repInfo.nextThreshold
                 friendTextLevel = repInfo.text
             end
-            local repRankInfo = C_GossipInfo_GetFriendshipReputationRanks(factionID)
+            local repRankInfo = C_GossipInfo.GetFriendshipReputationRanks(factionID)
             local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
             if friendID and friendID ~= 0 then
                 if maxRank > 0 then
@@ -296,8 +283,8 @@ local function bar_OnEnter()
             1
         )
 
-        if C_Reputation_IsFactionParagon(factionID) then
-            local currentValue, threshold = C_Reputation_GetFactionParagonInfo(factionID)
+        if C_Reputation.IsFactionParagon(factionID) then
+            local currentValue, threshold = C_Reputation.GetFactionParagonInfo(factionID)
             local paraCount = floor(currentValue / threshold)
             currentValue = mod(currentValue, threshold)
             GameTooltip:AddDoubleLine(
@@ -316,7 +303,7 @@ local function bar_OnEnter()
     GameTooltip:Show()
 end
 
-local function bar_OnLeave()
+local function barOnLeave()
     GameTooltip:Hide()
 end
 
@@ -346,9 +333,9 @@ function module:OnInit()
     statusbar.background:SetTexture(C.media.texture.status)
     statusbar.background:SetVertexColor(cfg.xpcolor.r, cfg.xpcolor.g, cfg.xpcolor.b, 0.3)
 
-    statusbar:SetScript("OnEvent", bar_OnEvent)
-    statusbar:SetScript("OnEnter", bar_OnEnter)
-    statusbar:SetScript("OnLeave", bar_OnLeave)
+    statusbar:SetScript("OnEvent", barOnEvent)
+    statusbar:SetScript("OnEnter", barOnEnter)
+    statusbar:SetScript("OnLeave", barOnLeave)
 
     statusbar:RegisterEvent("PLAYER_XP_UPDATE")
     statusbar:RegisterEvent("PLAYER_LEVEL_UP")
@@ -356,5 +343,5 @@ function module:OnInit()
     statusbar:RegisterEvent("UPDATE_FACTION")
     statusbar:RegisterEvent("MODIFIER_STATE_CHANGED")
 
-    self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE", switcher_OnEvent)
+    self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE", switcherOnEvent)
 end

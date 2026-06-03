@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
+----------------------------------------------------------------------------------------
 -- MicroMenu
+----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("MicroMenu")
 
 local cfg = C.actionbar.bars.micromenu
