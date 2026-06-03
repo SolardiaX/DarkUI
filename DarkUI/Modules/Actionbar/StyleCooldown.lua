@@ -5,7 +5,7 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 local module = E:Module("Actionbar"):Sub("StyleCooldown")
 
-local cfg = C.actionbar.cooldown
+local cfg = C.actionbar.styles.cooldown
 
 local numberFormatter = C_StringUtil.CreateNumericRuleFormatter()
 local hookedCooldowns = {}
@@ -14,7 +14,6 @@ local shinePool = {}
 local FONT_FACE = STANDARD_TEXT_FONT
 local FONT_SIZE = 13
 local FONT_FLAG = "OUTLINE"
-local MIN_DURATION = cfg.minDuration or 2
 local MIN_EFFECT_DURATION = cfg.minEffectDuration or 30
 local EFFECT_TYPE = cfg.effect or "shine"
 
@@ -50,42 +49,47 @@ end
 local function createShineFrame()
     local shine = CreateFrame("Frame", nil, UIParent)
     shine:SetFrameStrata("HIGH")
+    shine:SetToplevel(true)
     shine:Hide()
 
     local texture = shine:CreateTexture(nil, "OVERLAY")
     texture:SetAllPoints()
     texture:SetTexture("Interface\\Cooldown\\star4")
     texture:SetBlendMode("ADD")
-    texture:SetAlpha(0)
     shine.texture = texture
 
     local ag = shine:CreateAnimationGroup()
     ag:SetScript("OnFinished", onShineFinished)
 
+    -- Order 0: start invisible
+    local alphaInit = ag:CreateAnimation("Alpha")
+    alphaInit:SetFromAlpha(1)
+    alphaInit:SetToAlpha(0)
+    alphaInit:SetDuration(0)
+    alphaInit:SetOrder(0)
+
+    -- Order 1: scale up + fade in
     local scaleUp = ag:CreateAnimation("Scale")
-    scaleUp:SetOrigin("CENTER", 0, 0)
-    scaleUp:SetFromScale(1, 1)
-    scaleUp:SetToScale(4, 4)
-    scaleUp:SetDuration(0.3)
+    scaleUp:SetScale(5, 5)
+    scaleUp:SetDuration(0.375)
     scaleUp:SetOrder(1)
 
     local fadeIn = ag:CreateAnimation("Alpha")
     fadeIn:SetFromAlpha(0)
     fadeIn:SetToAlpha(1)
-    fadeIn:SetDuration(0.3)
+    fadeIn:SetDuration(0.375)
     fadeIn:SetOrder(1)
 
+    -- Order 2: scale down + fade out
     local scaleDown = ag:CreateAnimation("Scale")
-    scaleDown:SetOrigin("CENTER", 0, 0)
-    scaleDown:SetFromScale(4, 4)
-    scaleDown:SetToScale(1, 1)
-    scaleDown:SetDuration(0.4)
+    scaleDown:SetScale(0.2, 0.2)
+    scaleDown:SetDuration(0.375)
     scaleDown:SetOrder(2)
 
     local fadeOut = ag:CreateAnimation("Alpha")
     fadeOut:SetFromAlpha(1)
     fadeOut:SetToAlpha(0)
-    fadeOut:SetDuration(0.4)
+    fadeOut:SetDuration(0.375)
     fadeOut:SetOrder(2)
 
     shine.animGroup = ag
@@ -140,18 +144,23 @@ end
 -- Cooldown Hook
 ----------------------------------------------------------------------------------------
 
+local GetTime = GetTime
+
 local function onCooldownDone(cooldown)
-    local duration = cooldown._darkui_duration
-    if not duration or duration < MIN_EFFECT_DURATION then
+    local startTime = cooldown._darkui_start
+    if not startTime then
         return
     end
-    cooldown._darkui_duration = nil
+    cooldown._darkui_start = nil
+    if (GetTime() - startTime) < MIN_EFFECT_DURATION then
+        return
+    end
     playEffect(cooldown)
 end
 
-local function trackDuration(cooldown, start, duration)
-    if cooldown and start and duration and duration > 0 then
-        cooldown._darkui_duration = duration
+local function trackCooldownStart(cooldown)
+    if cooldown then
+        cooldown._darkui_start = GetTime()
     end
 end
 
@@ -161,7 +170,6 @@ local function updateCooldown(cooldown)
     end
 
     cooldown:SetCountdownFormatter(numberFormatter)
-    cooldown:SetMinimumCountdownDuration(MIN_DURATION)
 
     local region = cooldown:GetRegions()
     if region and region:IsObjectType("FontString") then
@@ -188,9 +196,13 @@ function module:OnEnable()
         end
     end
 
-    -- Track duration for finish effect
+    -- Track start time for finish effect (hook all cooldown-setting methods)
     if EFFECT_TYPE ~= "none" then
-        hooksecurefunc(cooldownMT, "SetCooldown", trackDuration)
+        hooksecurefunc(cooldownMT, "SetCooldown", trackCooldownStart)
+        hooksecurefunc(cooldownMT, "SetCooldownDuration", trackCooldownStart)
+        if cooldownMT.SetCooldownFromDurationObject then
+            hooksecurefunc(cooldownMT, "SetCooldownFromDurationObject", trackCooldownStart)
+        end
     end
 
     if CooldownFrame_SetDisplayAsPercentage then

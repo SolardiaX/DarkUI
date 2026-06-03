@@ -2,4 +2,6 @@
     <Script file="Media.lua"/>
     <Script file="Color.lua"/>
     <Script file="Defaults.lua"/>
+    <Include file="AuraWatchList\_load_.xml"/>
+    <Include file="RaidFrameAuras\_load_.xml"/>
 </Ui>

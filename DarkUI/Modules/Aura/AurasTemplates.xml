@@ -1,0 +1,18 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Button name="DarkUIAuraTemplate" inherits="SecureActionButtonTemplate, BackdropTemplate" virtual="true" framelevel="4">
+        <Size x="30" y="30"/>
+        <Attributes>
+            <Attribute name="type2" value="cancelaura"/>
+        </Attributes>
+        <Scripts>
+            <OnLoad>
+                local E = unpack(DarkUI)
+                local module = E:Module("Aura"):Sub("Auras")
+                module:CreateAuraIcon(self)
+            </OnLoad>
+        </Scripts>
+    </Button>
+
+    <Button name="DarkUIAuraTemplate28" inherits="DarkUIAuraTemplate" virtual="true"><Size x="28" y="28"/></Button>
+    <Button name="DarkUIAuraTemplate32" inherits="DarkUIAuraTemplate" virtual="true"><Size x="32" y="32"/></Button>
+</Ui>

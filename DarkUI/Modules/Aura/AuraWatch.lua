@@ -1,0 +1,701 @@
+local E, C, L = select(2, ...):unpack()
+
+----------------------------------------------------------------------------------------
+-- AuraWatch
+----------------------------------------------------------------------------------------
+local module = E:Module("Aura"):Sub("AuraWatch")
+
+local cfg = C.aura.auraWatch
+
+local GetTime = GetTime
+local pairs, ipairs, next, wipe, tinsert, tremove = pairs, ipairs, next, wipe, tinsert, tremove
+local select, format, floor, unpack = select, format, floor, unpack
+local CreateFrame = CreateFrame
+local UnitInRaid, UnitInParty = UnitInRaid, UnitInParty
+local C_Spell_GetSpellName = C_Spell.GetSpellName
+local C_Spell_GetSpellTexture = C_Spell.GetSpellTexture
+local C_Spell_GetSpellCooldown = C_Spell.GetSpellCooldown
+local C_Spell_GetSpellCharges = C_Spell.GetSpellCharges
+local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local GetInventoryItemCooldown = GetInventoryItemCooldown
+local GetTotemInfo = GetTotemInfo
+local IsPlayerSpell = IsPlayerSpell
+local GameTooltip = GameTooltip
+
+local MAX_FRAMES = 12
+
+local AuraList = {}
+local FrameList = {}
+local UnitIDTable = {}
+local cooldownTable = {}
+local IntCD = nil
+local IntTable = {}
+
+----------------------------------------------------------------------------------------
+-- Data Conversion
+----------------------------------------------------------------------------------------
+
+local function convertAuraList(source)
+    local result = {}
+    for _, entry in ipairs(source) do
+        local id = entry.AuraID or entry.SpellID or entry.ItemID or entry.SlotID or entry.TotemID or entry.IntID
+        if id then
+            result[id] = entry
+        end
+    end
+    return result
+end
+
+local function buildAuraList()
+    local watchList = E.AuraWatchList
+    if not watchList then
+        return
+    end
+
+    local myClass = E.myClass
+    local groups = cfg.groups
+
+    for i, group in ipairs(groups) do
+        AuraList[i] = {
+            Name = group.name,
+            Direction = group.dir,
+            Interval = group.interval,
+            Mode = group.mode,
+            IconSize = group.size,
+            BarWidth = group.barWidth,
+            Pos = group.pos,
+            List = {},
+        }
+
+        -- Merge ALL class data
+        if watchList["ALL"] and watchList["ALL"][group.name] then
+            local converted = convertAuraList(watchList["ALL"][group.name])
+            for id, data in pairs(converted) do
+                AuraList[i].List[id] = data
+            end
+        end
+
+        -- Merge class-specific data
+        if myClass and watchList[myClass] and watchList[myClass][group.name] then
+            local converted = convertAuraList(watchList[myClass][group.name])
+            for id, data in pairs(converted) do
+                AuraList[i].List[id] = data
+            end
+        end
+    end
+end
+
+local function buildUnitIDTable()
+    wipe(UnitIDTable)
+    for _, group in ipairs(AuraList) do
+        for _, data in pairs(group.List) do
+            if data.UnitID then
+                UnitIDTable[data.UnitID] = true
+            end
+        end
+    end
+    UnitIDTable["player"] = true
+end
+
+local function buildCooldownTable()
+    wipe(cooldownTable)
+    for key, group in ipairs(AuraList) do
+        for id, data in pairs(group.List) do
+            if data.SpellID or data.ItemID or data.SlotID or data.TotemID then
+                if not cooldownTable[key] then
+                    cooldownTable[key] = {}
+                end
+                cooldownTable[key][id] = data
+            end
+        end
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Frame Creation
+----------------------------------------------------------------------------------------
+
+local LCG = LibStub("LibCustomGlow-1.0", true)
+
+local function tooltipOnEnter(self)
+    GameTooltip:ClearLines()
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 0, 3)
+    if self.type == 1 then
+        GameTooltip:SetSpellByID(self.spellID)
+    elseif self.type == 2 then
+        GameTooltip:SetItemByID(self.spellID)
+    elseif self.type == 3 then
+        GameTooltip:SetInventoryItem("player", self.spellID)
+    elseif self.type == 4 then
+        GameTooltip:SetUnitAura(self.unit, self.index, self.filter)
+    elseif self.type == 5 then
+        GameTooltip:SetTotem(self.spellID)
+    end
+    GameTooltip:Show()
+end
+
+local function tooltipOnLeave()
+    GameTooltip:Hide()
+end
+
+local function enableTooltip(frame)
+    frame:EnableMouse(true)
+    frame.HL = frame:CreateTexture(nil, "HIGHLIGHT")
+    frame.HL:SetColorTexture(1, 1, 1, 0.25)
+    frame.HL:SetAllPoints(frame.Icon)
+    frame:SetScript("OnEnter", tooltipOnEnter)
+    frame:SetScript("OnLeave", tooltipOnLeave)
+end
+
+local function buildICON(parent, size)
+    size = size * (cfg.iconScale or 1)
+    local frame = CreateFrame("Frame", nil, parent)
+    frame:SetSize(size, size)
+    frame:Hide()
+
+    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.Icon:SetAllPoints()
+    frame.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+    frame.Cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
+    frame.Cooldown:SetAllPoints()
+    frame.Cooldown:SetReverse(true)
+
+    frame.Count = frame:CreateFontString(nil, "OVERLAY")
+    frame.Count:SetFont(STANDARD_TEXT_FONT, size * 0.45, "OUTLINE")
+    frame.Count:SetPoint("BOTTOMRIGHT", 2, -1)
+
+    frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
+    frame.Spellname:SetFont(STANDARD_TEXT_FONT, size * 0.4, "OUTLINE")
+    frame.Spellname:SetPoint("TOP", frame, "BOTTOM", 0, -2)
+    frame.Spellname:SetJustifyH("CENTER")
+    frame.Spellname:SetWidth(size * 2.5)
+    frame.Spellname:SetWordWrap(false)
+
+    frame.glowFrame = CreateFrame("Frame", nil, frame)
+    frame.glowFrame:SetAllPoints()
+
+    frame:CreateShadow()
+
+    if not cfg.clickThrough then
+        enableTooltip(frame)
+    end
+
+    return frame
+end
+
+local function buildBAR(parent, size, barWidth)
+    barWidth = barWidth or 150
+    local frame = CreateFrame("Frame", nil, parent)
+    frame:SetSize(barWidth + size + 4, size)
+    frame:Hide()
+
+    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.Icon:SetSize(size, size)
+    frame.Icon:SetPoint("LEFT")
+    frame.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+    frame.Statusbar = CreateFrame("StatusBar", nil, frame)
+    frame.Statusbar:SetPoint("LEFT", frame.Icon, "RIGHT", 4, 0)
+    frame.Statusbar:SetSize(barWidth, size)
+    frame.Statusbar:SetStatusBarTexture(C.media.texture.status)
+    frame.Statusbar:SetStatusBarColor(0.2, 0.6, 1)
+    frame.Statusbar:SetMinMaxValues(0, 1)
+
+    frame.Statusbar.bg = frame.Statusbar:CreateTexture(nil, "BACKGROUND")
+    frame.Statusbar.bg:SetAllPoints()
+    frame.Statusbar.bg:SetTexture(C.media.texture.status)
+    frame.Statusbar.bg:SetVertexColor(0.1, 0.1, 0.1, 0.6)
+
+    frame.Count = frame:CreateFontString(nil, "OVERLAY")
+    frame.Count:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Count:SetPoint("BOTTOMRIGHT", frame.Icon, 2, -1)
+
+    frame.Time = frame:CreateFontString(nil, "OVERLAY")
+    frame.Time:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Time:SetPoint("RIGHT", frame.Statusbar, -2, 0)
+    frame.Time:SetJustifyH("RIGHT")
+
+    frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
+    frame.Spellname:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Spellname:SetPoint("LEFT", frame.Statusbar, 2, 0)
+    frame.Spellname:SetPoint("RIGHT", frame.Time, "LEFT", -4, 0)
+    frame.Spellname:SetJustifyH("LEFT")
+    frame.Spellname:SetWordWrap(false)
+
+    frame.glowFrame = CreateFrame("Frame", nil, frame)
+    frame.glowFrame:SetAllPoints(frame.Icon)
+
+    frame:CreateShadow()
+
+    if not cfg.clickThrough then
+        enableTooltip(frame)
+    end
+
+    return frame
+end
+
+----------------------------------------------------------------------------------------
+-- Frame Positioning
+----------------------------------------------------------------------------------------
+
+local function setupAnchor(key, frameTable, group)
+    local dir = group.Direction
+    local interval = group.Interval
+    local size = group.IconSize
+
+    if group.Mode == "BAR" and dir == "CENTER" then
+        dir = "UP"
+    end
+
+    for i, frame in ipairs(frameTable) do
+        frame:ClearAllPoints()
+        if i == 1 then
+            frame:SetPoint("CENTER", frame.MoveHandle or frame:GetParent())
+        elseif dir == "RIGHT" or dir == "CENTER" then
+            frame:SetPoint("LEFT", frameTable[i - 1], "RIGHT", interval, 0)
+        elseif dir == "LEFT" then
+            frame:SetPoint("RIGHT", frameTable[i - 1], "LEFT", -interval, 0)
+        elseif dir == "UP" then
+            frame:SetPoint("BOTTOM", frameTable[i - 1], "TOP", 0, interval)
+        elseif dir == "DOWN" then
+            frame:SetPoint("TOP", frameTable[i - 1], "BOTTOM", 0, -interval)
+        end
+    end
+end
+
+local function buildFrames()
+    for key, group in ipairs(AuraList) do
+        local frameTable = {}
+        local parent = CreateFrame("Frame", "DarkUI_AuraWatch" .. key, UIParent)
+        parent:SetSize(1, 1)
+        parent:SetPoint(unpack(group.Pos))
+
+        for i = 1, MAX_FRAMES do
+            local frame
+            if group.Mode == "BAR" then
+                frame = buildBAR(parent, group.IconSize, group.BarWidth)
+            else
+                frame = buildICON(parent, group.IconSize)
+            end
+            frame.ID = i
+
+            if i == 1 then
+                frame.MoveHandle = parent
+            end
+
+            tinsert(frameTable, frame)
+        end
+
+        FrameList[key] = frameTable
+        setupAnchor(key, frameTable, group)
+    end
+
+    -- Identify InternalCD group
+    for key, group in ipairs(AuraList) do
+        if group.Name == "InternalCD" then
+            IntCD = { key = key, group = group }
+            break
+        end
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Timer Update
+----------------------------------------------------------------------------------------
+
+local function formatTimer(remain)
+    if remain < 0 then
+        return "N/A"
+    elseif remain < 60 then
+        return format("%.1f", remain)
+    else
+        return format("%d:%02d", remain / 60, remain % 60)
+    end
+end
+
+local function timerOnUpdate(self, elapsed)
+    local remain = self.expire - GetTime()
+    if remain <= 0 then
+        self.expire = nil
+        self:SetScript("OnUpdate", nil)
+        self:Hide()
+        return
+    end
+
+    if self.Time then
+        self.Time:SetText(formatTimer(remain))
+    end
+    if self.Statusbar then
+        self.Statusbar:SetValue(remain / self.duration)
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Aura Setup
+----------------------------------------------------------------------------------------
+
+local function setupAura(frame, icon, count, duration, expire, spellName, flash)
+    frame.Icon:SetTexture(icon)
+    frame.Spellname:SetText(spellName or "")
+
+    if count and count > 1 then
+        frame.Count:SetText(count)
+    else
+        frame.Count:SetText("")
+    end
+
+    if duration and duration > 0 and expire then
+        if frame.Cooldown then
+            frame.Cooldown:SetCooldown(expire - duration, duration)
+        end
+        if frame.Statusbar then
+            frame.duration = duration
+            frame.expire = expire
+            frame.Statusbar:SetValue((expire - GetTime()) / duration)
+            frame:SetScript("OnUpdate", timerOnUpdate)
+        end
+        if frame.Time then
+            frame.Time:SetText(formatTimer(expire - GetTime()))
+        end
+    else
+        if frame.Cooldown then
+            frame.Cooldown:Clear()
+        end
+        if frame.Time then
+            frame.Time:SetText("")
+        end
+        if frame.Statusbar then
+            frame.Statusbar:SetValue(1)
+        end
+    end
+
+    frame:Show()
+
+    if flash and frame.glowFrame and LCG then
+        LCG.PixelGlow_Start(frame.glowFrame)
+    elseif frame.glowFrame and LCG then
+        LCG.PixelGlow_Stop(frame.glowFrame)
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Update Cycle
+----------------------------------------------------------------------------------------
+
+local frameIndices = {}
+
+local function preCleanup()
+    for key in ipairs(AuraList) do
+        frameIndices[key] = 1
+    end
+end
+
+local function postCleanup()
+    for key, frameTable in ipairs(FrameList) do
+        local startIdx = frameIndices[key] or 1
+        for i = startIdx, MAX_FRAMES do
+            local frame = frameTable[i]
+            if frame and frame:IsShown() then
+                frame:Hide()
+                frame.Icon:SetTexture(nil)
+                if frame.Spellname then
+                    frame.Spellname:SetText("")
+                end
+                if frame.Count then
+                    frame.Count:SetText("")
+                end
+                if frame.Time then
+                    frame.Time:SetText("")
+                end
+                if frame.glowFrame and LCG then
+                    LCG.PixelGlow_Stop(frame.glowFrame)
+                end
+                frame:SetScript("OnUpdate", nil)
+            end
+        end
+    end
+end
+
+local function updateAuraWatchByFilter(unit, filter, inCombat)
+    local index = 1
+    while true do
+        local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
+        if not auraData then
+            break
+        end
+
+        local spellID = auraData.spellId
+        if spellID and not issecretvalue(spellID) then
+            for key, group in ipairs(AuraList) do
+                local data = group.List[spellID]
+                if data and data.AuraID and data.UnitID == unit then
+                    -- Apply filters
+                    local apps = auraData.applications
+                    if issecretvalue(apps) then
+                        apps = 0
+                    end
+                    if data.Combat and not inCombat then
+                        -- skip
+                    elseif data.Caster and data.Caster ~= auraData.sourceUnit then
+                        -- skip
+                    elseif data.Stack and apps > 0 and data.Stack > apps then
+                        -- skip
+                    else
+                        local idx = frameIndices[key]
+                        if idx and idx <= MAX_FRAMES then
+                            local frame = FrameList[key][idx]
+                            if frame then
+                                local duration = auraData.duration
+                                local expire = auraData.expirationTime
+                                if data.Timeless or issecretvalue(duration) then
+                                    duration = 0
+                                    expire = 0
+                                end
+                                setupAura(frame, auraData.icon, apps, duration, expire, auraData.name, data.Flash)
+                                frameIndices[key] = idx + 1
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        index = index + 1
+    end
+end
+
+local function updateAuraWatch(unit, inCombat)
+    updateAuraWatchByFilter(unit, "HELPFUL", inCombat)
+    updateAuraWatchByFilter(unit, "HARMFUL", inCombat)
+end
+
+----------------------------------------------------------------------------------------
+-- Cooldown Tracking
+----------------------------------------------------------------------------------------
+
+local function updateCD()
+    for key, cdList in pairs(cooldownTable) do
+        for id, data in pairs(cdList) do
+            local start, duration, remaining
+            local icon = C_Spell_GetSpellTexture(id)
+            local name = C_Spell_GetSpellName(id)
+
+            if data.SpellID then
+                if IsPlayerSpell(id) then
+                    local cdInfo = C_Spell_GetSpellCooldown(id)
+                    if cdInfo and cdInfo.startTime and not issecretvalue(cdInfo.duration) and cdInfo.duration > cfg.minCD then
+                        start = cdInfo.startTime
+                        duration = cdInfo.duration
+                    end
+                    local charges = C_Spell_GetSpellCharges(id)
+                    if charges and not issecretvalue(charges.currentCharges) and charges.currentCharges < charges.maxCharges then
+                        start = charges.cooldownStartTime
+                        duration = charges.cooldownDuration
+                    end
+                end
+            elseif data.ItemID then
+                local itemStart, itemDuration = C_Item.GetItemCooldown(id)
+                if itemStart and itemDuration and not issecretvalue(itemDuration) and itemDuration > cfg.minCD then
+                    start = itemStart
+                    duration = itemDuration
+                end
+                icon = C_Item.GetItemIconByID(id)
+                local itemInfo = C_Item.GetItemInfo(id)
+                name = itemInfo and itemInfo.itemName or name
+            elseif data.SlotID then
+                local slotStart, slotDuration = GetInventoryItemCooldown("player", id)
+                if slotStart and slotDuration and not issecretvalue(slotDuration) and slotDuration > cfg.minCD then
+                    start = slotStart
+                    duration = slotDuration
+                end
+                icon = GetInventoryItemTexture("player", id)
+            elseif data.TotemID then
+                local _, totemName, totemStart, totemDuration, totemIcon = GetTotemInfo(id)
+                if totemStart and totemDuration and totemDuration > 0 then
+                    start = totemStart
+                    duration = totemDuration
+                    icon = totemIcon
+                    name = totemName
+                end
+            end
+
+            if start and duration and duration > 0 then
+                local expire = start + duration
+                if expire > GetTime() then
+                    local idx = frameIndices[key]
+                    if idx and idx <= MAX_FRAMES then
+                        local frame = FrameList[key][idx]
+                        if frame then
+                            setupAura(frame, icon, nil, duration, expire, name)
+                            frameIndices[key] = idx + 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- InternalCD Tracking
+----------------------------------------------------------------------------------------
+
+local function startInternalCD(intData, spellID)
+    if not IntCD then
+        return
+    end
+
+    local icon = C_Spell_GetSpellTexture(spellID)
+    local name = C_Spell_GetSpellName(spellID)
+    local duration = intData.Duration
+    local expire = GetTime() + duration
+
+    -- Check if already tracking
+    for _, entry in ipairs(IntTable) do
+        if entry.spellID == spellID then
+            entry.expire = expire
+            entry.duration = duration
+            return
+        end
+    end
+
+    local key = IntCD.key
+    local group = IntCD.group
+    local frame
+    if group.Mode == "BAR" then
+        frame = buildBAR(FrameList[key][1]:GetParent(), group.IconSize, group.BarWidth)
+    else
+        frame = buildICON(FrameList[key][1]:GetParent(), group.IconSize)
+    end
+
+    setupAura(frame, icon, nil, duration, expire, name)
+    tinsert(IntTable, { frame = frame, spellID = spellID, expire = expire, duration = duration })
+    module:SortIntBars()
+end
+
+function module:SortIntBars()
+    if not IntCD then
+        return
+    end
+
+    local now = GetTime()
+    -- Remove expired
+    for i = #IntTable, 1, -1 do
+        if IntTable[i].expire <= now then
+            IntTable[i].frame:Hide()
+            tremove(IntTable, i)
+        end
+    end
+
+    -- Reposition
+    local group = IntCD.group
+    local dir = group.Direction
+    local interval = group.Interval
+    local anchor = FrameList[IntCD.key][1]:GetParent()
+
+    for i, entry in ipairs(IntTable) do
+        entry.frame:ClearAllPoints()
+        if i == 1 then
+            entry.frame:SetPoint("CENTER", anchor)
+        elseif dir == "UP" then
+            entry.frame:SetPoint("BOTTOM", IntTable[i - 1].frame, "TOP", 0, interval)
+        elseif dir == "DOWN" then
+            entry.frame:SetPoint("TOP", IntTable[i - 1].frame, "BOTTOM", 0, -interval)
+        elseif dir == "RIGHT" then
+            entry.frame:SetPoint("LEFT", IntTable[i - 1].frame, "RIGHT", interval, 0)
+        elseif dir == "LEFT" then
+            entry.frame:SetPoint("RIGHT", IntTable[i - 1].frame, "LEFT", -interval, 0)
+        end
+    end
+end
+
+local function updateInt(event, unit, _, spellID)
+    if not IntCD then
+        return
+    end
+    if event ~= "UNIT_SPELLCAST_SUCCEEDED" then
+        return
+    end
+
+    local intList = IntCD.group.List
+    local intData = intList[spellID]
+    if not intData then
+        return
+    end
+
+    if intData.OnSuccess then
+        local validUnit = (intData.UnitID == "all") and (unit == "player" or UnitInRaid(unit) or UnitInParty(unit)) or (unit == (intData.UnitID or "player"))
+        if validUnit then
+            startInternalCD(intData, spellID)
+        end
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Event Handler
+----------------------------------------------------------------------------------------
+
+local initialized = false
+
+local function onEvent(self, event, ...)
+    if event == "PLAYER_ENTERING_WORLD" then
+        if not initialized then
+            buildAuraList()
+            buildUnitIDTable()
+            buildCooldownTable()
+            buildFrames()
+            initialized = true
+        end
+        -- Fall through to update
+    end
+
+    if event == "UNIT_SPELLCAST_SUCCEEDED" then
+        updateInt(event, ...)
+        return
+    end
+
+    if event == "UNIT_AURA" then
+        local unit = ...
+        if not UnitIDTable[unit] then
+            return
+        end
+    end
+
+    -- Full update cycle
+    local inCombat = InCombatLockdown()
+    preCleanup()
+    updateCD()
+    for unit in pairs(UnitIDTable) do
+        if unit ~= "all" then
+            updateAuraWatch(unit, inCombat)
+        end
+    end
+    postCleanup()
+    module:SortIntBars()
+end
+
+----------------------------------------------------------------------------------------
+-- Module Lifecycle
+----------------------------------------------------------------------------------------
+
+function module:OnInit()
+    if not cfg or not cfg.enable then
+        return
+    end
+
+    local frame = CreateFrame("Frame")
+    frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    frame:RegisterUnitEvent("UNIT_AURA", "player", "target", "focus", "pet")
+    frame:RegisterEvent("PLAYER_TARGET_CHANGED")
+    frame:RegisterEvent("PLAYER_FOCUS_CHANGED")
+    frame:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
+    frame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+    frame:SetScript("OnEvent", onEvent)
+
+    SlashCmdList.DARKUI_AURAWATCH = function(msg)
+        -- placeholder for move/lock commands
+        print("|cff00ff00DarkUI AuraWatch|r: loaded")
+    end
+    SLASH_DARKUI_AURAWATCH1 = "/aurawatch"
+end

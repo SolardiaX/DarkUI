@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Include file="AurasTemplates.xml"/>
+    <Script file="Auras.lua" />
+    <Script file="Caster.lua" />
+    <Script file="AuraWatch.lua" />
+</Ui>
