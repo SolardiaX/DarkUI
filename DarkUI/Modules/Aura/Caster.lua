@@ -5,11 +5,7 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 local module = E:Module("Aura"):Sub("Caster")
 
-local UnitIsPlayer, UnitClass, UnitReaction = UnitIsPlayer, UnitClass, UnitReaction
-local GetUnitName = GetUnitName
-local CUSTOM_CLASS_COLORS, RAID_CLASS_COLORS = CUSTOM_CLASS_COLORS, RAID_CLASS_COLORS
-local FACTION_BAR_COLORS = FACTION_BAR_COLORS
-local format, select, pcall = format, select, pcall
+local format, pcall = format, pcall
 
 local function getSourceColor(srcUnit)
     if UnitIsPlayer(srcUnit) then

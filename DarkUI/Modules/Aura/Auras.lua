@@ -10,11 +10,8 @@ local cfg = C.aura
 local GetTime = GetTime
 local floor, format, ceil = math.floor, string.format, math.ceil
 local unpack, select, strmatch, tonumber = unpack, select, strmatch, tonumber
-local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
 local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
-local RegisterAttributeDriver = RegisterAttributeDriver
-local RegisterStateDriver = RegisterStateDriver
-local SecureHandlerSetFrameRef = SecureHandlerSetFrameRef
+local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
 local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
 
 local DEBUFF_COLORS = {
@@ -31,17 +28,17 @@ local DEBUFF_COLORS = {
 -- Time Formatting
 ----------------------------------------------------------------------------------------
 
-local day, hour, minute = 86400, 3600, 60
+local DAY, HOUR, MINUTE = 86400, 3600, 60
 
 local function formatAuraTime(s)
-    if s >= day then
-        return format("%dd", s / day + 0.5), s % day
-    elseif s >= 2 * hour then
-        return format("%dh", s / hour + 0.5), s % hour
-    elseif s >= 10 * minute then
-        return format("%dm", s / minute + 0.5), s % minute
-    elseif s >= minute then
-        return format("%d:%02d", s / minute, s % minute), s - floor(s)
+    if s >= DAY then
+        return format("%dd", s / DAY + 0.5), s % DAY
+    elseif s >= 2 * HOUR then
+        return format("%dh", s / HOUR + 0.5), s % HOUR
+    elseif s >= 10 * MINUTE then
+        return format("%dm", s / MINUTE + 0.5), s % MINUTE
+    elseif s >= MINUTE then
+        return format("%d:%02d", s / MINUTE, s % MINUTE), s - floor(s)
     elseif s > 10 then
         return format("%d", s), s - floor(s)
     elseif s > 5 then

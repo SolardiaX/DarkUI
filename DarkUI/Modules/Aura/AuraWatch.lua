@@ -11,7 +11,6 @@ local GetTime = GetTime
 local pairs, ipairs, next, wipe, tinsert, tremove = pairs, ipairs, next, wipe, tinsert, tremove
 local select, format, floor, unpack = select, format, floor, unpack
 local CreateFrame = CreateFrame
-local UnitInRaid, UnitInParty = UnitInRaid, UnitInParty
 local C_Spell_GetSpellName = C_Spell.GetSpellName
 local C_Spell_GetSpellTexture = C_Spell.GetSpellTexture
 local C_Spell_GetSpellCooldown = C_Spell.GetSpellCooldown
@@ -28,7 +27,7 @@ local AuraList = {}
 local FrameList = {}
 local UnitIDTable = {}
 local cooldownTable = {}
-local IntCD = nil
+local IntCD
 local IntTable = {}
 
 ----------------------------------------------------------------------------------------
@@ -67,7 +66,6 @@ local function buildAuraList()
             List = {},
         }
 
-        -- Merge ALL class data
         if watchList["ALL"] and watchList["ALL"][group.name] then
             local converted = convertAuraList(watchList["ALL"][group.name])
             for id, data in pairs(converted) do
@@ -75,7 +73,6 @@ local function buildAuraList()
             end
         end
 
-        -- Merge class-specific data
         if myClass and watchList[myClass] and watchList[myClass][group.name] then
             local converted = convertAuraList(watchList[myClass][group.name])
             for id, data in pairs(converted) do
@@ -147,7 +144,7 @@ local function enableTooltip(frame)
     frame:SetScript("OnLeave", tooltipOnLeave)
 end
 
-local function buildICON(parent, size)
+local function buildIcon(parent, size)
     size = size * (cfg.iconScale or 1)
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetSize(size, size)
@@ -184,7 +181,7 @@ local function buildICON(parent, size)
     return frame
 end
 
-local function buildBAR(parent, size, barWidth)
+local function buildBar(parent, size, barWidth)
     barWidth = barWidth or 150
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetSize(barWidth + size + 4, size)
@@ -274,9 +271,9 @@ local function buildFrames()
         for i = 1, MAX_FRAMES do
             local frame
             if group.Mode == "BAR" then
-                frame = buildBAR(parent, group.IconSize, group.BarWidth)
+                frame = buildBar(parent, group.IconSize, group.BarWidth)
             else
-                frame = buildICON(parent, group.IconSize)
+                frame = buildIcon(parent, group.IconSize)
             end
             frame.ID = i
 
@@ -291,7 +288,6 @@ local function buildFrames()
         setupAnchor(key, frameTable, group)
     end
 
-    -- Identify InternalCD group
     for key, group in ipairs(AuraList) do
         if group.Name == "InternalCD" then
             IntCD = { key = key, group = group }
@@ -430,18 +426,20 @@ local function updateAuraWatchByFilter(unit, filter, inCombat)
             for key, group in ipairs(AuraList) do
                 local data = group.List[spellID]
                 if data and data.AuraID and data.UnitID == unit then
-                    -- Apply filters
                     local apps = auraData.applications
                     if issecretvalue(apps) then
                         apps = 0
                     end
+                    local shouldShow = true
                     if data.Combat and not inCombat then
-                        -- skip
+                        shouldShow = false
                     elseif data.Caster and data.Caster ~= auraData.sourceUnit then
-                        -- skip
+                        shouldShow = false
                     elseif data.Stack and apps > 0 and data.Stack > apps then
-                        -- skip
-                    else
+                        shouldShow = false
+                    end
+
+                    if shouldShow then
                         local idx = frameIndices[key]
                         if idx and idx <= MAX_FRAMES then
                             local frame = FrameList[key][idx]
@@ -551,7 +549,6 @@ local function startInternalCD(intData, spellID)
     local duration = intData.Duration
     local expire = GetTime() + duration
 
-    -- Check if already tracking
     for _, entry in ipairs(IntTable) do
         if entry.spellID == spellID then
             entry.expire = expire
@@ -564,9 +561,9 @@ local function startInternalCD(intData, spellID)
     local group = IntCD.group
     local frame
     if group.Mode == "BAR" then
-        frame = buildBAR(FrameList[key][1]:GetParent(), group.IconSize, group.BarWidth)
+        frame = buildBar(FrameList[key][1]:GetParent(), group.IconSize, group.BarWidth)
     else
-        frame = buildICON(FrameList[key][1]:GetParent(), group.IconSize)
+        frame = buildIcon(FrameList[key][1]:GetParent(), group.IconSize)
     end
 
     setupAura(frame, icon, nil, duration, expire, name)
@@ -580,7 +577,6 @@ function module:SortIntBars()
     end
 
     local now = GetTime()
-    -- Remove expired
     for i = #IntTable, 1, -1 do
         if IntTable[i].expire <= now then
             IntTable[i].frame:Hide()
@@ -588,7 +584,6 @@ function module:SortIntBars()
         end
     end
 
-    -- Reposition
     local group = IntCD.group
     local dir = group.Direction
     local interval = group.Interval
@@ -662,7 +657,6 @@ local function onEvent(self, event, ...)
         end
     end
 
-    -- Full update cycle
     local inCombat = InCombatLockdown()
     preCleanup()
     updateCD()
