@@ -670,8 +670,88 @@ local function onEvent(self, event, ...)
 end
 
 ----------------------------------------------------------------------------------------
--- Module Lifecycle
+-- Slash Command (Move / Lock)
 ----------------------------------------------------------------------------------------
+
+local function makeMover(parent, name)
+    local mover = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    mover:SetAllPoints(parent)
+    mover:SetBackdrop({ bgFile = [[Interface\Tooltips\UI-Tooltip-Background]] })
+    mover:SetBackdropColor(0.1, 0.1, 0.1, 0.7)
+    mover:EnableMouse(true)
+    mover:SetMovable(true)
+    mover:RegisterForDrag("LeftButton")
+    mover:SetScript("OnDragStart", function(self)
+        self:GetParent():StartMoving()
+    end)
+    mover:SetScript("OnDragStop", function(self)
+        self:GetParent():StopMovingOrSizing()
+        self:GetParent():SetUserPlaced(false)
+    end)
+
+    mover.text = mover:CreateFontString(nil, "OVERLAY")
+    mover.text:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+    mover.text:SetPoint("CENTER")
+    mover.text:SetText(name)
+    mover:Hide()
+
+    parent.mover = mover
+    parent:SetMovable(true)
+    parent:SetClampedToScreen(true)
+end
+
+local function enterMoveMode()
+    for key, frameTable in ipairs(FrameList) do
+        local group = AuraList[key]
+        local parent = frameTable[1].MoveHandle
+        if not parent.mover then
+            makeMover(parent, group.Name)
+        end
+
+        local size = group.IconSize
+        local barWidth = group.BarWidth or 150
+        if group.Mode == "BAR" then
+            parent:SetSize(barWidth + size + 4, size * 6 + group.Interval * 5)
+        else
+            parent:SetSize(size * 6 + group.Interval * 5, size)
+        end
+
+        parent.mover:Show()
+
+        for i = 1, MAX_FRAMES do
+            local frame = frameTable[i]
+            if frame then
+                frame:SetScript("OnUpdate", nil)
+                frame:Hide()
+            end
+        end
+    end
+
+    for _, entry in ipairs(IntTable) do
+        entry.frame:Hide()
+    end
+    wipe(IntTable)
+
+    print("|cff00ff00DarkUI AuraWatch|r: unlocked - drag to reposition, |cffff0000/aurawatch lock|r to save")
+end
+
+local function enterLockMode()
+    for _, frameTable in ipairs(FrameList) do
+        local parent = frameTable[1].MoveHandle
+        if parent.mover then
+            parent.mover:Hide()
+        end
+        parent:SetSize(1, 1)
+    end
+
+    for _, entry in ipairs(IntTable) do
+        entry.frame:Hide()
+    end
+    wipe(IntTable)
+
+    onEvent(nil, "PLAYER_ENTERING_WORLD")
+    print("|cff00ff00DarkUI AuraWatch|r: locked")
+end
 
 function module:OnInit()
     if not cfg or not cfg.enable then
@@ -688,8 +768,14 @@ function module:OnInit()
     frame:SetScript("OnEvent", onEvent)
 
     SlashCmdList.DARKUI_AURAWATCH = function(msg)
-        -- placeholder for move/lock commands
-        print("|cff00ff00DarkUI AuraWatch|r: loaded")
+        msg = msg and msg:lower() or ""
+        if msg == "move" then
+            enterMoveMode()
+        elseif msg == "lock" then
+            enterLockMode()
+        else
+            print("|cff00ff00DarkUI AuraWatch|r: /aurawatch move | lock")
+        end
     end
     SLASH_DARKUI_AURAWATCH1 = "/aurawatch"
 end
