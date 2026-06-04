@@ -741,6 +741,34 @@ local function enterMoveMode()
     print("|cff00ff00DarkUI AuraWatch|r: unlocked - drag to reposition, |cffff0000/aurawatch lock|r to save")
 end
 
+local function enterTestMode()
+    if not initialized then
+        buildAuraList()
+        buildUnitIDTable()
+        buildCooldownTable()
+        buildFrames()
+        initialized = true
+    end
+
+    local testIcon = 136243 -- spell_nature_starfall
+    local now = GetTime()
+
+    for key, frameTable in ipairs(FrameList) do
+        local group = AuraList[key]
+        local count = math.min(6, MAX_FRAMES)
+        for i = 1, count do
+            local frame = frameTable[i]
+            if frame then
+                local duration = 30 + i * 10
+                local expire = now + duration - i * 5
+                setupAura(frame, testIcon, i > 1 and i or nil, duration, expire, "Test " .. i)
+            end
+        end
+    end
+
+    print("|cff00ff00DarkUI AuraWatch|r: test mode - showing sample frames, |cffff0000/aurawatch lock|r to reset")
+end
+
 local function enterLockMode()
     for _, frameTable in ipairs(FrameList) do
         local parent = frameTable[1].MoveHandle
@@ -779,8 +807,10 @@ function module:OnInit()
             enterMoveMode()
         elseif msg == "lock" then
             enterLockMode()
+        elseif msg == "test" then
+            enterTestMode()
         else
-            print("|cff00ff00DarkUI AuraWatch|r: /aurawatch move | lock")
+            print("|cff00ff00DarkUI AuraWatch|r: /aurawatch move | lock | test")
         end
     end
     SLASH_DARKUI_AURAWATCH1 = "/aurawatch"
