@@ -1,12 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 
--- Abin
--- 2016/09/13
-------------------------------------------------------------
-local _, ns = ...
-local B, C, L, DB = unpack(ns)
-local module = B:GetModule("AurasTable")
-
 local TIER = 7 -- Legion
 local INSTANCE = 822 -- Broken Isles
 
