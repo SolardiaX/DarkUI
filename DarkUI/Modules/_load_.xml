@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Include file="Actionbar\_load_.xml" />
     <Include file="Aura\_load_.xml" />
+    <Include file="Map\_load_.xml" />
 </Ui>

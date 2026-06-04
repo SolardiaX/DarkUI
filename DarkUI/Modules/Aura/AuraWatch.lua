@@ -139,12 +139,15 @@ local function styleBarFrame(frame)
         bar:SetPoint("BOTTOMLEFT", iconFrame or frame, "BOTTOMRIGHT", 5, 0)
 
         bar:SetStatusBarTexture(C.media.texture.status)
-        local tex = bar:GetStatusBarTexture()
-        if tex and tex.ClearTextureSlice then
-            tex:ClearTextureSlice()
-        end
         bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
 
+        bar.Spark = bar:CreateTexture(nil, "OVERLAY")
+        bar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+        bar.Spark:SetBlendMode("ADD")
+        bar.Spark:SetAlpha(.8)
+        bar.Spark:SetPoint("TOPLEFT", bar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
+        bar.Spark:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
+        
         if not bar._darkui_styled then
             bar._darkui_styled = true
             bar:SetTemplate("Default")

@@ -209,7 +209,7 @@ defaults.aura = {
                 pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 380 },
             },
             BuffBarCooldownViewer = {
-                pos = { "CENTER", "UIParent", "CENTER", 460, -100 },
+                pos = { "CENTER", "UIParent", "CENTER", 400, -100 },
                 iconSize = 22,
                 barWidth = 150,
                 barHeight = 12,
