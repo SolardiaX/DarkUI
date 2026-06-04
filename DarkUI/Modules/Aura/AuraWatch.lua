@@ -6,6 +6,7 @@ local E, C, L = select(2, ...):unpack()
 local module = E:Module("Aura"):Sub("AuraWatch")
 
 local cfg = C.aura.auraWatch
+local auraCfg = C.aura
 
 local GetTime = GetTime
 local pairs, ipairs, next, wipe, tinsert, tremove = pairs, ipairs, next, wipe, tinsert, tremove
@@ -146,20 +147,23 @@ end
 
 local function buildIcon(parent, size)
     size = size * (cfg.iconScale or 1)
+    local padding = auraCfg.icon_padding
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetSize(size, size)
     frame:Hide()
 
-    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
-    frame.Icon:SetAllPoints()
-    frame.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    frame.Icon = frame:CreateTexture(nil, "BORDER")
+    frame.Icon:SetPoint("TOPLEFT", padding, -padding)
+    frame.Icon:SetPoint("BOTTOMRIGHT", -padding, padding)
+    frame.Icon:SetDrawLayer("BACKGROUND", -8)
+    frame.Icon:SetTexCoord(unpack(C.media.texCoord))
 
     frame.Cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
-    frame.Cooldown:SetAllPoints()
+    frame.Cooldown:SetAllPoints(frame.Icon)
     frame.Cooldown:SetReverse(true)
 
     frame.Count = frame:CreateFontString(nil, "OVERLAY")
-    frame.Count:SetFont(STANDARD_TEXT_FONT, size * 0.45, "OUTLINE")
+    frame.Count:SetFont(unpack(auraCfg.count_font_style))
     frame.Count:SetPoint("BOTTOMRIGHT", 2, -1)
 
     frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
@@ -170,7 +174,7 @@ local function buildIcon(parent, size)
     frame.Spellname:SetWordWrap(false)
 
     frame.glowFrame = CreateFrame("Frame", nil, frame)
-    frame.glowFrame:SetAllPoints()
+    frame.glowFrame:SetAllPoints(frame.Icon)
 
     frame:CreateShadow()
 
@@ -183,14 +187,16 @@ end
 
 local function buildBar(parent, size, barWidth)
     barWidth = barWidth or 150
+    local padding = auraCfg.icon_padding
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetSize(barWidth + size + 4, size)
     frame:Hide()
 
-    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.Icon = frame:CreateTexture(nil, "BORDER")
     frame.Icon:SetSize(size, size)
     frame.Icon:SetPoint("LEFT")
-    frame.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    frame.Icon:SetDrawLayer("BACKGROUND", -8)
+    frame.Icon:SetTexCoord(unpack(C.media.texCoord))
 
     frame.Statusbar = CreateFrame("StatusBar", nil, frame)
     frame.Statusbar:SetPoint("LEFT", frame.Icon, "RIGHT", 4, 0)
@@ -205,16 +211,16 @@ local function buildBar(parent, size, barWidth)
     frame.Statusbar.bg:SetVertexColor(0.1, 0.1, 0.1, 0.6)
 
     frame.Count = frame:CreateFontString(nil, "OVERLAY")
-    frame.Count:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Count:SetFont(unpack(auraCfg.count_font_style))
     frame.Count:SetPoint("BOTTOMRIGHT", frame.Icon, 2, -1)
 
     frame.Time = frame:CreateFontString(nil, "OVERLAY")
-    frame.Time:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Time:SetFont(unpack(auraCfg.dur_font_style))
     frame.Time:SetPoint("RIGHT", frame.Statusbar, -2, 0)
     frame.Time:SetJustifyH("RIGHT")
 
     frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
-    frame.Spellname:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
+    frame.Spellname:SetFont(unpack(auraCfg.dur_font_style))
     frame.Spellname:SetPoint("LEFT", frame.Statusbar, 2, 0)
     frame.Spellname:SetPoint("RIGHT", frame.Time, "LEFT", -4, 0)
     frame.Spellname:SetJustifyH("LEFT")
