@@ -117,13 +117,13 @@ function module:OnEnable()
 
     -- Equipped border color
     LAB.RegisterCallback(module, "OnButtonUpdate", function(_, button)
-        if not button.backdrop then
+        if not button.__bg then
             return
         end
         if button.Border and button.Border:IsShown() then
-            button.backdrop:SetBackdropBorderColor(0, 0.7, 0.1)
+            button.__bg:SetBackdropBorderColor(0, 0.7, 0.1)
         else
-            button.backdrop:SetBackdropBorderColor(0, 0, 0)
+            button.__bg:SetBackdropBorderColor(0, 0, 0)
         end
     end)
 

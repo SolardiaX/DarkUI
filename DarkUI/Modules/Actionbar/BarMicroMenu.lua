@@ -41,10 +41,8 @@ function module:OnInit()
         local button = _G[b]
         if button then
             button:SetScale(0.75)
-            button:CreateBackdrop()
-            if button.backdrop then
-                button.backdrop:CreateShadow()
-            end
+            local bg = button:CreateBG()
+            bg:CreateShadow()
 
             button:SetParent(bar)
             button.SetParent = E.Dummy

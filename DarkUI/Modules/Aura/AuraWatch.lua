@@ -73,14 +73,21 @@ local function styleIconFrame(frame)
         iconTex:SetPoint("BOTTOMRIGHT", frame, -2, 2)
     end
 
-    if not frame._darkui_styled then
-        frame._darkui_styled = true
-        E:ApplyOverlayBorder(frame, 2)
+    if not frame.__styled then
+        frame.__styled = true
+        frame:CreateBorder(2)
     end
 
     if frame.Cooldown then
         frame.Cooldown:SetSwipeColor(0, 0, 0, cfg.style.swipeAlpha)
         frame.Cooldown:SetDrawEdge(false)
+
+        if frame.Cooldown.GetCountdownFontString then
+            local fs = frame.Cooldown:GetCountdownFontString()
+            if fs then
+                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
+            end
+        end
     end
 end
 
@@ -124,9 +131,9 @@ local function styleBarFrame(frame)
             iconTex:SetPoint("BOTTOMRIGHT", iconFrame, -2, 2)
         end
 
-        if not iconFrame._darkui_styled then
-            iconFrame._darkui_styled = true
-            E:ApplyOverlayBorder(iconFrame, 2)
+        if not iconFrame.__styled then
+            iconFrame.__styled = true
+            iconFrame:CreateBorder(2)
         end
     end
 
@@ -147,9 +154,9 @@ local function styleBarFrame(frame)
         bar.Spark:SetAlpha(.8)
         bar.Spark:SetPoint("TOPLEFT", bar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
         bar.Spark:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
-        
-        if not bar._darkui_styled then
-            bar._darkui_styled = true
+
+        if not bar.__styled then
+            bar.__styled = true
             bar:SetTemplate("Default")
             bar:CreateShadow()
         end
@@ -168,7 +175,7 @@ local function styleBarFrame(frame)
         end
     end
 
-    frame._darkui_styled = true
+    frame.__styled = true
 end
 
 ------------------------------------------------------------------------
@@ -299,6 +306,21 @@ layoutFrame:SetScript("OnUpdate", doLayout)
 -- Hook Viewers
 ------------------------------------------------------------------------
 
+local function refreshCooldownFonts(viewerName)
+    local viewer = _G[viewerName]
+    if not viewer then
+        return
+    end
+    for _, child in ipairs({ viewer:GetChildren() }) do
+        if child.Cooldown and child.Cooldown.GetCountdownFontString then
+            local fs = child.Cooldown:GetCountdownFontString()
+            if fs then
+                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
+            end
+        end
+    end
+end
+
 local function forceRefresh()
     positionAllViewers()
     lastLayoutTime = 0
@@ -316,6 +338,7 @@ local function hookViewer(viewerName)
             positionViewer(viewerName)
             lastLayoutTime = 0
             doLayout()
+            refreshCooldownFonts(viewerName)
         end)
     end
 end
@@ -353,6 +376,24 @@ local function setup()
     for _, name in ipairs(VIEWERS) do
         hookViewer(name)
     end
+
+    hooksecurefunc(getmetatable(CreateFrame("Cooldown", nil, nil, "CooldownFrameTemplate")).__index, "SetCooldown", function(cd)
+        local parent = cd:GetParent()
+        if not parent then
+            return
+        end
+        local viewer = parent:GetParent()
+        local viewerName = viewer and viewer.GetName and viewer:GetName()
+        if not viewerName or not cfg.viewers[viewerName] then
+            return
+        end
+        if cd.GetCountdownFontString then
+            local fs = cd:GetCountdownFontString()
+            if fs then
+                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
+            end
+        end
+    end)
 
     if EditModeManagerFrame then
         hooksecurefunc(EditModeManagerFrame, "ExitEditMode", function()

@@ -1,8 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Skin Engine
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local _G = _G
 local pairs, type, select = pairs, type, select
@@ -12,371 +12,457 @@ local unpack = unpack
 
 local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
 
-local themes = {} -- ["Blizzard_AchievementUI"] = func
-local skinQueue = {} -- skins waiting for ADDON_LOADED
-local loaded = {} -- already loaded skins
+------------------------------------------------------------------------
+-- Skin Registration (ADDON_LOADED dispatch)
+------------------------------------------------------------------------
+
+local themes = {}
+local loaded = {}
 
 function E:RegisterSkin(addonName, func)
-    if loaded[addonName] then
-        return
-    end
-    if C_AddOns.IsAddOnLoaded(addonName) then
-        local ok, err = pcall(func)
-        if not ok then
-            geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err))
-        end
-        loaded[addonName] = true
-    else
-        themes[addonName] = func
-    end
+	if loaded[addonName] then
+		return
+	end
+	if C_AddOns.IsAddOnLoaded(addonName) then
+		local ok, err = pcall(func)
+		if not ok then
+			geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err))
+		end
+		loaded[addonName] = true
+	else
+		themes[addonName] = func
+	end
 end
 
--- Called on ADDON_LOADED to execute pending skins
 local function onAddonLoaded(_, event, addonName)
-    local func = themes[addonName]
-    if func then
-        local ok, err = pcall(func)
-        if not ok then
-            geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err))
-        end
-        themes[addonName] = nil
-        loaded[addonName] = true
-    end
+	local func = themes[addonName]
+	if func then
+		local ok, err = pcall(func)
+		if not ok then
+			geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err))
+		end
+		themes[addonName] = nil
+		loaded[addonName] = true
+	end
 end
 
 E.Event:Register("ADDON_LOADED", onAddonLoaded, E)
 
--- Skin Utilities (internal)
+------------------------------------------------------------------------
+-- Shared Hover Helpers
+------------------------------------------------------------------------
 
-local function setModifiedBackdrop(self)
-    if self:IsEnabled() then
-        self:SetBackdropBorderColor(r, g, b)
-    end
+local function onEnterHighlight(self)
+	if self:IsEnabled() then
+		self:SetBackdropBorderColor(r, g, b)
+		if self.__overlay then
+			self.__overlay:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1)
+		end
+	end
 end
 
-local function setOriginalBackdrop(self)
-    self:SetBackdropBorderColor(unpack(C.media.border_color))
+local function onLeaveHighlight(self)
+	self:SetBackdropBorderColor(unpack(C.media.border_color))
+	if self.__overlay then
+		self.__overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+	end
 end
 
--- E:Skin(frame) — Generic frame skin
--- Strips textures, applies dark backdrop + shadow
+------------------------------------------------------------------------
+-- E:ReskinFrame — generic frame skin
+------------------------------------------------------------------------
 
-function E:Skin(frame)
-    if not frame or frame.__skinned then
-        return
-    end
-    if frame:IsForbidden() then
-        return
-    end
+function E:ReskinFrame(frame)
+	if not frame or frame.__styled then
+		return
+	end
+	if frame:IsForbidden() then
+		return
+	end
 
-    frame:StripTextures()
-    frame:SetTemplate("Default")
-    frame:CreateShadow()
+	frame:StripTextures()
+	frame:SetTemplate("Default")
+	frame:CreateShadow()
 
-    frame.__skinned = true
+	frame.__styled = true
 end
 
--- E:SkinButton(button) — Button skin
--- Strips textures, dark overlay backdrop, hover highlight with class color
+------------------------------------------------------------------------
+-- E:ReskinButton — button skin (strips + overlay + hover)
+------------------------------------------------------------------------
 
-function E:SkinButton(button)
-    if not button or button.__skinned then
-        return
-    end
-    if button:IsForbidden() then
-        return
-    end
+function E:ReskinButton(button)
+	if not button or button.__styled then
+		return
+	end
+	if button:IsForbidden() then
+		return
+	end
 
-    button:StripTextures()
+	button:StripTextures()
 
-    if button.SetNormalTexture then
-        button:SetNormalTexture("")
-    end
-    if button.SetHighlightTexture then
-        button:SetHighlightTexture("")
-    end
-    if button.SetPushedTexture then
-        button:SetPushedTexture("")
-    end
-    if button.SetDisabledTexture then
-        button:SetDisabledTexture("")
-    end
+	if button.SetNormalTexture then
+		button:SetNormalTexture("")
+	end
+	if button.SetHighlightTexture then
+		button:SetHighlightTexture("")
+	end
+	if button.SetPushedTexture then
+		button:SetPushedTexture("")
+	end
+	if button.SetDisabledTexture then
+		button:SetDisabledTexture("")
+	end
 
-    -- Clear atlas-based regions
-    if button.Left then
-        button.Left:SetAlpha(0)
-    end
-    if button.Right then
-        button.Right:SetAlpha(0)
-    end
-    if button.Middle then
-        button.Middle:SetAlpha(0)
-    end
+	if button.Left then
+		button.Left:SetAlpha(0)
+	end
+	if button.Right then
+		button.Right:SetAlpha(0)
+	end
+	if button.Middle then
+		button.Middle:SetAlpha(0)
+	end
+	if button.LeftSeparator then
+		button.LeftSeparator:SetAlpha(0)
+	end
+	if button.RightSeparator then
+		button.RightSeparator:SetAlpha(0)
+	end
+	if button.Flash then
+		button.Flash:SetAlpha(0)
+	end
 
-    button:SetTemplate("Overlay")
-    button:HookScript("OnEnter", setModifiedBackdrop)
-    button:HookScript("OnLeave", setOriginalBackdrop)
+	if button.TopLeft then
+		button.TopLeft:Hide()
+	end
+	if button.TopRight then
+		button.TopRight:Hide()
+	end
+	if button.BottomLeft then
+		button.BottomLeft:Hide()
+	end
+	if button.BottomRight then
+		button.BottomRight:Hide()
+	end
+	if button.TopMiddle then
+		button.TopMiddle:Hide()
+	end
+	if button.MiddleLeft then
+		button.MiddleLeft:Hide()
+	end
+	if button.MiddleRight then
+		button.MiddleRight:Hide()
+	end
+	if button.BottomMiddle then
+		button.BottomMiddle:Hide()
+	end
+	if button.MiddleMiddle then
+		button.MiddleMiddle:Hide()
+	end
 
-    button.__skinned = true
+	button:SetTemplate("Overlay")
+	button:HookScript("OnEnter", onEnterHighlight)
+	button:HookScript("OnLeave", onLeaveHighlight)
+
+	button.__styled = true
 end
 
--- E:SkinCloseButton(button) — Close button (X)
+------------------------------------------------------------------------
+-- E:ReskinCloseButton — close button (X)
+------------------------------------------------------------------------
 
-function E:SkinCloseButton(button, anchor)
-    if not button or button.__skinned then
-        return
-    end
+function E:ReskinCloseButton(button, anchor)
+	if not button or button.__styled then
+		return
+	end
 
-    button:StripTextures()
-    button:SetSize(18, 18)
-    button:SetTemplate("Overlay")
+	button:StripTextures()
+	button:SetSize(18, 18)
+	button:SetTemplate("Overlay")
+	button:CreateBorder()
 
-    button.text = button:CreateFontString(nil, "OVERLAY")
-    button.text:SetFont(C.media.standard_font[1], 16, C.media.standard_font[3])
-    button.text:SetText("x")
-    button.text:SetPoint("CENTER", 0, 1)
-    button.text:SetTextColor(unpack(C.media.text_color))
+	if not button.text then
+		button.text = button:CreateFontText(16, "x")
+		button.text:SetPoint("CENTER", 0, 1)
+	end
 
-    button:HookScript("OnEnter", setModifiedBackdrop)
-    button:HookScript("OnLeave", setOriginalBackdrop)
+	if anchor then
+		button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -4, -4)
+	else
+		button:SetPoint("TOPRIGHT", -4, -4)
+	end
 
-    if anchor then
-        button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -4, -4)
-    end
+	button:HookScript("OnEnter", function(self)
+		if self:IsEnabled() then
+			self:SetBackdropBorderColor(r, g, b)
+			if self.__border then
+				self.__border:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1)
+			end
+		end
+	end)
+	button:HookScript("OnLeave", function(self)
+		self:SetBackdropBorderColor(unpack(C.media.border_color))
+		if self.__border then
+			self.__border:SetVertexColor(0.1, 0.1, 0.1, 1)
+		end
+	end)
 
-    button.__skinned = true
+	button.__styled = true
 end
 
--- E:SkinTab(tab) — Tab button
+------------------------------------------------------------------------
+-- E:ReskinTab — tab button
+------------------------------------------------------------------------
 
-function E:SkinTab(tab)
-    if not tab or tab.__skinned then
-        return
-    end
-    if tab:IsForbidden() then
-        return
-    end
+function E:ReskinTab(tab)
+	if not tab or tab.__styled then
+		return
+	end
+	if tab:IsForbidden() then
+		return
+	end
 
-    tab:StripTextures()
+	tab:StripTextures()
 
-    local bg = CreateFrame("Frame", nil, tab, "BackdropTemplate")
-    bg:SetInside(tab, 4, 4)
-    bg:SetFrameLevel(tab:GetFrameLevel() - 1)
-    bg:SetTemplate("Overlay")
-    tab.bg = bg
+	local bg = CreateFrame("Frame", nil, tab, "BackdropTemplate")
+	bg:SetInside(tab, 4, 4)
+	bg:SetFrameLevel(tab:GetFrameLevel() - 1)
+	bg:SetTemplate("Overlay")
+	tab.__bg = bg
 
-    tab:HookScript("OnEnter", function(self)
-        self.bg:SetBackdropBorderColor(r, g, b)
-    end)
-    tab:HookScript("OnLeave", function(self)
-        self.bg:SetBackdropBorderColor(unpack(C.media.border_color))
-    end)
+	tab:HookScript("OnEnter", function(self)
+		self.__bg:SetBackdropBorderColor(r, g, b)
+	end)
+	tab:HookScript("OnLeave", function(self)
+		self.__bg:SetBackdropBorderColor(unpack(C.media.border_color))
+	end)
 
-    tab.__skinned = true
+	tab.__styled = true
 end
 
--- E:SkinScrollBar(scrollBar) — Scrollbar
+------------------------------------------------------------------------
+-- E:ReskinScrollBar — classic scrollbar
+------------------------------------------------------------------------
 
-function E:SkinScrollBar(scrollBar)
-    if not scrollBar or scrollBar.__skinned then
-        return
-    end
-    if scrollBar:IsForbidden() then
-        return
-    end
+function E:ReskinScrollBar(scrollBar)
+	if not scrollBar or scrollBar.__styled then
+		return
+	end
+	if scrollBar:IsForbidden() then
+		return
+	end
 
-    scrollBar:StripTextures()
+	scrollBar:StripTextures()
 
-    local thumb = scrollBar.GetThumbTexture and scrollBar:GetThumbTexture()
-    if thumb then
-        thumb:SetTexture(C.media.texture.blank)
-        thumb:SetVertexColor(r, g, b, 0.6)
-        thumb:SetSize(6, 40)
-    end
+	local thumb = scrollBar.GetThumbTexture and scrollBar:GetThumbTexture()
+	if thumb then
+		thumb:SetTexture(C.media.texture.blank)
+		thumb:SetVertexColor(r, g, b, 0.6)
+		thumb:SetSize(6, 40)
+	end
 
-    scrollBar.__skinned = true
+	scrollBar.__styled = true
 end
 
--- E:SkinEditBox(editbox) — Input field
+------------------------------------------------------------------------
+-- E:ReskinEditBox — input field
+------------------------------------------------------------------------
 
-function E:SkinEditBox(editbox)
-    if not editbox or editbox.__skinned then
-        return
-    end
-    if editbox:IsForbidden() then
-        return
-    end
+function E:ReskinEditBox(editbox)
+	if not editbox or editbox.__styled then
+		return
+	end
+	if editbox:IsForbidden() then
+		return
+	end
 
-    editbox:StripTextures()
-    editbox:SetTemplate("Blur")
+	editbox:StripTextures()
+	editbox:SetTemplate("Blur")
 
-    editbox.__skinned = true
+	editbox.__styled = true
 end
 
--- E:SkinSlider(slider) — Slider control
+------------------------------------------------------------------------
+-- E:ReskinSlider — slider control
+------------------------------------------------------------------------
 
-function E:SkinSlider(slider)
-    if not slider or slider.__skinned then
-        return
-    end
-    if slider:IsForbidden() then
-        return
-    end
+function E:ReskinSlider(slider)
+	if not slider or slider.__styled then
+		return
+	end
+	if slider:IsForbidden() then
+		return
+	end
 
-    slider:StripTextures()
-    slider:SetTemplate("Overlay")
+	slider:StripTextures()
+	slider:SetTemplate("Overlay")
 
-    local thumb = slider.GetThumbTexture and slider:GetThumbTexture()
-    if thumb then
-        thumb:SetTexture(C.media.texture.blank)
-        thumb:SetVertexColor(r, g, b)
-        thumb:SetSize(12, 12)
-    end
+	local thumb = slider.GetThumbTexture and slider:GetThumbTexture()
+	if thumb then
+		thumb:SetTexture(C.media.texture.blank)
+		thumb:SetVertexColor(r, g, b)
+		thumb:SetSize(12, 12)
+	end
 
-    slider.__skinned = true
+	slider.__styled = true
 end
 
--- E:SkinDropDown(dropdown) — Dropdown menu
+------------------------------------------------------------------------
+-- E:ReskinDropDown — dropdown menu
+------------------------------------------------------------------------
 
-function E:SkinDropDown(dropdown)
-    if not dropdown or dropdown.__skinned then
-        return
-    end
-    if dropdown:IsForbidden() then
-        return
-    end
+function E:ReskinDropDown(dropdown)
+	if not dropdown or dropdown.__styled then
+		return
+	end
+	if dropdown:IsForbidden() then
+		return
+	end
 
-    dropdown:StripTextures()
-    dropdown:SetTemplate("Blur")
+	dropdown:StripTextures()
+	dropdown:SetTemplate("Blur")
 
-    local button = dropdown.Button or (dropdown.GetName and _G[dropdown:GetName() .. "Button"])
-    if button then
-        button:StripTextures()
-        button:SetTemplate("Overlay")
-        button:SetSize(20, 20)
-        button:SetPoint("RIGHT", -2, 0)
-    end
+	local button = dropdown.Button or (dropdown.GetName and _G[dropdown:GetName() .. "Button"])
+	if button then
+		button:StripTextures()
+		button:SetTemplate("Overlay")
+		button:SetSize(20, 20)
+		button:SetPoint("RIGHT", -2, 0)
+	end
 
-    dropdown.__skinned = true
+	dropdown.__styled = true
 end
 
--- E:SkinStatusBar(bar) — Status/progress bar
+------------------------------------------------------------------------
+-- E:ReskinStatusBar — status/progress bar
+------------------------------------------------------------------------
 
-function E:SkinStatusBar(bar)
-    if not bar or bar.__skinned then
-        return
-    end
-    if bar:IsForbidden() then
-        return
-    end
+function E:ReskinStatusBar(bar)
+	if not bar or bar.__styled then
+		return
+	end
+	if bar:IsForbidden() then
+		return
+	end
 
-    bar:StripTextures()
-    bar:SetStatusBarTexture(C.media.texture.status)
-    bar:CreateBackground()
+	bar:StripTextures()
+	bar:SetStatusBarTexture(C.media.texture.status)
 
-    if bar.bg then
-        bar.bg:SetTemplate("Overlay")
-    end
+	local bg = bar:CreateBG()
+	bg:SetTemplate("Overlay")
 
-    bar.__skinned = true
+	bar.__styled = true
 end
 
--- E:SkinPortrait(frame) — Portrait frame (character panel style)
--- Strips portrait decorations, applies standard frame skin
+------------------------------------------------------------------------
+-- E:ReskinPortrait — portrait frame
+------------------------------------------------------------------------
 
-function E:SkinPortrait(frame)
-    if not frame or frame.__skinned then
-        return
-    end
-    if frame:IsForbidden() then
-        return
-    end
+function E:ReskinPortrait(frame)
+	if not frame or frame.__styled then
+		return
+	end
+	if frame:IsForbidden() then
+		return
+	end
 
-    -- Kill portrait-specific regions
-    local portrait = frame.PortraitContainer or frame.portrait
-    if portrait then
-        portrait:SetAlpha(0)
-    end
-    if frame.PortraitFrame then
-        frame.PortraitFrame:SetAlpha(0)
-    end
+	local portrait = frame.PortraitContainer or frame.portrait
+	if portrait then
+		portrait:SetAlpha(0)
+	end
+	if frame.PortraitFrame then
+		frame.PortraitFrame:SetAlpha(0)
+	end
 
-    -- Apply standard frame skin
-    frame:StripTextures()
-    frame:SetTemplate("Default")
-    frame:CreateShadow()
+	frame:StripTextures()
+	frame:SetTemplate("Default")
+	frame:CreateShadow()
 
-    frame.__skinned = true
+	frame.__styled = true
 end
 
--- E:SkinCheckBox(checkbox) — Already exists in Style.lua, re-export for consistency
--- (see Core/Style.lua E:SkinCheckBox)
+------------------------------------------------------------------------
+-- E:ReskinNavBar — navigation breadcrumb bar
+------------------------------------------------------------------------
 
--- E:SkinCheckBox is already defined in Style.lua, no need to redefine here
+function E:ReskinNavBar(navBar)
+	if not navBar or navBar.__styled then
+		return
+	end
+	if navBar:IsForbidden() then
+		return
+	end
 
--- E:SkinNavBar(navBar) — Navigation breadcrumb bar
+	navBar:StripTextures()
+	navBar:SetTemplate("Transparent")
 
-function E:SkinNavBar(navBar)
-    if not navBar or navBar.__skinned then
-        return
-    end
-    if navBar:IsForbidden() then
-        return
-    end
+	local overflowButton = navBar.overflow
+	if overflowButton then
+		E:ReskinButton(overflowButton)
+	end
 
-    navBar:StripTextures()
-    navBar:SetTemplate("Transparent")
-
-    local overflowButton = navBar.overflow
-    if overflowButton then
-        E:SkinButton(overflowButton)
-    end
-
-    navBar.__skinned = true
+	navBar.__styled = true
 end
 
--- E:SkinTrimScrollBar(scrollBar) — New-style TrimScrollBar (12.0+)
+------------------------------------------------------------------------
+-- E:ReskinTrimScrollBar — new-style TrimScrollBar (12.0+)
+------------------------------------------------------------------------
 
-function E:SkinTrimScrollBar(scrollBar)
-    if not scrollBar or scrollBar.__skinned then
-        return
-    end
-    if scrollBar:IsForbidden() then
-        return
-    end
+function E:ReskinTrimScrollBar(scrollBar)
+	if not scrollBar or scrollBar.__styled then
+		return
+	end
+	if scrollBar:IsForbidden() then
+		return
+	end
 
-    scrollBar:StripTextures()
+	scrollBar:StripTextures()
 
-    if scrollBar.Track then
-        scrollBar.Track:StripTextures()
-    end
-    if scrollBar.Thumb then
-        scrollBar.Thumb:StripTextures()
-        scrollBar.Thumb:SetTemplate("Overlay")
-        scrollBar.Thumb:SetFixedPanelTemplate(nil)
-    end
-    if scrollBar.Back then
-        scrollBar.Back:StripTextures()
-    end
-    if scrollBar.Forward then
-        scrollBar.Forward:StripTextures()
-    end
+	if scrollBar.Track then
+		scrollBar.Track:StripTextures()
+	end
+	if scrollBar.Thumb then
+		scrollBar.Thumb:StripTextures()
+		scrollBar.Thumb:SetTemplate("Overlay")
+		scrollBar.Thumb:SetFixedPanelTemplate(nil)
+	end
+	if scrollBar.Back then
+		scrollBar.Back:StripTextures()
+	end
+	if scrollBar.Forward then
+		scrollBar.Forward:StripTextures()
+	end
 
-    scrollBar.__skinned = true
+	scrollBar.__styled = true
 end
 
--- E:SkinInsetFrame(frame) — Inset panels within larger frames
+------------------------------------------------------------------------
+-- E:ReskinInsetFrame — inset panels
+------------------------------------------------------------------------
 
-function E:SkinInsetFrame(frame)
-    if not frame or frame.__skinned then
-        return
-    end
-    if frame:IsForbidden() then
-        return
-    end
+function E:ReskinInsetFrame(frame)
+	if not frame or frame.__styled then
+		return
+	end
+	if frame:IsForbidden() then
+		return
+	end
 
-    frame:StripTextures()
-    frame:SetTemplate("Transparent")
+	frame:StripTextures()
+	frame:SetTemplate("Transparent")
 
-    frame.__skinned = true
+	frame.__styled = true
+end
+
+------------------------------------------------------------------------
+-- E:ReskinCheckBox — checkbox (delegates to StyleCheckBox)
+------------------------------------------------------------------------
+
+function E:ReskinCheckBox(frame)
+	if not frame or frame.__styled then
+		return
+	end
+	E:StyleCheckBox(frame)
+	frame.__styled = true
 end

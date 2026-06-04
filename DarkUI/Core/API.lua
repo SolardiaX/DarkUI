@@ -1,451 +1,509 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Core API
-----------------------------------------------------------------------------------------
-E.UIScale = function()
-    -- if C.general.autoScale then
-    --     C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+------------------------------------------------------------------------
 
-    --     if E.screenHeight >= 2400 then
-    --         C.general.uiScale = C.general.uiScale * 3
-    --     elseif E.screenHeight >= 1600 then
-    --         C.general.uiScale = C.general.uiScale * 2
-    --     end
-    --     C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
-    -- end
-    if C.general.autoScale then
-        C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
-        C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5)) -- 8.1 Fix scale bug
-        if C.general.uiScale < 0.64 then
-            C.general.uiScale = 0.64
-        end
-    end
+------------------------------------------------------------------------
+-- UI Scale
+------------------------------------------------------------------------
+
+E.UIScale = function()
+	if C.general.autoScale then
+		C.general.uiScale = min(2, max(0.20, 768 / E.screenHeight))
+		C.general.uiScale = tonumber(string.sub(C.general.uiScale, 0, 5))
+		if C.general.uiScale < 0.64 then
+			C.general.uiScale = 0.64
+		end
+	end
 end
 E.UIScale()
 
-E.mult = 768 / E.screenHeight / C.general.uiScale
-E.noscalemult = E.mult * C.general.uiScale
-
-if E.screenHeight > 1200 then
-    E.mult = E.mult * math.floor(1 / E.mult + 0.5)
-end
+local pixel = 1
+local ratio = 768 / E.screenHeight
+E.mult = (pixel / C.general.uiScale) - ((pixel - ratio) / C.general.uiScale)
 
 local Mult = E.mult
 
---  Dummy object
+------------------------------------------------------------------------
+-- Backdrop Constants
+------------------------------------------------------------------------
+
+local BACKDROP = {
+	default = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.blank },
+	shadow = { edgeFile = C.media.texture.shadow },
+	border = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.border },
+	blur = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.shadow },
+}
+
+------------------------------------------------------------------------
+-- Utilities
+------------------------------------------------------------------------
+
 E.Dummy = function()
-    return
+	return
 end
 
--- Frame Hider
 E.FrameHider = CreateFrame("Frame")
 E.FrameHider:Hide()
 
--- Pet Battle Hider
 E.PetBattleFrameHider = CreateFrame("Frame", "DarkUI_PetBattleFrameHider", UIParent, "SecureHandlerStateTemplate")
 E.PetBattleFrameHider:SetAllPoints()
 E.PetBattleFrameHider:SetFrameStrata("LOW")
 RegisterStateDriver(E.PetBattleFrameHider, "visibility", "[petbattle] hide; show")
 
---  Kill object function
+------------------------------------------------------------------------
+-- Kill
+------------------------------------------------------------------------
 
-local kill = function(object)
-    if object.UnregisterAllEvents then
-        object:UnregisterAllEvents()
-        object:SetParent(E.FrameHider)
-    else
-        object.Show = object.Hide
-    end
-    object:Hide()
+local function kill(object)
+	if object.UnregisterAllEvents then
+		object:UnregisterAllEvents()
+		object:SetParent(E.FrameHider)
+	else
+		object.Show = object.Hide
+	end
+	object:Hide()
 end
 
---  Core API function
+------------------------------------------------------------------------
+-- StripTextures
+------------------------------------------------------------------------
+
 local stripTexturesBlizzFrames = {
-    "Inset",
-    "inset",
-    "InsetFrame",
-    "LeftInset",
-    "RightInset",
-    "NineSlice",
-    "BG",
-    "Bg",
-    "border",
-    "Border",
-    "Background",
-    "BorderFrame",
-    "bottomInset",
-    "BottomInset",
-    "bgLeft",
-    "bgRight",
-    "FilligreeOverlay",
-    "PortraitOverlay",
-    "ArtOverlayFrame",
-    "Portrait",
-    "portrait",
-    "ScrollFrameBorder",
-    "ScrollUpBorder",
-    "ScrollDownBorder",
+	"Inset",
+	"inset",
+	"InsetFrame",
+	"LeftInset",
+	"RightInset",
+	"NineSlice",
+	"BG",
+	"Bg",
+	"border",
+	"Border",
+	"Background",
+	"BorderFrame",
+	"bottomInset",
+	"BottomInset",
+	"bgLeft",
+	"bgRight",
+	"FilligreeOverlay",
+	"PortraitOverlay",
+	"ArtOverlayFrame",
+	"Portrait",
+	"portrait",
+	"ScrollFrameBorder",
+	"ScrollUpBorder",
+	"ScrollDownBorder",
 }
 
-local function stripTextures(object, kill)
-    if object.GetNumRegions then
-        for _, region in next, { object:GetRegions() } do
-            if region and region.IsObjectType and region:IsObjectType("Texture") then
-                if kill then
-                    region:Kill()
-                else
-                    region:SetTexture("")
-                    region:SetAtlas("")
-                end
-            end
-        end
-    end
+local function stripTextures(object, killFlag)
+	if object.GetNumRegions then
+		for i = 1, object:GetNumRegions() do
+			local region = select(i, object:GetRegions())
+			if region and region.IsObjectType and region:IsObjectType("Texture") then
+				if killFlag and type(killFlag) == "boolean" then
+					kill(region)
+				elseif tonumber(killFlag) then
+					if killFlag == 0 then
+						region:SetAlpha(0)
+					elseif i ~= killFlag then
+						region:SetTexture("")
+						region:SetAtlas("")
+					end
+				else
+					region:SetTexture("")
+					region:SetAtlas("")
+				end
+			end
+		end
+	end
 
-    local frameName = object.GetName and object:GetName()
-    for _, blizzard in pairs(stripTexturesBlizzFrames) do
-        local blizzFrame = object[blizzard] or frameName and _G[frameName .. blizzard]
-        if blizzFrame then
-            blizzFrame:StripTextures(kill)
-        end
-    end
+	local frameName = object.GetName and object:GetName()
+	for _, blizzard in pairs(stripTexturesBlizzFrames) do
+		local blizzFrame = object[blizzard] or (frameName and _G[frameName .. blizzard])
+		if blizzFrame and blizzFrame.StripTextures then
+			blizzFrame:StripTextures(killFlag)
+		end
+	end
 end
 
+------------------------------------------------------------------------
+-- Pixel Snap
+------------------------------------------------------------------------
+
+local issecrettable = issecrettable
+
 local function watchPixelSnap(frame, snap)
-    if (frame and not frame:IsForbidden()) and frame.pixelSnapDisabled and snap then
-        frame.pixelSnapDisabled = nil
-    end
+	if issecrettable and issecrettable(frame) then
+		return
+	end
+	if (frame and not frame:IsForbidden()) and frame.__pixelSnapOff and snap then
+		frame.__pixelSnapOff = nil
+	end
 end
 
 local function disablePixelSnap(frame)
-    if (frame and not frame:IsForbidden()) and not frame.pixelSnapDisabled then
-        if frame.SetSnapToPixelGrid then
-            frame:SetSnapToPixelGrid(false)
-            frame:SetTexelSnappingBias(0)
-        elseif frame.GetStatusBarTexture then
-            local texture = frame:GetStatusBarTexture()
-            if texture and texture.SetSnapToPixelGrid then
-                texture:SetSnapToPixelGrid(false)
-                texture:SetTexelSnappingBias(0)
-            end
-        end
+	if issecrettable and issecrettable(frame) then
+		return
+	end
+	if (frame and not frame:IsForbidden()) and not frame.__pixelSnapOff then
+		if frame.SetSnapToPixelGrid then
+			frame:SetSnapToPixelGrid(false)
+			frame:SetTexelSnappingBias(0)
+		elseif frame.GetStatusBarTexture then
+			local texture = frame:GetStatusBarTexture()
+			if type(texture) == "table" and texture.SetSnapToPixelGrid then
+				texture:SetSnapToPixelGrid(false)
+				texture:SetTexelSnappingBias(0)
+			end
+		end
 
-        frame.pixelSnapDisabled = true
-    end
+		frame.__pixelSnapOff = true
+	end
 end
 
+------------------------------------------------------------------------
+-- SetOutside / SetInside
+------------------------------------------------------------------------
+
 local function setOutside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or Mult
-    yOffset = yOffset or Mult
-    anchor = anchor or obj:GetParent()
+	xOffset = xOffset or Mult
+	yOffset = yOffset or Mult
+	anchor = anchor or obj:GetParent()
 
-    disablePixelSnap(obj)
+	disablePixelSnap(obj)
 
-    if obj:GetPoint() then
-        obj:ClearAllPoints()
-    end
+	if obj:GetPoint() then
+		obj:ClearAllPoints()
+	end
 
-    obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", -xOffset, yOffset)
-    obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", xOffset, -yOffset)
+	obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", -xOffset, yOffset)
+	obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", xOffset, -yOffset)
 end
 
 local function setInside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or Mult
-    yOffset = yOffset or Mult
-    anchor = anchor or obj:GetParent()
+	xOffset = xOffset or Mult
+	yOffset = yOffset or Mult
+	anchor = anchor or obj:GetParent()
 
-    disablePixelSnap(obj)
+	disablePixelSnap(obj)
 
-    if obj:GetPoint() then
-        obj:ClearAllPoints()
-    end
+	if obj:GetPoint() then
+		obj:ClearAllPoints()
+	end
 
-    obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", xOffset, -yOffset)
-    obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -xOffset, yOffset)
+	obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", xOffset, -yOffset)
+	obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -xOffset, yOffset)
 end
 
-local function createBackground(f, offset)
-    if f:GetObjectType() == "Texture" then
-        f = f:GetParent()
-    end
-    offset = offset or Mult
-    local lvl = f:GetFrameLevel()
-
-    f.bg = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    f.bg:SetPoint("TOPLEFT", f, -offset, offset)
-    f.bg:SetPoint("BOTTOMRIGHT", f, offset, -offset)
-    f.bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
-end
-
-local function createFontText(f, size, text, classcolor, anchor, x, y)
-    local fs = f:CreateFontString(nil, "OVERLAY", nil, 1)
-    fs:SetFont(C.media.standard_font[1], size, C.media.standard_font[3])
-    fs:SetText(text)
-    -- fs:SetWordWrap(false)
-    fs:SetShadowColor(0, 0, 0)
-    fs:SetShadowOffset(0.85, -0.85)
-
-    if classcolor then
-        fs:SetTextColor(E.myColor.r, E.myColor.g, E.myColor.b)
-    else
-        fs:SetTextColor(unpack(C.media.text_color))
-    end
-
-    if anchor and x and y then
-        fs:SetPoint(anchor, x, y)
-    else
-        fs:SetPoint("CENTER", 1, 0)
-    end
-
-    return fs
-end
+------------------------------------------------------------------------
+-- SetTemplate
+------------------------------------------------------------------------
 
 local function setTemplate(f, t, edge, insets)
-    Mixin(f, BackdropTemplateMixin) -- 9.0 to set backdrop
-    if not t then
-        t = "Default"
-    end
+	Mixin(f, BackdropTemplateMixin)
+	if not t then
+		t = "Default"
+	end
 
-    local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
-    local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
-    local overlay_color = C.media.overlay_color
+	local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
+	local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
+	local overlay_color = C.media.overlay_color
 
-    if t == "Shadow" then
-        if not edge then
-            edge = 6
-        end
-        if not insets then
-            insets = Mult
-        end
-        f:SetBackdrop({
-            bgFile = nil,
-            edgeFile = C.media.texture.shadow,
-            tile = false,
-            tileSize = 32,
-            edgeSize = edge,
-            insets = { left = insets, right = insets, top = insets, bottom = insets },
-        })
+	if t == "Shadow" then
+		if not edge then
+			edge = 6
+		end
+		if not insets then
+			insets = Mult
+		end
+		f:SetBackdrop({
+			bgFile = nil,
+			edgeFile = C.media.texture.shadow,
+			tile = false,
+			tileSize = 32,
+			edgeSize = edge,
+			insets = { left = insets, right = insets, top = insets, bottom = insets },
+		})
 
-        borderr, borderg, borderb, bordera = unpack(C.media.shadow_color)
-    elseif t == "Border" then
-        if not edge then
-            edge = 12
-        end
-        if not insets then
-            insets = Mult
-        end
-        f:SetBackdrop({
-            bgFile = C.media.texture.blank,
-            edgeFile = C.media.texture.border,
-            tile = false,
-            tileSize = 32,
-            edgeSize = edge,
-            insets = { left = insets, right = insets, top = insets, bottom = insets },
-        })
-        backdropa = 0
-    elseif t == "Blur" then
-        if not edge then
-            edge = Mult
-        end
-        if not insets then
-            insets = Mult
-        end
-        f:SetBackdrop({
-            bgFile = C.media.texture.blank,
-            edgeFile = C.media.texture.shadow,
-            tile = false,
-            tileEdge = true,
-            tileSize = 16,
-            edgeSize = edge,
-            insets = { left = insets, right = insets, top = insets, bottom = insets },
-        })
-    else
-        if not edge then
-            edge = Mult
-        end
-        if not insets then
-            insets = Mult
-        end
-        f:SetBackdrop({
-            bgFile = C.media.texture.blank,
-            edgeFile = C.media.texture.blank,
-            edgeSize = edge,
-            insets = { left = insets, right = insets, top = insets, bottom = insets },
-        })
-    end
+		borderr, borderg, borderb, bordera = unpack(C.media.shadow_color)
+	elseif t == "Border" then
+		if not edge then
+			edge = 12
+		end
+		if not insets then
+			insets = Mult
+		end
+		f:SetBackdrop({
+			bgFile = C.media.texture.blank,
+			edgeFile = C.media.texture.border,
+			tile = false,
+			tileSize = 32,
+			edgeSize = edge,
+			insets = { left = insets, right = insets, top = insets, bottom = insets },
+		})
+		backdropa = 0
+	elseif t == "Blur" then
+		if not edge then
+			edge = Mult
+		end
+		if not insets then
+			insets = Mult
+		end
+		f:SetBackdrop({
+			bgFile = C.media.texture.blank,
+			edgeFile = C.media.texture.shadow,
+			tile = false,
+			tileEdge = true,
+			tileSize = 16,
+			edgeSize = edge,
+			insets = { left = insets, right = insets, top = insets, bottom = insets },
+		})
+	else
+		if not edge then
+			edge = Mult
+		end
+		if not insets then
+			insets = Mult
+		end
+		f:SetBackdrop({
+			bgFile = C.media.texture.blank,
+			edgeFile = C.media.texture.blank,
+			edgeSize = edge,
+			insets = { left = insets, right = insets, top = insets, bottom = insets },
+		})
+	end
 
-    if t == "Transparent" then
-        backdropa = overlay_color[4]
-    elseif t == "Overlay" then
-        backdropa = 1
-        f:CreateOverlay()
-    elseif t == "Invisible" then
-        backdropa = 0
-        bordera = 0
-    end
+	if t == "Transparent" then
+		backdropa = overlay_color[4]
+	elseif t == "Overlay" then
+		backdropa = 1
+		f:CreateOverlay()
+	elseif t == "Invisible" then
+		backdropa = 0
+		bordera = 0
+	end
 
-    f:SetBackdropBorderColor(borderr, borderg, borderb, bordera)
+	f:SetBackdropBorderColor(borderr, borderg, borderb, bordera)
 
-    if t ~= "Shadow" then
-        f:SetBackdropColor(backdropr, backdropg, backdropb, backdropa)
-    end
+	if t ~= "Shadow" then
+		f:SetBackdropColor(backdropr, backdropg, backdropb, backdropa)
+	end
 end
+
+------------------------------------------------------------------------
+-- CreateBG — background frame wrapping outside self
+------------------------------------------------------------------------
+
+local function createBG(f, alpha)
+	if f.__bg then
+		return f.__bg
+	end
+
+	local frame = f
+	if f:IsObjectType("Texture") then
+		frame = f:GetParent()
+	end
+	local lvl = frame:GetFrameLevel()
+
+	local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	bg:SetOutside(f)
+	bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
+
+	Mixin(bg, BackdropTemplateMixin)
+	bg:SetBackdrop({
+		bgFile = C.media.texture.blank,
+		edgeFile = C.media.texture.blank,
+		edgeSize = Mult,
+		insets = { left = Mult, right = Mult, top = Mult, bottom = Mult },
+	})
+	bg:SetBackdropColor(0, 0, 0, alpha or C.media.backdrop_color[4])
+	bg:SetBackdropBorderColor(unpack(C.media.border_color))
+
+	f.__bg = bg
+	return bg
+end
+
+------------------------------------------------------------------------
+-- CreateShadow — glow edge frame
+------------------------------------------------------------------------
+
+local function createShadow(f, size)
+	if f.__shadow then
+		return f.__shadow
+	end
+
+	local frame = f
+	if f:IsObjectType("Texture") then
+		frame = f:GetParent()
+	end
+
+	size = size or 4
+	BACKDROP.shadow.edgeSize = size + 1
+
+	local shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	shadow:SetOutside(f, size, size)
+	shadow:SetBackdrop(BACKDROP.shadow)
+	shadow:SetBackdropBorderColor(0, 0, 0, 0.6)
+	shadow:SetFrameLevel(0)
+
+	f.__shadow = shadow
+	return shadow
+end
+
+------------------------------------------------------------------------
+-- CreateBorder — overlay texture border + shadow
+------------------------------------------------------------------------
+
+local function createBorder(f, margin)
+	if f.__border then
+		return f.__border
+	end
+
+	margin = margin or Mult
+
+	local border = f:CreateTexture(nil, "BACKGROUND", nil, -7)
+	border:SetTexture(C.media.texture.overlay)
+	border:SetTexCoord(0, 1, 0, 1)
+	border:SetDrawLayer("BACKGROUND", -7)
+	border:ClearAllPoints()
+	border:SetPoint("TOPRIGHT", f, margin, margin)
+	border:SetPoint("BOTTOMLEFT", f, -margin, -margin)
+
+	f.__border = border
+	createShadow(f)
+
+	return border
+end
+
+------------------------------------------------------------------------
+-- CreateOverlay — dark inner texture
+------------------------------------------------------------------------
 
 local function createOverlay(f, margin)
-    if f.overlay then
-        return
-    end
+	if f.__overlay then
+		return f.__overlay
+	end
 
-    margin = margin or Mult
+	margin = margin or Mult
 
-    local overlay = f:CreateTexture("$parentOverlay", "BORDER")
-    overlay:SetInside(f, margin, margin)
-    overlay:SetTexture(C.media.texture.blank)
-    overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
+	local overlay = f:CreateTexture("$parentOverlay", "BORDER")
+	overlay:SetInside(f, margin, margin)
+	overlay:SetTexture(C.media.texture.blank)
+	overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
 
-    f.overlay = overlay
+	f.__overlay = overlay
+	return overlay
 end
 
-local function createShadow(f, margin)
-    margin = margin or 4
+------------------------------------------------------------------------
+-- CreateGradient
+------------------------------------------------------------------------
 
-    local shadow = CreateFrame("Frame", nil, f)
-    shadow:SetFrameLevel(f:GetFrameLevel() == 0 and 0 or f:GetFrameLevel() - 1)
-    shadow:SetFrameStrata(f:GetFrameStrata())
-    shadow:SetOutside(f, margin, margin)
-    shadow:SetTemplate("Shadow")
-    shadow:SetBackdropColor(0, 0, 0, 0)
+local function createGradient(f)
+	if f.__gradient then
+		return f.__gradient
+	end
 
-    f.shadow = shadow
+	local gradient = f:CreateTexture(nil, "BORDER")
+	gradient:SetInside(f)
+	gradient:SetTexture(C.media.texture.gradient)
+	gradient:SetVertexColor(unpack(C.media.gradient_color))
+
+	f.__gradient = gradient
+	return gradient
 end
 
-local function createBackdrop(f, template, margin)
-    template = template or "Default"
-    margin = margin or Mult
+------------------------------------------------------------------------
+-- CreateFontText
+------------------------------------------------------------------------
 
-    local backdrop = CreateFrame("Frame", "$parentBackdrop", f)
-    backdrop:SetInside(f, margin, margin)
-    backdrop:SetTemplate(template)
+local function createFontText(f, size, text, classcolor, anchor, x, y)
+	local fs = f:CreateFontString(nil, "OVERLAY", nil, 1)
+	fs:SetFont(C.media.standard_font[1], size, C.media.standard_font[3])
+	fs:SetText(text)
+	fs:SetShadowColor(0, 0, 0)
+	fs:SetShadowOffset(0.85, -0.85)
 
-    if f:GetFrameLevel() - 1 >= 0 then
-        backdrop:SetFrameLevel(f:GetFrameLevel() - 1)
-    else
-        backdrop:SetFrameLevel(0)
-    end
+	if classcolor then
+		fs:SetTextColor(E.myColor.r, E.myColor.g, E.myColor.b)
+	else
+		fs:SetTextColor(unpack(C.media.text_color))
+	end
 
-    f.backdrop = backdrop
+	if anchor and x and y then
+		fs:SetPoint(anchor, x, y)
+	else
+		fs:SetPoint("CENTER", 1, 0)
+	end
+
+	return fs
 end
 
-local function createBorder(f, margin, shadow)
-    if f.border then
-        return
-    end
+------------------------------------------------------------------------
+-- Metatable Injection
+------------------------------------------------------------------------
 
-    margin = margin or Mult
-
-    f.border = CreateFrame("Frame", "$parentBorder", f, "BackdropTemplate")
-    f.border:ClearAllPoints()
-    f.border:SetPoint("TOPLEFT", f, "TOPLEFT", -margin, margin)
-    f.border:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", margin, -margin)
-    f.border:SetFrameLevel(f:GetFrameLevel() + 1)
-    f.border:SetTemplate("Border")
-
-    if shadow then
-        f.border:CreateShadow(shadow)
-    end
-end
-
-local function createPanel(f, t, w, h, a1, p, a2, x, y)
-    if not t then
-        t = "Default"
-    end
-
-    f:SetWidth(w)
-    f:SetHeight(h)
-    f:SetFrameLevel(1)
-    f:SetFrameStrata("BACKGROUND")
-    f:SetPoint(a1, p, a2, x, y)
-    f:SetTemplate(t)
-end
-
-local function fadeIn(f)
-    E:UIFrameFadeIn(f, 0.4, f:GetAlpha(), 1)
-end
-
-local function fadeOut(f)
-    E:UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
-end
-
---  Apply API to base metatables (no EnumerateFrames needed)
 local function addapi(object)
-    local mt = getmetatable(object).__index
-    if mt._darkui then
-        return
-    end
+	local mt = getmetatable(object).__index
+	if mt.__darkui then
+		return
+	end
 
-    mt.SetOutside = setOutside
-    mt.SetInside = setInside
-    mt.Kill = kill
-    mt.StripTextures = stripTextures
-    mt.CreateBackground = createBackground
-    mt.SetTemplate = setTemplate
-    mt.CreateOverlay = createOverlay
-    mt.CreateShadow = createShadow
-    mt.CreateBackdrop = createBackdrop
-    mt.CreateBorder = createBorder
-    mt.CreateFontText = createFontText
-    mt.CreatePanel = createPanel
-    mt.FadeIn = fadeIn
-    mt.FadeOut = fadeOut
+	mt.SetOutside = setOutside
+	mt.SetInside = setInside
+	mt.Kill = kill
+	mt.StripTextures = stripTextures
+	mt.SetTemplate = setTemplate
+	mt.CreateBG = createBG
+	mt.CreateShadow = createShadow
+	mt.CreateBorder = createBorder
+	mt.CreateOverlay = createOverlay
+	mt.CreateGradient = createGradient
+	mt.CreateFontText = createFontText
 
-    if mt.SetTexture then
-        hooksecurefunc(mt, "SetTexture", disablePixelSnap)
-    end
-    if mt.SetTexCoord then
-        hooksecurefunc(mt, "SetTexCoord", disablePixelSnap)
-    end
-    if mt.CreateTexture then
-        hooksecurefunc(mt, "CreateTexture", disablePixelSnap)
-    end
-    if mt.SetVertexColor then
-        hooksecurefunc(mt, "SetVertexColor", disablePixelSnap)
-    end
-    if mt.SetColorTexture then
-        hooksecurefunc(mt, "SetColorTexture", disablePixelSnap)
-    end
-    if mt.SetSnapToPixelGrid then
-        hooksecurefunc(mt, "SetSnapToPixelGrid", watchPixelSnap)
-    end
-    if mt.SetStatusBarTexture then
-        hooksecurefunc(mt, "SetStatusBarTexture", disablePixelSnap)
-    end
+	if mt.SetTexture then
+		hooksecurefunc(mt, "SetTexture", disablePixelSnap)
+	end
+	if mt.SetTexCoord then
+		hooksecurefunc(mt, "SetTexCoord", disablePixelSnap)
+	end
+	if mt.CreateTexture then
+		hooksecurefunc(mt, "CreateTexture", disablePixelSnap)
+	end
+	if mt.SetVertexColor then
+		hooksecurefunc(mt, "SetVertexColor", disablePixelSnap)
+	end
+	if mt.SetColorTexture then
+		hooksecurefunc(mt, "SetColorTexture", disablePixelSnap)
+	end
+	if mt.SetSnapToPixelGrid then
+		hooksecurefunc(mt, "SetSnapToPixelGrid", watchPixelSnap)
+	end
+	if mt.SetStatusBarTexture then
+		hooksecurefunc(mt, "SetStatusBarTexture", disablePixelSnap)
+	end
 
-    mt._darkui = true
+	mt.__darkui = true
 end
 
--- Inject into the distinct base metatables only
-local frame = CreateFrame("Frame")
-addapi(frame)
-addapi(frame:CreateTexture())
-addapi(frame:CreateFontString())
-addapi(frame:CreateMaskTexture())
+------------------------------------------------------------------------
+-- Inject into all frame types via EnumerateFrames
+------------------------------------------------------------------------
 
-local button = CreateFrame("Button")
-if getmetatable(button).__index ~= getmetatable(frame).__index then
-    addapi(button)
-end
+local handled = { ["Frame"] = true }
+local baseFrame = CreateFrame("Frame")
+addapi(baseFrame)
+addapi(baseFrame:CreateTexture())
+addapi(baseFrame:CreateFontString())
+addapi(baseFrame:CreateMaskTexture())
 
-local checkButton = CreateFrame("CheckButton")
-if getmetatable(checkButton).__index ~= getmetatable(frame).__index then
-    addapi(checkButton)
-end
-
-local statusBar = CreateFrame("StatusBar")
-if getmetatable(statusBar).__index ~= getmetatable(frame).__index then
-    addapi(statusBar)
-end
-
-local cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
-if getmetatable(cooldown).__index ~= getmetatable(frame).__index then
-    addapi(cooldown)
+local object = EnumerateFrames()
+while object do
+	if not object:IsForbidden() and not handled[object:GetObjectType()] then
+		addapi(object)
+		handled[object:GetObjectType()] = true
+	end
+	object = EnumerateFrames(object)
 end

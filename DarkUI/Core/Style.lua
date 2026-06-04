@@ -1,644 +1,489 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
--- Style
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
+-- Style — DarkUI component styling
+------------------------------------------------------------------------
 
-local styles = {
-    backdrop = {
-        bgFile = C.media.texture.blank,
-        edgeFile = C.media.texture.blank,
-        tile = false,
-        tileSize = 16,
-        edgeSize = 1,
-        insets = { left = 0, right = 0, top = 0, bottom = 0 },
-    },
-    backdropColor = C.media.backdrop_color,
-    backdropBorderColor = C.media.border_color,
-    gradientColor = C.media.gradient_color,
-}
+------------------------------------------------------------------------
+-- ApplyBackdrop — full styled panel (bg + shadow + optional gradient)
+------------------------------------------------------------------------
 
 function E:ApplyBackdrop(frame, gradient)
-    if frame.styled then
-        return
-    end
+	if frame.__styled then
+		return
+	end
+	if not frame or frame:IsForbidden() then
+		return
+	end
 
-    if frame and not frame:IsForbidden() then
-        frame:CreateBackdrop()
+	local bg = frame:CreateBG()
+	bg:CreateShadow()
 
-        frame.backdrop:SetBackdrop(styles.backdrop)
-        frame.backdrop:SetBackdropColor(unpack(styles.backdropColor))
-        frame.backdrop:SetBackdropBorderColor(unpack(styles.backdropBorderColor))
-        frame.backdrop:CreateShadow()
+	if gradient then
+		frame:CreateGradient()
+	end
 
-        if gradient then
-            frame.gradient = frame:CreateTexture()
-            frame.gradient:SetTexture(C.media.texture.gradient)
-            frame.gradient:SetVertexColor(unpack(styles.gradientColor))
-        end
-    end
-
-    frame.styled = true
+	frame.__styled = true
 end
 
-function E:StyleIcon(icon, t, parent)
-    parent = parent or icon:GetParent()
+------------------------------------------------------------------------
+-- ReskinIcon — texCoord + bg frame on existing icon texture
+------------------------------------------------------------------------
 
-    if t then
-        icon.b = CreateFrame("Frame", nil, parent)
-        icon.b:SetTemplate("Default")
-        icon.b:SetOutside(icon)
-    else
-        parent:CreateBackdrop("Default")
-        parent.backdrop:SetOutside(icon)
-    end
+function E:ReskinIcon(icon, shadow, parent)
+	parent = parent or icon:GetParent()
 
-    icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    icon:SetParent(t and icon.b or parent)
+	icon:SetTexCoord(unpack(C.media.texCoord))
+
+	local bg = parent:CreateBG()
+	bg:SetOutside(icon)
+
+	if shadow then
+		bg:CreateShadow()
+	end
+
+	return bg
 end
+
+------------------------------------------------------------------------
+-- CropIcon — simple texcoord + inset
+------------------------------------------------------------------------
 
 function E:CropIcon(icon)
-    icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    icon:SetInside()
+	icon:SetTexCoord(unpack(C.media.texCoord))
+	icon:SetInside()
 end
+
+------------------------------------------------------------------------
+-- StyleCheckBox
+------------------------------------------------------------------------
 
 function E:StyleCheckBox(frame)
-    local lvl = frame:GetFrameLevel()
+	local lvl = frame:GetFrameLevel()
 
-    frame:SetNormalTexture("")
-    frame:SetPushedTexture("")
-    frame:SetHighlightTexture(C.media.texture.status)
+	frame:SetNormalTexture("")
+	frame:SetPushedTexture("")
+	frame:SetHighlightTexture(C.media.texture.status)
 
-    frame.bg = CreateFrame("Frame", nil, frame)
-    frame.bg:SetInside(frame, 4, 4)
-    frame.bg:SetFrameLevel(lvl == 0 and 1 or lvl - 1)
-    frame.bg:SetTemplate("Blur")
+	local bg = CreateFrame("Frame", nil, frame)
+	bg:SetInside(frame, 4, 4)
+	bg:SetFrameLevel(lvl == 0 and 1 or lvl - 1)
+	bg:SetTemplate("Blur")
+	frame.__bg = bg
 
-    frame.hl = frame:GetHighlightTexture()
-    frame.hl:SetInside(frame.bg)
-    frame.hl:SetVertexColor(E.myColor.r, E.myColor.g, E.myColor.b, 0.2)
+	frame.hl = frame:GetHighlightTexture()
+	frame.hl:SetInside(bg)
+	frame.hl:SetVertexColor(E.myColor.r, E.myColor.g, E.myColor.b, 0.2)
 
-    frame.ch = frame:GetCheckedTexture()
-    frame.ch:SetAtlas("checkmark-minimal")
-    frame.ch:SetDesaturated(true)
-    frame.ch:SetTexCoord(0, 1, 0, 1)
-    frame.ch:SetVertexColor(E.myColor.r, E.myColor.g, E.myColor.b)
+	frame.ch = frame:GetCheckedTexture()
+	frame.ch:SetAtlas("checkmark-minimal")
+	frame.ch:SetDesaturated(true)
+	frame.ch:SetTexCoord(0, 1, 0, 1)
+	frame.ch:SetVertexColor(E.myColor.r, E.myColor.g, E.myColor.b)
 end
 
-function E:StyleCharButton(f, point, text)
-    f:StripTextures()
-    f:SetSize(18, 18)
-    f:SetTemplate("Overlay")
+------------------------------------------------------------------------
+-- StyleButton — action button overlay/highlight/push textures
+------------------------------------------------------------------------
 
-    -- E:StyleIcon(f)
-    E:ApplyOverlayBorder(f)
-
-    if not text then
-        text = "x"
-    end
-    if not f.text then
-        f.text = f:CreateFontText(16, text)
-        f.text:SetPoint("CENTER", 0, 1)
-    end
-
-    if point then
-        f:SetPoint("TOPRIGHT", point, "TOPRIGHT", -4, -4)
-    else
-        f:SetPoint("TOPRIGHT", -4, -4)
-    end
-
-    f:HookScript("OnEnter", function(self)
-        if self:IsEnabled() then
-            self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
-            self.border:SetVertexColor(E.myColor.r * 0.3, E.myColor.g * 0.3, E.myColor.b * 0.3, 1)
-        end
-    end)
-    f:HookScript("OnLeave", function(self)
-        self:SetBackdropBorderColor(unpack(C.media.border_color))
-        self.border:SetVertexColor(0.1, 0.1, 0.1, 1)
-    end)
-end
-
-function E:ApplyOverlayBorder(f, margin)
-    margin = margin or E.mult
-
-    local border
-    local fn = f:GetName()
-
-    if fn ~= nil then
-        border = _G[fn .. "Border"] or f:CreateTexture(fn .. "Border", "BACKGROUND", nil, -7)
-    else
-        border = f:CreateTexture(nil, "BACKGROUND", nil, -7)
-    end
-
-    border:SetTexture(C.media.texture.overlay)
-    border:SetTexCoord(0, 1, 0, 1)
-    border:SetDrawLayer("BACKGROUND", -7)
-    border:ClearAllPoints()
-    border:SetPoint("TOPRIGHT", f, margin, margin)
-    border:SetPoint("BOTTOMLEFT", f, -margin, -margin)
-
-    f.border = border
-
-    f:CreateShadow()
-end
-
--- Sample Button Style Methods
-local setModifiedBackdrop = function(self)
-    if self:IsEnabled() then
-        self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
-        if self.overlay then
-            self.overlay:SetVertexColor(E.myColor.r * 0.3, E.myColor.g * 0.3, E.myColor.b * 0.3, 1)
-        end
-    end
-end
-
-local setOriginalBackdrop = function(self)
-    self:SetBackdropBorderColor(unpack(C.media.border_color))
-    if self.overlay then
-        self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
-    end
-end
-
-function E:StyleTextButton(f, strip)
-    if strip then
-        f:StripTextures()
-    end
-
-    if f.SetNormalTexture then
-        f:SetNormalTexture("")
-    end
-    if f.SetHighlightTexture then
-        f:SetHighlightTexture("")
-    end
-    if f.SetPushedTexture then
-        f:SetPushedTexture("")
-    end
-    if f.SetDisabledTexture then
-        f:SetDisabledTexture("")
-    end
-
-    if f.Left then
-        f.Left:SetAlpha(0)
-    end
-    if f.Right then
-        f.Right:SetAlpha(0)
-    end
-    if f.Middle then
-        f.Middle:SetAlpha(0)
-    end
-    if f.LeftSeparator then
-        f.LeftSeparator:SetAlpha(0)
-    end
-    if f.RightSeparator then
-        f.RightSeparator:SetAlpha(0)
-    end
-    if f.Flash then
-        f.Flash:SetAlpha(0)
-    end
-
-    if f.TopLeft then
-        f.TopLeft:Hide()
-    end
-    if f.TopRight then
-        f.TopRight:Hide()
-    end
-    if f.BottomLeft then
-        f.BottomLeft:Hide()
-    end
-    if f.BottomRight then
-        f.BottomRight:Hide()
-    end
-    if f.TopMiddle then
-        f.TopMiddle:Hide()
-    end
-    if f.MiddleLeft then
-        f.MiddleLeft:Hide()
-    end
-    if f.MiddleRight then
-        f.MiddleRight:Hide()
-    end
-    if f.BottomMiddle then
-        f.BottomMiddle:Hide()
-    end
-    if f.MiddleMiddle then
-        f.MiddleMiddle:Hide()
-    end
-
-    f:SetTemplate("Overlay")
-    f:HookScript("OnEnter", setModifiedBackdrop)
-    f:HookScript("OnLeave", setOriginalBackdrop)
-end
-
---  Normal Button Style Methods
 function E:StyleButton(button, margin)
-    local overlay = button:CreateTexture(nil, "OVERLAY")
-    overlay:SetOutside(button, margin, margin)
-    overlay:SetTexture(C.media.texture.overlay)
-    button.overlay = overlay
+	local overlay = button:CreateTexture(nil, "OVERLAY")
+	overlay:SetOutside(button, margin, margin)
+	overlay:SetTexture(C.media.texture.overlay)
+	button.__overlay = overlay
 
-    if button.NormalTexture then
-        button.NormalTexture:SetAlpha(0)
-    end
+	if button.NormalTexture then
+		button.NormalTexture:SetAlpha(0)
+	end
 
-    if button.SetHighlightTexture and not button.highlight then
-        local highlight = button:CreateTexture()
-        highlight:SetTexture(C.media.button.hover)
-        highlight:SetInside(button, margin, margin)
-        button.highlight = highlight
-        button:SetHighlightTexture(highlight)
-    end
+	if button.SetHighlightTexture and not button.highlight then
+		local highlight = button:CreateTexture()
+		highlight:SetTexture(C.media.button.hover)
+		highlight:SetInside(button, margin, margin)
+		button.highlight = highlight
+		button:SetHighlightTexture(highlight)
+	end
 
-    if button.SetPushedTexture and not button.pushed then
-        local pushed = button:CreateTexture()
-        pushed:SetTexture(C.media.button.pushed)
-        pushed:SetInside(button, margin, margin)
-        button.pushed = pushed
-        button:SetPushedTexture(pushed)
-    end
+	if button.SetPushedTexture and not button.pushed then
+		local pushed = button:CreateTexture()
+		pushed:SetTexture(C.media.button.pushed)
+		pushed:SetInside(button, margin, margin)
+		button.pushed = pushed
+		button:SetPushedTexture(pushed)
+	end
 
-    if button.SetCheckedTexture and not button.checked then
-        local checked = button:CreateTexture()
-        checked:SetTexture(C.media.button.checked)
-        checked:SetInside(button, margin, margin)
-        button.checked = checked
-        button:SetCheckedTexture(checked)
-    end
+	if button.SetCheckedTexture and not button.checked then
+		local checked = button:CreateTexture()
+		checked:SetTexture(C.media.button.checked)
+		checked:SetInside(button, margin, margin)
+		button.checked = checked
+		button:SetCheckedTexture(checked)
+	end
 
-    local cooldown = button:GetName() and _G[button:GetName() .. "Cooldown"] or button.Cooldown
-    if cooldown then
-        cooldown:SetInside(button, margin, margin)
-    end
+	local cooldown = button:GetName() and _G[button:GetName() .. "Cooldown"] or button.Cooldown
+	if cooldown then
+		cooldown:SetInside(button, margin, margin)
+	end
 end
 
---  ActionButton Style Methods
+------------------------------------------------------------------------
+-- StyleActionButton — full actionbar button restyling
+------------------------------------------------------------------------
+
 local hooksecurefunc = hooksecurefunc
 local unpack, pairs, gsub = unpack, pairs, gsub
 local RANGE_INDICATOR = RANGE_INDICATOR
 local KEY_BUTTON3, KEY_BUTTON4, KEY_SPACE, KEY_NUMPAD1 = KEY_BUTTON3, KEY_BUTTON4, KEY_SPACE, KEY_NUMPAD1
 local KEY_MOUSEWHEELUP, KEY_MOUSEWHEELDOWN = KEY_MOUSEWHEELUP, KEY_MOUSEWHEELDOWN
 
-local style = {
-    icon = {
-        texCoord = { 0.1, 0.9, 0.1, 0.9 },
-        points = {
-            { "TOPLEFT", 1, -1 },
-            { "BOTTOMRIGHT", -1, 1 },
-        },
-    },
-    border = {
-        file = C.media.button.border,
-        points = {
-            { "TOPLEFT", -2, 2 },
-            { "BOTTOMRIGHT", 2, -2 },
-        },
-    },
-    flash = {
-        file = C.media.button.flash,
-        points = {
-            { "TOPLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    normalTexture = {
-        file = C.media.button.normal,
-        color = { 0.5, 0.5, 0.5, 0.6 },
-        points = {
-            { "TOPLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    pushedTexture = {
-        file = C.media.button.glow,
-        -- color = { 0.9, 0.8, 0.1, 0.3 },
-        points = {
-            { "TOPLEFT", -2, 2 },
-            { "BOTTOMRIGHT", 2, -2 },
-        },
-    },
-    checkedTexture = {
-        file = "",
-        points = {
-            { "TOPLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    highlightTexture = {
-        file = "",
-        points = {
-            { "TOPLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    hotkey = {
-        font = { STANDARD_TEXT_FONT, 11, "OUTLINE" },
-        points = {
-            { "TOPRIGHT", 0, 0 },
-            { "TOPLEFT", 0, 0 },
-        },
-    },
-    count = {
-        font = { STANDARD_TEXT_FONT, 11, "OUTLINE" },
-        points = {
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    name = {
-        font = { STANDARD_TEXT_FONT, 10, "OUTLINE" },
-        points = {
-            { "BOTTOMLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    cooldown = {
-        font = { STANDARD_TEXT_FONT, 16, "OUTLINE" },
-        points = {
-            { "TOPLEFT", 0, 0 },
-            { "BOTTOMRIGHT", 0, 0 },
-        },
-    },
-    backdrop = {
-        bgFile = C.media.button.buttonback,
-        edgeFile = C.media.button.outer_shadow,
-        tile = false,
-        tileSize = 16,
-        edgeSize = 2,
-        insets = { left = 2, right = 2, top = 2, bottom = 2 },
-        backgroundColor = C.media.backdrop_color,
-        borderColor = C.media.border_color,
-        points = {
-            { "TOPLEFT", -2, 2 },
-            { "BOTTOMRIGHT", 2, -2 },
-        },
-    },
+local actionStyle = {
+	icon = {
+		texCoord = { 0.1, 0.9, 0.1, 0.9 },
+		points = {
+			{ "TOPLEFT", 1, -1 },
+			{ "BOTTOMRIGHT", -1, 1 },
+		},
+	},
+	border = {
+		file = C.media.button.border,
+		points = {
+			{ "TOPLEFT", -2, 2 },
+			{ "BOTTOMRIGHT", 2, -2 },
+		},
+	},
+	flash = {
+		file = C.media.button.flash,
+		points = {
+			{ "TOPLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	normalTexture = {
+		file = C.media.button.normal,
+		color = { 0.5, 0.5, 0.5, 0.6 },
+		points = {
+			{ "TOPLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	pushedTexture = {
+		file = C.media.button.glow,
+		points = {
+			{ "TOPLEFT", -2, 2 },
+			{ "BOTTOMRIGHT", 2, -2 },
+		},
+	},
+	checkedTexture = {
+		file = "",
+		points = {
+			{ "TOPLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	highlightTexture = {
+		file = "",
+		points = {
+			{ "TOPLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	hotkey = {
+		font = { STANDARD_TEXT_FONT, 11, "OUTLINE" },
+		points = {
+			{ "TOPRIGHT", 0, 0 },
+			{ "TOPLEFT", 0, 0 },
+		},
+	},
+	count = {
+		font = { STANDARD_TEXT_FONT, 11, "OUTLINE" },
+		points = {
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	name = {
+		font = { STANDARD_TEXT_FONT, 10, "OUTLINE" },
+		points = {
+			{ "BOTTOMLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	cooldown = {
+		font = { STANDARD_TEXT_FONT, 16, "OUTLINE" },
+		points = {
+			{ "TOPLEFT", 0, 0 },
+			{ "BOTTOMRIGHT", 0, 0 },
+		},
+	},
+	backdrop = {
+		bgFile = C.media.button.buttonback,
+		edgeFile = C.media.button.outer_shadow,
+		tile = false,
+		tileSize = 16,
+		edgeSize = 2,
+		insets = { left = 2, right = 2, top = 2, bottom = 2 },
+		backgroundColor = C.media.backdrop_color,
+		borderColor = C.media.border_color,
+		points = {
+			{ "TOPLEFT", -2, 2 },
+			{ "BOTTOMRIGHT", 2, -2 },
+		},
+	},
 }
 
 local keyButton = gsub(KEY_BUTTON4, "%d", "")
 local keyNumpad = gsub(KEY_NUMPAD1, "%d", "")
 
 local replaces = {
-    { "(" .. keyButton .. ")", "M" },
-    { "(" .. keyNumpad .. ")", "N" },
-    { "(a%-)", "a" },
-    { "(c%-)", "c" },
-    { "(s%-)", "s" },
-    { KEY_BUTTON3, "M3" },
-    { KEY_MOUSEWHEELUP, "MU" },
-    { KEY_MOUSEWHEELDOWN, "MD" },
-    { KEY_SPACE, "Sp" },
-    { "CAPSLOCK", "CL" },
-    { "BUTTON", "M" },
-    { "NUMPAD", "N" },
-    { "(ALT%-)", "a" },
-    { "(CTRL%-)", "c" },
-    { "(SHIFT%-)", "s" },
-    { "MOUSEWHEELUP", "MU" },
-    { "MOUSEWHEELDOWN", "MD" },
-    { "SPACE", "Sp" },
+	{ "(" .. keyButton .. ")", "M" },
+	{ "(" .. keyNumpad .. ")", "N" },
+	{ "(a%-)", "a" },
+	{ "(c%-)", "c" },
+	{ "(s%-)", "s" },
+	{ KEY_BUTTON3, "M3" },
+	{ KEY_MOUSEWHEELUP, "MU" },
+	{ KEY_MOUSEWHEELDOWN, "MD" },
+	{ KEY_SPACE, "Sp" },
+	{ "CAPSLOCK", "CL" },
+	{ "BUTTON", "M" },
+	{ "NUMPAD", "N" },
+	{ "(ALT%-)", "a" },
+	{ "(CTRL%-)", "c" },
+	{ "(SHIFT%-)", "s" },
+	{ "MOUSEWHEELUP", "MU" },
+	{ "MOUSEWHEELDOWN", "MD" },
+	{ "SPACE", "Sp" },
 }
 
 local function updateHotKey(hotkey)
-    local text = hotkey:GetText()
-    if not text then
-        return
-    end
+	local text = hotkey:GetText()
+	if not text then
+		return
+	end
 
-    if text == RANGE_INDICATOR then
-        text = ""
-    else
-        for _, value in pairs(replaces) do
-            text = gsub(text, value[1], value[2])
-        end
-    end
+	if text == RANGE_INDICATOR then
+		text = ""
+	else
+		for _, value in pairs(replaces) do
+			text = gsub(text, value[1], value[2])
+		end
+	end
 
-    hotkey:SetFormattedText("%s", text)
-end
-
-local function CallButtonFunctionByName(button, func, ...)
-    if button and func and button[func] then
-        button[func](button, ...)
-    end
+	hotkey:SetFormattedText("%s", text)
 end
 
 local function ApplyPoints(self, points)
-    if not points then
-        return
-    end
+	if not points then
+		return
+	end
 
-    self:ClearAllPoints()
-    for _, point in next, points do
-        self:SetPoint(unpack(point))
-    end
+	self:ClearAllPoints()
+	for _, point in next, points do
+		self:SetPoint(unpack(point))
+	end
 end
 
 local function ApplyTexCoord(texture, texCoord)
-    if texture.__lockdown or not texCoord then
-        return
-    end
-
-    texture:SetTexCoord(unpack(texCoord))
+	if texture.__lockdown or not texCoord then
+		return
+	end
+	texture:SetTexCoord(unpack(texCoord))
 end
 
 local function ApplyVertexColor(texture, color)
-    if not color then
-        return
-    end
-
-    texture:SetVertexColor(unpack(color))
+	if not color then
+		return
+	end
+	texture:SetVertexColor(unpack(color))
 end
 
 local function ApplyAlpha(region, alpha)
-    if not alpha then
-        return
-    end
-
-    region:SetAlpha(alpha)
+	if not alpha then
+		return
+	end
+	region:SetAlpha(alpha)
 end
 
 local function ApplyFont(fontString, font)
-    if not font then
-        return
-    end
-
-    fontString:SetFont(unpack(font))
+	if not font then
+		return
+	end
+	fontString:SetFont(unpack(font))
 end
 
 local function ApplyHorizontalAlign(fontString, align)
-    if not align then
-        return
-    end
-    fontString:SetJustifyH(align)
+	if not align then
+		return
+	end
+	fontString:SetJustifyH(align)
 end
 
 local function ApplyVerticalAlign(fontString, align)
-    if not align then
-        return
-    end
-    fontString:SetJustifyV(align)
+	if not align then
+		return
+	end
+	fontString:SetJustifyV(align)
 end
 
 local function ApplyTexture(texture, file)
-    if not file then
-        return
-    end
-
-    texture:SetTexture(file)
+	if not file then
+		return
+	end
+	texture:SetTexture(file)
 end
 
 local function ApplyNormalTexture(button, file)
-    if not file then
-        return
-    end
+	if not file then
+		return
+	end
+	button:SetNormalTexture(file)
+end
 
-    button:SetNormalTexture(file)
+local function CallButtonFunctionByName(button, func, ...)
+	if button and func and button[func] then
+		button[func](button, ...)
+	end
 end
 
 local function SetupTexture(texture, cfg, func, button)
-    if not texture or not cfg then
-        return
-    end
+	if not texture or not cfg then
+		return
+	end
 
-    ApplyTexCoord(texture, cfg.texCoord)
-    ApplyPoints(texture, cfg.points)
-    ApplyVertexColor(texture, cfg.color)
-    ApplyAlpha(texture, cfg.alpha)
-    if func == "SetTexture" then
-        ApplyTexture(texture, cfg.file)
-    elseif func == "SetNormalTexture" then
-        ApplyNormalTexture(button, cfg.file)
-    elseif cfg.file then
-        CallButtonFunctionByName(button, func, cfg.file)
-    end
+	ApplyTexCoord(texture, cfg.texCoord)
+	ApplyPoints(texture, cfg.points)
+	ApplyVertexColor(texture, cfg.color)
+	ApplyAlpha(texture, cfg.alpha)
+	if func == "SetTexture" then
+		ApplyTexture(texture, cfg.file)
+	elseif func == "SetNormalTexture" then
+		ApplyNormalTexture(button, cfg.file)
+	elseif cfg.file then
+		CallButtonFunctionByName(button, func, cfg.file)
+	end
 end
 
 local function SetupFontString(fontString, cfg)
-    if not fontString or not cfg then
-        return
-    end
+	if not fontString or not cfg then
+		return
+	end
 
-    ApplyPoints(fontString, cfg.points)
-    ApplyFont(fontString, cfg.font)
-    ApplyAlpha(fontString, cfg.alpha)
-    ApplyHorizontalAlign(fontString, cfg.halign)
-    ApplyVerticalAlign(fontString, cfg.valign)
+	ApplyPoints(fontString, cfg.points)
+	ApplyFont(fontString, cfg.font)
+	ApplyAlpha(fontString, cfg.alpha)
+	ApplyHorizontalAlign(fontString, cfg.halign)
+	ApplyVerticalAlign(fontString, cfg.valign)
 end
 
 local function SetupCooldown(cooldown, cfg)
-    if not cooldown or not cfg then
-        return
-    end
-
-    ApplyPoints(cooldown, cfg.points)
+	if not cooldown or not cfg then
+		return
+	end
+	ApplyPoints(cooldown, cfg.points)
 end
 
-local function SetupBackdrop(button, backdrop)
-    if not backdrop or button.backdrop then
-        return
-    end
+local function SetupBackdrop(button, bdCfg)
+	if not bdCfg or button.__bg then
+		return
+	end
 
-    button:CreateBackdrop("Transparent")
+	Mixin(button, BackdropTemplateMixin)
+	local bg = CreateFrame("Frame", nil, button, "BackdropTemplate")
+	ApplyPoints(bg, bdCfg.points)
+	bg:SetFrameLevel(button:GetFrameLevel() - 1)
+	bg:SetBackdrop(bdCfg)
 
-    local bg = button.backdrop
-    ApplyPoints(bg, backdrop.points)
+	if bdCfg.backgroundColor then
+		bg:SetBackdropColor(unpack(bdCfg.backgroundColor))
+	end
+	if bdCfg.borderColor then
+		bg:SetBackdropBorderColor(unpack(bdCfg.borderColor))
+	end
 
-    bg:SetFrameLevel(button:GetFrameLevel() - 1)
-    bg:SetBackdrop(backdrop)
-
-    if backdrop.backgroundColor then
-        bg:SetBackdropColor(unpack(backdrop.backgroundColor))
-    end
-    if backdrop.borderColor then
-        bg:SetBackdropBorderColor(unpack(backdrop.borderColor))
-    end
+	button.__bg = bg
 end
 
 function E:StyleActionButton(button, force)
-    if not button then
-        return
-    end
-    if button.__styled and not force then
-        return
-    end
+	if not button then
+		return
+	end
+	if button.__styled and not force then
+		return
+	end
 
-    local buttonName = button:GetName()
-    local icon = button.icon or _G[buttonName .. "Icon"]
-    local hotkey = button.HotKey or _G[buttonName .. "HotKey"]
-    local count = button.Count or _G[buttonName .. "Count"]
-    local name = button.Name or _G[buttonName .. "Name"]
-    local flash = button.Flash or _G[buttonName .. "Flash"]
-    local border = button.Border or _G[buttonName .. "Border"]
-    local autoCastable = button.AutoCastable or _G[buttonName .. "AutoCastable"]
-    local cooldown = button.cooldown or _G[buttonName .. "Cooldown"] or button.Cooldown
-    local normal = button.NormalTexture or button:GetNormalTexture()
-    local pushed = button.PushedTexture or button:GetPushedTexture()
-    local checked = button.CheckedTexture or (button.GetCheckedTexture and button:GetCheckedTexture() or nil)
-    local highlight = button.HighlightTexture or button:GetHighlightTexture()
-    local newActionTexture = button.NewActionTexture
-    local spellHighlight = button.SpellHighlightTexture
-    local slotbg = button.SlotBackground
-    local iconMask = button.IconMask
-    local petShine = _G[buttonName .. "Shine"]
+	local buttonName = button:GetName()
+	local icon = button.icon or _G[buttonName .. "Icon"]
+	local hotkey = button.HotKey or _G[buttonName .. "HotKey"]
+	local count = button.Count or _G[buttonName .. "Count"]
+	local name = button.Name or _G[buttonName .. "Name"]
+	local flash = button.Flash or _G[buttonName .. "Flash"]
+	local border = button.Border or _G[buttonName .. "Border"]
+	local autoCastable = button.AutoCastable or _G[buttonName .. "AutoCastable"]
+	local cooldown = button.cooldown or _G[buttonName .. "Cooldown"] or button.Cooldown
+	local normal = button.NormalTexture or button:GetNormalTexture()
+	local pushed = button.PushedTexture or button:GetPushedTexture()
+	local checked = button.CheckedTexture or (button.GetCheckedTexture and button:GetCheckedTexture() or nil)
+	local highlight = button.HighlightTexture or button:GetHighlightTexture()
+	local newActionTexture = button.NewActionTexture
+	local spellHighlight = button.SpellHighlightTexture
+	local slotbg = button.SlotBackground
+	local iconMask = button.IconMask
+	local petShine = _G[buttonName .. "Shine"]
 
-    -- if normal then normal:SetAlpha(0) end
-    if border then
-        border:SetTexture("")
-    end
-    if flash then
-        flash:SetTexture("")
-    end
-    if newActionTexture then
-        newActionTexture:SetTexture("")
-    end
-    if slotbg then
-        slotbg:Hide()
-    end
-    if iconMask then
-        iconMask:Hide()
-    end
-    if petShine then
-        petShine:SetInside()
-    end
-    if spellHighlight then
-        spellHighlight:SetOutside()
-    end
-    if autoCastable then
-        autoCastable:SetTexCoord(0.217, 0.765, 0.217, 0.765)
-        autoCastable:SetInside()
-    end
+	if border then
+		border:SetTexture("")
+	end
+	if flash then
+		flash:SetTexture("")
+	end
+	if newActionTexture then
+		newActionTexture:SetTexture("")
+	end
+	if slotbg then
+		slotbg:Hide()
+	end
+	if iconMask then
+		iconMask:Hide()
+	end
+	if petShine then
+		petShine:SetInside()
+	end
+	if spellHighlight then
+		spellHighlight:SetOutside()
+	end
+	if autoCastable then
+		autoCastable:SetTexCoord(0.217, 0.765, 0.217, 0.765)
+		autoCastable:SetInside()
+	end
 
-    --backdrop
-    SetupBackdrop(button, style.backdrop)
+	SetupBackdrop(button, actionStyle.backdrop)
+	SetupCooldown(cooldown, actionStyle.cooldown)
 
-    --cooldown
-    SetupCooldown(cooldown, style.cooldown)
+	SetupTexture(icon, actionStyle.icon, "SetTexture", icon)
+	SetupTexture(flash, actionStyle.flash, "SetTexture", flash)
+	SetupTexture(border, actionStyle.border, "SetTexture", border)
+	SetupTexture(normal, actionStyle.normalTexture, "SetNormalTexture", button)
+	SetupTexture(pushed, actionStyle.pushedTexture, "SetPushedTexture", button)
+	SetupTexture(highlight, actionStyle.highlightTexture, "SetHighlightTexture", button)
+	SetupTexture(checked, actionStyle.checkedTexture, "SetCheckedTexture", button)
 
-    SetupTexture(icon, style.icon, "SetTexture", icon)
-    SetupTexture(flash, style.flash, "SetTexture", flash)
-    SetupTexture(border, style.border, "SetTexture", border)
-    SetupTexture(normal, style.normalTexture, "SetNormalTexture", button)
-    SetupTexture(pushed, style.pushedTexture, "SetPushedTexture", button)
-    SetupTexture(highlight, style.highlightTexture, "SetHighlightTexture", button)
-    SetupTexture(checked, style.checkedTexture, "SetCheckedTexture", button)
+	if checked then
+		checked:SetColorTexture(1, 0.8, 0, 0.35)
+	end
+	if highlight then
+		highlight:SetColorTexture(1, 1, 1, 0.25)
+	end
+	if spellHighlight then
+		spellHighlight:SetOutside()
+	end
 
-    if checked then
-        checked:SetColorTexture(1, 0.8, 0, 0.35)
-    end
-    if highlight then
-        highlight:SetColorTexture(1, 1, 1, 0.25)
-    end
-    if spellHighlight then
-        spellHighlight:SetOutside()
-    end
+	SetupFontString(hotkey, actionStyle.hotkey)
+	SetupFontString(count, actionStyle.count)
+	SetupFontString(name, actionStyle.name)
 
-    --hotkey+count+name
-    SetupFontString(hotkey, style.hotkey)
-    SetupFontString(count, style.count)
-    SetupFontString(name, style.name)
+	if hotkey then
+		updateHotKey(hotkey)
+		hooksecurefunc(hotkey, "SetText", updateHotKey)
+	end
 
-    if hotkey then
-        updateHotKey(hotkey)
-        hooksecurefunc(hotkey, "SetText", updateHotKey)
-    end
-
-    button.__styled = true
+	button.__styled = true
 end
