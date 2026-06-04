@@ -6,7 +6,6 @@ local E, C, L = select(2, ...):unpack()
 local module = E:Module("Aura"):Sub("AuraWatch")
 
 local cfg = C.aura.auraWatch
-local auraCfg = C.aura
 
 local GetTime = GetTime
 local pairs, ipairs, next, wipe, tinsert, tremove = pairs, ipairs, next, wipe, tinsert, tremove
@@ -147,36 +146,31 @@ end
 
 local function buildIcon(parent, size)
     size = size * (cfg.iconScale or 1)
-    local padding = auraCfg.icon_padding
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetSize(size, size)
     frame:Hide()
 
-    frame.Icon = frame:CreateTexture(nil, "BORDER")
-    frame.Icon:SetPoint("TOPLEFT", padding, -padding)
-    frame.Icon:SetPoint("BOTTOMRIGHT", -padding, padding)
-    frame.Icon:SetDrawLayer("BACKGROUND", -8)
+    E:ApplyOverlayBorder(frame, 2)
+
+    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.Icon:SetPoint("TOPLEFT", frame, 2, -2)
+    frame.Icon:SetPoint("BOTTOMRIGHT", frame, -2, 2)
     frame.Icon:SetTexCoord(unpack(C.media.texCoord))
+    frame.Icon:SetDrawLayer("BACKGROUND", -8)
 
     frame.Cooldown = CreateFrame("Cooldown", nil, frame, "CooldownFrameTemplate")
     frame.Cooldown:SetAllPoints(frame.Icon)
     frame.Cooldown:SetReverse(true)
 
-    frame.Count = frame:CreateFontString(nil, "OVERLAY")
-    frame.Count:SetFont(unpack(auraCfg.count_font_style))
-    frame.Count:SetPoint("BOTTOMRIGHT", 2, -1)
+    local parentFrame = CreateFrame("Frame", nil, frame)
+    parentFrame:SetAllPoints()
+    parentFrame:SetFrameLevel(frame:GetFrameLevel() + 6)
 
-    frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
-    frame.Spellname:SetFont(STANDARD_TEXT_FONT, size * 0.4, "OUTLINE")
-    frame.Spellname:SetPoint("TOP", frame, "BOTTOM", 0, -2)
-    frame.Spellname:SetJustifyH("CENTER")
-    frame.Spellname:SetWidth(size * 2.5)
-    frame.Spellname:SetWordWrap(false)
+    frame.Spellname = parentFrame:CreateFontText(13, "", false, "TOP", 0, 5)
+    frame.Count = parentFrame:CreateFontText(size * 0.55, "", false, "BOTTOMRIGHT", 6, -3)
 
     frame.glowFrame = CreateFrame("Frame", nil, frame)
     frame.glowFrame:SetAllPoints(frame.Icon)
-
-    frame:CreateShadow()
 
     if not cfg.clickThrough then
         enableTooltip(frame)
@@ -187,49 +181,43 @@ end
 
 local function buildBar(parent, size, barWidth)
     barWidth = barWidth or 150
-    local padding = auraCfg.icon_padding
     local frame = CreateFrame("Frame", nil, parent)
-    frame:SetSize(barWidth + size + 4, size)
+    frame:SetSize(size, size)
     frame:Hide()
 
-    frame.Icon = frame:CreateTexture(nil, "BORDER")
-    frame.Icon:SetSize(size, size)
-    frame.Icon:SetPoint("LEFT")
-    frame.Icon:SetDrawLayer("BACKGROUND", -8)
+    E:ApplyOverlayBorder(frame, 2)
+
+    frame.Icon = frame:CreateTexture(nil, "ARTWORK")
+    frame.Icon:SetPoint("TOPLEFT", frame, 2, -2)
+    frame.Icon:SetPoint("BOTTOMRIGHT", frame, -2, 2)
     frame.Icon:SetTexCoord(unpack(C.media.texCoord))
+    frame.Icon:SetDrawLayer("BACKGROUND", -8)
 
     frame.Statusbar = CreateFrame("StatusBar", nil, frame)
-    frame.Statusbar:SetPoint("LEFT", frame.Icon, "RIGHT", 4, 0)
-    frame.Statusbar:SetSize(barWidth, size)
-    frame.Statusbar:SetStatusBarTexture(C.media.texture.status)
-    frame.Statusbar:SetStatusBarColor(0.2, 0.6, 1)
+    frame.Statusbar:SetSize(barWidth, size / 2.5)
+    frame.Statusbar:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 5, 0)
     frame.Statusbar:SetMinMaxValues(0, 1)
+    frame.Statusbar:SetValue(0)
+    frame.Statusbar:SetStatusBarTexture(C.media.texture.gradient)
+    frame.Statusbar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+    frame.Statusbar:SetTemplate("Default")
+    frame.Statusbar:CreateShadow()
 
-    frame.Statusbar.bg = frame.Statusbar:CreateTexture(nil, "BACKGROUND")
-    frame.Statusbar.bg:SetAllPoints()
-    frame.Statusbar.bg:SetTexture(C.media.texture.status)
-    frame.Statusbar.bg:SetVertexColor(0.1, 0.1, 0.1, 0.6)
+    frame.Statusbar.Spark = frame.Statusbar:CreateTexture(nil, "OVERLAY")
+    frame.Statusbar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
+    frame.Statusbar.Spark:SetBlendMode("ADD")
+    frame.Statusbar.Spark:SetAlpha(0.8)
+    frame.Statusbar.Spark:SetPoint("TOPLEFT", frame.Statusbar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
+    frame.Statusbar.Spark:SetPoint("BOTTOMRIGHT", frame.Statusbar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
 
-    frame.Count = frame:CreateFontString(nil, "OVERLAY")
-    frame.Count:SetFont(unpack(auraCfg.count_font_style))
-    frame.Count:SetPoint("BOTTOMRIGHT", frame.Icon, 2, -1)
-
-    frame.Time = frame:CreateFontString(nil, "OVERLAY")
-    frame.Time:SetFont(unpack(auraCfg.dur_font_style))
-    frame.Time:SetPoint("RIGHT", frame.Statusbar, -2, 0)
-    frame.Time:SetJustifyH("RIGHT")
-
-    frame.Spellname = frame:CreateFontString(nil, "OVERLAY")
-    frame.Spellname:SetFont(unpack(auraCfg.dur_font_style))
-    frame.Spellname:SetPoint("LEFT", frame.Statusbar, 2, 0)
-    frame.Spellname:SetPoint("RIGHT", frame.Time, "LEFT", -4, 0)
+    frame.Count = frame:CreateFontText(14, "", false, "BOTTOMRIGHT", 3, -1)
+    frame.Time = frame.Statusbar:CreateFontText(14, "", false, "RIGHT", 0, 8)
+    frame.Spellname = frame.Statusbar:CreateFontText(14, "", false, "LEFT", 2, 8)
+    frame.Spellname:SetWidth(frame.Statusbar:GetWidth() * 0.6)
     frame.Spellname:SetJustifyH("LEFT")
-    frame.Spellname:SetWordWrap(false)
 
     frame.glowFrame = CreateFrame("Frame", nil, frame)
     frame.glowFrame:SetAllPoints(frame.Icon)
-
-    frame:CreateShadow()
 
     if not cfg.clickThrough then
         enableTooltip(frame)
@@ -717,9 +705,9 @@ local function enterMoveMode()
         local size = group.IconSize
         local barWidth = group.BarWidth or 150
         if group.Mode == "BAR" then
-            parent:SetSize(barWidth + size + 4, size * 6 + group.Interval * 5)
+            parent:SetSize(barWidth + size + 5, (size + group.Interval) * 6)
         else
-            parent:SetSize(size * 6 + group.Interval * 5, size)
+            parent:SetSize((size + group.Interval) * 6, size)
         end
 
         parent.mover:Show()
