@@ -196,36 +196,27 @@ defaults.aura = {
     count_font_style = { STANDARD_TEXT_FONT, 12, "THINOUTLINE" },
     auraWatch = {
         enable = true,
-        clickThrough = false,
-        iconScale = 1,
-        minCD = 3,
-        groups = {
-            { name = "Player Aura", dir = "LEFT", interval = 5, mode = "ICON", size = 22, pos = { "BOTTOMRIGHT", "UIParent", "BOTTOM", -200, 309 } },
-            { name = "Special Aura", dir = "LEFT", interval = 5, mode = "ICON", size = 36, pos = { "BOTTOMRIGHT", "UIParent", "BOTTOM", -200, 336 } },
-            { name = "Target Aura", dir = "RIGHT", interval = 5, mode = "ICON", size = 36, pos = { "BOTTOMLEFT", "UIParent", "BOTTOM", 200, 309 } },
-            { name = "Warning", dir = "RIGHT", interval = 5, mode = "ICON", size = 42, pos = { "BOTTOMLEFT", "UIParent", "BOTTOM", 200, 370 } },
-            { name = "Focus Aura", dir = "RIGHT", interval = 5, mode = "ICON", size = 35, pos = { "BOTTOMLEFT", "UIParent", "LEFT", 5, -130 } },
-            {
-                name = "Spell Cooldown",
-                dir = "UP",
-                interval = 5,
-                mode = "BAR",
-                size = 18,
-                pos = { "BOTTOMRIGHT", "UIParent", "BOTTOM", -425, 125 },
-                barWidth = 150,
+        spacing = 4,
+        barSpacing = 2,
+        viewers = {
+            EssentialCooldownViewer = {
+                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 260 },
             },
-            { name = "Enchant Aura", dir = "LEFT", interval = 5, mode = "ICON", size = 36, pos = { "BOTTOMRIGHT", "UIParent", "BOTTOM", -200, 377 } },
-            { name = "Raid Buff", dir = "LEFT", interval = 5, mode = "ICON", size = 42, pos = { "CENTER", "UIParent", "CENTER", -220, 200 } },
-            { name = "Raid Debuff", dir = "RIGHT", interval = 5, mode = "ICON", size = 42, pos = { "CENTER", "UIParent", "CENTER", 220, 200 } },
-            {
-                name = "InternalCD",
-                dir = "UP",
-                interval = 5,
-                mode = "BAR",
-                size = 18,
-                pos = { "BOTTOMRIGHT", "UIParent", "BOTTOM", -425, 500 },
-                barWidth = 150,
+            UtilityCooldownViewer = {
+                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 240 },
             },
+            BuffIconCooldownViewer = {
+                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 300 },
+            },
+            BuffBarCooldownViewer = {
+                pos = { "BOTTOM", "UIParent", "BOTTOM", -300, 180 },
+                iconSize = 24,
+                barWidth = 150,
+                barHeight = 12,
+            },
+        },
+        style = {
+            swipeAlpha = 0.7,
         },
     },
 }
