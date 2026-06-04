@@ -3,4 +3,5 @@
     <Script file="CallbackHandler-1.0.lua"/>
     <Script file="LibCustomGlow-1.0.lua"/>
     <Script file="LibActionButton-1.0.lua"/>
+    <Script file="LibEditModeOverride-1.0.lua"/>
 </Ui>

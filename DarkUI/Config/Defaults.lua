@@ -200,17 +200,17 @@ defaults.aura = {
         barSpacing = 2,
         viewers = {
             EssentialCooldownViewer = {
-                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 260 },
+                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 300 },
             },
             UtilityCooldownViewer = {
                 pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 240 },
             },
             BuffIconCooldownViewer = {
-                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 300 },
+                pos = { "BOTTOM", "UIParent", "BOTTOM", 0, 380 },
             },
             BuffBarCooldownViewer = {
-                pos = { "BOTTOM", "UIParent", "BOTTOM", -300, 180 },
-                iconSize = 24,
+                pos = { "CENTER", "UIParent", "CENTER", 460, -100 },
+                iconSize = 22,
                 barWidth = 150,
                 barHeight = 12,
             },

@@ -5,6 +5,48 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 local string_format, math_abs = string.format, math.abs
 
+----------------------------------------------------------------------------------------
+-- LibEditModeOverride
+----------------------------------------------------------------------------------------
+
+E.LEMO = LibStub("LibEditModeOverride-1.0")
+
+local lemoReady = false
+
+local function initLEMO()
+    if lemoReady then
+        return
+    end
+    if not E.LEMO:IsReady() then
+        return
+    end
+    lemoReady = true
+    E.LEMO:LoadLayouts()
+end
+
+function E:IsLEMOReady()
+    if not lemoReady then
+        initLEMO()
+    end
+    return lemoReady
+end
+
+function E:ApplyEditModeChanges()
+    if InCombatLockdown() then
+        return
+    end
+    if not self:IsLEMOReady() then
+        return
+    end
+    self.LEMO:LoadLayouts()
+    self.LEMO:ApplyChanges()
+end
+
+local lemoFrame = CreateFrame("Frame")
+lemoFrame:RegisterEvent("EDIT_MODE_LAYOUTS_UPDATED")
+lemoFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+lemoFrame:SetScript("OnEvent", initLEMO)
+
 local Colors = {
     highlight = { 250 / 255, 250 / 255, 250 / 255 },
     green = { 25 / 255, 178 / 255, 25 / 255 },
@@ -234,3 +276,5 @@ end
 
 -- local mover = Anchor:Create(default, "Default Tooltip", "tooltip.position")
 -- mover:Show()
+
+E.Anchor = Anchor

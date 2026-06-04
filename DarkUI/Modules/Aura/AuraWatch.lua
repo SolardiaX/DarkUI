@@ -51,11 +51,6 @@ end
 ------------------------------------------------------------------------
 
 local function styleIconFrame(frame)
-    if frame._darkui_styled then
-        return
-    end
-    frame._darkui_styled = true
-
     local regions = { frame:GetRegions() }
     local iconTex, maskTex, overlayTex = regions[1], regions[2], regions[3]
 
@@ -78,7 +73,10 @@ local function styleIconFrame(frame)
         iconTex:SetPoint("BOTTOMRIGHT", frame, -2, 2)
     end
 
-    E:ApplyOverlayBorder(frame, 2)
+    if not frame._darkui_styled then
+        frame._darkui_styled = true
+        E:ApplyOverlayBorder(frame, 2)
+    end
 
     if frame.Cooldown then
         frame.Cooldown:SetSwipeColor(0, 0, 0, cfg.style.swipeAlpha)
@@ -91,11 +89,6 @@ end
 ------------------------------------------------------------------------
 
 local function styleBarFrame(frame)
-    if frame._darkui_styled then
-        return
-    end
-    frame._darkui_styled = true
-
     local vcfg = cfg.viewers.BuffBarCooldownViewer or {}
     local iconSize = vcfg.iconSize or 24
     local barWidth = vcfg.barWidth or 150
@@ -131,7 +124,10 @@ local function styleBarFrame(frame)
             iconTex:SetPoint("BOTTOMRIGHT", iconFrame, -2, 2)
         end
 
-        E:ApplyOverlayBorder(iconFrame, 2)
+        if not iconFrame._darkui_styled then
+            iconFrame._darkui_styled = true
+            E:ApplyOverlayBorder(iconFrame, 2)
+        end
     end
 
     local bar = frame.Bar
@@ -149,8 +145,11 @@ local function styleBarFrame(frame)
         end
         bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
 
-        bar:SetTemplate("Default")
-        bar:CreateShadow()
+        if not bar._darkui_styled then
+            bar._darkui_styled = true
+            bar:SetTemplate("Default")
+            bar:CreateShadow()
+        end
 
         if bar.Name then
             bar.Name:ClearAllPoints()
@@ -165,6 +164,8 @@ local function styleBarFrame(frame)
             bar.Duration:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
         end
     end
+
+    frame._darkui_styled = true
 end
 
 ------------------------------------------------------------------------
@@ -295,6 +296,12 @@ layoutFrame:SetScript("OnUpdate", doLayout)
 -- Hook Viewers
 ------------------------------------------------------------------------
 
+local function forceRefresh()
+    positionAllViewers()
+    lastLayoutTime = 0
+    doLayout()
+end
+
 local function hookViewer(viewerName)
     local viewer = _G[viewerName]
     if not viewer then
@@ -304,6 +311,7 @@ local function hookViewer(viewerName)
     if viewer.RefreshLayout then
         hooksecurefunc(viewer, "RefreshLayout", function()
             positionViewer(viewerName)
+            lastLayoutTime = 0
             doLayout()
         end)
     end
@@ -313,45 +321,16 @@ end
 -- Move Mode
 ------------------------------------------------------------------------
 
-local function createMover(viewerName)
-    local viewer = _G[viewerName]
-    if not viewer or movers[viewerName] then
-        return
-    end
-
-    local mover = CreateFrame("Frame", nil, viewer, "BackdropTemplate")
-    mover:SetAllPoints(viewer)
-    mover:SetBackdrop({ bgFile = "Interface\\Tooltips\\UI-Tooltip-Background" })
-    mover:SetBackdropColor(0.1, 0.1, 0.1, 0.7)
-    mover:SetFrameStrata("HIGH")
-    mover:EnableMouse(true)
-    mover:RegisterForDrag("LeftButton")
-    mover:SetScript("OnDragStart", function()
-        viewer:StartMoving()
-    end)
-    mover:SetScript("OnDragStop", function()
-        viewer:StopMovingOrSizing()
-    end)
-
-    local text = mover:CreateFontString(nil, "OVERLAY")
-    text:SetFont(STANDARD_TEXT_FONT, 11, "OUTLINE")
-    text:SetPoint("CENTER")
-    text:SetText(viewerName)
-    mover:Hide()
-
-    movers[viewerName] = mover
-    viewer:SetMovable(true)
-    viewer:SetClampedToScreen(true)
-end
-
 local function toggleMoveMode()
     moveMode = not moveMode
     for _, name in ipairs(VIEWERS) do
-        if _G[name] then
-            createMover(name)
-            if movers[name] then
-                movers[name]:SetShown(moveMode)
+        local viewer = _G[name]
+        if viewer then
+            if not movers[name] then
+                local vkey = "aura.auraWatch.viewers." .. name .. ".pos"
+                movers[name] = E.Anchor:Create(viewer, name, vkey)
             end
+            movers[name]:SetShown(moveMode)
         end
     end
     if moveMode then
@@ -367,15 +346,39 @@ end
 
 local function setup()
     positionAllViewers()
+
     for _, name in ipairs(VIEWERS) do
         hookViewer(name)
     end
 
     if EditModeManagerFrame then
-        hooksecurefunc(EditModeManagerFrame, "ExitEditMode", positionAllViewers)
+        hooksecurefunc(EditModeManagerFrame, "ExitEditMode", function()
+            if InCombatLockdown() then
+                return
+            end
+            if E:IsLEMOReady() then
+                E.LEMO:LoadLayouts()
+            end
+            forceRefresh()
+            C_Timer_After(0, forceRefresh)
+        end)
+    end
+
+    if CooldownViewerSettings and CooldownViewerSettings.RefreshLayout then
+        hooksecurefunc(CooldownViewerSettings, "RefreshLayout", function()
+            if InCombatLockdown() then
+                return
+            end
+            C_Timer_After(0, forceRefresh)
+        end)
     end
 
     C_Timer_After(0.2, doLayout)
+    C_Timer_After(1, function()
+        if not InCombatLockdown() then
+            E:ApplyEditModeChanges()
+        end
+    end)
 end
 
 function module:OnInit()
