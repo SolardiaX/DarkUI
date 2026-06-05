@@ -279,7 +279,6 @@ local function setTemplate(f, t, edge, insets)
 		backdropa = overlay_color[4]
 	elseif t == "Overlay" then
 		backdropa = 1
-		f:CreateOverlay()
 	elseif t == "Invisible" then
 		backdropa = 0
 		bordera = 0
@@ -296,7 +295,7 @@ end
 -- CreateBG — background frame wrapping outside self
 ------------------------------------------------------------------------
 
-local function createBG(f, alpha)
+local function createBG(f, size, insets)
 	if f.__bg then
 		return f.__bg
 	end
@@ -308,18 +307,7 @@ local function createBG(f, alpha)
 	local lvl = frame:GetFrameLevel()
 
 	local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-	bg:SetOutside(f)
-	bg:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
-
-	Mixin(bg, BackdropTemplateMixin)
-	bg:SetBackdrop({
-		bgFile = C.media.texture.blank,
-		edgeFile = C.media.texture.blank,
-		edgeSize = Mult,
-		insets = { left = Mult, right = Mult, top = Mult, bottom = Mult },
-	})
-	bg:SetBackdropColor(0, 0, 0, alpha or C.media.backdrop_color[4])
-	bg:SetBackdropBorderColor(unpack(C.media.border_color))
+	setTemplate(bg, "Default", size, insets)
 
 	f.__bg = bg
 	return bg
@@ -329,7 +317,7 @@ end
 -- CreateShadow — glow edge frame
 ------------------------------------------------------------------------
 
-local function createShadow(f, size)
+local function createShadow(f, margin)
 	if f.__shadow then
 		return f.__shadow
 	end
@@ -339,11 +327,11 @@ local function createShadow(f, size)
 		frame = f:GetParent()
 	end
 
-	size = size or 4
-	BACKDROP.shadow.edgeSize = size + 1
+	margin = margin or 2
+	BACKDROP.shadow.edgeSize = margin + 1
 
 	local shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-	shadow:SetOutside(f, size, size)
+	shadow:SetOutside(f, margin, margin)
 	shadow:SetBackdrop(BACKDROP.shadow)
 	shadow:SetBackdropBorderColor(0, 0, 0, 0.6)
 	shadow:SetFrameLevel(0)
@@ -363,16 +351,14 @@ local function createBorder(f, margin)
 
 	margin = margin or Mult
 
-	local border = f:CreateTexture(nil, "BACKGROUND", nil, -7)
-	border:SetTexture(C.media.texture.overlay)
-	border:SetTexCoord(0, 1, 0, 1)
-	border:SetDrawLayer("BACKGROUND", -7)
+	local border = f:CreateTexture(nil, "BORDER")
+	border:SetTexture(C.media.texture.texture)
+	border:SetTexCoord(unpack(C.media.texCoord))
 	border:ClearAllPoints()
 	border:SetPoint("TOPRIGHT", f, margin, margin)
 	border:SetPoint("BOTTOMLEFT", f, -margin, -margin)
 
 	f.__border = border
-	createShadow(f)
 
 	return border
 end
@@ -386,13 +372,20 @@ local function createOverlay(f, margin)
 		return f.__overlay
 	end
 
+	local frame = f
+	if f:IsObjectType("Texture") then
+		frame = f:GetParent()
+	end
+
 	margin = margin or Mult
 
-	local overlay = f:CreateTexture("$parentOverlay", "BORDER")
-	overlay:SetInside(f, margin, margin)
-	overlay:SetTexture(C.media.texture.blank)
-	overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
-
+	local overlay = f:CreateTexture(nil, "OVERLAY")
+	overlay:SetTexture(C.media.texture.overlay)
+	overlay:SetTexCoord(unpack(C.media.texCoord))
+	overlay:ClearAllPoints()
+	overlay:SetPoint("TOPRIGHT", f, margin, margin)
+	overlay:SetPoint("BOTTOMLEFT", f, -margin, -margin)
+	
 	f.__overlay = overlay
 	return overlay
 end

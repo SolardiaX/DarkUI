@@ -75,7 +75,8 @@ local function styleIconFrame(frame)
 
     if not frame.__styled then
         frame.__styled = true
-        frame:CreateBorder(2)
+        frame:CreateOverlay()
+        frame:CreateShadow()
     end
 
     if frame.Cooldown then
@@ -133,7 +134,7 @@ local function styleBarFrame(frame)
 
         if not iconFrame.__styled then
             iconFrame.__styled = true
-            iconFrame:CreateBorder(2)
+            iconFrame:CreateOverlay(2)
         end
     end
 
