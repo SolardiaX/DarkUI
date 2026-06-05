@@ -292,79 +292,56 @@ local function setTemplate(f, t, edge, insets)
 end
 
 ------------------------------------------------------------------------
--- CreateBG — background frame wrapping outside self
+-- CreateTemplate — create a child frame with SetTemplate style
 ------------------------------------------------------------------------
 
-local function createBG(f, size, insets)
-	if f.__bg then
-		return f.__bg
+local function createTemplate(f, t, margin)
+	t = t or "Default"
+	local key = "__" .. t:lower()
+	if f[key] then
+		return f[key]
 	end
 
 	local frame = f
 	if f:IsObjectType("Texture") then
 		frame = f:GetParent()
-	end
-	local lvl = frame:GetFrameLevel()
-
-	local bg = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-	setTemplate(bg, "Default", size, insets)
-
-	f.__bg = bg
-	return bg
-end
-
-------------------------------------------------------------------------
--- CreateShadow — glow edge frame
-------------------------------------------------------------------------
-
-local function createShadow(f, margin)
-	if f.__shadow then
-		return f.__shadow
-	end
-
-	local frame = f
-	if f:IsObjectType("Texture") then
-		frame = f:GetParent()
-	end
-
-	margin = margin or 2
-	BACKDROP.shadow.edgeSize = margin + 1
-
-	local shadow = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-	shadow:SetOutside(f, margin, margin)
-	shadow:SetBackdrop(BACKDROP.shadow)
-	shadow:SetBackdropBorderColor(0, 0, 0, 0.6)
-	shadow:SetFrameLevel(0)
-
-	f.__shadow = shadow
-	return shadow
-end
-
-------------------------------------------------------------------------
--- CreateBorder — overlay texture border + shadow
-------------------------------------------------------------------------
-
-local function createBorder(f, margin)
-	if f.__border then
-		return f.__border
 	end
 
 	margin = margin or Mult
+	local lvl = frame:GetFrameLevel()
 
-	local border = f:CreateTexture(nil, "BORDER")
-	border:SetTexture(C.media.texture.texture)
-	border:SetTexCoord(unpack(C.media.texCoord))
-	border:ClearAllPoints()
-	border:SetPoint("TOPRIGHT", f, margin, margin)
-	border:SetPoint("BOTTOMLEFT", f, -margin, -margin)
+	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	child:SetOutside(f, margin, margin)
 
-	f.__border = border
+	if t == "Shadow" then
+		child:SetFrameLevel(0)
+	elseif t == "Border" then
+		child:SetFrameLevel(lvl + 1)
+	else
+		child:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
+	end
 
-	return border
+	setTemplate(child, t)
+
+	f[key] = child
+	return child
+end
+
+-- Convenience aliases
+local function createBG(f, margin)
+	return createTemplate(f, "Default", margin)
+end
+
+local function createShadow(f, margin)
+	return createTemplate(f, "Shadow", margin or 4)
+end
+
+local function createBorder(f, margin)
+	return createTemplate(f, "Border", margin)
 end
 
 ------------------------------------------------------------------------
--- CreateOverlay — dark inner texture
+-- CreateOverlay — overlay texture (tex_overlay)
 ------------------------------------------------------------------------
 
 local function createOverlay(f, margin)
@@ -372,20 +349,14 @@ local function createOverlay(f, margin)
 		return f.__overlay
 	end
 
-	local frame = f
-	if f:IsObjectType("Texture") then
-		frame = f:GetParent()
-	end
-
-	margin = margin or Mult
+	margin = margin or 2
 
 	local overlay = f:CreateTexture(nil, "OVERLAY")
 	overlay:SetTexture(C.media.texture.overlay)
-	overlay:SetTexCoord(unpack(C.media.texCoord))
 	overlay:ClearAllPoints()
 	overlay:SetPoint("TOPRIGHT", f, margin, margin)
 	overlay:SetPoint("BOTTOMLEFT", f, -margin, -margin)
-	
+
 	f.__overlay = overlay
 	return overlay
 end
@@ -449,6 +420,7 @@ local function addapi(object)
 	mt.Kill = kill
 	mt.StripTextures = stripTextures
 	mt.SetTemplate = setTemplate
+	mt.CreateTemplate = createTemplate
 	mt.CreateBG = createBG
 	mt.CreateShadow = createShadow
 	mt.CreateBorder = createBorder

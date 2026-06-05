@@ -134,7 +134,7 @@ local function styleBarFrame(frame)
 
         if not iconFrame.__styled then
             iconFrame.__styled = true
-            iconFrame:CreateOverlay(2)
+            iconFrame:CreateOverlay()
         end
     end
 
