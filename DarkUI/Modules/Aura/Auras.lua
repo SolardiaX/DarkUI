@@ -1,8 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Auras
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 local module = E:Module("Aura"):Sub("Auras")
 
 local cfg = C.aura
@@ -24,9 +24,9 @@ local DEBUFF_COLORS = {
     Enrage = { 0.95, 0.37, 0.96 },
 }
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Time Formatting
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local DAY, HOUR, MINUTE = 86400, 3600, 60
 
@@ -58,9 +58,11 @@ local function startOrStopFlash(animation, timeleft)
     end
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Button Scripts
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+local updateAuras, updateTempEnchant
 
 local function buttonSetTooltip(button)
     if button:GetAttribute("index") then
@@ -102,9 +104,9 @@ end
 
 local function buttonOnAttributeChanged(button, attribute, value)
     if attribute == "index" then
-        module:UpdateAuras(button, value)
+        updateAuras(button, value)
     elseif attribute == "target-slot" then
-        module:UpdateTempEnchant(button, value)
+        updateTempEnchant(button, value)
     end
 end
 
@@ -114,11 +116,11 @@ local function buttonOnEnter(button)
     button:SetScript("OnUpdate", buttonUpdateTimer)
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Aura Updates
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
-function module:UpdateAuras(button, index)
+updateAuras = function(button, index)
     local unit, filter = button.header:GetAttribute("unit"), button.filter
     local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
 
@@ -178,7 +180,7 @@ function module:UpdateAuras(button, index)
     button.expiration = nil
 end
 
-function module:UpdateTempEnchant(button, index)
+updateTempEnchant = function(button, index)
     local expirationTime = select(button.enchantOffset, GetWeaponEnchantInfo())
     if expirationTime then
         local quality = GetInventoryItemQuality("player", index)
@@ -197,11 +199,11 @@ function module:UpdateTempEnchant(button, index)
     end
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Header Setup
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
-function module:UpdateHeader(header)
+local function updateHeader(header)
     local size = cfg.debuff_size
 
     if header.filter == "HELPFUL" then
@@ -225,7 +227,7 @@ function module:UpdateHeader(header)
     header:SetAttribute("template", format("DarkUIAuraTemplate%d", size))
 end
 
-function module:CreateAuraHeader(filter)
+local function createAuraHeader(filter)
     local name = filter == "HELPFUL" and "DarkUIPlayerBuffs" or "DarkUIPlayerDebuffs"
 
     local header = CreateFrame("Frame", name, UIParent, "SecureAuraHeaderTemplate")
@@ -255,15 +257,15 @@ function module:CreateAuraHeader(filter)
         header:SetAttribute("includeWeapons", 1)
     end
 
-    self:UpdateHeader(header)
+    updateHeader(header)
     header:Show()
 
     return header
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Icon Creation
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local indexToOffset = { 2, 6, 10 }
 
@@ -326,9 +328,9 @@ function module:CreateAuraIcon(button)
     end
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Module Lifecycle
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 function module:OnInit()
     if not cfg or not cfg.enable then
@@ -339,11 +341,11 @@ function module:OnInit()
     BuffFrame:Kill()
     DebuffFrame:Kill()
 
-    self.BuffFrame = self:CreateAuraHeader("HELPFUL")
+    self.BuffFrame = createAuraHeader("HELPFUL")
     self.BuffFrame:ClearAllPoints()
     self.BuffFrame:SetPoint(unpack(cfg.buff_pos))
 
-    self.DebuffFrame = self:CreateAuraHeader("HARMFUL")
+    self.DebuffFrame = createAuraHeader("HARMFUL")
     self.DebuffFrame:ClearAllPoints()
     self.DebuffFrame:SetPoint(unpack(cfg.debuff_pos))
 end
