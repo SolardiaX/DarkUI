@@ -7,6 +7,8 @@ local module = E:Module("Actionbar"):Sub("Bars")
 local actionButton = LibStub("DarkUI-ActionButton")
 local LAB = LibStub("LibActionButton-1.0")
 
+local format = string.format
+
 local num = NUM_ACTIONBAR_BUTTONS
 
 local BAR_DATA = {
@@ -20,8 +22,14 @@ local BAR_DATA = {
     [8] = { page = 15, bindName = "MULTIACTIONBAR7BUTTON", vertical = false, flyout = "UP" },
 }
 
-local fullPage =
-    "[bar:6]6;[bar:5]5;[bar:4]4;[bar:3]3;[bar:2]2;[possessbar]16;[overridebar]18;[shapeshift]17;[vehicleui]16;[bonusbar:5]11;[bonusbar:4]10;[bonusbar:3]9;[bonusbar:2]8;[bonusbar:1]7;1"
+local vehicleBarIndex = GetVehicleBarIndex()
+local overrideBarIndex = GetOverrideBarIndex()
+local tempShapeshiftIndex = GetTempShapeshiftBarIndex()
+
+local fullPage = format(
+    "[bar:6]6;[bar:5]5;[bar:4]4;[bar:3]3;[bar:2]2;[possessbar]%d;[overridebar]%d;[shapeshift]%d;[vehicleui]%d;[bonusbar:5]11;[bonusbar:4]10;[bonusbar:3]9;[bonusbar:2]8;[bonusbar:1]7;1",
+    vehicleBarIndex, overrideBarIndex, tempShapeshiftIndex, vehicleBarIndex
+)
 
 local function createBar(index, cfg, data)
     if not cfg.enable then

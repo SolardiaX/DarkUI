@@ -28,15 +28,14 @@ function module:OnInit()
     E:StyleActionButton(button, true)
 
     button:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         if UnitOnTaxi("player") then
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:SetText(TAXI_CANCEL, 1, 1, 1)
             GameTooltip:AddLine(TAXI_CANCEL_DESCRIPTION, 1, 0.8, 0, true)
-            GameTooltip:Show()
         else
-            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip_SetTitle(GameTooltip, LEAVE_VEHICLE)
+            GameTooltip:SetText(LEAVE_VEHICLE, 1, 1, 1)
         end
+        GameTooltip:Show()
     end)
     button:SetScript("OnLeave", function()
         GameTooltip:Hide()

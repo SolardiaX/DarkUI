@@ -57,7 +57,8 @@ function module:OnInit()
 
             button:HookScript("OnEnter", function(self)
                 GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT")
-                GameTooltip_SetTitle(GameTooltip, self.tooltipText)
+                GameTooltip:SetText(self.tooltipText, 1, 1, 1)
+                GameTooltip:Show()
             end)
 
             tinsert(bar.buttonList, button)

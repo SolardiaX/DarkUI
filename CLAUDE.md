@@ -83,3 +83,9 @@ fix: [Unitframe] cooldown of nameplate
 chore: bump to v11.1.5-b1.0.6
 feat: [Options] adjust gui size
 ```
+
+## References
+
+`DarkUI/REFERENCES.md` records which external addons each module references.
+When adding new modules or updating existing ones based on external code, update this file.
+Use it to find original sources when iterating features or fixing bugs.

@@ -35,8 +35,10 @@ local function shiftBarUpdate()
 
             if isCastable then
                 icon:SetVertexColor(1.0, 1.0, 1.0)
+                icon:SetDesaturation(0)
             else
                 icon:SetVertexColor(0.4, 0.4, 0.4)
+                icon:SetDesaturation(1)
             end
         end
     end

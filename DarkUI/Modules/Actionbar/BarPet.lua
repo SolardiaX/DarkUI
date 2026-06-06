@@ -8,12 +8,23 @@ local module = E:Module("Actionbar"):Sub("BarPet")
 local cfg = C.actionbar.bars.barpet
 local num = NUM_PET_ACTION_SLOTS
 
+local function hasPetActionHighlightMark(index)
+    if PET_ACTION_HIGHLIGHT_MARKS then
+        return PET_ACTION_HIGHLIGHT_MARKS[index]
+    end
+    return false
+end
+
 local function updatePetBar()
+    if not PetHasActionBar() then
+        return
+    end
+
     for i = 1, num do
         local buttonName = "PetActionButton" .. i
         local petActionButton = _G[buttonName]
         local petActionIcon = petActionButton.icon
-        local petAutoCastOverlay = petActionButton.AutoCastOverlay
+        local petAutoCastOverlay = petActionButton.AutoCastOverlay or petActionButton.AutoCastable
 
         local name, texture, isToken, isActive, autoCastAllowed, autoCastEnabled, spellID = GetPetActionInfo(i)
 
@@ -48,21 +59,27 @@ local function updatePetBar()
             petActionButton:SetChecked(false)
         end
 
-        petAutoCastOverlay:SetShown(autoCastAllowed)
-        petAutoCastOverlay:ShowAutoCastEnabled(autoCastEnabled)
+        if petAutoCastOverlay then
+            petAutoCastOverlay:SetShown(autoCastAllowed)
+            if petAutoCastOverlay.ShowAutoCastEnabled then
+                petAutoCastOverlay:ShowAutoCastEnabled(autoCastEnabled)
+            end
+        end
 
         if texture then
             if GetPetActionSlotUsable(i) then
                 petActionIcon:SetVertexColor(1, 1, 1)
+                petActionIcon:SetDesaturation(0)
             else
                 petActionIcon:SetVertexColor(0.4, 0.4, 0.4)
+                petActionIcon:SetDesaturation(1)
             end
             petActionIcon:Show()
         else
             petActionIcon:Hide()
         end
 
-        SharedActionButton_RefreshSpellHighlight(petActionButton, PET_ACTION_HIGHLIGHT_MARKS[i])
+        SharedActionButton_RefreshSpellHighlight(petActionButton, hasPetActionHighlightMark(i))
     end
 end
 
