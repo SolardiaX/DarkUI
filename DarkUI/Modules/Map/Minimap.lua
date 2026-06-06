@@ -4,9 +4,9 @@ if not C.map.minimap.enable then
     return
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- MiniMap Styles
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 local module = E:Module("Map"):Sub("MiniMap")
 
 local unpack, ipairs = unpack, ipairs
@@ -44,95 +44,174 @@ local FRAMES_TO_ROTATE = {
     },
 }
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Disable Blizzard Elements
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
+
+local function hideObject(obj)
+    if not obj then
+        return
+    end
+    obj:SetAlpha(0)
+    obj:Hide()
+    if obj.UnregisterAllEvents then
+        obj:UnregisterAllEvents()
+    end
+    if obj.Show then
+        obj.Show = E.Dummy
+    end
+end
 
 local function disableBlizzard()
     MinimapCluster:EnableMouse(false)
-    MinimapCompassTexture:Hide()
-    MinimapCluster.BorderTop:StripTextures()
 
-    Minimap.ZoomIn:Kill()
-    Minimap.ZoomOut:Kill()
+    hideObject(MinimapCompassTexture)
+
+    if MinimapCluster.BorderTop then
+        MinimapCluster.BorderTop:Hide()
+    end
+
+    if Minimap.ZoomIn then
+        Minimap.ZoomIn:SetAlpha(0)
+        Minimap.ZoomIn:Hide()
+    end
+    if Minimap.ZoomOut then
+        Minimap.ZoomOut:SetAlpha(0)
+        Minimap.ZoomOut:Hide()
+    end
 
     Minimap:SetArchBlobRingScalar(0)
     Minimap:SetQuestBlobRingScalar(0)
 
-    MinimapCluster.ZoneTextButton:Hide()
+    if MinimapCluster.ZoneTextButton then
+        MinimapCluster.ZoneTextButton:Hide()
+    end
 
     Minimap:SetSize(Minimap:GetWidth() * 0.88, Minimap:GetHeight() * 0.88)
-    Minimap.SetSize = E.Dummy
     Minimap:ClearAllPoints()
     Minimap:SetPoint(unpack(cfg.position))
 
-    MinimapBackdrop:Kill()
+    -- Reparent Housing overlay before hiding MinimapBackdrop
+    if MinimapBackdrop then
+        if MinimapBackdrop.StaticOverlayTexture then
+            MinimapBackdrop.StaticOverlayTexture:SetParent(Minimap)
+            MinimapBackdrop.StaticOverlayTexture:SetInside(Minimap)
+            MinimapBackdrop.StaticOverlayTexture:SetTexCoord(0.2, 0.8, 0.2, 0.8)
+        end
+        MinimapBackdrop:Hide()
+    end
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Icon Repositioning
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local function resetIcons()
     -- Difficulty
     local instDiff = MinimapCluster.InstanceDifficulty
-    instDiff:SetParent(Minimap)
-    instDiff:ClearAllPoints()
-    instDiff:SetPoint(unpack(cfg.iconpos.instance))
+    if instDiff then
+        instDiff:SetParent(Minimap)
+        instDiff:ClearAllPoints()
+        instDiff:SetPoint(unpack(cfg.iconpos.instance))
 
-    instDiff.Default.Border:Hide()
-    instDiff.Default.Background:SetSize(28, 36)
-    instDiff.Default.Background:SetVertexColor(0.6, 0.3, 0)
-    instDiff.Default.HeroicTexture:ClearAllPoints()
-    instDiff.Default.HeroicTexture:SetPoint("CENTER", -1, 7)
-    instDiff.Default.HeroicTexture.SetPoint = E.Dummy
-    instDiff.Default.MythicTexture:ClearAllPoints()
-    instDiff.Default.MythicTexture:SetPoint("CENTER", -1, 7)
-    instDiff.Default.MythicTexture.SetPoint = E.Dummy
+        if instDiff.Default then
+            if instDiff.Default.Border then
+                instDiff.Default.Border:Hide()
+            end
+            instDiff.Default.Background:SetSize(28, 36)
+            instDiff.Default.Background:SetVertexColor(0.6, 0.3, 0)
+            if instDiff.Default.HeroicTexture then
+                instDiff.Default.HeroicTexture:ClearAllPoints()
+                instDiff.Default.HeroicTexture:SetPoint("CENTER", -1, 7)
+                instDiff.Default.HeroicTexture.SetPoint = E.Dummy
+            end
+            if instDiff.Default.MythicTexture then
+                instDiff.Default.MythicTexture:ClearAllPoints()
+                instDiff.Default.MythicTexture:SetPoint("CENTER", -1, 7)
+                instDiff.Default.MythicTexture.SetPoint = E.Dummy
+            end
+        end
 
-    instDiff.Guild.Border:Hide()
-    instDiff.Guild.Background:SetSize(28, 36)
-    instDiff.Guild.Background:SetVertexColor(0.6, 0.3, 0)
+        if instDiff.Guild then
+            if instDiff.Guild.Border then
+                instDiff.Guild.Border:Hide()
+            end
+            instDiff.Guild.Background:SetSize(28, 36)
+            instDiff.Guild.Background:SetVertexColor(0.6, 0.3, 0)
+        end
 
-    instDiff.ChallengeMode.Border:Hide()
-    instDiff.ChallengeMode.Background:SetSize(28, 36)
-    instDiff.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
+        if instDiff.ChallengeMode then
+            if instDiff.ChallengeMode.Border then
+                instDiff.ChallengeMode.Border:Hide()
+            end
+            instDiff.ChallengeMode.Background:SetSize(28, 36)
+            instDiff.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
+        end
+    end
 
-    -- Queue Status
-    QueueStatusFrame:SetClampedToScreen(true)
-    QueueStatusFrame:SetFrameStrata("TOOLTIP")
-    QueueStatusButton:SetParent(Minimap)
-    QueueStatusButton:ClearAllPoints()
-    QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
-    QueueStatusButton:SetScale(0.48)
-    hooksecurefunc(QueueStatusButton, "SetPoint", function(self, _, anchor)
-        if anchor ~= Minimap then
+    -- Queue Status (use flag to prevent recursion)
+    if QueueStatusButton then
+        QueueStatusFrame:SetClampedToScreen(true)
+        QueueStatusFrame:SetFrameStrata("TOOLTIP")
+        QueueStatusButton:SetParent(Minimap)
+        QueueStatusButton:ClearAllPoints()
+        QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
+        QueueStatusButton:SetScale(0.48)
+
+        local isSettingQueuePoint
+        hooksecurefunc(QueueStatusButton, "SetPoint", function(self)
+            if isSettingQueuePoint then
+                return
+            end
+            isSettingQueuePoint = true
             self:ClearAllPoints()
             self:SetPoint(unpack(cfg.iconpos.queue))
-        end
-    end)
+            isSettingQueuePoint = false
+        end)
+    end
 
     -- GameTime
-    GameTimeFrame:SetSize(26, 26)
-    GameTimeFrame:ClearAllPoints()
-    GameTimeFrame:SetPoint(unpack(cfg.iconpos.time))
-    GameTimeFrame:SetHitRectInsets(0, 0, 0, 0)
+    if GameTimeFrame then
+        GameTimeFrame:SetSize(26, 26)
+        GameTimeFrame:ClearAllPoints()
+        GameTimeFrame:SetPoint(unpack(cfg.iconpos.time))
+        GameTimeFrame:SetHitRectInsets(0, 0, 0, 0)
+    end
 
     -- Clock
-    TimeManagerClockButton:ClearAllPoints()
-    TimeManagerClockButton:SetPoint(unpack(cfg.iconpos.clock))
-    TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
-    TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
-    TimeManagerAlarmFiredTexture:ClearAllPoints()
-    TimeManagerAlarmFiredTexture:SetPoint("TOPLEFT", TimeManagerClockTicker, "TOPLEFT", -18, 10)
-    TimeManagerAlarmFiredTexture:SetPoint("BOTTOMRIGHT", TimeManagerClockTicker, "BOTTOMRIGHT", 15, -13)
+    if TimeManagerClockButton then
+        TimeManagerClockButton:ClearAllPoints()
+        TimeManagerClockButton:SetPoint(unpack(cfg.iconpos.clock))
+        if TimeManagerClockTicker then
+            TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
+            TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
+        end
+        if TimeManagerAlarmFiredTexture and TimeManagerClockTicker then
+            TimeManagerAlarmFiredTexture:ClearAllPoints()
+            TimeManagerAlarmFiredTexture:SetPoint("TOPLEFT", TimeManagerClockTicker, "TOPLEFT", -18, 10)
+            TimeManagerAlarmFiredTexture:SetPoint("BOTTOMRIGHT", TimeManagerClockTicker, "BOTTOMRIGHT", 15, -13)
+        end
+    end
 
     -- Mail
-    local mailFrame = MinimapCluster.IndicatorFrame.MailFrame
-    mailFrame:SetSize(cfg.iconSize, cfg.iconSize)
-    mailFrame:ClearAllPoints()
-    mailFrame:SetPoint(unpack(cfg.iconpos.mail))
-    mailFrame.SetPoint = E.Dummy
+    local indicatorFrame = MinimapCluster.IndicatorFrame
+    if indicatorFrame and indicatorFrame.MailFrame then
+        local mailFrame = indicatorFrame.MailFrame
+        mailFrame:SetSize(cfg.iconSize, cfg.iconSize)
+        mailFrame:ClearAllPoints()
+        mailFrame:SetPoint(unpack(cfg.iconpos.mail))
+
+        local isSettingMailPoint
+        hooksecurefunc(mailFrame, "SetPoint", function(self)
+            if isSettingMailPoint then
+                return
+            end
+            isSettingMailPoint = true
+            self:ClearAllPoints()
+            self:SetPoint(unpack(cfg.iconpos.mail))
+            isSettingMailPoint = false
+        end)
+    end
 
     -- Expansion Landing Page Button
     local garrButton = ExpansionLandingPageMinimapButton
@@ -156,7 +235,7 @@ local function resetIcons()
                 if ExpansionLandingPage and ExpansionLandingPage:IsShown() then
                     HideUIPanel(ExpansionLandingPage)
                 end
-                module:ShowGarrisonMenu(self)
+                showGarrisonMenu(self)
             end
         end)
 
@@ -170,25 +249,34 @@ local function resetIcons()
     end
 
     -- Tracking
-    MinimapCluster.Tracking:SetParent(Minimap)
-    MinimapCluster.Tracking:SetSize(28, 28)
-    MinimapCluster.Tracking:ClearAllPoints()
-    MinimapCluster.Tracking:SetPoint("LEFT", Minimap, "RIGHT", -12, 2)
-    MinimapCluster.Tracking.Background:Hide()
-    MinimapCluster.Tracking.Button:SetSize(28, 28)
+    local tracking = MinimapCluster.Tracking
+    if tracking then
+        tracking:SetParent(Minimap)
+        tracking:SetSize(28, 28)
+        tracking:ClearAllPoints()
+        tracking:SetPoint("LEFT", Minimap, "RIGHT", -12, 2)
+        if tracking.Background then
+            tracking.Background:Hide()
+        end
+        if tracking.Button then
+            tracking.Button:SetSize(28, 28)
+        end
+    end
 
     -- AddonCompartment
     if AddonCompartmentFrame then
         AddonCompartmentFrame:ClearAllPoints()
-        AddonCompartmentFrame:SetPoint("BOTTOMRIGHT", Minimap, -26, 2)
+        AddonCompartmentFrame:SetPoint("BOTTOMLEFT", Minimap, -22, 2)
+        AddonCompartmentFrame:SetAlpha(0)
+        AddonCompartmentFrame:Kill()
     end
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Garrison Menu (12.0: MenuUtil replaces EasyMenu)
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
-function module:ShowGarrisonMenu(anchor)
+local function showGarrisonMenu(anchor)
     MenuUtil.CreateContextMenu(anchor, function(_, rootDescription)
         rootDescription:CreateButton(GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, function()
             if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_9_0_Garrison) then
@@ -221,9 +309,9 @@ function module:ShowGarrisonMenu(anchor)
     end)
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Decorative Textures
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local function addTextures()
     for _, ftr in ipairs(FRAMES_TO_ROTATE) do
@@ -256,9 +344,9 @@ local function addTextures()
     border:SetScale(0.88)
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 -- Auto Zoom Out
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 local function enableAutoZoomOut()
     if not cfg.autoZoom then
@@ -268,8 +356,6 @@ local function enableAutoZoomOut()
     local isResetting
     local function resetZoom()
         Minimap:SetZoom(0)
-        Minimap.ZoomIn:Enable()
-        Minimap.ZoomOut:Disable()
         isResetting = false
     end
 
@@ -281,9 +367,284 @@ local function enableAutoZoomOut()
     end)
 end
 
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
+-- RecycleBin — Collect addon minimap buttons
+------------------------------------------------------------------------
+
+local blackList = {
+    ["GameTimeFrame"] = true,
+    ["MinimapBackdrop"] = true,
+    ["TimeManagerClockButton"] = true,
+    ["QueueStatusButton"] = true,
+    ["QueueStatusMinimapButton"] = true,
+    ["GarrisonLandingPageMinimapButton"] = true,
+    ["ExpansionLandingPageMinimapButton"] = true,
+    ["MinimapZoneTextButton"] = true,
+    ["RecycleBinFrame"] = true,
+    ["RecycleBinToggleButton"] = true,
+}
+
+local ignoredButtons = {
+    ["GatherMatePin"] = true,
+    ["HandyNotes.-Pin"] = true,
+    ["TTMinimapButton"] = true,
+}
+
+local function isButtonIgnored(name)
+    for pattern in pairs(ignoredButtons) do
+        if name:match(pattern) then
+            return true
+        end
+    end
+end
+
+local removedTextures = {
+    [136430] = true,
+    [136467] = true,
+}
+
+local function setupRecycleBin()
+    local buttons = {}
+    local numMinimapChildren = 0
+    local ICONS_PER_ROW = 10
+    local BUTTON_SIZE = 32
+    local SPACING = 3
+
+    -- Toggle button
+    local toggleBtn = CreateFrame("Button", "RecycleBinToggleButton", Minimap)
+    toggleBtn:SetSize(36, 36)
+    toggleBtn:SetPoint("BOTTOMLEFT", -4, -6)
+    toggleBtn:SetFrameLevel(999)
+    toggleBtn:RegisterForClicks("LeftButtonUp")
+
+    local toggleIcon = toggleBtn:CreateTexture(nil, "ARTWORK", nil, 1)
+    toggleIcon:SetAllPoints()
+    toggleIcon:SetTexture("Interface\\HelpFrame\\ReportLagIcon-Loot")
+
+    local hl = toggleBtn:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetAllPoints()
+    hl:SetTexture("Interface\\HelpFrame\\ReportLagIcon-Loot")
+    hl:SetAlpha(0.3)
+
+    -- Bin container
+    local binWidth, binHeight, binAlpha = 220, 40, 0.85
+    local bin = CreateFrame("Frame", "RecycleBinFrame", UIParent)
+    bin:SetPoint("BOTTOMRIGHT", toggleBtn, "BOTTOMLEFT", -3, 0)
+    bin:SetSize(binWidth, binHeight)
+    bin:SetFrameStrata("BACKGROUND")
+    bin:SetFrameLevel(9)
+    -- bin:CreateShadow()
+    bin:Hide()
+
+    -- Gradient background
+    local bgTex = bin:CreateTexture(nil, "BACKGROUND")
+    bgTex:SetAllPoints()
+    bgTex:SetTexture(C.media.texture.blank)
+    bgTex:SetGradient("HORIZONTAL", CreateColor(0, 0, 0, 0), CreateColor(0, 0, 0, binAlpha))
+
+    -- Border lines (class-colored gradient)
+    local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
+
+    local topLine = bin:CreateTexture(nil, "BORDER")
+    topLine:SetHeight(E.mult)
+    topLine:SetPoint("BOTTOMLEFT", bin, "TOPLEFT")
+    topLine:SetPoint("BOTTOMRIGHT", bin, "TOPRIGHT")
+    topLine:SetTexture(C.media.texture.blank)
+    topLine:SetGradient("HORIZONTAL", CreateColor(cr, cg, cb, 0), CreateColor(cr, cg, cb, binAlpha))
+
+    local bottomLine = bin:CreateTexture(nil, "BORDER")
+    bottomLine:SetHeight(E.mult)
+    bottomLine:SetPoint("TOPLEFT", bin, "BOTTOMLEFT")
+    bottomLine:SetPoint("TOPRIGHT", bin, "BOTTOMRIGHT")
+    bottomLine:SetTexture(C.media.texture.blank)
+    bottomLine:SetGradient("HORIZONTAL", CreateColor(cr, cg, cb, 0), CreateColor(cr, cg, cb, binAlpha))
+
+    local rightLine = bin:CreateTexture(nil, "BORDER")
+    rightLine:SetWidth(E.mult)
+    rightLine:SetPoint("TOPLEFT", bin, "TOPRIGHT", 0, E.mult)
+    rightLine:SetPoint("BOTTOMLEFT", bin, "BOTTOMRIGHT", 0, -E.mult)
+    rightLine:SetTexture(C.media.texture.blank)
+    rightLine:SetGradient("VERTICAL", CreateColor(cr, cg, cb, binAlpha), CreateColor(cr, cg, cb, binAlpha))
+
+    -- Fade animations
+    local fadeIn = bin:CreateAnimationGroup()
+    fadeIn.alpha = fadeIn:CreateAnimation("Alpha")
+    fadeIn.alpha:SetFromAlpha(0)
+    fadeIn.alpha:SetToAlpha(1)
+    fadeIn.alpha:SetDuration(0.3)
+    fadeIn:SetScript("OnPlay", function()
+        bin:Show()
+    end)
+
+    local fadeOut = bin:CreateAnimationGroup()
+    fadeOut.alpha = fadeOut:CreateAnimation("Alpha")
+    fadeOut.alpha:SetFromAlpha(1)
+    fadeOut.alpha:SetToAlpha(0)
+    fadeOut.alpha:SetDuration(0.3)
+    fadeOut:SetScript("OnFinished", function()
+        bin:Hide()
+    end)
+
+    local function hideBin()
+        if bin:IsShown() then
+            fadeOut:Play()
+        end
+    end
+
+    -- Reskin a collected button
+    local function reskinButton(child)
+        local name = child:GetName() or ""
+
+        for i = 1, child:GetNumRegions() do
+            local region = select(i, child:GetRegions())
+            if region:IsObjectType("Texture") then
+                local texture = region:GetTexture() or ""
+                if removedTextures[texture]
+                    or (type(texture) == "string" and (texture:find("Interface\\CharacterFrame") or texture:find("Interface\\Minimap"))) then
+                    region:SetTexture(nil)
+                    region:Hide()
+                elseif not region.__ignored then
+                    region:ClearAllPoints()
+                    region:SetAllPoints()
+                end
+            end
+        end
+
+        child:SetSize(BUTTON_SIZE, BUTTON_SIZE)
+        child:SetTemplate("Transparent")
+
+        buttons[#buttons + 1] = child
+    end
+
+    -- Move collected buttons into bin
+    local function setupButtons()
+        local binLevel = bin:GetFrameLevel()
+
+        for _, child in ipairs(buttons) do
+            if not child.__binStyled then
+                child:SetParent(bin)
+                child:SetFrameLevel(binLevel + 5)
+                if child:HasScript("OnDragStop") then
+                    child:SetScript("OnDragStop", nil)
+                end
+                if child:HasScript("OnDragStart") then
+                    child:SetScript("OnDragStart", nil)
+                end
+                if child:HasScript("OnClick") then
+                    child:HookScript("OnClick", hideBin)
+                end
+
+                if child:IsObjectType("Button") then
+                    child:SetHighlightTexture(C.media.texture.blank)
+                    child:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+                end
+
+                child.__binStyled = true
+            end
+        end
+    end
+
+    -- Arrange buttons in grid
+    local function sortButtons()
+        if #buttons == 0 then
+            return
+        end
+
+        local shownButtons = {}
+        for _, btn in ipairs(buttons) do
+            if btn:IsShown() then
+                shownButtons[#shownButtons + 1] = btn
+            end
+        end
+
+        local numShown = #shownButtons
+        if numShown == 0 then
+            return
+        end
+
+        local rows = math.ceil(numShown / ICONS_PER_ROW)
+        local newHeight = rows * (BUTTON_SIZE + SPACING) + SPACING
+        bin:SetHeight(newHeight)
+
+        for i, btn in ipairs(shownButtons) do
+            btn:ClearAllPoints()
+            local col = (i - 1) % ICONS_PER_ROW
+            local row = math.floor((i - 1) / ICONS_PER_ROW)
+            btn:SetPoint("BOTTOMRIGHT", bin, "BOTTOMRIGHT",
+                -(col * (BUTTON_SIZE + SPACING) + SPACING),
+                row * (BUTTON_SIZE + SPACING) + SPACING)
+        end
+    end
+
+    -- Scan for new addon buttons
+    local scanCount = 0
+    local function collectButtons()
+        local numChildren = Minimap:GetNumChildren()
+        if numChildren ~= numMinimapChildren then
+            for i = 1, numChildren do
+                local child = select(i, Minimap:GetChildren())
+                local name = child and child.GetName and child:GetName()
+                if name and not child.__binExamed and not blackList[name] then
+                    if (child:IsObjectType("Button") or name:upper():find("BUTTON"))
+                        and not isButtonIgnored(name) then
+                        reskinButton(child)
+                    end
+                    child.__binExamed = true
+                end
+            end
+            numMinimapChildren = numChildren
+        end
+
+        setupButtons()
+
+        scanCount = scanCount + 1
+        if scanCount < 12 then
+            C_Timer_After(5, collectButtons)
+        end
+    end
+
+    -- Toggle button click
+    toggleBtn:SetScript("OnClick", function()
+        if bin:IsShown() then
+            hideBin()
+        else
+            sortButtons()
+            fadeIn:Play()
+        end
+    end)
+
+    toggleBtn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+        GameTooltip:SetText("RecycleBin", 1, 1, 1)
+        GameTooltip:AddLine("Click to toggle addon buttons", nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    toggleBtn:SetScript("OnLeave", GameTooltip_Hide)
+
+    -- Start scanning (immediate + event-driven for fast collection)
+    collectButtons()
+
+    local eventFrame = CreateFrame("Frame")
+    eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+    eventFrame:SetScript("OnEvent", function(self)
+        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+        C_Timer_After(0.5, collectButtons)
+    end)
+end
+
+------------------------------------------------------------------------
+-- HybridMinimap (dungeon square minimap)
+------------------------------------------------------------------------
+
+local function setupHybridMinimap()
+    if HybridMinimap and HybridMinimap.CircleMask then
+        HybridMinimap.CircleMask:SetTexture("Interface\\BUTTONS\\WHITE8X8")
+    end
+end
+
+------------------------------------------------------------------------
 -- Module Init
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
 function module:OnInit()
     if not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager") then
@@ -295,7 +656,12 @@ function module:OnInit()
     addTextures()
     enableAutoZoomOut()
 
-    Minimap:EnableMouseWheel()
+    if cfg.recycleBin then
+        setupRecycleBin()
+    end
+
+    -- Mouse wheel zoom
+    Minimap:EnableMouseWheel(true)
     Minimap:SetScript("OnMouseWheel", function(_, direction)
         if direction > 0 then
             Minimap.ZoomIn:Click()
@@ -303,4 +669,11 @@ function module:OnInit()
             Minimap.ZoomOut:Click()
         end
     end)
+
+    -- HybridMinimap
+    if HybridMinimap then
+        setupHybridMinimap()
+    else
+        EventUtil.ContinueOnAddOnLoaded("Blizzard_HybridMinimap", setupHybridMinimap)
+    end
 end

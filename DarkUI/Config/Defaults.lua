@@ -393,6 +393,7 @@ defaults.map = {
             clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
         },
         autoZoom = true,
+        recycleBin = true,
     },
     worldmap = {
         enable = true,
