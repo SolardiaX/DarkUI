@@ -2,4 +2,5 @@
     <Include file="Actionbar\_load_.xml" />
     <Include file="Aura\_load_.xml" />
     <Include file="Map\_load_.xml" />
+    <Include file="Unitframe\_load_.xml" />
 </Ui>

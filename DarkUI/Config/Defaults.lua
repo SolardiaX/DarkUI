@@ -384,7 +384,7 @@ defaults.map = {
         enable = true,
         position = { "TOPRIGHT", "UIParent", "TOPRIGHT", -35, -35 },
         autoZoom = true,
-        recycleBin = true,
+        recycleBin = false,
     },
     worldmap = {
         enable = true,
@@ -495,6 +495,7 @@ defaults.nameplate = {
 ----------------------------------------------------------------------------------------
 defaults.unitframe = {
     enable = true,
+    mediaPath = C.media.path,
     scale = 0.9,
     portrait3D = false,
     player = {
