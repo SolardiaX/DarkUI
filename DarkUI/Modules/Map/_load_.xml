@@ -1,3 +1,14 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Button name="DarkUIWorldQuestPinTemplate" inherits="POIButtonTemplate, LegendHighlightableMapPoiPinTemplate" mixin="DarkUIWorldQuestPinMixin" virtual="true">
+        <KeyValues>
+            <KeyValue key="questRewardTooltipStyle" value="TOOLTIP_QUEST_REWARDS_STYLE_WORLD_QUEST" type="global" />
+        </KeyValues>
+    </Button>
+    <Button name="DarkUIWorldQuestPOITemplate" inherits="AreaPOIPinTemplate" virtual="true" />
+    <Button name="DarkUIWorldQuestEventTemplate" inherits="AreaPOIEventPinTemplate" virtual="true" />
+
     <Script file="Minimap.lua" />
+    <Script file="WorldMapData.lua" />
+    <Script file="WorldMap.lua" />
+    <Script file="WorldMapRewardIcon.lua" />
 </Ui>

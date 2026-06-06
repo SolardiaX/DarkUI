@@ -388,9 +388,10 @@ defaults.map = {
     },
     worldmap = {
         enable = true,
-        iconSize = 28,
         removeFog = true,
-        rewardIcon = true,
+        revealGlow = true,
+        scale = 0.8,
+        maxScale = 0.7,
         position = { "BOTTOM", "UIParent", "BOTTOM", 0, 320 },
     },
 }
