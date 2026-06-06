@@ -383,15 +383,6 @@ defaults.map = {
     minimap = {
         enable = true,
         position = { "TOPRIGHT", "UIParent", "TOPRIGHT", -35, -35 },
-        iconSize = 20,
-        iconpos = {
-            mail = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", -30, -8 },
-            garrison = { "CENTER", "Minimap", "CENTER", 90, 130 },
-            queue = { "RIGHT", "Minimap", "LEFT", 40, -50 },
-            instance = { "TOPRIGHT", "Minimap", "TOPRIGHT", 20, 20 },
-            time = { "BOTTOM", "Minimap", "BOTTOM", 1, 1 },
-            clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
-        },
         autoZoom = true,
         recycleBin = true,
     },

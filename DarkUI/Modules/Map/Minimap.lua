@@ -14,6 +14,16 @@ local C_Timer_After = C_Timer.After
 
 local cfg = C.map.minimap
 
+local ICON_SIZE = 20
+local ICON_POS = {
+    mail = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", -30, -8 },
+    garrison = { "CENTER", "Minimap", "CENTER", 90, 130 },
+    queue = { "RIGHT", "Minimap", "LEFT", 40, -50 },
+    instance = { "TOPRIGHT", "Minimap", "TOPRIGHT", 20, 20 },
+    time = { "BOTTOM", "Minimap", "BOTTOM", 1, 1 },
+    clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
+}
+
 local media = {
     map_gloss = C.media.path .. "map_gloss",
     map_overlay = C.media.path .. C.general.style .. "\\" .. "map_overlay",
@@ -112,7 +122,18 @@ local function resetIcons()
     if instDiff then
         instDiff:SetParent(Minimap)
         instDiff:ClearAllPoints()
-        instDiff:SetPoint(unpack(cfg.iconpos.instance))
+        instDiff:SetPoint(unpack(ICON_POS.instance))
+
+        local isSettingDiffPoint
+        hooksecurefunc(instDiff, "SetPoint", function(self)
+            if isSettingDiffPoint then
+                return
+            end
+            isSettingDiffPoint = true
+            self:ClearAllPoints()
+            self:SetPoint(unpack(ICON_POS.instance))
+            isSettingDiffPoint = false
+        end)
 
         if instDiff.Default then
             if instDiff.Default.Border then
@@ -155,7 +176,7 @@ local function resetIcons()
         QueueStatusFrame:SetFrameStrata("TOOLTIP")
         QueueStatusButton:SetParent(Minimap)
         QueueStatusButton:ClearAllPoints()
-        QueueStatusButton:SetPoint(unpack(cfg.iconpos.queue))
+        QueueStatusButton:SetPoint(unpack(ICON_POS.queue))
         QueueStatusButton:SetScale(0.48)
 
         local isSettingQueuePoint
@@ -165,7 +186,7 @@ local function resetIcons()
             end
             isSettingQueuePoint = true
             self:ClearAllPoints()
-            self:SetPoint(unpack(cfg.iconpos.queue))
+            self:SetPoint(unpack(ICON_POS.queue))
             isSettingQueuePoint = false
         end)
     end
@@ -174,14 +195,14 @@ local function resetIcons()
     if GameTimeFrame then
         GameTimeFrame:SetSize(26, 26)
         GameTimeFrame:ClearAllPoints()
-        GameTimeFrame:SetPoint(unpack(cfg.iconpos.time))
+        GameTimeFrame:SetPoint(unpack(ICON_POS.time))
         GameTimeFrame:SetHitRectInsets(0, 0, 0, 0)
     end
 
     -- Clock
     if TimeManagerClockButton then
         TimeManagerClockButton:ClearAllPoints()
-        TimeManagerClockButton:SetPoint(unpack(cfg.iconpos.clock))
+        TimeManagerClockButton:SetPoint(unpack(ICON_POS.clock))
         if TimeManagerClockTicker then
             TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
             TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
@@ -197,9 +218,9 @@ local function resetIcons()
     local indicatorFrame = MinimapCluster.IndicatorFrame
     if indicatorFrame and indicatorFrame.MailFrame then
         local mailFrame = indicatorFrame.MailFrame
-        mailFrame:SetSize(cfg.iconSize, cfg.iconSize)
+        mailFrame:SetSize(ICON_SIZE, ICON_SIZE)
         mailFrame:ClearAllPoints()
-        mailFrame:SetPoint(unpack(cfg.iconpos.mail))
+        mailFrame:SetPoint(unpack(ICON_POS.mail))
 
         local isSettingMailPoint
         hooksecurefunc(mailFrame, "SetPoint", function(self)
@@ -208,7 +229,7 @@ local function resetIcons()
             end
             isSettingMailPoint = true
             self:ClearAllPoints()
-            self:SetPoint(unpack(cfg.iconpos.mail))
+            self:SetPoint(unpack(ICON_POS.mail))
             isSettingMailPoint = false
         end)
     end
@@ -219,7 +240,7 @@ local function resetIcons()
         local function updateGarrisonButton(self)
             self:SetParent(Minimap)
             self:ClearAllPoints()
-            self:SetPoint(unpack(cfg.iconpos.garrison))
+            self:SetPoint(unpack(ICON_POS.garrison))
             self:SetScale(0.6)
         end
 
