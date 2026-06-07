@@ -44,7 +44,7 @@ C.aura.auraWatch = {
 -- RaidDebuffs
 C.aura.raidDebuffs = {}
 
--- RaidDebuffs
+-- RaidBuffs
 C.aura.raidBuffs = {}
 
 local function newAuraFormat(value)

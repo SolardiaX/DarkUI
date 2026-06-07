@@ -1,15 +1,15 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.aura.auraWatch.enable then
+if not C.aura.coolDownViewer.enable then
     return
 end
 
 ------------------------------------------------------------------------
--- AuraWatch — Blizzard Cooldown Manager Restyling
+-- CoolDownViewer — Blizzard Cooldown Manager Restyling
 ------------------------------------------------------------------------
-local module = E:Module("Aura"):Sub("AuraWatch")
+local module = E:Module("Aura"):Sub("CoolDownViewer")
 
-local cfg = C.aura.auraWatch
+local cfg = C.aura.coolDownViewer
 local unpack, ipairs, pairs = unpack, ipairs, pairs
 local C_Timer_After = C_Timer.After
 
@@ -354,7 +354,7 @@ local function toggleMoveMode()
         local viewer = _G[name]
         if viewer then
             if not movers[name] then
-                local vkey = "aura.auraWatch.viewers." .. name .. ".pos"
+                local vkey = "aura.coolDownViewer.viewers." .. name .. ".pos"
                 movers[name] = E.Anchor:Create(viewer, name, vkey)
             end
             movers[name]:SetShown(moveMode)

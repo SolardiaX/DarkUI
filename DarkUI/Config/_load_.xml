@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="Media.lua"/>
     <Script file="Color.lua"/>
-    <Script file="Defaults.lua"/>
+    <Script file="Settings.lua"/>
     <Script file="AurasTable.lua"/>
     <Script file="Nameplate.lua"/>
     <Include file="RaidFrameAuras/_load_.xml"/>

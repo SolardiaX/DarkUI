@@ -65,8 +65,31 @@ Only localize when there is a **measurable benefit**:
 - Shared state (accessed cross-file or needs lifecycle reset) → `module.xxx` or `self.xxx` in OnInit/OnEnable
 
 ### Config References
-- `local cfg = C.actionbar.bars.barpet` at file top is fine (ReloadUI model, no hot-reload)
-- `local num = NUM_ACTIONBAR_BUTTONS` for constants is fine
+
+**Rule**: File top-level only holds table references to C sub-tables. Read primitive values at point of use, never cache them at file level — savedVariable overrides merge into C at ADDON_LOADED and table references will see updated values, but primitive copies are frozen.
+
+**Do**:
+```lua
+-- file top: hold table reference
+local cfg = C.unitframe
+
+-- inside function: read value at point of use
+function module:OnInit()
+    self:SetScale(cfg.scale)
+    local path = cfg.mediaPath .. "statusbar"
+end
+```
+
+**Don't**:
+```lua
+-- WRONG: primitive copy at file level — frozen before overrides merge
+local scale = C.unitframe.scale
+local mediaPath = C.unitframe.mediaPath
+
+function module:OnInit()
+    self:SetScale(scale)           -- stale value
+end
+```
 
 ## Git Commit Convention
 Format: `type: [Scope] description`

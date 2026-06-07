@@ -43,19 +43,41 @@ local conditions = setmetatable({
     UnitTarget = function(_, unit) return unit and UnitExists(unit.."target") end,
     PlayerTaxi = function() return UnitOnTaxi("player") end,
     UnitTaxi = function(_, unit) return unit and UnitOnTaxi(unit) end,
-    UnitMaxHealth = function(_, unit) return unit and not UnitIsDeadOrGhost(unit) and UnitHealthPercent(unit) >= 100 end,
-    PlayerMaxHealth = function(_, unit) return unit and not UnitIsDeadOrGhost("player") and UnitHealthPercent("player") >= 100 end,
-    UnitMaxMana = function(_, unit) return unit and not UnitIsDeadOrGhost(unit) and UnitPowerPercent(unit) >= 100 end,
-    PlayerMaxMana = function(_, unit) return unit and not UnitIsDeadOrGhost("player") and UnitPowerPercent("player") >= 100 end,
+    UnitMaxHealth = function(_, unit)
+        if not unit or UnitIsDeadOrGhost(unit) then return false end
+        local pct = UnitHealthPercent(unit)
+        return not issecretvalue(pct) and pct >= 100
+    end,
+    PlayerMaxHealth = function(_, unit)
+        if not unit or UnitIsDeadOrGhost("player") then return false end
+        local pct = UnitHealthPercent("player")
+        return not issecretvalue(pct) and pct >= 100
+    end,
+    UnitMaxMana = function(_, unit)
+        if not unit or UnitIsDeadOrGhost(unit) then return false end
+        local pct = UnitPowerPercent(unit)
+        return not issecretvalue(pct) and pct >= 100
+    end,
+    PlayerMaxMana = function(_, unit)
+        if not unit or UnitIsDeadOrGhost("player") then return false end
+        local pct = UnitPowerPercent("player")
+        return not issecretvalue(pct) and pct >= 100
+    end,
     Stealth = IsStealthed,
     Flying = IsFlying,
     Resting = IsResting,
     Combat = InCombatLockdown,
-    PlayerNotMaxHealth = function(_, unit) return unit and UnitHealthPercent("player") < 100 end,
+    PlayerNotMaxHealth = function(_, unit)
+        if not unit then return false end
+        local pct = UnitHealthPercent("player")
+        return not issecretvalue(pct) and pct < 100
+    end,
     PlayerNotMaxMana = function(_, unit)
+        if not unit then return false end
         local _, powerTypeString = UnitPowerType("player")
         if powerTypeString ~= "RAGE" and powerTypeString ~= "RUNIC_POWER" then
-            return unit and UnitPowerPercent("player") < 100
+            local pct = UnitPowerPercent("player")
+            return not issecretvalue(pct) and pct < 100
         end
     end,
     Casting = function(_, unit) return unit and (UnitCastingInfo(unit) or UnitChannelInfo(unit)) end,

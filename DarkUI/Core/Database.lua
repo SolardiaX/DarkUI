@@ -7,12 +7,10 @@ local E, C, L = select(2, ...):unpack()
 local Database = {}
 E.db = Database
 
-local defaults = {}
 local overrides = {}
 
 local wipe = wipe
 local type, pairs, tonumber = type, pairs, tonumber
-local format = string.format
 
 local function deepCopy(src)
     if type(src) ~= "table" then
@@ -94,39 +92,29 @@ end
 -- Public API
 ----------------------------------------------------------------------------------------
 
-function Database:RegisterDefaults(tbl)
-    defaults = tbl
-end
-
-function Database:GetDefaults()
-    return defaults
-end
-
--- Get value: override first, then default
+-- Get value from merged config
 function Database:Get(path)
-    local tbl, key = traverse(overrides, path, false)
-    if tbl and tbl[key] ~= nil then
-        return tbl[key]
-    end
-    tbl, key = traverse(defaults, path, false)
+    local tbl, key = traverse(C, path, false)
     if tbl then
         return tbl[key]
     end
     return nil
 end
 
--- Set override value (if equals default, removes the override)
+-- Set override value (if equals current C value after reset, removes the override)
 function Database:Set(path, value)
-    local defTbl, defKey = traverse(defaults, path, false)
-    local defValue = defTbl and defTbl[defKey]
+    local curTbl, curKey = traverse(C, path, false)
+    local curValue = curTbl and curTbl[curKey]
 
-    if self:ValuesEqual(value, defValue) then
-        self:Reset(path)
-    else
-        local tbl, key = traverse(overrides, path, true)
-        if tbl then
-            tbl[key] = value
-        end
+    -- Store in overrides
+    local tbl, key = traverse(overrides, path, true)
+    if tbl then
+        tbl[key] = value
+    end
+
+    -- Update C directly
+    if curTbl then
+        curTbl[curKey] = value
     end
 end
 
@@ -190,22 +178,7 @@ end
 -- Proxy Builder
 ----------------------------------------------------------------------------------------
 
-local function mergeDefaults(target, source)
-    for k, v in pairs(source) do
-        if target[k] == nil then
-            if type(v) == "table" then
-                target[k] = deepCopy(v)
-            else
-                target[k] = v
-            end
-        elseif type(v) == "table" and type(target[k]) == "table" then
-            mergeDefaults(target[k], v)
-        end
-    end
-end
-
 function Database:BuildProxy()
-    mergeDefaults(C, defaults)
     mergeInto(C, overrides)
 end
 
@@ -233,12 +206,6 @@ function Database:Initialize()
     -- Point to active override source
     overrides = DarkUI_DB.useGlobal and DarkUI_DB.global or DarkUI_CharDB.overrides
 
-    -- Build C table for module reads
+    -- Apply user overrides onto C (defaults already written by Config/Defaults.lua)
     self:BuildProxy()
-end
-
--- Early init: populate C with defaults so subsequent file loads can read config
-if E.defaults then
-    Database:RegisterDefaults(E.defaults)
-    Database:BuildProxy()
 end
