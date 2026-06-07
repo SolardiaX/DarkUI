@@ -190,22 +190,22 @@ end
 -- Proxy Builder
 ----------------------------------------------------------------------------------------
 
+local function mergeDefaults(target, source)
+    for k, v in pairs(source) do
+        if target[k] == nil then
+            if type(v) == "table" then
+                target[k] = deepCopy(v)
+            else
+                target[k] = v
+            end
+        elseif type(v) == "table" and type(target[k]) == "table" then
+            mergeDefaults(target[k], v)
+        end
+    end
+end
+
 function Database:BuildProxy()
-    -- Wipe C then rebuild from defaults + overrides
-    for k in pairs(C) do
-        if k ~= "media" then -- preserve media table (loaded before defaults)
-            C[k] = nil
-        end
-    end
-
-    for k, v in pairs(defaults) do
-        if type(v) == "table" then
-            C[k] = deepCopy(v)
-        else
-            C[k] = v
-        end
-    end
-
+    mergeDefaults(C, defaults)
     mergeInto(C, overrides)
 end
 
