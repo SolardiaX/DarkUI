@@ -38,9 +38,9 @@
 	<Script file="elements\tags.lua"/>
 	<Script file="elements\threatindicator.lua"/>
 
-	<Script file='Plugins\AutoResurrect.lua' />
-	<Script file='Plugins\RaidAuras.lua' />
 	<Script file='Plugins\EnemyRange.lua' />
+	<Script file='Plugins\Fader.lua' />
+	<Script file='Plugins\DebuffHighlight.lua' />
 
 	<Script file="finalize.lua"/>
 

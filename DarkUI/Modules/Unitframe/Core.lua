@@ -279,26 +279,25 @@ function module.CreateAuraTimer(aura, elapsed)
 end
 
 function module:FilterAuras(unit, data, src)
+    local element = src or self
     local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
     local isFromPlayer = playerUnits[data.sourceUnit]
     local spellID = data.spellId
 
-    local self = src or self
-
-    if isInRaid == "raid" then
+    if isInRaid then
         local auraList = C.aura.raidbuffs[E.myClass]
         if auraList and auraList[spellID] and data.isFromPlayerOrPlayerPet then
             return true
         elseif C.aura.raidbuffs["ALL"][spellID] then
             return true
         end
-    elseif self.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
+    elseif element.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
         return true
-    elseif self.onlyShowPlayer and isFromPlayer then
+    elseif element.onlyShowPlayer and isFromPlayer then
         return true
     elseif data.isBossAura or SpellIsPriorityAura(spellID) then
         return true
-    elseif (not self.onlyShowPlayer) and data.name then
+    elseif (not element.onlyShowPlayer) and data.name then
         return true
     end
 

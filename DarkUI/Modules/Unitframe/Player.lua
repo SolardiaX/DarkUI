@@ -88,7 +88,6 @@ local function createBar(self)
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
-    self.Power:SetPoint("CENTER")
     self.Power:SetFrameStrata("LOW")
     self.Power:SetFrameLevel(3)
     self.Power:SetPoint('CENTER', self, 40, -2)

@@ -89,7 +89,6 @@ local function createBar(self)
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
-    self.Power:SetPoint("CENTER")
     self.Power:SetFrameStrata("LOW")
     self.Power:SetFrameLevel(3)
     self.Power:SetPoint('CENTER', self, -40, -2)
@@ -337,27 +336,6 @@ local function createAuraIcon(self)
     self.Auras = f
 end
 
-local function createCombatFeed(self)
-    local fcf = CreateFrame("Frame", nil, self)
-    fcf:SetSize(32, 32)
-    fcf:SetPoint("BOTTOM", self, "TOPRIGHT", 0, 120)
-
-    for i = 1, 6 do
-        fcf[i] = fcf:CreateFontString("$parentFCFText" .. i, "OVERLAY")
-    end
-
-    fcf.font = STANDARD_TEXT_FONT
-    fcf.fontFlags = "THINOUTLINE"
-    fcf.fontHeight = 16
-    fcf.showPets = true
-    fcf.showHots = true
-    fcf.showAutoAttack = true
-    fcf.showOverHealing = true
-    fcf.abbreviateNumbers = true
-
-    self.FloatingCombatFeedback = fcf
-end
-
 local function createStyle(self)
     self.colors = C.oUF_colors
     self.cUnit = "target"
@@ -377,7 +355,6 @@ local function createStyle(self)
     createCastbar(self)
     createTargetType(self)
     createAuraIcon(self)
-    --createCombatFeed(self)
 
     self.PvPClassificationIndicator = core:CreateIcon(self, "BACKGROUND", 24, -1, self, "LEFT", "RIGHT", -32, 0)
     self.PvPTimer = self:CreateTag(self, "[dd:pvptimer]", .5)

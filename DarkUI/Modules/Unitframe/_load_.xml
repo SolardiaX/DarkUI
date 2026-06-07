@@ -1,6 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Script file="Core.lua" />
     <Script file="Tags.lua" />
+    <Script file="RaidDebuffs.lua" />
     <Script file="Class.lua" />
     <Script file="Player.lua" />
     <Script file="Target.lua" />

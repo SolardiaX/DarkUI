@@ -16,7 +16,7 @@ local media = {
     portrait_overlay       = mediaPath .. "uf_portrait_overlay",
 
     foreground             = mediaPath .. C.general.style .. "\\" .. "uf_compact_foreground",
-    foreground_hightthreat = mediaPath .. C.general.style .. "\\" .. "uf_compact_foreground_highthreat",
+    foreground_highthreat  = mediaPath .. C.general.style .. "\\" .. "uf_compact_foreground_highthreat",
     foreground_lowthreat   = mediaPath .. C.general.style .. "\\" .. "uf_compact_foreground_lowthreat",
     background             = mediaPath .. C.general.style .. "\\" .. "uf_compact_background",
 
@@ -90,7 +90,6 @@ local function createBar(self)
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
-    self.Power:SetPoint("CENTER")
     self.Power:SetFrameStrata("LOW")
     self.Power:SetFrameLevel(4)
     self.Power:SetPoint('TOP', self.Health, 'BOTTOM', 0, 0)
@@ -217,12 +216,12 @@ end
 
 local function createThreatType(self)
     local fg_files = {
-        media.foreground,
-        media.foreground_lowthreat,
-        media.foreground_hightthreat,
+        [0] = media.foreground,
+        [1] = media.foreground_lowthreat,
+        [2] = media.foreground_lowthreat,
+        [3] = media.foreground_highthreat,
     }
 
-    local default_status = 1
     local threat_status_file
 
     local function event_handler(self, event, unit)
@@ -231,7 +230,7 @@ local function createThreatType(self)
         end
 
         local status = UnitCanAttack(self.unit, 'target') and UnitThreatSituation(self.unit, 'target') or (UnitThreatSituation(self.unit))
-        local file = status and fg_files[status] or fg_files[default_status]
+        local file = (status ~= nil) and fg_files[status] or fg_files[0]
         if (threat_status_file ~= file) then
             threat_status_file = file
             self.FrameFG.texture:SetTexture(threat_status_file)

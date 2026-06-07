@@ -39,27 +39,37 @@ local cfg = C.nameplate
 local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
 local arrow = C.media.path .. "uf_nameplate_arrow"
 
-local totemData = {
-    [GetSpellName(192058)] = 136013,    -- Capacitor Totem
-    [GetSpellName(98008)]  = 237586,    -- Spirit Link Totem
-    [GetSpellName(192077)] = 538576,    -- Wind Rush Totem
-    [GetSpellName(204331)] = 511726,    -- Counterstrike Totem
-    [GetSpellName(204332)] = 136114,    -- Windfury Totem
-    [GetSpellName(204336)] = 136039,    -- Grounding Totem
-    [GetSpellName(157153)] = 971076,    -- Cloudburst Totem
-    [GetSpellName(5394)]   = 135127,    -- Healing Stream Totem
-    [GetSpellName(108280)] = 538569,    -- Healing Tide Totem
-    [GetSpellName(207399)] = 136080,    -- Ancestral Protection Totem
-    [GetSpellName(198838)] = 136098,    -- Earthen Wall Totem
-    [GetSpellName(51485)]  = 136100,    -- Earthgrab Totem
-    [GetSpellName(196932)] = 136232,    -- Voodoo Totem
-    [GetSpellName(192222)] = 971079,    -- Liquid Magma Totem
-    [GetSpellName(204330)] = 135829,    -- Skyfury Totem
-}
+local totemData = {}
+do
+    local spellIcons = {
+        [192058] = 136013,    -- Capacitor Totem
+        [98008]  = 237586,    -- Spirit Link Totem
+        [192077] = 538576,    -- Wind Rush Totem
+        [204331] = 511726,    -- Counterstrike Totem
+        [204332] = 136114,    -- Windfury Totem
+        [204336] = 136039,    -- Grounding Totem
+        [157153] = 971076,    -- Cloudburst Totem
+        [5394]   = 135127,    -- Healing Stream Totem
+        [108280] = 538569,    -- Healing Tide Totem
+        [207399] = 136080,    -- Ancestral Protection Totem
+        [198838] = 136098,    -- Earthen Wall Totem
+        [51485]  = 136100,    -- Earthgrab Totem
+        [196932] = 136232,    -- Voodoo Totem
+        [192222] = 971079,    -- Liquid Magma Totem
+        [204330] = 135829,    -- Skyfury Totem
+    }
+    for spellID, icon in pairs(spellIcons) do
+        local name = GetSpellName(spellID)
+        if name then
+            totemData[name] = icon
+        end
+    end
+end
 
 local kickID = 0
 
 local healList, exClass, healerSpecs = {}, {}, {}
+local healerCheckFrame = CreateFrame("Frame")
 local testing = false
 
 exClass.DEATHKNIGHT = true
@@ -131,12 +141,12 @@ local function checkHealers(_, event)
     if event == "PLAYER_ENTERING_WORLD" then
         local _, instanceType = IsInInstance()
         if instanceType == "pvp" then
-            t:SetScript("OnUpdate", checkBattleFieldHealers)
+            healerCheckFrame:SetScript("OnUpdate", checkBattleFieldHealers)
         elseif instanceType == "arena" then
-            t:SetScript("OnUpdate", checkArenaHealers)
+            healerCheckFrame:SetScript("OnUpdate", checkArenaHealers)
         else
             healList = {}
-            t:SetScript("OnUpdate", nil)
+            healerCheckFrame:SetScript("OnUpdate", nil)
         end
     end
 end
@@ -690,21 +700,11 @@ local function style(self, unit)
         self.HealerIcon:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
     end
 
-    -- Quest Icon
+    -- Quest Indicator
     if cfg.quest then
-        self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
-        self.QuestIcon:SetSize((cfg.height * 2 * E.noscalemult), (cfg.height * 2 * E.noscalemult))
-        self.QuestIcon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
-        self.QuestIcon:Hide()
-
-        self.QuestIcon.Text = self:CreateFontString(nil, "OVERLAY")
-        self.QuestIcon.Text:SetPoint("RIGHT", self.QuestIcon, "LEFT", -1, 0)
-        self.QuestIcon.Text:SetFont(unpack(C.media.standard_font))
-
-        self.QuestIcon.Item = self:CreateTexture(nil, "OVERLAY")
-        self.QuestIcon.Item:SetSize((cfg.height * 2 * E.noscalemult) - 2, (cfg.height * 2 * E.noscalemult) - 2)
-        self.QuestIcon.Item:SetPoint("RIGHT", self.QuestIcon.Text, "LEFT", -2, 0)
-        self.QuestIcon.Item:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+        self.QuestIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
+        self.QuestIndicator:SetSize((cfg.height * 2 * E.noscalemult), (cfg.height * 2 * E.noscalemult))
+        self.QuestIndicator:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
     end
 
     -- Aura tracking
