@@ -4,6 +4,8 @@ local E, C, L = select(2, ...):unpack()
 --	Nameplate Aura Configuration
 ------------------------------------------------------------------------
 
+C.nameplate = C.nameplate or {}
+
 C.nameplate.whiteList = {
 	[268756] = true,	-- 望远镜饰品
 	-- Buffs
