@@ -241,6 +241,9 @@ local function createStyle(self)
     self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "OVERLAY", 18, -1, self, "TOP", "TOP", 0, -2)
     self.GroupRoleIndicator:SetDesaturated(1)
 
+    self.ResurrectIndicator = core:CreateIcon(self, "OVERLAY", 16, -1, self, "CENTER", "CENTER", 0, 0)
+    self.SummonIndicator = core:CreateIcon(self, "OVERLAY", 20, -1, self, "CENTER", "CENTER", 0, 0)
+
     -- PrivateAuras
     local pa = CreateFrame("Frame", nil, self)
     pa:SetPoint("CENTER", self.Health, 0, 0)
