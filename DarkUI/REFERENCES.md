@@ -35,11 +35,12 @@ Used for finding original sources when iterating or fixing bugs.
 
 | File | Reference | Notes |
 |------|-----------|-------|
-| `Modules/Unitframe/Core.lua` | NDui `Modules/UFs/Functions.lua`, `Elements/Castbar.lua` | Empower pips, castbar ticks |
+| `Modules/Unitframe/Core.lua` | NDui `Modules/UFs/Functions.lua`, `Elements/Castbar.lua` | Empower pips, castbar ticks, kick CD color, SetVertexColorFromBoolean |
+| `Modules/Unitframe/Class.lua` | Blizzard `Blizzard_UnitFrame/Mainline/ClassPowerBar.lua`, `PlayerFrame.lua` | Reparent PlayerFrameBottomManagedFramesContainer, UNIT_DISPLAYPOWER relay |
 | `Modules/Unitframe/Tags.lua` | NDui `Modules/UFs/Tags.lua` | Secret value safe HP/PP tags |
 | `Modules/Unitframe/Nameplate.lua` | NDui `Modules/UFs/Nameplates.lua`, ElvUI `Nameplates/Plugins/PVPRole.lua` | Totem data, kick CD, BG healer |
 | `Modules/Unitframe/Raid.lua` | NDui `Modules/UFs/Spawns.lua` | CompactRaidFrame hiding |
-| `Modules/Unitframe/Player.lua` | ShestakUI | Texture-based frame style |
+| `Modules/Unitframe/Player.lua` | ShestakUI, NDui `Modules/UFs/Functions.lua` | Texture-based frame style, AdditionalPower AbbreviateNumbers pattern |
 | `Modules/Unitframe/Target.lua` | ShestakUI | Texture-based frame style |
 
 ## Core
