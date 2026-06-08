@@ -165,10 +165,11 @@ oUF.Tags.Methods['dd:pp'] = function(u)
     local power = UnitPower(u)
     if isSecretValue(power) then return "" end
 
-    if color then
-        return hexColor(color) .. E:AbbreviateNumber(power or 0)
+    local text = E:AbbreviateNumber(power or 0)
+    if color and color.WrapTextInColorCode then
+        return color:WrapTextInColorCode(text)
     end
-    return format("|cff999999%s", E:AbbreviateNumber(power or 0))
+    return text
 end
 oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
 

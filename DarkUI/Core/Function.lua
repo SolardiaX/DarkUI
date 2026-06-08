@@ -105,17 +105,10 @@ local defaultAbbrOptions = { config = CreateAbbreviateConfig({
     { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
     { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
 })}
-local localeAbbrOptions
-if GetLocalizedNumberAbbreviationData then
-    local data = GetLocalizedNumberAbbreviationData()
-    if data then
-        localeAbbrOptions = { config = CreateAbbreviateConfig(data) }
-    end
-end
 
 function E:AbbreviateNumber(value)
-    local options = C.general.useLocalNumberFormat and localeAbbrOptions or defaultAbbrOptions
-    return AbbreviateNumbers(value, options)
+    local options = C.general.useLocalNumberFormat and L.AbbrOptions or defaultAbbrOptions
+    return AbbreviateNumbers(value, options or defaultAbbrOptions)
 end
 
 -- RGB To Hex function

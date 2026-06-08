@@ -8,6 +8,12 @@ if E.locale ~= "zhTW" then
     return
 end
 
+L.AbbrOptions = { config = CreateAbbreviateConfig({
+    { breakpoint = 1e12, abbreviation = "兆", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+    { breakpoint = 1e8, abbreviation = "億", significandDivisor = 1e6, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+    { breakpoint = 1e4, abbreviation = "萬", significandDivisor = 1e3, fractionDivisor = 1e1, abbreviationIsGlobal = false },
+})}
+
 L.WELCOME_LINE = "歡迎使用 DarkUI "
 L.POPUP_INSTALLUI = "該角色首次使用 DarkUI. 你必須重新加載UI來配置."
 L.POPUP_RESETUI = "此操作將重置 DarkUI 的全部配置為默認參數."
