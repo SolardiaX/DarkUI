@@ -4,6 +4,5 @@
     <Script file="Settings.lua"/>
     <Script file="AurasTable.lua"/>
     <Script file="Nameplate.lua"/>
-    <Include file="AuraWatchList/_load_.xml"/>
     <Include file="RaidFrameAuras/_load_.xml"/>
 </Ui>

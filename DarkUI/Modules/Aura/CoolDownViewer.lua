@@ -10,7 +10,7 @@ end
 local module = E:Module("Aura"):Sub("CoolDownViewer")
 
 local cfg = C.aura.coolDownViewer
-local unpack, ipairs, pairs = unpack, ipairs, pairs
+local unpack, ipairs = unpack, ipairs
 local C_Timer_After = C_Timer.After
 
 local VIEWERS = {
@@ -19,32 +19,6 @@ local VIEWERS = {
     "BuffIconCooldownViewer",
     "BuffBarCooldownViewer",
 }
-
-------------------------------------------------------------------------
--- Viewer Positioning
-------------------------------------------------------------------------
-
-local movers = {}
-local moveMode = false
-
-local function positionViewer(viewerName)
-    local viewer = _G[viewerName]
-    if not viewer then
-        return
-    end
-    local vcfg = cfg.viewers[viewerName]
-    if not vcfg or not vcfg.pos then
-        return
-    end
-    viewer:ClearAllPoints()
-    viewer:SetPoint(unpack(vcfg.pos))
-end
-
-local function positionAllViewers()
-    for _, name in ipairs(VIEWERS) do
-        positionViewer(name)
-    end
-end
 
 ------------------------------------------------------------------------
 -- Icon Style (for Essential/Utility/BuffIcon viewers)
@@ -323,7 +297,6 @@ local function refreshCooldownFonts(viewerName)
 end
 
 local function forceRefresh()
-    positionAllViewers()
     lastLayoutTime = 0
     doLayout()
 end
@@ -336,7 +309,6 @@ local function hookViewer(viewerName)
 
     if viewer.RefreshLayout then
         hooksecurefunc(viewer, "RefreshLayout", function()
-            positionViewer(viewerName)
             lastLayoutTime = 0
             doLayout()
             refreshCooldownFonts(viewerName)
@@ -345,35 +317,10 @@ local function hookViewer(viewerName)
 end
 
 ------------------------------------------------------------------------
--- Move Mode
-------------------------------------------------------------------------
-
-local function toggleMoveMode()
-    moveMode = not moveMode
-    for _, name in ipairs(VIEWERS) do
-        local viewer = _G[name]
-        if viewer then
-            if not movers[name] then
-                local vkey = "aura.coolDownViewer.viewers." .. name .. ".pos"
-                movers[name] = E.Anchor:Create(viewer, name, vkey)
-            end
-            movers[name]:SetShown(moveMode)
-        end
-    end
-    if moveMode then
-        print("|cff00ff00DarkUI AuraWatch:|r Move mode ON. Drag viewers to reposition.")
-    else
-        print("|cff00ff00DarkUI AuraWatch:|r Move mode OFF.")
-    end
-end
-
-------------------------------------------------------------------------
 -- Init
 ------------------------------------------------------------------------
 
 local function setup()
-    positionAllViewers()
-
     for _, name in ipairs(VIEWERS) do
         hookViewer(name)
     end
@@ -441,12 +388,4 @@ function module:OnInit()
             layoutFrame:Show()
         end)
     end
-
-    SlashCmdList.DARKUI_AURAWATCH = function(msg)
-        msg = msg and msg:lower() or ""
-        if msg == "move" or msg == "lock" then
-            toggleMoveMode()
-        end
-    end
-    SLASH_DARKUI_AURAWATCH1 = "/aurawatch"
 end
