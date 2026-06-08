@@ -54,7 +54,7 @@ local UseCustomFlyout = WoWRetail or (FlyoutButtonMixin and not ActionButton_Upd
 
 local KeyBound = LibStub("LibKeyBound-1.0", true)
 local CBH = LibStub("CallbackHandler-1.0")
-local LCG = LibStub("LibCustomGlow-1.0", true) -- NDui: use LCG mod
+local LCG = LibStub("LibCustomGlow-1.0", true)
 local Masque = LibStub("Masque", true)
 
 lib.eventFrame = lib.eventFrame or CreateFrame("Frame")

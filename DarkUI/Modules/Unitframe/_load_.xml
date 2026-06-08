@@ -13,5 +13,5 @@
     <Script file="PartyPet.lua" />
     <Script file="Boss.lua" />
     <Script file="Raid.lua" />
-    <!-- <Script file="Nameplate.lua" /> -->
+    <Script file="Nameplate.lua" />
 </Ui>
