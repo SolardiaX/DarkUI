@@ -457,8 +457,8 @@ C.tooltip = {
 ----------------------------------------------------------------------------------------
 C.nameplate = {
     enable = true,
-    height = 12,
-    width = 300,
+    height = 6,
+    width = 160,
     distance = 60,
     ad_height = 0,
     ad_width = 40,
