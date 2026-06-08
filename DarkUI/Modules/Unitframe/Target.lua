@@ -96,9 +96,9 @@ local function createBar(self)
     self.Power:SetStatusBarTexture(media.mpTex)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
-    self.Power.bg.multiplier = .45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
+    self.Power.bg:SetVertexColor(0, 0, 0, 0.7)
 
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
