@@ -8,17 +8,9 @@ if E.locale ~= "zhCN" then
     return
 end
 
-L.ValueFormat = function(value)
-    if value >= 1e12 then
-        return format("%.2f兆", value / 1e12)
-    elseif value >= 1e8 then
-        return format("%.2f亿", value / 1e8)
-    elseif value >= 1e4 then
-        return format("%.1f万", value / 1e4)
-    else
-        return format("%.0f", value)
-    end
-end
+L.NumberCap1 = "万"
+L.NumberCap2 = "亿"
+L.NumberCap3 = "兆"
 
 L.WELCOME_LINE = "欢迎使用 DarkUI "
 L.POPUP_INSTALLUI = "该角色首次使用 DarkUI. 你必须重新加载UI来配置."

@@ -2,5 +2,6 @@
     <Include file="AurasTemplates.xml"/>
     <Script file="Auras.lua" />
     <Script file="Caster.lua" />
-    <Script file="CoolDownViewer.lua" />
+    <!-- <Script file="AuraWatch.lua" /> -->
+    <!-- <Script file="CoolDownViewer.lua" /> -->
 </Ui>

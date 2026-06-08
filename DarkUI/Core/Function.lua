@@ -99,30 +99,26 @@ function E:Round(number, decimals)
     return (("%%.%df"):format(decimals)):format(number)
 end
 
-function E:ShortValue(value)
-    if C.general.locale_valueformat and type(L.ValueFormat) == "function" then
-        return L.ValueFormat(value)
-    end
+local NUMBER_ABBR_OPTIONS = {
+    [1] = { config = CreateAbbreviateConfig({
+        { breakpoint = 1e12, abbreviation = "t", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e9, abbreviation = "b", significandDivisor = 1e7, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
+    })},
+    [2] = { config = CreateAbbreviateConfig({
+        { breakpoint = 1e12, abbreviation = L.NumberCap3, significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e8, abbreviation = L.NumberCap2, significandDivisor = 1e6, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e4, abbreviation = L.NumberCap1, significandDivisor = 1e3, fractionDivisor = 1e1, abbreviationIsGlobal = false },
+    })},
+}
 
-    if value >= 1e11 then
-        return ("%.0fb"):format(value / 1e9)
-    elseif value >= 1e10 then
-        return ("%.1fb"):format(value / 1e9):gsub("%.?0+([km])$", "%1")
-    elseif value >= 1e9 then
-        return ("%.2fb"):format(value / 1e9):gsub("%.?0+([km])$", "%1")
-    elseif value >= 1e8 then
-        return ("%.0fm"):format(value / 1e6)
-    elseif value >= 1e7 then
-        return ("%.1fm"):format(value / 1e6):gsub("%.?0+([km])$", "%1")
-    elseif value >= 1e6 then
-        return ("%.2fm"):format(value / 1e6):gsub("%.?0+([km])$", "%1")
-    elseif value >= 1e5 then
-        return ("%.0fk"):format(value / 1e3)
-    elseif value >= 1e3 then
-        return ("%.1fk"):format(value / 1e3):gsub("%.?0+([km])$", "%1")
-    else
-        return format("%.0f", value)
+function E:ShortValue(value)
+    local options = NUMBER_ABBR_OPTIONS[C.general.numberFormat]
+    if options then
+        return AbbreviateNumbers(value, options)
     end
+    return value
 end
 
 -- RGB To Hex function

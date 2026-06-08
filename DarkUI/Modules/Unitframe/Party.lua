@@ -83,7 +83,7 @@ local function createBar(self)
 
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
-    self.Health.Smooth = true
+    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
     self.Health.colorClass = true
     self.Health.colorClassNPC = true
     self.Health.colorClassPet = true
@@ -324,7 +324,6 @@ function module:OnInit()
         local party = oUF:SpawnHeader(
                 "DarkUIPartyHeader",
                 nil,
-                "custom [group:party,nogroup:raid][@player,exists,nogroup:party] show;hide",
                 "point", 'LEFT',
                 "columnAnchorPoint", columnAnchorPoint,
                 "unitsPerColumn", unitsPerColumn,
@@ -342,6 +341,7 @@ function module:OnInit()
                     self:SetScale(%f)
                 ]]):format(85, 85, cfg.scale)
         )
+        party:SetVisibility("custom [group:party,nogroup:raid][@player,exists,nogroup:party] show;hide")
 
         party:SetPoint(unpack(position))
 

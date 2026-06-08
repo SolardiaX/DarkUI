@@ -100,7 +100,7 @@ local function createBar(self)
     self.Health.bg:SetAlpha(0.3)
 
     self.Health.frequentUpdates = true
-    self.Health.Smooth = true
+    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.raid.colorHealth
 
@@ -256,7 +256,6 @@ function module:OnInit()
             local party = oUF:SpawnHeader(
                     "DarkUIPartyHeader",
                     nil,
-                    "custom [group:raid][@player,exists,nogroup:party] show;hide",
                     "showSolo", cfg.party.showSolo,
                     "showPlayer", cfg.party.showPlayer,
                     "showParty", true,
@@ -273,7 +272,9 @@ function module:OnInit()
                         self:SetHeight(%d)
                         self:SetScale(%f)
                     ]]):format(cfg.raid.size, cfg.raid.size, cfg.scale)
-            ):SetPoint(unpack(cfg.raid.position))
+            )
+            party:SetVisibility("custom [group:raid][@player,exists,nogroup:party] show;hide")
+            party:SetPoint(unpack(cfg.raid.position))
 
             if CompactPartyFrame then
                 CompactPartyFrame:UnregisterAllEvents()
@@ -290,7 +291,6 @@ function module:OnInit()
                 group = oUF:SpawnHeader(
                         name,
                         nil,
-                        "custom [group:raid] show; hide",
                         "showPlayer", true,
                         "showSolo", cfg.raid.showSolo,
                         "showParty", cfg.party.raidMode,
@@ -310,6 +310,7 @@ function module:OnInit()
                             self:SetHeight(%d)
                         ]]):format(cfg.raid.size, cfg.raid.size)
                 )
+                group:SetVisibility("custom [group:raid] show; hide")
 
                 group:SetScale(cfg.scale)
                 groups[i] = group

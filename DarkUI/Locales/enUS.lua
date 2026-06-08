@@ -4,6 +4,10 @@ local E, C, L = select(2, ...):unpack()
 -- enUS (base locale)
 ----------------------------------------------------------------------------------------
 
+L.NumberCap1 = "k"
+L.NumberCap2 = "m"
+L.NumberCap3 = "b"
+
 L.WELCOME_LINE = "Welcome to DarkUI "
 L.POPUP_INSTALLUI = "You are the first time to use DarkUI. Require RELOAD UI to complete setup."
 L.POPUP_RESETUI = "Will reset DarkUI to default configration."

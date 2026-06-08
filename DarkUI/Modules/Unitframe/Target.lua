@@ -85,7 +85,7 @@ local function createBar(self)
     self.Health.colorClass = cfg.target.colorHealth
     self.Health.colorClassNPC = cfg.target.colorHealth
     self.Health.colorClassPet = cfg.target.colorHealth
-    self.Health.Smooth = true
+    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)

@@ -12,7 +12,7 @@ C.general = {
     autoScale = true,
     style = "cold",
     liteMode = false,
-    locale_valueformat = false,
+    numberFormat = 1,
 }
 
 ----------------------------------------------------------------------------------------

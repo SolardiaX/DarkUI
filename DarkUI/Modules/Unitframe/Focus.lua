@@ -86,7 +86,7 @@ local function createBar(self)
 
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
-    self.Health.Smooth = true
+    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
     self.Health.colorClass = true
     self.Health.colorClassNPC = true
     self.Health.colorClassPet = true

@@ -84,7 +84,7 @@ local function createBar(self)
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.player.colorHealth
-    self.Health.Smooth = true
+    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
@@ -98,66 +98,59 @@ local function createBar(self)
     self.Power.bg.multiplier = .45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
-    
+
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
-    self.Power.Smooth = true
+    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
 
     --Incoming heal
-    local mhpb = self.Health:CreateTexture(nil, "ARTWORK")
-    mhpb:SetWidth(1)
-    mhpb:SetTexture(media.incoming_barTex)
-    mhpb:SetVertexColor(0, 1, 0.5, 0.2)
+    local healingAll = CreateFrame("StatusBar", nil, self.Health)
+    healingAll:SetPoint("TOP")
+    healingAll:SetPoint("BOTTOM")
+    healingAll:SetPoint("LEFT", self.Health:GetStatusBarTexture(), "RIGHT")
+    healingAll:SetWidth(212)
+    healingAll:SetStatusBarTexture(media.incoming_barTex)
+    healingAll:SetStatusBarColor(0, 1, 0.5, 0.2)
 
-    local ohpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ohpb:SetWidth(1)
-    ohpb:SetTexture(media.incoming_barTex)
-    ohpb:SetVertexColor(0, 1, 0, 0.2)
+    local damageAbsorb = CreateFrame("StatusBar", nil, self.Health)
+    damageAbsorb:SetPoint("TOP")
+    damageAbsorb:SetPoint("BOTTOM")
+    damageAbsorb:SetPoint("LEFT", healingAll:GetStatusBarTexture(), "RIGHT")
+    damageAbsorb:SetWidth(212)
+    damageAbsorb:SetStatusBarTexture(media.incoming_barTex)
+    damageAbsorb:SetStatusBarColor(1, 1, 0, 0.2)
 
-    local abb = self.Health:CreateTexture(nil, "ARTWORK")
-    abb:SetWidth(1)
-    abb:SetTexture(media.incoming_barTex)
-    abb:SetVertexColor(1, 1, 0, 0.2)
+    local overDamageAbsorbIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    overDamageAbsorbIndicator:SetWidth(15)
+    overDamageAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
+    overDamageAbsorbIndicator:SetBlendMode("ADD")
+    overDamageAbsorbIndicator:SetAlpha(.7)
+    overDamageAbsorbIndicator:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
+    overDamageAbsorbIndicator:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
 
-    local abbo = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-    abbo:SetAllPoints(abb)
-    abbo:SetTexture("Interface\\RaidFrame\\Shield-Overlay", true, true)
-    abbo.tileSize = 32
+    local healAbsorb = CreateFrame("StatusBar", nil, self.Health)
+    healAbsorb:SetPoint("TOP")
+    healAbsorb:SetPoint("BOTTOM")
+    healAbsorb:SetPoint("RIGHT", self.Health:GetStatusBarTexture())
+    healAbsorb:SetWidth(212)
+    healAbsorb:SetReverseFill(true)
+    healAbsorb:SetStatusBarTexture(media.incoming_barTex)
+    healAbsorb:SetStatusBarColor(0, .5, .8, .5)
+    healAbsorb:SetFrameLevel(self.Health:GetFrameLevel())
 
-    local oag = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-    oag:SetWidth(15)
-    oag:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
-    oag:SetBlendMode("ADD")
-    oag:SetAlpha(.7)
-    oag:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
-    oag:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
+    local overHealAbsorbIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
+    overHealAbsorbIndicator:SetWidth(15)
+    overHealAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
+    overHealAbsorbIndicator:SetBlendMode("ADD")
+    overHealAbsorbIndicator:SetAlpha(.5)
+    overHealAbsorbIndicator:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
+    overHealAbsorbIndicator:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
 
-    local hab = CreateFrame("StatusBar", nil, self.Health)
-    hab:SetPoint("TOPLEFT", self.Health)
-    hab:SetPoint("BOTTOMRIGHT", self.Health:GetStatusBarTexture())
-    hab:SetReverseFill(true)
-    hab:SetStatusBarTexture(media.incoming_barTex)
-    hab:SetStatusBarColor(0, .5, .8, .5)
-    hab:SetFrameLevel(self.Health:GetFrameLevel())
-
-    local ohg = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
-    ohg:SetWidth(15)
-    ohg:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
-    ohg:SetBlendMode("ADD")
-    ohg:SetAlpha(.5)
-    ohg:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
-    ohg:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
-
-    self.HealPredictionAndAbsorb = {
-        myBar = mhpb,
-        otherBar = ohpb,
-        absorbBar = abb,
-        absorbBarOverlay = abbo,
-        overAbsorbGlow = oag,
-        healAbsorbBar = hab,
-        overHealAbsorbGlow = ohg,
-        maxOverflow = 1,
-    }
+    self.Health.HealingAll = healingAll
+    self.Health.DamageAbsorb = damageAbsorb
+    self.Health.OverDamageAbsorbIndicator = overDamageAbsorbIndicator
+    self.Health.HealAbsorb = healAbsorb
+    self.Health.OverHealAbsorbIndicator = overHealAbsorbIndicator
 
     -- AdditionalPower
     self.AdditionalPower = CreateFrame("StatusBar", nil, self)

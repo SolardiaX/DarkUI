@@ -8,19 +8,9 @@ if E.locale ~= "ruRU" then
     return
 end
 
-L.ValueFormat = function(value)
-    if value >= 1e12 then
-        return format("%.2f трлн", value / 1e12)
-    elseif value >= 1e9 then
-        return format("%.2f млрд", value / 1e9)
-    elseif value >= 1e6 then
-        return format("%.1f млн", value / 1e6)
-    elseif value >= 1e3 then
-        return format("%.1f тыс", value / 1e3)
-    else
-        return format("%.0f", value)
-    end
-end
+L.NumberCap1 = "тыс"
+L.NumberCap2 = "млн"
+L.NumberCap3 = "млрд"
 
 L.WELCOME_LINE = "Добро пожаловать в DarkUI "
 L.POPUP_INSTALLUI =

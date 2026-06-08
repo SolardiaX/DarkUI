@@ -18,10 +18,36 @@ local UnitIsDead, UnitIsDeadOrGhost = UnitIsDead, UnitIsDeadOrGhost
 local UnitIsGhost, UnitIsFeignDeath = UnitIsGhost, UnitIsFeignDeath
 local UnitName, UnitClass, UnitLevel, UnitReaction = UnitName, UnitClass, UnitLevel, UnitReaction
 local UnitPowerType, UnitPower = UnitPowerType, UnitPower
+local TruncateWhenZero = C_StringUtil.TruncateWhenZero
 local format, len, gsub, floor = string.format, string.len, string.gsub, math.floor
 
 local function isSecretValue(value)
     return issecretvalue and issecretvalue(value)
+end
+
+local function colorToRGB(color)
+    if type(color) == "table" then
+        if color.GetRGB then
+            return color:GetRGB()
+        end
+        return color[1] or 0, color[2] or 0, color[3] or 0
+    end
+    return 0, 0, 0
+end
+
+local function hexColor(color)
+    local r, g, b = colorToRGB(color)
+    return format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
+end
+
+local function colorGradient(perc, max, r1, g1, b1, r2, g2, b2, r3, g3, b3)
+    local segment, relperc = math.modf((perc / max) * 2)
+    if segment >= 2 then return r3, g3, b3 end
+    if segment <= 0 then return r1, g1, b1 end
+    if segment == 1 then
+        return r2 + (r3 - r2) * relperc, g2 + (g3 - g2) * relperc, b2 + (b3 - b2) * relperc
+    end
+    return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
 end
 
 ------------------------------------------------------------------------
@@ -31,16 +57,13 @@ end
 oUF.Tags.Methods["dd:nameplateNameColor"] = function(unit)
     local reaction = UnitReaction(unit, "player")
     if not UnitIsUnit("player", unit) and UnitIsPlayer(unit) and (reaction and reaction >= 5) then
-        local c = C.oUF_colors.power["MANA"]
-        return format("|cff%02x%02x%02x", c[1] * 255, c[2] * 255, c[3] * 255)
+        return hexColor(C.oUF_colors.power["MANA"])
     elseif UnitIsPlayer(unit) then
         return _TAGS["raidcolor"](unit)
     elseif reaction then
-        local c = C.oUF_colors.reaction[reaction]
-        return format("|cff%02x%02x%02x", c[1] * 255, c[2] * 255, c[3] * 255)
+        return hexColor(C.oUF_colors.reaction[reaction])
     else
-        local r, g, b = 0.33, 0.59, 0.33
-        return format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
+        return format("|cff%02x%02x%02x", 0.33 * 255, 0.59 * 255, 0.33 * 255)
     end
 end
 oUF.Tags.Events["dd:nameplateNameColor"] = "UNIT_POWER_UPDATE UNIT_FLAGS"
@@ -79,15 +102,22 @@ oUF.Tags.Events["dd:nameLongAbbrev"] = "UNIT_NAME_UPDATE"
 
 oUF.Tags.Methods['dd:difficulty'] = function(u)
     local l = UnitLevel(u)
-    return Hex(GetQuestDifficultyColor((l > 0) and l or 99))
+    local c = GetQuestDifficultyColor((l > 0) and l or 99)
+    return format("|cff%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
 end
 
 ------------------------------------------------------------------------
 -- Health / Power tags
 ------------------------------------------------------------------------
 
-oUF.Tags.Methods['dd:smarthp'] = function(u, r)
-    if not UnitIsConnected(r or u) then
+local hpCalculator = CreateUnitHealPredictionCalculator()
+local hpColorCurve = C_CurveUtil.CreateColorCurve()
+hpColorCurve:AddPoint(0, CreateColor(245 / 255, 68 / 255, 68 / 255, 1))
+hpColorCurve:AddPoint(0.5, CreateColor(245 / 255, 186 / 255, 69 / 255, 1))
+hpColorCurve:AddPoint(1, CreateColor(105 / 255, 201 / 255, 105 / 255, 1))
+
+oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
+    if not UnitIsConnected(u) then
         return L.UNITFRAME_OFFLINE
     elseif UnitIsGhost(u) then
         return L.UNITFRAME_GHOST
@@ -97,37 +127,48 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, r)
         return L.UNITFRAME_DEAD
     end
 
-    local per = UnitHealthPercent(u, true, CurveConstants.ScaleTo100)
-    if isSecretValue(per) then return "" end
+    UnitGetDetailedHealPrediction(u, "player", hpCalculator)
+    local color = hpCalculator:EvaluateCurrentHealthPercent(hpColorCurve)
 
-    if per >= 100 then
-        local max = UnitHealthMax(u)
-        if isSecretValue(max) then return "100%" end
-        return '|cff98c290' .. E:ShortValue(max)
+    local rawPer = format(UnitHealthPercent(u, true, CurveConstants.ScaleTo100))
+    local per = not isSecretValue(rawPer) and format("%d%%", rawPer) or ""
+    local cur = E:ShortValue(UnitHealth(u))
+    local max = E:ShortValue(UnitHealthMax(u))
+
+    local text
+    if arg1 == "currentmax" then
+        text = cur .. " | " .. max
+    elseif arg1 == "current" then
+        text = cur
+    elseif arg1 == "percent" then
+        text = per
+    elseif arg1 == "loss" then
+        text = E:ShortValue(UnitHealthMissing(u))
     else
-        local cur = UnitHealth(u)
-        if isSecretValue(cur) then
-            return format("|cfffd5c69%d%%|r", per)
-        end
-        local r, g, b = ColorGradient(per, 100, 245 / 255, 68 / 255, 68 / 255, 245 / 255, 186 / 255, 69 / 255, 105 / 255, 201 / 255, 105 / 255)
-        local color = Hex(r, g, b)
-        return format('|cfffd5c69%s |cffdbf6db- %s%d%%|r', E:ShortValue(cur), color, per)
+        text = per ~= "" and (cur .. " | " .. per) or cur
     end
+
+    if color then
+        return color:WrapTextInColorCode(text)
+    end
+
+    return text
 end
-oUF.Tags.Events['dd:smarthp'] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
+oUF.Tags.Events['dd:smarthp'] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 
 oUF.Tags.Methods['dd:pp'] = function(u)
     local color = C.oUF_colors.power[select(2, UnitPowerType(u))]
     if color == nil then
         color = C.oUF_colors.power[select(1, UnitPowerType(u))]
     end
-    if color == nil then
-        color = { 0.6, 0.6, 0.6 }
-    end
 
     local power = UnitPower(u)
     if isSecretValue(power) then return "" end
-    return Hex(color[1], color[2], color[3]) .. E:ShortValue(power or 0)
+
+    if color then
+        return hexColor(color) .. E:ShortValue(power or 0)
+    end
+    return format("|cff999999%s", E:ShortValue(power or 0))
 end
 oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
 
