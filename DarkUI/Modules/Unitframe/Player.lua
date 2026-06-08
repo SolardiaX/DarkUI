@@ -100,7 +100,8 @@ local function createBar(self)
     self.Power.bg.multiplier = .45
 
     self.Power.frequentUpdates = true
-    self.Power.colorPower = true
+    -- self.Power.colorPower = true
+    self.Power.colorClass = true
     self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
@@ -170,17 +171,12 @@ local function createBar(self)
     self.AdditionalPower.text:SetPoint("CENTER")
 
     self.AdditionalPower.PostUpdate = function(element, cur, max)
-        if element.text and max > 0 then
-            local perc = cur/max * 100
-            if perc > 95 then
-                perc = ""
-                element:SetAlpha(0)
-            else
-                perc = format("%d%%", perc)
-                element:SetAlpha(1)
-            end
-            element.text:SetText(perc)
+        if not element.text then return end
+        if max == 0 then
+            element.text:SetText("")
+            return
         end
+        element.text:SetText(E:AbbreviateNumber(cur))
     end
 
     self.AdditionalPower.colorPower = true
@@ -396,6 +392,7 @@ local function createStyle(self)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     core:SetFader(self, cfg.player.fader)
+    core:SetupClassPower(self)
 end
 
 function module:OnInit()
