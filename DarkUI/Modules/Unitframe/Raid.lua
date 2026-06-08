@@ -211,6 +211,8 @@ local function createRaidDebuffs(self)
     frame.time = frame:CreateFontText(12, "", false, "CENTER", 1, 0)
 
     frame.ShowDispellableDebuff = true
+    frame.ShowBossDebuff = true
+    frame.BossDebuffPriority = 9999999
     frame.EnableTooltip = cfg.raid.raidDebuffs.enableTooltip
     frame.ShowDebuffBorder = cfg.raid.raidDebuffs.showDebuffBorder
     frame.FilterDispellableDebuff = cfg.raid.raidDebuffs.filterDispellableDebuff
