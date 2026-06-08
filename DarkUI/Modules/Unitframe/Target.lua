@@ -85,7 +85,7 @@ local function createBar(self)
     self.Health.colorClass = cfg.target.colorHealth
     self.Health.colorClassNPC = cfg.target.colorHealth
     self.Health.colorClassPet = cfg.target.colorHealth
-    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
@@ -105,7 +105,7 @@ local function createBar(self)
     self.Power.colorReaction = true
     self.Power.colorTapping = true
     self.Power.colorDisconnected = true
-    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal

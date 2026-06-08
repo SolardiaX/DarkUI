@@ -83,7 +83,7 @@ local function createBar(self)
 
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
-    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorClass = true
     self.Health.colorClassNPC = true
     self.Health.colorClassPet = true
@@ -106,7 +106,7 @@ local function createBar(self)
     self.Power.colorReaction = true
     self.Power.colorTapping = true
     self.Power.colorDisconnected = true
-    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal

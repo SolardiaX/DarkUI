@@ -100,7 +100,7 @@ local function createBar(self)
     self.Health.bg:SetAlpha(0.3)
 
     self.Health.frequentUpdates = true
-    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.raid.colorHealth
 
@@ -124,7 +124,7 @@ local function createBar(self)
     self.Power.colorReaction = true
     self.Power.colorTapping = true
     self.Power.colorDisconnected = true
-    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal

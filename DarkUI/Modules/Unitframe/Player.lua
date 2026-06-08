@@ -84,7 +84,7 @@ local function createBar(self)
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.player.colorHealth
-    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
 
     --power bar
     self.Power = CreateFrame("StatusBar", nil, self)
@@ -102,7 +102,7 @@ local function createBar(self)
     self.Power.frequentUpdates = true
     -- self.Power.colorPower = true
     self.Power.colorClass = true
-    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal

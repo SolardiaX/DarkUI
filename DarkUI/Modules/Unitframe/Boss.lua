@@ -55,7 +55,7 @@ local function createBar(self)
 
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
-    self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorClass = true
     self.Health.colorClassNPC = true
     self.Health.colorClassPet = true
@@ -76,7 +76,7 @@ local function createBar(self)
 
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
-    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --alt power bar
@@ -94,7 +94,7 @@ local function createBar(self)
     self.AlternativePower.bg:SetTexture(media.mpTex)
 
     self.AlternativePower.colorPower = true
-    self.AlternativePower.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.AlternativePower.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.AlternativePower.PostUpdateColor = core.PostUpdatePowerColor
 end
 
