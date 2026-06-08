@@ -270,6 +270,55 @@ local function createAuraIcon(self)
     self.Auras = f
 end
 
+local function createCastbar(self)
+    local barBorder = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
+
+    local cb = CreateFrame("StatusBar", nil, self)
+    cb:SetFrameLevel(5)
+    cb:SetStatusBarTexture(C.media.texture.status)
+    cb:SetStatusBarColor(1, 0.8, 0)
+    cb:SetPoint("TOP", self, "BOTTOM", 0, -16)
+    cb:SetSize(94, 10)
+
+    cb.bg = cb:CreateTexture(nil, "BACKGROUND")
+    cb.bg:SetAllPoints()
+    cb.bg:SetColorTexture(0.1, 0.1, 0.1, 0.8)
+
+    local fg = CreateFrame("Frame", nil, cb)
+    fg:SetAllPoints()
+    fg:SetFrameLevel(cb:GetFrameLevel() + 2)
+
+    fg.Texture = fg:CreateTexture(nil, "OVERLAY")
+    fg.Texture:SetTexture(barBorder)
+    fg.Texture:SetAllPoints(fg)
+    cb.Foreground = fg
+
+    local spark = cb:CreateTexture(nil, "OVERLAY", nil, 7)
+    spark:SetBlendMode("ADD")
+    spark:SetVertexColor(0.8, 0.6, 0, 1)
+    spark:SetSize(15, cb:GetHeight() * 2)
+    cb.Spark = spark
+
+    local time = core:CreateFont(cb, STANDARD_TEXT_FONT, 11, "OUTLINE")
+    time:SetPoint("RIGHT", cb, "RIGHT", -2, 0)
+    time:SetJustifyH("RIGHT")
+    cb.Time = time
+
+    local text = core:CreateFont(cb, STANDARD_TEXT_FONT, 11, "OUTLINE")
+    text:SetPoint("LEFT", cb, "LEFT", 2, 0)
+    text:SetPoint("RIGHT", time, "LEFT", -4, 0)
+    text:SetJustifyH("LEFT")
+    cb.Text = text
+
+    cb.timeToHold = 0.5
+    cb.PostCastStart = core.PostCastStart
+    cb.PostCastFail = core.PostCastFail
+    cb.PostCastStop = core.PostCastStop
+    cb.PostCastInterruptible = core.PostCastInterruptible
+
+    self.Castbar = cb
+end
+
 local function createStyle(self)
     self.colors = C.oUF_colors
     self.cUnit = "focus"
@@ -288,6 +337,7 @@ local function createStyle(self)
     createTag(self)
     createThreatType(self)
     createAuraIcon(self)
+    createCastbar(self)
 
     self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, 18)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
