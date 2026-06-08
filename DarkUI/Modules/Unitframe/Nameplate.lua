@@ -32,7 +32,6 @@ local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
 local IsInInstance, IsInGroup, IsInRaid = IsInInstance, IsInGroup, IsInRaid
 local GetNumGroupMembers = GetNumGroupMembers
 local GetSpellName = C_Spell.GetSpellName
-local C_Spell_GetSpellCooldown = C_Spell.GetSpellCooldown
 
 local cfg = C.nameplate
 
@@ -66,7 +65,24 @@ do
     end
 end
 
-local kickID = 0
+local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
+local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
+
+local function castColorUpdateInterruptible(self)
+    if self.notInterruptible then
+        core.SetCastbarNotInterruptible(self)
+    else
+        core.SetCastbarInterruptible(self)
+    end
+    local r, g, b = self:GetStatusBarColor()
+    self.bg:SetColorTexture(r, g, b, 0.2)
+end
+
+local function castColorUpdateStart(self)
+    self:GetStatusBarTexture():SetVertexColorFromBoolean(
+        self.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
+    )
+end
 
 local healList, exClass, healerSpecs = {}, {}, {}
 local healerCheckFrame = CreateFrame("Frame")
@@ -282,35 +298,6 @@ local function castColor(self)
     else
         if LCG then LCG.HideOverlayGlow(self.Icon.glowFrame) end
     end
-end
-
-local CastInterruptibleColor = CreateColor(1, 0.8, 0)
-local CastNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
-
-local function castColorInterruptible(self)
-    if self.notInterruptible then
-        self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
-        self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
-    elseif cfg.kick_color then
-        local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
-        local start = cooldownInfo and cooldownInfo.startTime or 0
-        if start ~= 0 then
-            self:SetStatusBarColor(1, 0.5, 0)
-            self.bg:SetColorTexture(1, 0.5, 0, 0.2)
-        else
-            self:SetStatusBarColor(1, 0.8, 0)
-            self.bg:SetColorTexture(1, 0.8, 0, 0.2)
-        end
-    else
-        self:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
-        self.bg:SetColorTexture(27 / 255, 147 / 255, 226 / 255, 0.2)
-    end
-end
-
-local function castColorStart(self)
-    self:GetStatusBarTexture():SetVertexColorFromBoolean(
-        self.notInterruptible, CastNotInterruptibleColor, CastInterruptibleColor
-    )
 end
 
 -- Threat color
@@ -645,9 +632,9 @@ local function style(self, unit)
 
     self.Castbar.PostCastStart = function(cb, unit)
         castColor(cb)
-        castColorStart(cb)
+        castColorUpdateStart(cb)
     end
-    self.Castbar.PostCastInterruptible = castColorInterruptible
+    self.Castbar.PostCastInterruptible = castColorUpdateInterruptible
 
     -- Create Cast Time Text
     self.Castbar.Time = self.Castbar:CreateFontString(nil, "ARTWORK")
@@ -843,34 +830,6 @@ function module:PLAYER_LOGIN()
 end
 
 function module:OnInit()
-    if cfg.kick_color then
-        if E.myClass == "DEATHKNIGHT" then
-            kickID = 47528
-        elseif E.myClass == "DEMONHUNTER" then
-            kickID = 183752
-        elseif E.myClass == "DRUID" then
-            kickID = 106839
-        elseif E.myClass == "HUNTER" then
-            kickID = GetSpecialization() == 3 and 187707 or 147362
-        elseif E.myClass == "MAGE" then
-            kickID = 2139
-        elseif E.myClass == "MONK" then
-            kickID = 116705
-        elseif E.myClass == "PALADIN" then
-            kickID = 96231
-        elseif E.myClass == "PRIEST" then
-            kickID = 15487
-        elseif E.myClass == "ROGUE" then
-            kickID = 1766
-        elseif E.myClass == "SHAMAN" then
-            kickID = 57994
-        elseif E.myClass == "WARLOCK" then
-            kickID = 119910
-        elseif E.myClass == "WARRIOR" then
-            kickID = 6552
-        end
-    end
-
     self:RegisterEvent("PLAYER_LOGIN")
 
     if cfg.combat == true then

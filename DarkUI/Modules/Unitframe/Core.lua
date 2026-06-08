@@ -14,6 +14,14 @@ local select, pairs, ipairs, unpack, tinsert = select, pairs, ipairs, unpack, ta
 local CastbarCompleteColor = {.1, .8, 0}
 local CastbarFailColor = {1, .1, 0}
 
+local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
+local CastbarKickOnCDColor = CreateColor(1, 0.5, 0)
+local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
+
+local C_Spell_GetSpellCooldown = C_Spell.GetSpellCooldown
+
+local kickID = 0
+
 local channelingTicks = {
     [740] = 4,        -- 宁静
     [755] = 5,        -- 生命通道
@@ -42,6 +50,23 @@ module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE", function()
         channelingTicks[47757] = numTicks
         channelingTicks[47758] = numTicks
     end
+
+    local classKicks = {
+        DEATHKNIGHT = 47528,
+        DEMONHUNTER = 183752,
+        DRUID = 106839,
+        EVOKER = 351338,
+        HUNTER = GetSpecialization() == 3 and 187707 or 147362,
+        MAGE = 2139,
+        MONK = 116705,
+        PALADIN = 96231,
+        PRIEST = 15487,
+        ROGUE = 1766,
+        SHAMAN = 57994,
+        WARLOCK = 119910,
+        WARRIOR = 6552,
+    }
+    kickID = classKicks[E.myClass] or 0
 end)
 
 ------------------------------------------------------------------
@@ -96,18 +121,27 @@ local function setBarTicks(Castbar, ticks, numTicks)
     end
 end
 
-local CastbarInterruptibleColor = CreateColor(27 / 255, 147 / 255, 226 / 255)
-local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
-
 local function setCastbarInterruptible(Castbar)
-    Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
-    Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
+    if kickID > 0 then
+        local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
+        local start = cooldownInfo and cooldownInfo.startTime or 0
+        if start ~= 0 then
+            Castbar:SetStatusBarColor(CastbarKickOnCDColor:GetRGB())
+        else
+            Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
+        end
+    else
+        Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
+    end
+    if Castbar.Spark then Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1) end
 end
+module.SetCastbarInterruptible = setCastbarInterruptible
 
 local function setCastbarNotInterruptible(Castbar)
     Castbar:SetStatusBarColor(CastbarNotInterruptibleColor:GetRGB())
-    Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
+    if Castbar.Spark then Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1) end
 end
+module.SetCastbarNotInterruptible = setCastbarNotInterruptible
 
 function module:PostCastStart(unit)
     local Castbar = self
