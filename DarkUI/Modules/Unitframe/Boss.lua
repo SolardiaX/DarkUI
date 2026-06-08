@@ -76,7 +76,7 @@ local function createBar(self)
 
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
-    self.Power.Smooth = true
+    self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
 
     --alt power bar
     self.AlternativePower = CreateFrame("StatusBar", nil, self)
@@ -93,7 +93,7 @@ local function createBar(self)
     self.AlternativePower.bg:SetTexture(media.mpTex)
 
     self.AlternativePower.colorPower = true
-    self.AlternativePower.Smooth = true
+    self.AlternativePower.smoothing = Enum.StatusBarInterpolation.Continuous
 end
 
 local function createPortrait(self)

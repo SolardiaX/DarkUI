@@ -9,9 +9,7 @@ local UnitIsFriend, UnitIsPlayer, UnitIsUnit = UnitIsFriend, UnitIsPlayer, UnitI
 local UnitIsDeadOrGhost, UnitIsConnected = UnitIsDeadOrGhost, UnitIsConnected
 local IsPlayerSpell = IsPlayerSpell
 local IsInRaid = IsInRaid
-local SpellIsPriorityAura = SpellIsPriorityAura
 local select, pairs, ipairs, unpack, tinsert = select, pairs, ipairs, unpack, table.insert
-local DebuffTypeColor = DebuffTypeColor
 
 local CastbarCompleteColor = {.1, .8, 0}
 local CastbarFailColor = {1, .1, 0}
@@ -134,7 +132,7 @@ function module:PostCastFail(...)
     local Castbar = self
 
     Castbar:SetStatusBarColor(unpack(CastbarFailColor))
-    Castbar:SetValue(Castbar.max)
+    Castbar:SetValue(1)
 
     if Castbar.enableFader then
         Castbar:FadeOut()
@@ -145,8 +143,8 @@ function module:PostCastStop(unit, spellname, _)
     local Castbar = self
 
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
-    Castbar:SetValue(Castbar.max)
-    
+    Castbar:SetValue(1)
+
     if Castbar.enableFader then
         Castbar:FadeOut()
     end
@@ -206,12 +204,6 @@ end
 ------------------------------------------------------------------
 --  Methods for icon                                            --
 ------------------------------------------------------------------
-local playerUnits = {
-    ["player"]  = true,
-    ["pet"]     = true,
-    ["vehicle"] = true,
-}
-
 function module.PostCreateButton(element, button)
     button:CreateOverlay()
     button:CreateShadow()
@@ -233,20 +225,22 @@ end
 function module.PostUpdateButton(element, button, unit, data, position)
     if button.__overlay then button.__overlay:Show() end
     if button.__shadow then button.__shadow:Show() end
-    
+
     button.__shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
     button.Icon:SetDesaturated(false)
 
-    if data.isHarmful then
-        if not UnitIsFriend("player", unit) and not playerUnits[data.sourceUnit] then
+    if data.isHarmfulAura then
+        if not UnitIsFriend("player", unit) and not data.isPlayerAura then
             button.Icon:SetDesaturated(true)
-        else
-            local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
-            button.shadow:SetBackdropBorderColor(color.r * .82, color.g * .82, color.b * .82)
+        elseif element.dispelColorCurve then
+            local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
+            if color then
+                button.__shadow:SetBackdropBorderColor(color:GetRGBA())
+            end
         end
     else
-        if (data.isStealable or ((E.myClass == "MAGE" or E.myClass == "PRIEST" or E.myClass == "SHAMAN" or E.myClass == "HUNTER") and data.dispelName == "Magic")) and not UnitIsFriend("player", unit) then
-            button.shadow:SetBackdropBorderColor(1, 0.85, 0)
+        if type(data.dispelName) ~= "nil" and not UnitIsFriend("player", unit) then
+            button.__shadow:SetBackdropBorderColor(1, 0.85, 0)
         end
     end
 end
@@ -279,26 +273,19 @@ function module.CreateAuraTimer(aura, elapsed)
     end
 end
 
-function module:FilterAuras(unit, data, src)
-    local element = src or self
-    local isInRaid = IsInRaid(LE_PARTY_CATEGORY_HOME)
-    local isFromPlayer = playerUnits[data.sourceUnit]
-    local spellID = data.spellId
+function module:FilterAuras(unit, data)
+    local spellId = data.spellId
 
-    if isInRaid then
+    if IsInRaid(LE_PARTY_CATEGORY_HOME) then
         local auraList = C.aura.raidbuffs[E.myClass]
-        if auraList and auraList[spellID] and data.isFromPlayerOrPlayerPet then
-            return true
-        elseif C.aura.raidbuffs["ALL"][spellID] then
+        if (auraList and auraList[spellId] and data.isPlayerAura) or C.aura.raidbuffs["ALL"][spellId] then
             return true
         end
-    elseif element.showStealableBuffs and data.isStealable and not UnitIsPlayer(unit) then
+    elseif self.showStealableBuffs and type(data.dispelName) ~= "nil" and not UnitIsPlayer(unit) then
         return true
-    elseif element.onlyShowPlayer and isFromPlayer then
+    elseif self.onlyShowPlayer and data.isPlayerAura then
         return true
-    elseif data.isBossAura or SpellIsPriorityAura(spellID) then
-        return true
-    elseif (not element.onlyShowPlayer) and data.name then
+    elseif not self.onlyShowPlayer and data.name then
         return true
     end
 

@@ -416,12 +416,12 @@ end
 
 -- Auras functions
 local function aurasCustomFilter(element, unit, data)
-    if cfg.blackList[data.spellID] then
+    if cfg.blackList[data.spellId] then
         return false
-    elseif cfg.whiteList[data.spellID] and data.isFromPlayerOrPlayerPet then
+    elseif cfg.whiteList[data.spellId] and data.isPlayerAura then
         return true
     else
-        return core:FilterAuras(unit, data, element)
+        return core.FilterAuras(element, unit, data)
     end
 end
 
