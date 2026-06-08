@@ -244,6 +244,39 @@ local function createStyle(self)
     self.ResurrectIndicator = core:CreateIcon(self, "OVERLAY", 16, -1, self, "CENTER", "CENTER", 0, 0)
     self.SummonIndicator = core:CreateIcon(self, "OVERLAY", 20, -1, self, "CENTER", "CENTER", 0, 0)
 
+    -- TargetBorder + ThreatBorder (via FrameFG vertex color)
+    local defaultFGColor = { 0.47, 0.4, 0.4 }
+    local targetColor = { 0.8, 0.7, 0.3 }
+    local threatColors = {
+        [1] = { 0.7, 0.7, 0.3 },
+        [2] = { 0.7, 0.4, 0 },
+        [3] = { 0.7, 0.1, 0.1 },
+    }
+
+    local function updateBorderColor(frame)
+        if UnitIsUnit("target", frame.unit) then
+            frame.FrameFG.texture:SetVertexColor(unpack(targetColor))
+            return
+        end
+
+        local status = UnitThreatSituation(frame.unit)
+        if status and status > 0 and threatColors[status] then
+            frame.FrameFG.texture:SetVertexColor(unpack(threatColors[status]))
+        else
+            frame.FrameFG.texture:SetVertexColor(unpack(defaultFGColor))
+        end
+    end
+
+    self:RegisterEvent("PLAYER_TARGET_CHANGED", updateBorderColor, true)
+    self:RegisterEvent("GROUP_ROSTER_UPDATE", updateBorderColor, true)
+    self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", function(frame, _, unit)
+        if unit == frame.unit then updateBorderColor(frame) end
+    end)
+    self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", function(frame, _, unit)
+        if unit == frame.unit then updateBorderColor(frame) end
+    end)
+    tinsert(self.__elements, updateBorderColor)
+
     -- PrivateAuras
     local pa = CreateFrame("Frame", nil, self)
     pa:SetPoint("CENTER", self.Health, 0, 0)
