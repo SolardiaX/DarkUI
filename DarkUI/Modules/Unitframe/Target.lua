@@ -101,7 +101,10 @@ local function createBar(self)
     self.Power.bg.multiplier = .45
 
     self.Power.frequentUpdates = true
-    self.Power.colorPower = true
+    self.Power.colorClass = true
+    self.Power.colorReaction = true
+    self.Power.colorTapping = true
+    self.Power.colorDisconnected = true
     self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 

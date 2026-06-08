@@ -300,7 +300,7 @@ end
 function module:PostUpdatePowerColor(unit, color, r, g, b)
     local bg = self.bg
     if bg then
-        if not r and color then
+        if not r and color and color.GetRGB then
             r, g, b = color:GetRGB()
         end
         if r then
