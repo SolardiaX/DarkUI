@@ -449,14 +449,9 @@ local function aurasPostCreateIcon(element, button)
     button:SetSize(cfg.auras_size, cfg.auras_size)
     button:EnableMouse(false)
 
-    button.remaining = button:CreateFontString(nil, 'OVERLAY')
-    button.remaining:SetFont(STANDARD_TEXT_FONT, 10, "THINOUTLINE")
-    button.remaining:SetPoint("BOTTOM", button, "BOTTOM", 0, -4)
-    button.remaining:SetJustifyH("CENTER")
-
-    button.Cooldown.noCooldownCount = true
+    button.Cooldown.noCooldownCount = not cfg.show_timers
     if button.Cooldown.SetHideCountdownNumbers then
-		button.Cooldown:SetHideCountdownNumbers(true)
+        button.Cooldown:SetHideCountdownNumbers(not cfg.show_timers)
     end
 
     button.Count:SetPoint("BOTTOM", button, "TOP", 0, -8)
@@ -469,7 +464,6 @@ local function aurasPostCreateIcon(element, button)
         button.parent = CreateFrame("Frame", nil, button)
         button.parent:SetFrameLevel(button.Cooldown:GetFrameLevel() + 1)
         button.Count:SetParent(button.parent)
-        button.remaining:SetParent(button.parent)
     else
         element.disableCooldown = true
     end
@@ -477,16 +471,6 @@ end
 
 local function aurasPostUpdateIcon(element, button, unit, data)
     core.PostUpdateButton(element, button, unit, data)
-
-    if data.duration and data.duration > 0 and cfg.show_timers then
-        button.remaining:Show()
-        button.timeLeft = data.expirationTime
-        button:SetScript("OnUpdate", core.CreateAuraTimer)
-    else
-        button.remaining:Hide()
-        button.timeLeft = math.huge
-        button:SetScript("OnUpdate", nil)
-    end
 
     if cfg.colorBorder and data.isHarmfulAura and element.dispelColorCurve then
         local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
@@ -498,7 +482,6 @@ local function aurasPostUpdateIcon(element, button, unit, data)
     else
         button.Overlay:SetVertexColor(0, 0, 0)
     end
-    button.first = true
 end
 
 local function callback(self, event, unit)

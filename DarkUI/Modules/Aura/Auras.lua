@@ -14,15 +14,7 @@ local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = G
 local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
 local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
 
-local DEBUFF_COLORS = {
-    none = { 0.8, 0, 0 },
-    Magic = { 0.2, 0.6, 1 },
-    Curse = { 0.6, 0, 1 },
-    Disease = { 0.6, 0.4, 0 },
-    Poison = { 0, 0.6, 0 },
-    Bleed = { 0.8, 0, 0 },
-    Enrage = { 0.95, 0.37, 0.96 },
-}
+local dispelColorCurve = C_CurveUtil.CreateColorCurve()
 
 ------------------------------------------------------------------------
 -- Time Formatting
@@ -169,8 +161,12 @@ updateAuras = function(button, index)
     end
 
     if filter == "HARMFUL" then
-        local color = DEBUFF_COLORS[auraData.dispelName or "none"] or DEBUFF_COLORS.none
-        button:SetBackdropBorderColor(color[1], color[2], color[3])
+        local color = C_UnitAuras.GetAuraDispelTypeColor(unit, auraData.auraInstanceID, dispelColorCurve)
+        if color then
+            button:SetBackdropBorderColor(color:GetRGBA())
+        else
+            button:SetBackdropBorderColor(0.8, 0, 0)
+        end
     else
         button:SetBackdropBorderColor(0, 0, 0)
     end
