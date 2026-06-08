@@ -405,6 +405,14 @@ local function createFontText(f, size, text, classcolor, anchor, x, y)
 	return fs
 end
 
+local function fadeIn(f)
+	E:UIFrameFadeIn(f, 0.4, f:GetAlpha(), 1)
+end
+
+local function fadeOut(f)
+	E:UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
+end
+
 ------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
@@ -427,6 +435,8 @@ local function addapi(object)
 	mt.CreateOverlay = createOverlay
 	mt.CreateGradient = createGradient
 	mt.CreateFontText = createFontText
+	mt.FadeIn = fadeIn
+	mt.FadeOut = fadeOut
 
 	if mt.SetTexture then
 		hooksecurefunc(mt, "SetTexture", disablePixelSnap)
