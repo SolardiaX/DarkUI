@@ -594,7 +594,7 @@ C.unitframe = {
         },
     },
     boss = {
-        position = { "TOPRIGHT", "UIParent", "TOPRIGHT", -150, -400 },
+        position = { "TOPRIGHT", "UIParent", "TOPRIGHT", -250, -400 },
         spacing = 60,
         aura = { player_aura_only = true, show_stealable_buffs = true },
         fader = {

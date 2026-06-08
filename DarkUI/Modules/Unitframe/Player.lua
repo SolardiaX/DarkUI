@@ -390,6 +390,24 @@ local function createStyle(self)
     self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
     self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
+    -- PrivateAuras
+    local pa = CreateFrame("Frame", nil, UIParent)
+    pa:SetPoint("TOPRIGHT", self, "TOPLEFT", -60, 60)
+    pa:SetSize(130, 30)
+    pa.size = 30
+    pa.spacing = 4
+    pa.initialAnchor = "TOPRIGHT"
+    pa.growthX = "LEFT"
+    pa.growthY = "DOWN"
+    pa.borderScale = 0
+    pa.disableCooldown = false
+    pa.disableCooldownText = false
+    pa.PostCreateAura = function(_, aura)
+        aura:CreateOverlay()
+        aura:CreateShadow()
+    end
+    self.PrivateAuras = pa
+
     core:SetFader(self, cfg.player.fader)
     core:SetupClassPower(self)
 end

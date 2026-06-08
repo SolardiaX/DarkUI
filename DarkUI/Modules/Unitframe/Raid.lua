@@ -239,6 +239,24 @@ local function createStyle(self)
     self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "OVERLAY", 18, -1, self, "TOP", "TOP", 0, -2)
     self.GroupRoleIndicator:SetDesaturated(1)
 
+    -- PrivateAuras
+    local pa = CreateFrame("Frame", nil, self)
+    pa:SetPoint("CENTER", self.Health, 0, 0)
+    pa:SetSize(20, 20)
+    pa.size = 20
+    pa.spacing = 0
+    pa.initialAnchor = "CENTER"
+    pa.growthX = "RIGHT"
+    pa.growthY = "UP"
+    pa.num = 1
+    pa.borderScale = 0
+    pa.disableCooldown = false
+    pa.disableCooldownText = true
+    pa.PostCreateAura = function(_, aura)
+        aura:CreateOverlay()
+    end
+    self.PrivateAuras = pa
+
     core:SetFader(self, cfg.raid.fader)
 end
 

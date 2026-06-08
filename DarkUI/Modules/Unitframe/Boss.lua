@@ -149,31 +149,41 @@ local function createTag(self)
 end
 
 local function createAuraIcon(self)
-    local f = CreateFrame('Frame', nil, self)
-    f:SetFrameStrata("HIGH")
-    f:SetFrameLevel(1)
+    -- Buffs (above)
+    local buffs = CreateFrame('Frame', nil, self)
+    buffs:SetFrameStrata("HIGH")
+    buffs:SetFrameLevel(1)
+    buffs.size = 22
+    buffs.spacing = 4
+    buffs.initialAnchor = 'BOTTOMLEFT'
+    buffs['growth-x'] = 'RIGHT'
+    buffs['growth-y'] = 'UP'
+    buffs.num = 6
+    buffs.showStealableBuffs = cfg.boss.aura.show_Stealable_buffs
+    buffs:SetSize((buffs.size + buffs.spacing) * buffs.num, buffs.size)
+    buffs:SetPoint('BOTTOMLEFT', self, 'TOPLEFT', 0, 8)
+    buffs.PostCreateButton = core.PostCreateButton
+    buffs.PostUpdateButton = core.PostUpdateButton
+    buffs.FilterAura = core.FilterAuras
+    self.Buffs = buffs
 
-    f.size = 24
-    f.spacing = 6
-    f.gap = true
-    f.initialAnchor = 'RIGHT'
-    f.onlyShowPlayer = cfg.boss.aura.player_aura_only
-    f.showStealableBuffs = cfg.boss.aura.show_Stealable_buffs
-    f['growth-x'] = 'LEFT'
-    f['growth-y'] = 'DOWN'
-
-    local h = (f.size + f.spacing) * 6
-    local w = (f.size + f.spacing) * 4
-    f:SetSize(h, w)
-    f:SetPoint('RIGHT', self, 'LEFT', -40, 0)
-
-    f.reanchorIfVisibleChanged = true
-    f.PostCreateButton = core.PostCreateButton
-    f.PostUpdateButton = core.PostUpdateButton
-    f.PostUpdateGapButton = core.PostUpdateGapButton
-    f.FilterAura = core.FilterAuras
-
-    self.Auras = f
+    -- Debuffs (below)
+    local debuffs = CreateFrame('Frame', nil, self)
+    debuffs:SetFrameStrata("HIGH")
+    debuffs:SetFrameLevel(1)
+    debuffs.size = 22
+    debuffs.spacing = 4
+    debuffs.initialAnchor = 'TOPLEFT'
+    debuffs['growth-x'] = 'RIGHT'
+    debuffs['growth-y'] = 'DOWN'
+    debuffs.num = 6
+    debuffs.onlyShowPlayer = cfg.boss.aura.player_aura_only
+    debuffs:SetSize((debuffs.size + debuffs.spacing) * debuffs.num, debuffs.size)
+    debuffs:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -8)
+    debuffs.PostCreateButton = core.PostCreateButton
+    debuffs.PostUpdateButton = core.PostUpdateButton
+    debuffs.FilterAura = core.FilterAuras
+    self.Debuffs = debuffs
 end
 
 local function createStyle(self)
@@ -195,6 +205,24 @@ local function createStyle(self)
 
     self.RaidTargetIndicator = core:CreateIcon(self, "BACKGROUND", 18, -1, self, "CENTER", "CENTER", 20, 0)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
+
+    -- PrivateAuras (left side, grow left)
+    local pa = CreateFrame("Frame", nil, UIParent)
+    pa:SetPoint("RIGHT", self, "LEFT", -8, 0)
+    pa:SetSize(130, 24)
+    pa.size = 24
+    pa.spacing = 4
+    pa.initialAnchor = "RIGHT"
+    pa.growthX = "LEFT"
+    pa.growthY = "DOWN"
+    pa.borderScale = 0
+    pa.disableCooldown = false
+    pa.disableCooldownText = false
+    pa.PostCreateAura = function(_, aura)
+        aura:CreateOverlay()
+        aura:CreateShadow()
+    end
+    self.PrivateAuras = pa
 
     core:SetFader(self, cfg.boss.fader)
 end
