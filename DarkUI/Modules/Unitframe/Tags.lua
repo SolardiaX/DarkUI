@@ -69,15 +69,10 @@ end
 oUF.Tags.Events["dd:nameplateNameColor"] = "UNIT_POWER_UPDATE UNIT_FLAGS"
 
 oUF.Tags.Methods["dd:nameplateHealth"] = function(unit)
-    local per = UnitHealthPercent(unit, true, CurveConstants.ScaleTo100)
-    if isSecretValue(per) then return "" end
-
-    local hp = UnitHealth(unit)
-    if isSecretValue(hp) then
-        return format("%d%%", per)
-    else
-        return format("%s - %d%%", E:AbbreviateNumber(hp), per)
-    end
+    local per = format("%d%%", UnitHealthPercent(unit, true, CurveConstants.ScaleTo100))
+    local cur = E:AbbreviateNumber(UnitHealth(unit))
+    
+    return cur .. " - " .. per
 end
 oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
 
@@ -130,14 +125,13 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
     UnitGetDetailedHealPrediction(u, "player", hpCalculator)
     local color = hpCalculator:EvaluateCurrentHealthPercent(hpColorCurve)
 
-    local rawPer = format(UnitHealthPercent(u, true, CurveConstants.ScaleTo100))
-    local per = not isSecretValue(rawPer) and format("%d%%", rawPer) or ""
+    local per = format("%d%%", UnitHealthPercent(u, true, CurveConstants.ScaleTo100))
     local cur = E:AbbreviateNumber(UnitHealth(u))
     local max = E:AbbreviateNumber(UnitHealthMax(u))
 
     local text
     if arg1 == "currentmax" then
-        text = cur .. " | " .. max
+        text = cur .. " - " .. max
     elseif arg1 == "current" then
         text = cur
     elseif arg1 == "percent" then
@@ -145,7 +139,7 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
     elseif arg1 == "loss" then
         text = E:AbbreviateNumber(UnitHealthMissing(u))
     else
-        text = per ~= "" and (cur .. " | " .. per) or cur
+        text = cur .. " - " .. per
     end
 
     if color then
