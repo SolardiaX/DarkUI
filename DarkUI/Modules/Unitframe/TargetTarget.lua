@@ -57,11 +57,6 @@ local function createBar(self)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
-    self.Health.bg = self.Health:CreateTexture(nil, 'BORDER')
-    self.Health.bg:SetTexture(media.hpTex)
-    self.Health.bg:SetAllPoints(self.Health)
-    self.Health.bg.multiplier = 0.3
-
     self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.smoothing = Enum.StatusBarInterpolation.Continuous
