@@ -361,7 +361,6 @@ local function createStyle(self)
                         :done()
 
     self.CombatIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "RIGHT", "LEFT", -28, 0)
-    self.CombatIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOMRIGHT", "TOPRIGHT", -12, 25)
     self.LeaderIndicator:SetTexture(media.leader_Tex)
