@@ -212,28 +212,29 @@ local playerUnits = {
     ["vehicle"] = true,
 }
 
-function module:PostCreateIcon(button)
-    E:ApplyOverlayBorder(button)
+function module.PostCreateButton(element, button)
+    button:CreateOverlay()
+    button:CreateShadow()
 
     button.Icon:SetTexCoord(unpack(C.media.texCoord))
     button.Icon:SetPoint("TOPLEFT", button, "TOPLEFT", 2, -2)
     button.Icon:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -2, 2)
     button.Icon:SetDrawLayer("BACKGROUND", -8)
-    
+
     button.Overlay:SetTexture(nil)
     button.Stealable:SetAtlas("bags-newitem")
 end
 
-function module:PostUpdateGapIcon(unit, button, offset)
-    button.border:Hide()
-    button.shadow:Hide()
+function module.PostUpdateGapButton(element, unit, button, position)
+    if button.__overlay then button.__overlay:Hide() end
+    if button.__shadow then button.__shadow:Hide() end
 end
 
-function module:PostUpdateIcon(button, unit, data)
-    button.border:Show()
-    button.shadow:Show()
+function module.PostUpdateButton(element, button, unit, data, position)
+    if button.__overlay then button.__overlay:Show() end
+    if button.__shadow then button.__shadow:Show() end
     
-    button.shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
+    button.__shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
     button.Icon:SetDesaturated(false)
 
     if data.isHarmful then

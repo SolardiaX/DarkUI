@@ -265,9 +265,9 @@ local function createAuraIcon(self)
     f:SetPoint('RIGHT', self, 'LEFT', -40, 0)
 
     f.reanchorIfVisibleChanged = true
-    f.PostCreateButton = core.PostCreateIcon
-    f.PostUpdateButton = core.PostUpdateIcon
-    f.PostUpdateGapButton = core.PostUpdateGapIcon
+    f.PostCreateButton = core.PostCreateButton
+    f.PostUpdateButton = core.PostUpdateButton
+    f.PostUpdateGapButton = core.PostUpdateGapButton
     f.FilterAura = core.FilterAuras
 
     self.Auras = f

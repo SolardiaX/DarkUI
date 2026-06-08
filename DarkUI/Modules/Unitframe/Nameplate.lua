@@ -426,7 +426,7 @@ local function aurasCustomFilter(element, unit, data)
 end
 
 local function aurasPostCreateIcon(element, button)
-    core:PostCreateIcon(button)
+    core.PostCreateButton(element, button)
 
     button:SetSize(cfg.auras_size, cfg.auras_size)
     button:EnableMouse(false)
@@ -458,7 +458,7 @@ local function aurasPostCreateIcon(element, button)
 end
 
 local function aurasPostUpdateIcon(element, button, unit, data)
-    core:PostUpdateIcon(button, unit, data)
+    core.PostUpdateButton(element, button, unit, data)
 
     if data.duration and data.duration > 0 and cfg.show_timers then
         button.remaining:Show()
@@ -657,7 +657,7 @@ local function style(self, unit)
     self.Castbar.IconOverlay:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
     self.Castbar.IconOverlay:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", 12, 0)
 
-    E:ApplyOverlayBorder(self.Castbar.IconOverlay)
+    self.Castbar.IconOverlay:CreateOverlay()
 
     self.Castbar.Icon = self.Castbar:CreateTexture(nil, "OVERLAY")
     self.Castbar.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
