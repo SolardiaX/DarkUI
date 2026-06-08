@@ -277,6 +277,7 @@ end
 
 function module:FilterAuras(unit, data)
     local spellId = data.spellId
+    if issecretvalue(spellId) then return false end
 
     if IsInRaid(LE_PARTY_CATEGORY_HOME) then
         local auraList = C.aura.raidbuffs[E.myClass]

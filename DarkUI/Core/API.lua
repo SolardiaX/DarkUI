@@ -22,6 +22,7 @@ E.UIScale()
 local pixel = 1
 local ratio = 768 / E.screenHeight
 E.mult = (pixel / C.general.uiScale) - ((pixel - ratio) / C.general.uiScale)
+E.noscalemult = E.mult * C.general.uiScale
 
 local Mult = E.mult
 

@@ -8,7 +8,7 @@ if not C.nameplate.enable then return end
 local module = E:Module("Unitframe"):Sub("Nameplate")
 local core = E:Module("Unitframe")
 
-local LBG = LibStub("LibButtonGlow-1.0", true)
+local LCG = LibStub("LibCustomGlow-1.0", true)
 
 local oUF = select(2, ...).oUF
 
@@ -202,21 +202,21 @@ local function updateTarget(self)
     local isMe = UnitIsUnit(self.unit, "player")
 
     if isTarget and not isMe then
-        self:SetSize((cfg.width + cfg.ad_width) * E.noscalemult, (cfg.height + cfg.ad_height) * E.noscalemult)
-        self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - ((cfg.height + cfg.ad_height) * E.noscalemult))
-        self.Castbar.Icon:SetSize(((cfg.height + cfg.ad_height) * 2 * E.noscalemult) + 8, ((cfg.height + cfg.ad_height) * 2 * E.noscalemult) + 8)
+        self:SetSize(cfg.width + cfg.ad_width, cfg.height + cfg.ad_height)
+        self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - (cfg.height + cfg.ad_height))
+        self.Castbar.Icon:SetSize((cfg.height + cfg.ad_height) * 2 + 8, (cfg.height + cfg.ad_height) * 2 + 8)
         if cfg.class_icons == true then
-            self.Class.Icon:SetSize(((cfg.height + cfg.ad_height) * 2 * E.noscalemult) + 8, ((cfg.height + cfg.ad_height) * 2 * E.noscalemult) + 8)
+            self.Class.Icon:SetSize((cfg.height + cfg.ad_height) * 2 + 8, (cfg.height + cfg.ad_height) * 2 + 8)
         end
 
         self:SetAlpha(1)
         if self.arrow then self.arrow:Show() end
     else
-        self:SetSize(cfg.width * E.noscalemult, cfg.height * E.noscalemult)
-        self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - (cfg.height * E.noscalemult))
-        self.Castbar.Icon:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+        self:SetSize(cfg.width, cfg.height)
+        self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - cfg.height)
+        self.Castbar.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
         if cfg.class_icons == true then
-            self.Class.Icon:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+            self.Class.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
         end
         if UnitExists("target") and not isMe then
             self:SetAlpha(0.5)
@@ -276,16 +276,16 @@ end
 
 -- Cast color
 local function castColor(self)
-    if cfg.majorSpells[self.spellID] then
-        LBG.ShowOverlayGlow(self.Icon.glowFrame)
+    local spellID = self.spellID
+    if not issecretvalue(spellID) and cfg.majorSpells[spellID] then
+        if LCG then LCG.ShowOverlayGlow(self.Icon.glowFrame) end
     else
-        LBG.HideOverlayGlow(self.Icon.glowFrame)
+        if LCG then LCG.HideOverlayGlow(self.Icon.glowFrame) end
     end
+end
 
-    if self.notInterruptible then
-        self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
-        self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
-    elseif cfg.kick_color then
+local function castColorInterruptible(self)
+    if cfg.kick_color then
         local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
         local start = cooldownInfo and cooldownInfo.startTime or 0
         if start ~= 0 then
@@ -299,6 +299,11 @@ local function castColor(self)
         self:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
         self.bg:SetColorTexture(27 / 255, 147 / 255, 226 / 255, 0.2)
     end
+end
+
+local function castColorNotInterruptible(self)
+    self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
+    self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
 end
 
 -- Threat color
@@ -369,46 +374,55 @@ local function threatColor(self, forced)
 end
 
 --Healthbar color
-local function healthPostUpdate(self, unit, min, max)
-    local main = self:GetParent()
+local lowHealthCurve = C_CurveUtil.CreateColorCurve()
+lowHealthCurve:SetType(Enum.LuaCurveType.Step)
+lowHealthCurve:AddPoint(0, CreateColor(1, 0, 0, 1))
+lowHealthCurve:AddPoint(0.2, CreateColor(1, 1, 0, 1))
+lowHealthCurve:AddPoint(0.5, CreateColor(unpack(C.media.border_color)))
 
-    local perc = 0
-    if max and max > 0 then
-        perc = min / max
-    end
+local function healthPostUpdate(self, unit)
+    local main = self:GetParent()
 
     local r, g, b
     local mu = self.bg.multiplier
     local unitReaction = UnitReaction(unit, "player")
     if not UnitIsUnit("player", unit) and UnitIsPlayer(unit) and (unitReaction and unitReaction >= 5) then
-        r, g, b = unpack(C.oUF_colors.power["MANA"])
+        local color = C.oUF_colors.power["MANA"]
+        r, g, b = color:GetRGB()
         self:SetStatusBarColor(r, g, b)
         self.bg:SetVertexColor(r * mu, g * mu, b * mu)
     elseif not UnitIsTapDenied(unit) and not UnitIsPlayer(unit) then
         local reaction = C.oUF_colors.reaction[unitReaction]
         if reaction then
-            r, g, b = reaction[1], reaction[2], reaction[3]
+            r, g, b = reaction:GetRGB()
         else
             r, g, b = UnitSelectionColor(unit, true)
         end
 
         self:SetStatusBarColor(r, g, b)
+        self.bg:SetVertexColor(r * mu, g * mu, b * mu)
     end
 
     if cfg.customUnits[main.unitName] or cfg.customUnits[main.npcID] then
-        self:SetStatusBarColor(unpack(cfg.custom_color))
+        r, g, b = unpack(cfg.custom_color)
+        self:SetStatusBarColor(r, g, b)
+        self.bg:SetVertexColor(r * mu, g * mu, b * mu)
     end
 
     if UnitIsPlayer(unit) then
-        if perc <= 0.5 and perc >= 0.2 then
-            setColorBorder(self, 1, 1, 0)
-        elseif perc < 0.2 then
-            setColorBorder(self, 1, 0, 0)
+        local color = UnitHealthPercent(unit, true, lowHealthCurve)
+        if color then
+            setColorBorder(self, color:GetRGB())
         else
             setColorBorder(self, unpack(C.media.border_color))
         end
-    elseif not UnitIsPlayer(unit) and cfg.enhance_threat == true then
-        setColorBorder(self, unpack(C.media.border_color))
+    elseif cfg.enhance_threat == true then
+        local color = UnitHealthPercent(unit, true, lowHealthCurve)
+        if color then
+            setColorBorder(self, color:GetRGB())
+        else
+            setColorBorder(self, unpack(C.media.border_color))
+        end
     end
 
     threatColor(main, true)
@@ -416,9 +430,13 @@ end
 
 -- Auras functions
 local function aurasCustomFilter(element, unit, data)
-    if cfg.blackList[data.spellId] then
+    local spellId = data.spellId
+    if issecretvalue(spellId) then
         return false
-    elseif cfg.whiteList[data.spellId] and data.isPlayerAura then
+    end
+    if cfg.blackList[spellId] then
+        return false
+    elseif cfg.whiteList[spellId] and data.isPlayerAura then
         return true
     else
         return core.FilterAuras(element, unit, data)
@@ -470,9 +488,13 @@ local function aurasPostUpdateIcon(element, button, unit, data)
         button:SetScript("OnUpdate", nil)
     end
 
-    local color = DebuffTypeColor[data.dispelName] or DebuffTypeColor.none
-    if cfg.colorBorder then
-        button.Overlay:SetVertexColor(color.r, color.g, color.b)
+    if cfg.colorBorder and data.isHarmfulAura and element.dispelColorCurve then
+        local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
+        if color then
+            button.Overlay:SetVertexColor(color:GetRGBA())
+        else
+            button.Overlay:SetVertexColor(0, 0, 0)
+        end
     else
         button.Overlay:SetVertexColor(0, 0, 0)
     end
@@ -488,11 +510,13 @@ local function callback(self, event, unit)
         self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
 
         if UnitIsUnit(unit, "player") then
+            self:EnableElement("Power")
             self.Power:Show()
             self.Name:Hide()
             self.Castbar:SetAlpha(0)
             self.RaidTargetIndicator:SetAlpha(0)
         else
+            self:DisableElement("Power")
             self.Power:Hide()
             self.Name:Show()
             self.Castbar:SetAlpha(1)
@@ -563,10 +587,9 @@ local function style(self, unit)
     self.Power:SetStatusBarTexture(C.media.texture.status)
     self.Power:ClearAllPoints()
     self.Power:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", 0, -6)
-    self.Power:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 0, -6 - (cfg.height * E.noscalemult / 2))
+    self.Power:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 0, -6 - cfg.height / 2)
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
-    self.Power.PostUpdate = module.PreUpdatePower
     self.Power:CreateShadow()
     createBorderFrame(self.Power)
 
@@ -590,8 +613,8 @@ local function style(self, unit)
     -- Name Text
     self.Name = self:CreateFontString(nil, "OVERLAY")
     self.Name:SetFont(unpack(C.media.standard_font))
-    self.Name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 4)
-    self.Name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 3, 4)
+    self.Name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 6)
+    self.Name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 3, 6)
     self.Name:SetWordWrap(false)
 
     if cfg.name_abbrev == true then
@@ -621,7 +644,7 @@ local function style(self, unit)
     self.Castbar:SetStatusBarTexture(C.media.texture.status)
     self.Castbar:SetStatusBarColor(1, 0.8, 0)
     self.Castbar:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", -4, -8)
-    self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 4, -8 - (cfg.height * E.noscalemult))
+    self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 4, -8 - cfg.height)
     self.Castbar:CreateShadow()
     createBorderFrame(self.Castbar)
 
@@ -630,10 +653,12 @@ local function style(self, unit)
     self.Castbar.bg:SetTexture(C.media.texture.status_bg)
     self.Castbar.bg:SetColorTexture(1, 0.8, 0, 0.2)
 
-    self.Castbar.PostCastStart = castColor
-    self.Castbar.PostCastFail = castColor
-    self.Castbar.PostCastInterruptible = castColor
-    self.Castbar.PostCastStop = castColor
+    self.Castbar.PostCastStart = function(cb, unit)
+        castColor(cb)
+        castColorInterruptible(cb)
+    end
+    self.Castbar.PostCastInterruptible = castColorInterruptible
+    self.Castbar.PostCastNotInterruptible = castColorNotInterruptible
 
     -- Create Cast Time Text
     self.Castbar.Time = self.Castbar:CreateFontString(nil, "ARTWORK")
@@ -641,7 +666,7 @@ local function style(self, unit)
     self.Castbar.Time:SetFont(unpack(C.media.standard_font))
 
     self.Castbar.CustomTimeText = function(self, duration)
-        self.Time:SetText(("%.1f"):format(self.channeling and duration or self.max - duration))
+        self.Time:SetFormattedText("%.1f", duration:GetRemainingDuration())
     end
 
     -- Create Cast Name Text
@@ -655,7 +680,7 @@ local function style(self, unit)
 
     -- Create CastBar Icon
     self.Castbar.IconOverlay = CreateFrame("Frame", nil, self.Castbar)
-    self.Castbar.IconOverlay:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+    self.Castbar.IconOverlay:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
     self.Castbar.IconOverlay:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", 12, 0)
 
     self.Castbar.IconOverlay:CreateOverlay()
@@ -671,14 +696,14 @@ local function style(self, unit)
 
     -- Raid Icon
     self.RaidTargetIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
-    self.RaidTargetIndicator:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+    self.RaidTargetIndicator:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
     self.RaidTargetIndicator:SetPoint("BOTTOM", self.Health, "TOP", 0, cfg.track_auras == true and 38 or 16)
 
     -- Class Icon
     if cfg.class_icons == true then
         self.Class = CreateFrame("Frame", nil, self)
         self.Class.Icon = self.Class:CreateTexture(nil, "OVERLAY")
-        self.Class.Icon:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+        self.Class.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
         self.Class.Icon:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", -8, 0)
         self.Class.Icon:SetTexture("Interface\\WorldStateFrame\\Icons-Classes")
         self.Class.Icon:SetTexCoord(0, 0, 0, 0)
@@ -688,7 +713,7 @@ local function style(self, unit)
     if cfg.totem_icons == true then
         self.Totem = CreateFrame("Frame", nil, self)
         self.Totem.Icon = self.Totem:CreateTexture(nil, "OVERLAY")
-        self.Totem.Icon:SetSize((cfg.height * 2 * E.noscalemult) + 8, (cfg.height * 2 * E.noscalemult) + 8)
+        self.Totem.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
         self.Totem.Icon:SetPoint("BOTTOM", self.Health, "TOP", 0, 16)
         self.Totem.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
     end
@@ -701,17 +726,27 @@ local function style(self, unit)
         self.HealerIcon:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
     end
 
-    -- Quest Indicator
+    -- Quest Icon
     if cfg.quest then
-        self.QuestIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
-        self.QuestIndicator:SetSize((cfg.height * 2 * E.noscalemult), (cfg.height * 2 * E.noscalemult))
-        self.QuestIndicator:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
+        self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
+        self.QuestIcon:SetSize(cfg.height * 2, cfg.height * 2)
+        self.QuestIcon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
+        self.QuestIcon:Hide()
+
+        self.QuestIcon.Text = self:CreateFontString(nil, "OVERLAY")
+        self.QuestIcon.Text:SetPoint("LEFT", self.QuestIcon, "RIGHT", -1, 0)
+        self.QuestIcon.Text:SetFont(unpack(C.media.standard_font))
+
+        self.QuestIcon.Item = self:CreateTexture(nil, "OVERLAY")
+        self.QuestIcon.Item:SetSize(cfg.height * 2 - 2, cfg.height * 2 - 2)
+        self.QuestIcon.Item:SetPoint("LEFT", self.QuestIcon.Text, "RIGHT", -2, 0)
+        self.QuestIcon.Item:SetTexCoord(0.1, 0.9, 0.1, 0.9)
     end
 
     -- Aura tracking
     if cfg.track_debuffs == true or cfg.track_buffs == true then
         self.Auras = CreateFrame("Frame", nil, self)
-        self.Auras:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT", 2 * E.noscalemult, 20)
+        self.Auras:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT", 2, 20)
         self.Auras.initialAnchor = "BOTTOMRIGHT"
         self.Auras["growth-y"] = "UP"
         self.Auras["growth-x"] = "LEFT"
@@ -728,6 +763,7 @@ local function style(self, unit)
         self.Auras.FilterAura = aurasCustomFilter
         self.Auras.PostCreateButton = aurasPostCreateIcon
         self.Auras.PostUpdateButton = aurasPostUpdateIcon
+        self.Auras.dispelColorCurve = C_CurveUtil.CreateColorCurve()
     end
 
     -- Health color
@@ -856,5 +892,8 @@ function module:OnInit()
 
     oUF:RegisterStyle("DarkUI:Nameplates", style)
     oUF:SetActiveStyle("DarkUI:Nameplates")
-    oUF:SpawnNamePlates("DarkUINameplates", callback)
+
+    local driver = oUF:SpawnNamePlates("DarkUINameplates")
+    driver:SetSize(cfg.width, cfg.height)
+    driver:SetAddedCallback(callback)
 end

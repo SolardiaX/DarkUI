@@ -41,6 +41,7 @@
 	<Script file='Plugins\EnemyRange.lua' />
 	<Script file='Plugins\Fader.lua' />
 	<Script file='Plugins\DebuffHighlight.lua' />
+	<Script file='Plugins\QuestIcon.lua' />
 
 	<Script file="finalize.lua"/>
 
