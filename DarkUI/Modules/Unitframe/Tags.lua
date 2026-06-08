@@ -5,9 +5,7 @@ local E, C, L = select(2, ...):unpack()
 ------------------------------------------------------------------------
 local oUF = select(2, ...).oUF or oUF
 
-local issecretvalue = issecretvalue
 local UnitHealthPercent = UnitHealthPercent
-local UnitPowerPercent = UnitPowerPercent
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local GetPVPTimer = GetPVPTimer
 local IsPVPTimerRunning = IsPVPTimerRunning
@@ -20,10 +18,6 @@ local UnitName, UnitClass, UnitLevel, UnitReaction = UnitName, UnitClass, UnitLe
 local UnitPowerType, UnitPower = UnitPowerType, UnitPower
 local TruncateWhenZero = C_StringUtil.TruncateWhenZero
 local format, len, gsub, floor = string.format, string.len, string.gsub, math.floor
-
-local function isSecretValue(value)
-    return issecretvalue and issecretvalue(value)
-end
 
 local function colorToRGB(color)
     if type(color) == "table" then
@@ -38,16 +32,6 @@ end
 local function hexColor(color)
     local r, g, b = colorToRGB(color)
     return format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
-end
-
-local function colorGradient(perc, max, r1, g1, b1, r2, g2, b2, r3, g3, b3)
-    local segment, relperc = math.modf((perc / max) * 2)
-    if segment >= 2 then return r3, g3, b3 end
-    if segment <= 0 then return r1, g1, b1 end
-    if segment == 1 then
-        return r2 + (r3 - r2) * relperc, g2 + (g3 - g2) * relperc, b2 + (b3 - b2) * relperc
-    end
-    return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
 end
 
 ------------------------------------------------------------------------
@@ -82,14 +66,13 @@ oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_U
 
 oUF.Tags.Methods["dd:nameLong"] = function(unit)
     local name = UnitName(unit)
-    if isSecretValue(name) then return "" end
     return E:UTF(name, 18, true)
 end
 oUF.Tags.Events["dd:nameLong"] = "UNIT_NAME_UPDATE"
 
 oUF.Tags.Methods["dd:nameLongAbbrev"] = function(unit)
     local name = UnitName(unit)
-    if isSecretValue(name) then return "" end
+    if not canaccessvalue(name) then return "" end
     local newname = (len(name) > 18) and gsub(name, "%s?(.[\128-\191]*)%S+%s", "%1. ") or name
     return E:UTF(newname, 18, false)
 end
@@ -156,10 +139,7 @@ oUF.Tags.Methods['dd:pp'] = function(u)
         color = C.oUF_colors.power[select(1, UnitPowerType(u))]
     end
 
-    local power = UnitPower(u)
-    if isSecretValue(power) then return "" end
-
-    local text = E:AbbreviateNumber(power or 0)
+    local text = E:AbbreviateNumber(UnitPower(u))
     if color and color.WrapTextInColorCode then
         return color:WrapTextInColorCode(text)
     end
@@ -169,7 +149,6 @@ oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
 
 oUF.Tags.Methods['dd:realname'] = function(u, r)
     local name, realm = UnitName(r or u)
-    if isSecretValue(name) then return "" end
     if realm then
         name = name .. '-*'
     end
@@ -191,7 +170,6 @@ oUF.Tags.Methods["dd:raidname"] = function(unit, rolf)
 
     local colorstr = color and E:RGBToHex(color.r, color.g, color.b, true) or "ffffff"
     local name = UnitName(rolf or unit)
-    if isSecretValue(name) then return "" end
 
     return "|cff" .. colorstr .. (E:UTF(name, 4, true) or "") .. "|r"
 end
@@ -210,13 +188,9 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
     elseif not UnitIsConnected(unit) then
         hpval = L.UNITFRAME_OFFLINE
     else
-        local per = UnitHealthPercent(unit, true, CurveConstants.ScaleTo100)
-        if not isSecretValue(per) and per < 100 then
-            local max = UnitHealthMax(unit)
-            local cur = UnitHealth(unit)
-            if not isSecretValue(max) and not isSecretValue(cur) and max - cur > 0 then
-                hpval = "-" .. E:AbbreviateNumber(max - cur)
-            end
+        local loss = TruncateWhenZero(UnitHealthMissing(unit))
+        if loss ~= "0" and loss ~= "" then
+            hpval = "-" .. loss
         end
     end
     return "|cff" .. colorstr .. (hpval or "100%") .. "|r"
@@ -231,9 +205,10 @@ oUF.Tags.Methods['dd:pvptimer'] = function(unit)
 end
 
 oUF.Tags.Methods["dd:altpower"] = function(unit)
-    local cur = UnitPower(unit, ALTERNATE_POWER_INDEX)
-    if isSecretValue(cur) then return end
-    return cur > 0 and cur
+    local cur = TruncateWhenZero(UnitPower(unit, ALTERNATE_POWER_INDEX))
+    if cur ~= "0" and cur ~= "" then
+        return cur
+    end
 end
 oUF.Tags.Events["dd:altpower"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER"
 

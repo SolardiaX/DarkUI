@@ -62,6 +62,9 @@ function E:UTF(string, i, dots)
     if not string then
         return
     end
+    if not canaccessvalue(string) then
+        return string
+    end
     local bytes = string:len()
     if bytes <= i then
         return string
