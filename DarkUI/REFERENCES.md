@@ -29,7 +29,7 @@ Used for finding original sources when iterating or fixing bugs.
 
 | File | Reference | Notes |
 |------|-----------|-------|
-| `Modules/Aura/AuraWatch.lua` | BetterCooldownManager, CooldownManagerCentered | Spell tracking framework |
+| `Modules/Aura/CoolDownViewer.lua` | Blizzard `CooldownViewer` system | Restyle EssentialCooldownViewer, UtilityCooldownViewer, BuffIcon/BuffBar viewers |
 
 ## Unitframe
 
@@ -39,8 +39,10 @@ Used for finding original sources when iterating or fixing bugs.
 | `Modules/Unitframe/Class.lua` | Blizzard `Blizzard_UnitFrame/Mainline/ClassPowerBar.lua`, `PlayerFrame.lua` | Reparent PlayerFrameBottomManagedFramesContainer, UNIT_DISPLAYPOWER relay |
 | `Modules/Unitframe/Tags.lua` | NDui `Modules/UFs/Tags.lua` | Secret value safe HP/PP tags |
 | `Modules/Unitframe/Nameplate.lua` | NDui `Modules/UFs/Nameplates.lua`, ElvUI `Nameplates/Plugins/PVPRole.lua` | Totem data, kick CD, BG healer |
-| `Modules/Unitframe/Raid.lua` | NDui `Modules/UFs/Spawns.lua` | CompactRaidFrame hiding |
-| `Modules/Unitframe/Player.lua` | ShestakUI, NDui `Modules/UFs/Functions.lua` | Texture-based frame style, AdditionalPower AbbreviateNumbers pattern |
+| `Modules/Unitframe/Boss.lua` | NDui `Modules/UFs/Functions.lua`, ShestakUI `Modules/UnitFrames/Layout.lua` | CastBar with tex_bar_border, Buffs/Debuffs split, PrivateAuras |
+| `Modules/Unitframe/Focus.lua` | NDui `Modules/UFs/Functions.lua` | CastBar below frame with tex_bar_border |
+| `Modules/Unitframe/Raid.lua` | NDui `Modules/UFs/Spawns.lua` | CompactRaidFrame hiding, PrivateAuras |
+| `Modules/Unitframe/Player.lua` | ShestakUI, NDui `Modules/UFs/Functions.lua` | Texture-based frame style, AdditionalPower AbbreviateNumbers pattern, PrivateAuras |
 | `Modules/Unitframe/Target.lua` | ShestakUI | Texture-based frame style |
 
 ## Core
@@ -48,3 +50,9 @@ Used for finding original sources when iterating or fixing bugs.
 | File | Reference | Notes |
 |------|-----------|-------|
 | `Core/API.lua` | NDui `Core/Functions.lua` | SetTemplate, CreateShadow, pixel snap |
+
+## Libs
+
+| File | Reference | Notes |
+|------|-----------|-------|
+| `Libs/oUF/Plugins/DebuffHighlight.lua` | ShestakUI `Libs/oUF/Modules/DispelColor.lua` | ColorCurve + GetAuraDispelTypeColor, talent-aware dispel detection |
