@@ -99,26 +99,23 @@ function E:Round(number, decimals)
     return (("%%.%df"):format(decimals)):format(number)
 end
 
-local NUMBER_ABBR_OPTIONS = {
-    [1] = { config = CreateAbbreviateConfig({
-        { breakpoint = 1e12, abbreviation = "t", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-        { breakpoint = 1e9, abbreviation = "b", significandDivisor = 1e7, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-        { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-        { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
-    })},
-    [2] = { config = CreateAbbreviateConfig({
-        { breakpoint = 1e12, abbreviation = L.NumberCap3, significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-        { breakpoint = 1e8, abbreviation = L.NumberCap2, significandDivisor = 1e6, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-        { breakpoint = 1e4, abbreviation = L.NumberCap1, significandDivisor = 1e3, fractionDivisor = 1e1, abbreviationIsGlobal = false },
-    })},
-}
-
-function E:ShortValue(value)
-    local options = NUMBER_ABBR_OPTIONS[C.general.numberFormat]
-    if options then
-        return AbbreviateNumbers(value, options)
+local defaultAbbrOptions = { config = CreateAbbreviateConfig({
+    { breakpoint = 1e12, abbreviation = "t", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+    { breakpoint = 1e9, abbreviation = "b", significandDivisor = 1e7, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+    { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+    { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
+})}
+local localeAbbrOptions
+if GetLocalizedNumberAbbreviationData then
+    local data = GetLocalizedNumberAbbreviationData()
+    if data then
+        localeAbbrOptions = { config = CreateAbbreviateConfig(data) }
     end
-    return value
+end
+
+function E:AbbreviateNumber(value)
+    local options = C.general.useLocalNumberFormat and localeAbbrOptions or defaultAbbrOptions
+    return AbbreviateNumbers(value, options)
 end
 
 -- RGB To Hex function

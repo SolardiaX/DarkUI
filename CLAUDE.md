@@ -112,3 +112,10 @@ feat: [Options] adjust gui size
 `DarkUI/REFERENCES.md` records which external addons each module references.
 When adding new modules or updating existing ones based on external code, update this file.
 Use it to find original sources when iterating features or fixing bugs.
+
+## Debugging & Fix Strategy
+
+When hitting API incompatibility or incorrect usage patterns:
+- **First** check `DarkUI/Libs/oUF/` source (elements, tags examples, colors.lua) for how the lib handles it
+- **Then** cross-reference NDui / ElvUI for usage patterns in the same scenario
+- **Don't** guess a fix without checking lib internals — they already solved 12.0 adaptation (e.g. `WrapTextInColorCode`, `CreateUnitHealPredictionCalculator`, `AbbreviateNumbers`)

@@ -8,10 +8,6 @@ if E.locale ~= "zhCN" then
     return
 end
 
-L.NumberCap1 = "万"
-L.NumberCap2 = "亿"
-L.NumberCap3 = "兆"
-
 L.WELCOME_LINE = "欢迎使用 DarkUI "
 L.POPUP_INSTALLUI = "该角色首次使用 DarkUI. 你必须重新加载UI来配置."
 L.POPUP_RESETUI = "此操作将重置 DarkUI 的全部配置为默认参数."

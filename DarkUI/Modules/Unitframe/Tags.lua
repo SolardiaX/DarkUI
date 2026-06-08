@@ -76,7 +76,7 @@ oUF.Tags.Methods["dd:nameplateHealth"] = function(unit)
     if isSecretValue(hp) then
         return format("%d%%", per)
     else
-        return format("%s - %d%%", E:ShortValue(hp), per)
+        return format("%s - %d%%", E:AbbreviateNumber(hp), per)
     end
 end
 oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
@@ -132,8 +132,8 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
 
     local rawPer = format(UnitHealthPercent(u, true, CurveConstants.ScaleTo100))
     local per = not isSecretValue(rawPer) and format("%d%%", rawPer) or ""
-    local cur = E:ShortValue(UnitHealth(u))
-    local max = E:ShortValue(UnitHealthMax(u))
+    local cur = E:AbbreviateNumber(UnitHealth(u))
+    local max = E:AbbreviateNumber(UnitHealthMax(u))
 
     local text
     if arg1 == "currentmax" then
@@ -143,7 +143,7 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
     elseif arg1 == "percent" then
         text = per
     elseif arg1 == "loss" then
-        text = E:ShortValue(UnitHealthMissing(u))
+        text = E:AbbreviateNumber(UnitHealthMissing(u))
     else
         text = per ~= "" and (cur .. " | " .. per) or cur
     end
@@ -166,9 +166,9 @@ oUF.Tags.Methods['dd:pp'] = function(u)
     if isSecretValue(power) then return "" end
 
     if color then
-        return hexColor(color) .. E:ShortValue(power or 0)
+        return hexColor(color) .. E:AbbreviateNumber(power or 0)
     end
-    return format("|cff999999%s", E:ShortValue(power or 0))
+    return format("|cff999999%s", E:AbbreviateNumber(power or 0))
 end
 oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
 
@@ -220,7 +220,7 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
             local max = UnitHealthMax(unit)
             local cur = UnitHealth(unit)
             if not isSecretValue(max) and not isSecretValue(cur) and max - cur > 0 then
-                hpval = "-" .. E:ShortValue(max - cur)
+                hpval = "-" .. E:AbbreviateNumber(max - cur)
             end
         end
     end

@@ -8,10 +8,6 @@ if E.locale ~= "ruRU" then
     return
 end
 
-L.NumberCap1 = "тыс"
-L.NumberCap2 = "млн"
-L.NumberCap3 = "млрд"
-
 L.WELCOME_LINE = "Добро пожаловать в DarkUI "
 L.POPUP_INSTALLUI =
     "Вы впервые используете DarkUI. Требуется ПЕРЕЗАГРУЗКА интерфейса для завершения настройки."
