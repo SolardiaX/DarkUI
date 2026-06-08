@@ -96,14 +96,14 @@ local function setBarTicks(Castbar, ticks, numTicks)
     end
 end
 
-local function updateCastbarColor(Castbar, unit)
-    if not UnitIsUnit(unit, "player") and Castbar.notInterruptible then
-        Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
-        Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
-    else
-        Castbar:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
-        Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
-    end
+local function setCastbarInterruptible(Castbar)
+    Castbar:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
+    Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
+end
+
+local function setCastbarNotInterruptible(Castbar)
+    Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
+    Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
 end
 
 function module:PostCastStart(unit, _, _)
@@ -125,7 +125,7 @@ function module:PostCastStart(unit, _, _)
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
     end
 
-    updateCastbarColor(Castbar, unit)
+    setCastbarInterruptible(Castbar)
 end
 
 function module:PostCastFail(...)
@@ -151,9 +151,11 @@ function module:PostCastStop(unit, spellname, _)
 end
 
 function module:PostCastInterruptible(unit)
-    local Castbar = self
+    setCastbarInterruptible(self)
+end
 
-    updateCastbarColor(Castbar, unit)
+function module:PostCastNotInterruptible(unit)
+    setCastbarNotInterruptible(self)
 end
 
 ------------------------------------------------------------------
@@ -295,6 +297,19 @@ end
 ------------------------------------------------------------------
 --  Methods for powerbar                                        --
 ------------------------------------------------------------------
+function module:PostUpdatePowerColor(unit, color, r, g, b)
+    local bg = self.bg
+    if bg then
+        if not r and color then
+            r, g, b = color:GetRGB()
+        end
+        if r then
+            local mu = bg.multiplier or 0.3
+            bg:SetVertexColor(r * mu, g * mu, b * mu)
+        end
+    end
+end
+
 function module:PostUpdatePower(Power, unit, _, max)
     if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) or (max == 0) then
         Power:SetValue(0)

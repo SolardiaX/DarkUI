@@ -81,6 +81,7 @@ local function createBar(self)
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
     self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.PostUpdateColor = core.PostUpdatePowerColor
 end
 
 local function createPortrait(self)

@@ -98,11 +98,12 @@ local function createBar(self)
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
-    self.Power.bg:SetVertexColor(0, 0, 0, 0.7)
+    self.Power.bg.multiplier = .45
 
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
     self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal
     local healingAll = CreateFrame("StatusBar", nil, self.Health)
@@ -278,6 +279,7 @@ local function createCastbar(self)
     castbar.PostCastStart = core.PostCastStart
     castbar.PostCastFail = core.PostCastFail
     castbar.PostCastInterruptible = core.PostCastInterruptible
+    castbar.PostCastNotInterruptible = core.PostCastNotInterruptible
     castbar.PostCastStop = core.PostCastStop
 
     self.Castbar = castbar

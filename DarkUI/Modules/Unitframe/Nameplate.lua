@@ -573,7 +573,8 @@ local function style(self, unit)
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints()
     self.Power.bg:SetTexture(C.media.texture.status)
-    self.Power.bg.multiplier = 0.2
+    self.Power.bg.multiplier = .2
+    self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     -- Hide Blizzard Power Bar
     hooksecurefunc(_G.NamePlateDriverFrame, "SetupClassNameplateBars", function(frame)

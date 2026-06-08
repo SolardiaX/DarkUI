@@ -107,6 +107,7 @@ local function createBar(self)
     self.Power.frequentUpdates = true
     self.Power.colorPower = true
     self.Power.smoothing = Enum.StatusBarInterpolation.Continuous
+    self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     --Incoming heal
     local healingAll = CreateFrame("StatusBar", nil, self.Health)
