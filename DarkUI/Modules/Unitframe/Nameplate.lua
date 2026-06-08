@@ -284,8 +284,14 @@ local function castColor(self)
     end
 end
 
+local CastInterruptibleColor = CreateColor(1, 0.8, 0)
+local CastNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
+
 local function castColorInterruptible(self)
-    if cfg.kick_color then
+    if self.notInterruptible then
+        self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
+        self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
+    elseif cfg.kick_color then
         local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
         local start = cooldownInfo and cooldownInfo.startTime or 0
         if start ~= 0 then
@@ -301,9 +307,10 @@ local function castColorInterruptible(self)
     end
 end
 
-local function castColorNotInterruptible(self)
-    self:SetStatusBarColor(0.5, 0.5, 0.5, 1)
-    self.bg:SetColorTexture(0.5, 0.5, 0.5, 0.2)
+local function castColorStart(self)
+    self:GetStatusBarTexture():SetVertexColorFromBoolean(
+        self.notInterruptible, CastNotInterruptibleColor, CastInterruptibleColor
+    )
 end
 
 -- Threat color
@@ -638,10 +645,9 @@ local function style(self, unit)
 
     self.Castbar.PostCastStart = function(cb, unit)
         castColor(cb)
-        castColorInterruptible(cb)
+        castColorStart(cb)
     end
     self.Castbar.PostCastInterruptible = castColorInterruptible
-    self.Castbar.PostCastNotInterruptible = castColorNotInterruptible
 
     -- Create Cast Time Text
     self.Castbar.Time = self.Castbar:CreateFontString(nil, "ARTWORK")

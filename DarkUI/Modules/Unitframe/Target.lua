@@ -282,7 +282,6 @@ local function createCastbar(self)
     castbar.PostCastStart = core.PostCastStart
     castbar.PostCastFail = core.PostCastFail
     castbar.PostCastInterruptible = core.PostCastInterruptible
-    castbar.PostCastNotInterruptible = core.PostCastNotInterruptible
     castbar.PostCastStop = core.PostCastStop
 
     self.Castbar = castbar

@@ -96,17 +96,20 @@ local function setBarTicks(Castbar, ticks, numTicks)
     end
 end
 
+local CastbarInterruptibleColor = CreateColor(27 / 255, 147 / 255, 226 / 255)
+local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
+
 local function setCastbarInterruptible(Castbar)
-    Castbar:SetStatusBarColor(27 / 255, 147 / 255, 226 / 255)
+    Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
     Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1)
 end
 
 local function setCastbarNotInterruptible(Castbar)
-    Castbar:SetStatusBarColor(0.5, 0.5, 0.5, 1)
+    Castbar:SetStatusBarColor(CastbarNotInterruptibleColor:GetRGB())
     Castbar.Spark:SetVertexColor(0.8, 0.8, 0.8, 1)
 end
 
-function module:PostCastStart(unit, _, _)
+function module:PostCastStart(unit)
     local Castbar = self
 
     if Castbar.enableFader then
@@ -120,15 +123,23 @@ function module:PostCastStart(unit, _, _)
     if unit == "player" then
         local numTicks = 0
         if Castbar.channeling then
-            numTicks = channelingTicks[Castbar.spellID] or 0
+            local spellID = Castbar.spellID
+            if spellID and not issecretvalue(spellID) then
+                numTicks = channelingTicks[spellID] or 0
+            end
         end
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
+        setCastbarInterruptible(Castbar)
+    elseif not UnitIsUnit(unit, "player") then
+        Castbar:GetStatusBarTexture():SetVertexColorFromBoolean(
+            Castbar.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
+        )
+    else
+        setCastbarInterruptible(Castbar)
     end
-
-    setCastbarInterruptible(Castbar)
 end
 
-function module:PostCastFail(...)
+function module:PostCastFail(unit)
     local Castbar = self
 
     Castbar:SetStatusBarColor(unpack(CastbarFailColor))
@@ -139,7 +150,7 @@ function module:PostCastFail(...)
     end
 end
 
-function module:PostCastStop(unit, spellname, _)
+function module:PostCastStop(unit)
     local Castbar = self
 
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
@@ -151,11 +162,11 @@ function module:PostCastStop(unit, spellname, _)
 end
 
 function module:PostCastInterruptible(unit)
-    setCastbarInterruptible(self)
-end
-
-function module:PostCastNotInterruptible(unit)
-    setCastbarNotInterruptible(self)
+    if self.notInterruptible then
+        setCastbarNotInterruptible(self)
+    else
+        setCastbarInterruptible(self)
+    end
 end
 
 ------------------------------------------------------------------
