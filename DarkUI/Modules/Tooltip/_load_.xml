@@ -9,6 +9,7 @@
     <Script file="InstanceLockCompare.lua" />
     <Script file="ItemCount.lua" />
     <Script file="ItemIcons.lua" />
+    <Script file="ItemLevel.lua" />
     <Script file="MountSource.lua" />
     <Script file="MultiItemRef.lua" />
     <Script file="SpellID.lua" />

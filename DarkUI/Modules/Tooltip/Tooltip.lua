@@ -268,7 +268,7 @@ local function onTooltipSetUnit(self)
         local line = _G["GameTooltipTextLeft" .. i]
         if not line or not line:GetText() then return end
         local text = line:GetText()
-        if text and canaccessvalue(text) and (text == FACTION_HORDE or text == FACTION_ALLIANCE or text == PVP_ENABLED) then
+        if text and canaccessvalue(text) and (text == FACTION_HORDE or text == FACTION_ALLIANCE or text == PVP_ENABLED or text == UNIT_POPUP_RIGHT_CLICK) then
             line:SetText()
         end
     end
@@ -651,18 +651,27 @@ function module:OnInit()
 
     -- Menu skin
     local menuManagerProxy = Menu.GetManager()
+    local menuBackdrops = {}
     local function skinMenu(menuFrame)
-        if menuFrame.styled then return end
         menuFrame:DisableDrawLayer("BACKGROUND")
         menuFrame:StripTextures()
-        menuFrame:CreateBackdrop("Default")
-        menuFrame.__backdrop:CreateShadow()
-        menuFrame.styled = true
+
+        if menuBackdrops[menuFrame] then
+            menuFrame.__backdrop = menuBackdrops[menuFrame]
+        else
+            menuFrame:CreateBackdrop("Default")
+            menuFrame.__backdrop:CreateShadow()
+            menuBackdrops[menuFrame] = menuFrame.__backdrop
+        end
+
+        local lvl = menuFrame:GetFrameLevel() - 1
+        menuFrame.__backdrop:SetFrameLevel(lvl < 0 and 0 or lvl)
     end
-    local function setupMenu()
-        local menuFrame = menuManagerProxy:GetOpenMenu()
+    local function setupMenu(manager, _, menuDescription)
+        local menuFrame = manager:GetOpenMenu()
         if menuFrame then
             skinMenu(menuFrame)
+            menuDescription:AddMenuAcquiredCallback(skinMenu)
         end
     end
     hooksecurefunc(menuManagerProxy, "OpenMenu", setupMenu)
