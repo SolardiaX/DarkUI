@@ -8,11 +8,7 @@ local cargBags = select(2, ...).cargBags
 local module = E:Module("Bags")
 local cfg = C.bags
 
-local CHAR_BANK_TYPE = Enum.BankType.Character or 0
-local ACCOUNT_BANK_TYPE = Enum.BankType.Account or 2
-
 local GetContainerNumSlots = C_Container.GetContainerNumSlots
-local GetContainerItemLink = C_Container.GetContainerItemLink
 
 local cbNivaya = cargBags:GetImplementation("Nivaya")
 

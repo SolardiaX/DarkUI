@@ -8,20 +8,11 @@ local cargBags = select(2, ...).cargBags
 local module = E:Module("Bags")
 local cfg = C.bags
 
-local NUM_BAG_SLOTS = 5
 local CHAR_BANK_TYPE = Enum.BankType.Character or 0
 local ACCOUNT_BANK_TYPE = Enum.BankType.Account or 2
 
-local GetContainerNumSlots = C_Container.GetContainerNumSlots
-local GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
-local GetContainerItemDurability = C_Container.GetContainerItemDurability
-local GetContainerItemLink = C_Container.GetContainerItemLink
-local PickupContainerItem = C_Container.PickupContainerItem
-
-local next, ipairs, unpack = next, ipairs, unpack
-local format, strfind = string.format, string.find
-
-local C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID = C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID
+local ipairs, unpack = ipairs, unpack
+local strfind = string.find
 
 local itemSlotSize = cfg.itemSlotSize or 32
 
@@ -33,9 +24,7 @@ local Textures = {
     Deposit = C.media.path .. "bag_deposit",
 }
 
-cfg.fonts = {
-    standard = { STANDARD_TEXT_FONT, 12, "OUTLINE" },
-}
+local FONT_STANDARD = { STANDARD_TEXT_FONT, 12, "OUTLINE" }
 
 ------------------------------------------------------------------------
 -- Container Class
@@ -43,8 +32,6 @@ cfg.fonts = {
 
 local cbNivaya = cargBags:GetImplementation("Nivaya")
 local MyContainer = cbNivaya:GetContainerClass()
-
-local BagFrames, BankFrames = {}, {}
 
 ------------------------------------------------------------------------
 -- Sort
@@ -274,7 +261,7 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
 
     button.tooltip = button:CreateFontString()
     button.tooltip:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", isBag and -76 or -59, 4.5)
-    button.tooltip:SetFont(unpack(cfg.fonts.standard))
+    button.tooltip:SetFont(unpack(FONT_STANDARD))
     button.tooltip:SetJustifyH("RIGHT")
     button.tooltip:SetText(hint)
     button.tooltip:SetTextColor(0.8, 0.8, 0.8)
@@ -339,8 +326,6 @@ function MyContainer:OnCreate(name, settings)
     local tAccount = name == "cBniv_BankAccount"
     local tBankBags = strfind(name, "Bank")
 
-    table.insert((tBankBags and BankFrames or BagFrames), self)
-
     self:EnableMouse(true)
     self.UpdateDimensions = UpdateDimensions
     self:SetFrameStrata("HIGH")
@@ -365,7 +350,7 @@ function MyContainer:OnCreate(name, settings)
 
     -- Caption
     local caption = background:CreateFontString(nil, "OVERLAY", nil)
-    caption:SetFont(unpack(cfg.fonts.standard))
+    caption:SetFont(unpack(FONT_STANDARD))
     local t = L["BAG_CAPTIONS_" .. self.name:upper():sub(7)] or (tBankBags and self.name:sub(5))
     if not t then
         t = self.name
@@ -391,9 +376,8 @@ function MyContainer:OnCreate(name, settings)
     end
 
     if tBag or tBank then
-        local bagType = tBag and "bags" or "bank"
         local tS = tBag and "backpack+bags" or "bank"
-        local tI = tBag and NUM_BAG_SLOTS or 7
+        local tI = tBag and 5 or 7
 
         local bagButtons = self:SpawnPlugin("BagBar", tS)
         bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))
@@ -532,7 +516,7 @@ function MyContainer:OnCreate(name, settings)
         local freeSlot = self:SpawnPlugin("TagDisplay", "[space]", self.DropTarget)
         freeSlot.__type = (tBag and "Bag") or (tBank and "Bank") or (tReagent and "BankReagent") or (tAccount and "BankAccount")
         freeSlot:SetPoint("BOTTOMRIGHT", self.DropTarget, "BOTTOMRIGHT", 1.5, 1.5)
-        freeSlot:SetFont(unpack(cfg.fonts.standard))
+        freeSlot:SetFont(unpack(FONT_STANDARD))
         freeSlot:SetJustifyH("RIGHT")
         freeSlot:SetShadowColor(0, 0, 0, 0)
         self.NumFreeSlots = freeSlot
@@ -565,7 +549,7 @@ function MyContainer:OnCreate(name, settings)
 
         local money = self:SpawnPlugin("TagDisplay", "[money]", self)
         money:SetPoint("TOPRIGHT", self, -32, -2)
-        money:SetFont(unpack(cfg.fonts.standard))
+        money:SetFont(unpack(FONT_STANDARD))
         money:SetJustifyH("RIGHT")
         money:SetShadowColor(0, 0, 0, 0)
     end
@@ -709,7 +693,7 @@ local function getIconOverlayAtlas(item)
     if not item.link then
         return
     end
-    if C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID(item.link) then
+    if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(item.link) then
         return "AzeriteIconFrame"
     elseif IsCosmeticItem(item.link) then
         return "CosmeticIconFrame"
