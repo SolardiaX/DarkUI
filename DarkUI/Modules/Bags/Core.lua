@@ -59,11 +59,6 @@ function module:OnInit()
     self:CreateContainers(cbNivaya)
     cbNivaya:CreateAnchors()
     cbNivaya:Init()
-
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
-        self:OnEnterWorld()
-        self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-    end)
 end
 
 function module:LoadDefaults()
@@ -352,48 +347,19 @@ function cbNivaya:OnBankClosed()
 end
 
 ------------------------------------------------------------------------
--- Enter World
-------------------------------------------------------------------------
-
-function module:OnEnterWorld()
-    local buttonCollector = {}
-
-    for bagId = 0, 16 do
-        local slots = GetContainerNumSlots(bagId)
-        for slotId = 1, slots do
-            local button = cbNivaya.buttonClass:New(bagId, slotId)
-            buttonCollector[#buttonCollector + 1] = button
-            cbNivaya:SetButton(bagId, slotId, nil)
-        end
-    end
-
-    for _, button in pairs(buttonCollector) do
-        if button.container then
-            button.container:RemoveButton(button)
-        end
-        button:Free()
-    end
-
-    cbNivaya:UpdateBags()
-    self:ResetNewItems()
-end
-
-------------------------------------------------------------------------
 -- Utilities
 ------------------------------------------------------------------------
 
 function module:ResetNewItems()
     local knownItems = self.knownItems
+    wipe(knownItems)
+
     for bag = 0, 5 do
         local numSlots = GetContainerNumSlots(bag)
         for slot = 1, numSlots do
             local item = cbNivaya:GetItemInfo(bag, slot)
             if item.id then
-                if knownItems[item.id] then
-                    knownItems[item.id] = knownItems[item.id] + (item.count or 0)
-                else
-                    knownItems[item.id] = item.count or 1
-                end
+                knownItems[item.id] = (knownItems[item.id] or 0) + (item.count or 1)
             end
         end
     end
