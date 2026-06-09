@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ----------------------------------------------------------------------------------------
 -- Core Functions
@@ -148,7 +148,7 @@ end
 -- Set Variable in game (delegates to Database system)
 function E:SetVariable(group, key, value)
     local path = group .. "." .. key
-    E.db:Set(path, value)
+    DB:Set(path, value)
 end
 
 -- Global EasyMenu function

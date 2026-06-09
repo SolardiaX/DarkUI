@@ -7,6 +7,7 @@ local addonName, ns = ...
 ns[1] = {} -- E, Engine
 ns[2] = {} -- C, Config
 ns[3] = {} -- L, Locale
+ns[4] = {} -- DB, Database
 
 local E = ns[1]
 
@@ -25,7 +26,7 @@ E.myColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[E.myClass]
 E.myColorString = format("|cff%02x%02x%02x", E.myColor.r * 255, E.myColor.g * 255, E.myColor.b * 255)
 
 function ns:unpack()
-    return self[1], self[2], self[3]
+    return self[1], self[2], self[3], self[4]
 end
 
 _G[addonName] = ns
@@ -39,7 +40,7 @@ bootstrap:RegisterEvent("ADDON_LOADED")
 bootstrap:RegisterEvent("PLAYER_LOGIN")
 bootstrap:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
-        E.db:Initialize()
+        ns[4]:Initialize()
         E:InitializeModules()
         bootstrap:UnregisterEvent("ADDON_LOADED")
     elseif event == "PLAYER_LOGIN" then

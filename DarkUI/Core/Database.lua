@@ -1,11 +1,11 @@
-local E, C, L = select(2, ...):unpack()
+local _, ns = ...
+local E, C, L = ns:unpack()
 
 ----------------------------------------------------------------------------------------
--- Database System
+-- DB System
 ----------------------------------------------------------------------------------------
 
-local Database = {}
-E.db = Database
+local DB = ns[4]
 
 local overrides = {}
 
@@ -93,7 +93,7 @@ end
 ----------------------------------------------------------------------------------------
 
 -- Get value from merged config
-function Database:Get(path)
+function DB:Get(path)
     local tbl, key = traverse(C, path, false)
     if tbl then
         return tbl[key]
@@ -102,7 +102,7 @@ function Database:Get(path)
 end
 
 -- Set override value (if equals current C value after reset, removes the override)
-function Database:Set(path, value)
+function DB:Set(path, value)
     local curTbl, curKey = traverse(C, path, false)
     local curValue = curTbl and curTbl[curKey]
 
@@ -119,7 +119,7 @@ function Database:Set(path, value)
 end
 
 -- Reset single path to default (remove override)
-function Database:Reset(path)
+function DB:Reset(path)
     local tbl, key = traverse(overrides, path, false)
     if tbl and tbl[key] ~= nil then
         tbl[key] = nil
@@ -128,7 +128,7 @@ function Database:Reset(path)
 end
 
 -- Reset a section or everything
-function Database:ResetAll(section)
+function DB:ResetAll(section)
     if section then
         overrides[section] = nil
     else
@@ -137,13 +137,13 @@ function Database:ResetAll(section)
 end
 
 -- Check if value equals default (no override stored)
-function Database:IsDefault(path)
+function DB:IsDefault(path)
     local tbl, key = traverse(overrides, path, false)
     return not tbl or tbl[key] == nil
 end
 
 -- Deep value equality
-function Database:ValuesEqual(a, b)
+function DB:ValuesEqual(a, b)
     if type(a) ~= type(b) then
         return false
     end
@@ -164,13 +164,13 @@ function Database:ValuesEqual(a, b)
 end
 
 -- Toggle global vs per-character
-function Database:SetUseGlobal(useGlobal)
+function DB:SetUseGlobal(useGlobal)
     DarkUI_DB.useGlobal = useGlobal
     overrides = useGlobal and DarkUI_DB.global or DarkUI_CharDB.overrides
     self:BuildProxy()
 end
 
-function Database:IsGlobal()
+function DB:IsGlobal()
     return DarkUI_DB and DarkUI_DB.useGlobal or false
 end
 
@@ -178,7 +178,7 @@ end
 -- Proxy Builder
 ----------------------------------------------------------------------------------------
 
-function Database:BuildProxy()
+function DB:BuildProxy()
     mergeInto(C, overrides)
 end
 
@@ -186,7 +186,7 @@ end
 -- Initialization
 ----------------------------------------------------------------------------------------
 
-function Database:Initialize()
+function DB:Initialize()
     if not DarkUI_DB then
         DarkUI_DB = { version = E.version, useGlobal = true, global = {} }
     end
