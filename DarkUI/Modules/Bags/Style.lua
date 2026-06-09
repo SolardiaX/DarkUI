@@ -14,6 +14,12 @@ local ACCOUNT_BANK_TYPE = Enum.BankType.Account or 2
 local ipairs, unpack = ipairs, unpack
 local strfind = string.find
 
+local C_Container_GetContainerItemDurability = C_Container.GetContainerItemDurability
+local C_Container_GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
+local C_Container_GetContainerNumSlots = C_Container.GetContainerNumSlots
+local C_Container_GetContainerItemLink = C_Container.GetContainerItemLink
+local C_Container_PickupContainerItem = C_Container.PickupContainerItem
+
 local itemSlotSize = cfg.itemSlotSize or 32
 
 local Textures = {
@@ -299,11 +305,11 @@ local function getFirstFreeSlot(bagtype)
     end
 
     for _, i in next, containerIDs do
-        local t = GetContainerNumFreeSlots(i)
+        local t = C_Container_GetContainerNumFreeSlots(i)
         if t > 0 then
-            local numSlots = GetContainerNumSlots(i)
+            local numSlots = C_Container_GetContainerNumSlots(i)
             for j = 1, numSlots do
-                if not GetContainerItemLink(i, j) then
+                if not C_Container_GetContainerItemLink(i, j) then
                     return i, j
                 end
             end
@@ -329,7 +335,6 @@ function MyContainer:OnCreate(name, settings)
     self:EnableMouse(true)
     self.UpdateDimensions = updateDimensions
     self:SetFrameStrata("HIGH")
-    tinsert(UISpecialFrames, self:GetName())
 
     if tBag or tBank then
         setFrameMovable(self, module.opts.Unlocked)
@@ -493,7 +498,7 @@ function MyContainer:OnCreate(name, settings)
         local function DropTargetProcessItem()
             local bID, sID = getFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
             if bID then
-                PickupContainerItem(bID, sID)
+                C_Container_PickupContainerItem(bID, sID)
             end
         end
 
@@ -742,7 +747,7 @@ function MyButton:OnUpdateButton(item)
     end
 
     -- Durability
-    local dCur, dMax = GetContainerItemDurability(item.bagId, item.slotId)
+    local dCur, dMax = C_Container_GetContainerItemDurability(item.bagId, item.slotId)
     if dMax and dMax > 0 and dCur < dMax then
         local r, g, b = itemColorGradient(dCur / dMax, 1, 0, 0, 1, 1, 0, 0, 1, 0)
         self.durability:SetText(Round(dCur / dMax * 100) .. "%")
