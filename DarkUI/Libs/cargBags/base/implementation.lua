@@ -63,7 +63,7 @@ function Implementation:New(name)
     impl.events = {}
     impl.notInited = true
 
-    tinsert(UISpecialFrames, name)
+    -- tinsert(UISpecialFrames, name)
 
     self.instances[name] = impl
 

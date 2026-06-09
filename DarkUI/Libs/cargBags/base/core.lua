@@ -89,8 +89,13 @@ function cargBags:ReplaceBlizzard(name)
     OpenBackpack = toggleBag -- Blizz does not provide toggling here
     OpenBag = toggleBag        -- fixed the loot won alert frame
 
-    hooksecurefunc("CloseAllBags", closeBag)
-    hooksecurefunc("CloseBackpack", closeBag)
+    CloseAllBags = function()
+        if impl:IsShown() then
+            impl:Hide()
+            return true
+        end
+    end
+    CloseBackpack = CloseAllBags
 
     BankFrame:UnregisterAllEvents()
 end

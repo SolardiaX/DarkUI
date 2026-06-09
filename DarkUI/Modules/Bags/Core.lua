@@ -161,6 +161,11 @@ function module:CreateContainers(cbNivaya)
 
     bags.main:SetPoint(unpack(self.opts.BagPos))
     bags.bank:SetPoint(unpack(self.opts.BankPos))
+
+    -- All containers default hidden (shown by OnOpen / OnBankOpened)
+    for _, bag in pairs(bags) do
+        bag:Hide()
+    end
 end
 
 ------------------------------------------------------------------------
