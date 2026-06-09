@@ -37,7 +37,7 @@ local MyContainer = cbNivaya:GetContainerClass()
 -- Sort
 ------------------------------------------------------------------------
 
-local QuickSort
+local quickSort
 do
     local func = function(v1, v2)
         if v1 == nil or v2 == nil then
@@ -57,7 +57,7 @@ do
             return v1[4] > v2[4]
         end
     end
-    QuickSort = function(tbl)
+    quickSort = function(tbl)
         table.sort(tbl, func)
     end
 end
@@ -90,7 +90,7 @@ function MyContainer:OnContentsChanged()
 
     local opts = module.opts
     if (tBank or tReagent) and opts.SortBank or (not (tBank or tReagent) and opts.SortBags) then
-        QuickSort(buttonIDs)
+        quickSort(buttonIDs)
     end
 
     for _, v in ipairs(buttonIDs) do
@@ -176,7 +176,7 @@ local function resetNewItems()
     module:ResetNewItems()
 end
 
-local function UpdateDimensions(self)
+local function updateDimensions(self)
     local height = 0
     if self.BagBar and self.BagBar:IsShown() then
         height = height + 40
@@ -193,7 +193,7 @@ local function UpdateDimensions(self)
     self:SetHeight(self.ContainerHeight + height)
 end
 
-local function SetFrameMovable(f, v)
+local function setFrameMovable(f, v)
     f:SetMovable(true)
     f:SetUserPlaced(true)
     f:RegisterForDrag("LeftButton")
@@ -223,7 +223,7 @@ end
 ------------------------------------------------------------------------
 
 local classColor
-local function IconButton_OnEnter(self)
+local function iconButtonOnEnter(self)
     self.mouseover = true
     if not classColor then
         classColor = { GetClassColor(select(2, UnitClass("player"))) }
@@ -234,7 +234,7 @@ local function IconButton_OnEnter(self)
     end
 end
 
-local function IconButton_OnLeave(self)
+local function iconButtonOnLeave(self)
     self.mouseover = false
     self.icon:SetVertexColor(0.8, 0.8, 0.8)
     if self.tooltip then
@@ -269,10 +269,10 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
 
     button.tag = name
     button:SetScript("OnEnter", function()
-        IconButton_OnEnter(button)
+        iconButtonOnEnter(button)
     end)
     button:SetScript("OnLeave", function()
-        IconButton_OnLeave(button)
+        iconButtonOnLeave(button)
     end)
     button.mouseover = false
 
@@ -283,7 +283,7 @@ end
 -- Free Slot Helper
 ------------------------------------------------------------------------
 
-local function GetFirstFreeSlot(bagtype)
+local function getFirstFreeSlot(bagtype)
     local containerIDs
     if bagtype == "bag" then
         containerIDs = { 0, 1, 2, 3, 4 }
@@ -327,12 +327,12 @@ function MyContainer:OnCreate(name, settings)
     local tBankBags = strfind(name, "Bank")
 
     self:EnableMouse(true)
-    self.UpdateDimensions = UpdateDimensions
+    self.UpdateDimensions = updateDimensions
     self:SetFrameStrata("HIGH")
     tinsert(UISpecialFrames, self:GetName())
 
     if tBag or tBank then
-        SetFrameMovable(self, module.opts.Unlocked)
+        setFrameMovable(self, module.opts.Unlocked)
     end
 
     self.Columns = (tBankBags and cfg.columns.bank) or cfg.columns.bag
@@ -491,7 +491,7 @@ function MyContainer:OnCreate(name, settings)
         end
 
         local function DropTargetProcessItem()
-            local bID, sID = GetFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
+            local bID, sID = getFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
             if bID then
                 PickupContainerItem(bID, sID)
             end
