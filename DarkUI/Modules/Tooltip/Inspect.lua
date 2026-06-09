@@ -14,6 +14,8 @@ local CanInspect = CanInspect
 local NotifyInspect = NotifyInspect
 local ClearInspectPlayer = ClearInspectPlayer
 local UnitGUID = UnitGUID
+local UnitTokenFromGUID = UnitTokenFromGUID
+local UnitExists = UnitExists
 local UnitIsUnit = UnitIsUnit
 local UnitIsPlayer = UnitIsPlayer
 local UnitIsVisible = UnitIsVisible
@@ -327,18 +329,20 @@ end
 local function onTooltipSetUnit(self)
     if self ~= GameTooltip then return end
 
-    local _, unitID = self:GetUnit()
-    if not unitID or not UnitIsPlayer(unitID) then return end
+    local data = self:GetTooltipData()
+    local guid = data and data.guid
+    if not guid or not canaccessvalue(guid) then return end
 
-    local guid = UnitGUID(unitID)
-    if not canaccessvalue(guid) then return end
+    local unit = UnitTokenFromGUID(guid) or (UnitExists("mouseover") and "mouseover")
+    if not unit or not UnitIsPlayer(unit) then return end
 
-    currentUnit = unitID
+    currentUnit = unit
     currentGUID = guid
     if not cache[guid] then cache[guid] = {} end
 
-    inspectUnit(unitID)
+    inspectUnit(unit)
 end
+
 
 ------------------------------------------------------------------------
 -- Lifecycle

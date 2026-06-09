@@ -22,7 +22,7 @@ local UnitCreatureType, UnitClassification = UnitCreatureType, UnitClassificatio
 local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
 local UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel = UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel
 local UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction = UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction
-local UnitHealth, UnitHealthMax = UnitHealth, UnitHealthMax
+local UnitHealth = UnitHealth
 local UnitIsInMyGuild, UnitExists = UnitIsInMyGuild, UnitExists
 local UnitIsEnemy, UnitIsFriend = UnitIsEnemy, UnitIsFriend
 local GetCVar = GetCVar
@@ -302,45 +302,12 @@ local function onTooltipSetUnit(self)
     end
 
     -- Setup inline health bar
-    GameTooltipStatusBar:Hide()
-
     if not UnitIsDeadOrGhost(unit) then
-        self:AddLine(" ")
-        local numLines = self:NumLines()
-
-        if not module.hpBar then
-            local bar = CreateFrame("StatusBar", "DarkUI_TooltipHPBar", GameTooltip, "BackdropTemplate")
-            bar:SetBackdrop({
-                bgFile = "Interface\\Buttons\\WHITE8x8",
-                edgeFile = "Interface\\Buttons\\WHITE8x8",
-                tiled = false, edgeSize = 1, insets = { left = -1, right = -1, top = -1, bottom = -1 }
-            })
-            bar:SetBackdropColor(0, 0, 0, 0.5)
-            bar:SetBackdropBorderColor(0, 0, 0, 0.5)
-            bar:SetStatusBarTexture(C.media.texture.status)
-            bar:SetHeight(6)
-
-            bar.text = bar:CreateFontString(nil, "OVERLAY", "Tooltip_Small")
-            bar.text:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
-            bar.text:SetAllPoints()
-            bar.text:SetJustifyH("CENTER")
-
-            module.hpBar = bar
+        local bar = GameTooltip.StatusBar
+        if bar then
+            local r, g, b = getUnitColor(unit)
+            bar:SetStatusBarColor(r, g, b)
         end
-
-        local bar = module.hpBar
-        local r, g, b = getUnitColor(unit)
-        bar:SetStatusBarColor(r, g, b)
-        bar:SetMinMaxValues(0, UnitHealthMax(unit))
-        bar:SetValue(UnitHealth(unit))
-        bar.text:SetText(E:AbbreviateNumber(UnitHealth(unit)))
-        bar:ClearAllPoints()
-        bar:SetPoint("LEFT", "GameTooltipTextLeft" .. numLines, "LEFT", 0, -4)
-        bar:SetPoint("RIGHT", self, "RIGHT", -9, 0)
-        bar:Show()
-
-        self:SetMinimumWidth(140)
-        module.hpUnit = unit
     end
 end
 
@@ -626,15 +593,47 @@ function module:OnInit()
         hooksecurefunc(GameTooltip, "SetShapeshift", combatHideTooltip)
     end
 
-    -- Drive inline health bar via Blizzard's internal status updates
-    GameTooltipStatusBar:HookScript("OnValueChanged", function()
-        if module.hpBar and module.hpUnit and module.hpBar:IsShown() then
-            local unit = module.hpUnit
-            module.hpBar:SetMinMaxValues(0, UnitHealthMax(unit))
-            module.hpBar:SetValue(UnitHealth(unit))
-            module.hpBar.text:SetText(E:AbbreviateNumber(UnitHealth(unit)))
-        end
-    end)
+    -- Restyle native StatusBar
+    local statusBar = GameTooltip.StatusBar
+    if statusBar then
+        GameTooltipStatusBar:SetScript("OnValueChanged", nil)
+        statusBar:ClearAllPoints()
+        statusBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 1, 3)
+        statusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", -1, 3)
+        statusBar:SetStatusBarTexture(C.media.texture.status)
+        statusBar:SetHeight(5)
+
+        local border = statusBar:CreateTexture(nil, "BACKGROUND", nil, -1)
+        border:SetTexture("Interface\\Buttons\\WHITE8x8")
+        border:SetPoint("TOPLEFT", -1, 1)
+        border:SetPoint("BOTTOMRIGHT", 1, -1)
+        border:SetVertexColor(0, 0, 0)
+
+        local bg = statusBar:CreateTexture(nil, "BACKGROUND")
+        bg:SetTexture("Interface\\Buttons\\WHITE8x8")
+        bg:SetAllPoints()
+        bg:SetVertexColor(0, 0, 0, 0.5)
+
+        statusBar.text = statusBar:CreateFontString(nil, "OVERLAY")
+        statusBar.text:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
+        statusBar.text:SetAllPoints()
+        statusBar.text:SetJustifyH("CENTER")
+
+        hooksecurefunc(statusBar, "UpdateUnitHealth", function(self)
+            if not self.text then return end
+            local unit = select(2, GameTooltip:GetUnit())
+            if unit and canaccessvalue(unit) then
+                local ok, value = pcall(UnitHealth, unit)
+                if ok and value then
+                    self.text:SetText(E:AbbreviateNumber(value))
+                else
+                    self.text:SetText("")
+                end
+            else
+                self.text:SetText("")
+            end
+        end)
+    end
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, onTooltipSetUnit)
 
@@ -642,11 +641,6 @@ function module:OnInit()
     GameTooltip:HookScript("OnTooltipCleared", function(tt)
         GameTooltip_ClearMoney(tt)
         GameTooltip_ClearStatusBars(tt)
-
-        if module.hpBar then
-            module.hpBar:Hide()
-        end
-        module.hpUnit = nil
     end)
 
     -- Menu skin

@@ -13,6 +13,8 @@ local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local UnitIsPlayer = UnitIsPlayer
 local UnitInParty = UnitInParty
 local UnitInRaid = UnitInRaid
+local UnitExists = UnitExists
+local UnitTokenFromGUID = UnitTokenFromGUID
 local GetNumGroupMembers = GetNumGroupMembers
 
 local function getLFDRole(unit)
@@ -33,7 +35,12 @@ local function onTooltipSetUnit(self)
     if self ~= GameTooltip or self:IsForbidden() then return end
     local _, instanceType = IsInInstance()
     if instanceType == "scenario" then return end
-    local _, unit = GameTooltip:GetUnit()
+
+    local data = self:GetTooltipData()
+    local guid = data and data.guid
+    if not guid or not canaccessvalue(guid) then return end
+    local unit = UnitTokenFromGUID(guid) or (UnitExists("mouseover") and "mouseover")
+
     if unit and UnitIsPlayer(unit) and ((UnitInParty(unit) or UnitInRaid(unit)) and GetNumGroupMembers() > 0) then
         local leaderText = UnitIsGroupLeader(unit) and "|cFFFFFFFF - " .. LEADER .. "|r" or ""
         GameTooltip:AddLine(ROLE .. ": " .. getLFDRole(unit) .. leaderText)
