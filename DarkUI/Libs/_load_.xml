@@ -1,4 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Include file="LibStub\_load_.xml" />
+    <Include file="cargBags\_load_.xml" />
     <Include file="oUF\oUF.xml" />
 </Ui>
