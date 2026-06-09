@@ -334,6 +334,7 @@ C.chat = {
     sticky = true,
     loot_icons = true,
     role_icons = true,
+    chat_copy = true,
 }
 
 ----------------------------------------------------------------------------------------

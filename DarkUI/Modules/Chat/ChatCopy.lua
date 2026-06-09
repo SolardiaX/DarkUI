@@ -1,10 +1,10 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Copy Chat
+-- Chat Copy
 ------------------------------------------------------------------------
 
-local module = E:Module("Chat"):Sub("CopyChat")
+local module = E:Module("Chat"):Sub("ChatCopy")
 
 local cfg = C.chat
 
@@ -108,6 +108,10 @@ local function copyChat(cf)
 end
 
 function module:OnInit()
+    if not cfg.chat_copy then
+        return
+    end
+
     for i = 1, NUM_CHAT_WINDOWS do
         local cf = _G[format("ChatFrame%d", i)]
         local button = CreateFrame("Button", nil, cf)
