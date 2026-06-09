@@ -8,5 +8,6 @@
     <Script file="Filters.lua" />
     <Script file="MouseScroll.lua" />
     <Script file="RealLinks.lua" />
+    <Script file="CopyChat.lua" />
     <Script file="Bubbles.lua" />
 </Ui>
