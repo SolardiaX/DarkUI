@@ -349,7 +349,7 @@ function E:ReskinStatusBar(bar)
 	bar:StripTextures()
 	bar:SetStatusBarTexture(C.media.texture.status)
 
-	local bg = bar:CreateBG()
+	local bg = bar:CreateBackdrop()
 	bg:SetTemplate("Overlay")
 
 	bar.__styled = true

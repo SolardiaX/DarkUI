@@ -41,7 +41,7 @@ function module:OnInit()
         local button = _G[b]
         if button then
             button:SetScale(0.75)
-            local bg = button:CreateBG()
+            local bg = button:CreateBackdrop()
             bg:CreateShadow()
 
             button:SetParent(bar)

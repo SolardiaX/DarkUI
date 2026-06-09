@@ -16,7 +16,7 @@ function E:ApplyBackdrop(frame, gradient)
 		return
 	end
 
-	local bg = frame:CreateBG()
+	local bg = frame:CreateBackdrop()
 	bg:CreateShadow()
 
 	if gradient then
@@ -35,7 +35,7 @@ function E:ReskinIcon(icon, shadow, parent)
 
 	icon:SetTexCoord(unpack(C.media.texCoord))
 
-	local bg = parent:CreateBG()
+	local bg = parent:CreateBackdrop()
 	bg:SetOutside(icon)
 
 	if shadow then

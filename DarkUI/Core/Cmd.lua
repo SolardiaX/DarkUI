@@ -172,8 +172,8 @@ local function createTemplatePreview()
 
 	-- Row 2: Create* API demos
 	local apis = {
-		{ label = "CreateBG", fn = function(box)
-			box:CreateBG()
+		{ label = "CreateBackdrop", fn = function(box)
+			box:CreateBackdrop()
 		end },
         { label = "CreateShadow", fn = function(box)
 			box:CreateShadow()
