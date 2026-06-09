@@ -436,8 +436,13 @@ local function addapi(object)
 	mt.CreateOverlay = createOverlay
 	mt.CreateGradient = createGradient
 	mt.CreateFontText = createFontText
-	mt.FadeIn = fadeIn
-	mt.FadeOut = fadeOut
+
+	if not mt.FadeIn then
+		mt.FadeIn = fadeIn
+	end
+	if not mt.FadeOut then
+		mt.FadeOut = fadeOut
+	end
 
 	if mt.SetTexture then
 		hooksecurefunc(mt, "SetTexture", disablePixelSnap)

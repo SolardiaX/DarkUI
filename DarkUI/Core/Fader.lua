@@ -3,82 +3,137 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 -- Fader
 ----------------------------------------------------------------------------------------
+
+local next = next
 local defaultFadeIn = { time = 0.4, alpha = 1 }
 local defaultFadeOut = { time = 0.3, alpha = 0 }
 
-local frameFadeManager = CreateFrame("FRAME")
+local FADEFRAMES = {}
+local FADEMANAGER = CreateFrame("Frame")
+FADEMANAGER.delay = 0.05
 
--- Generic fade function
-local function UIFrameFade(frame, fadeInfo)
-    if not frame then
+local function fadeOnUpdate(_, elapsed)
+    FADEMANAGER.timer = (FADEMANAGER.timer or 0) + elapsed
+
+    if FADEMANAGER.timer > FADEMANAGER.delay then
+        FADEMANAGER.timer = 0
+
+        for frame, info in next, FADEFRAMES do
+            if frame:IsVisible() then
+                info.fadeTimer = (info.fadeTimer or 0) + (elapsed + FADEMANAGER.delay)
+            else
+                info.fadeTimer = info.timeToFade + 1
+            end
+
+            if info.fadeTimer < info.timeToFade then
+                if info.mode == "IN" then
+                    frame:SetAlpha((info.fadeTimer / info.timeToFade) * info.diffAlpha + info.startAlpha)
+                else
+                    frame:SetAlpha(((info.timeToFade - info.fadeTimer) / info.timeToFade) * info.diffAlpha + info.endAlpha)
+                end
+            else
+                frame:SetAlpha(info.endAlpha)
+
+                if info.fadeHoldTime and info.fadeHoldTime > 0 then
+                    info.fadeHoldTime = info.fadeHoldTime - elapsed
+                else
+                    FADEFRAMES[frame] = nil
+
+                    if info.finishedFunc then
+                        info.finishedFunc(frame)
+                    end
+                end
+            end
+        end
+
+        if not next(FADEFRAMES) then
+            FADEMANAGER:SetScript("OnUpdate", nil)
+        end
+    end
+end
+
+function E:UIFrameFade(frame, info)
+    if not frame or frame:IsForbidden() then
         return
     end
 
-    if not fadeInfo.mode then
-        fadeInfo.mode = "IN"
+    if not info.mode then
+        info.mode = "IN"
     end
 
-    local alpha
-    if fadeInfo.mode == "IN" then
-        if not fadeInfo.startAlpha then
-            fadeInfo.startAlpha = 0
-        end
-        if not fadeInfo.endAlpha then
-            fadeInfo.endAlpha = 1.0
-        end
-
-        alpha = 0
-    elseif fadeInfo.mode == "OUT" then
-        if not fadeInfo.startAlpha then
-            fadeInfo.startAlpha = 1.0
-        end
-        if not fadeInfo.endAlpha then
-            fadeInfo.endAlpha = 0
-        end
-
-        alpha = 1.0
+    if info.mode == "IN" then
+        if not info.startAlpha then info.startAlpha = 0 end
+        if not info.endAlpha then info.endAlpha = 1 end
+        if not info.diffAlpha then info.diffAlpha = info.endAlpha - info.startAlpha end
+    else
+        if not info.startAlpha then info.startAlpha = 1 end
+        if not info.endAlpha then info.endAlpha = 0 end
+        if not info.diffAlpha then info.diffAlpha = info.startAlpha - info.endAlpha end
     end
 
-    frame:SetAlpha(fadeInfo.startAlpha)
-    frame.fadeInfo = fadeInfo
+    frame:SetAlpha(info.startAlpha)
 
-    local index = 1
-    while FADEFRAMES[index] do
-        -- If frame is already set to fade then return
-        if FADEFRAMES[index] == frame then
-            return
-        end
-
-        index = index + 1
+    if not FADEFRAMES[frame] then
+        FADEFRAMES[frame] = info
+        FADEMANAGER:SetScript("OnUpdate", fadeOnUpdate)
+    else
+        FADEFRAMES[frame] = info
     end
-
-    tinsert(FADEFRAMES, frame)
-    frameFadeManager:SetScript("OnUpdate", UIFrameFade_OnUpdate)
 end
 
--- Convenience function to do a simple fade in
 function E:UIFrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
-    local fadeInfo = {}
+    if not frame or frame:IsForbidden() then
+        return
+    end
 
-    fadeInfo.mode = "IN"
-    fadeInfo.timeToFade = timeToFade
-    fadeInfo.startAlpha = startAlpha
-    fadeInfo.endAlpha = endAlpha
-    UIFrameFade(frame, fadeInfo)
+    if frame.__fadeObject then
+        frame.__fadeObject.fadeTimer = nil
+    else
+        frame.__fadeObject = {}
+    end
+
+    frame.__fadeObject.mode = "IN"
+    frame.__fadeObject.timeToFade = timeToFade
+    frame.__fadeObject.startAlpha = startAlpha
+    frame.__fadeObject.endAlpha = endAlpha
+    frame.__fadeObject.diffAlpha = endAlpha - startAlpha
+
+    E:UIFrameFade(frame, frame.__fadeObject)
 end
 
--- Convenience function to do a simple fade out
 function E:UIFrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
-    local fadeInfo = {}
+    if not frame or frame:IsForbidden() then
+        return
+    end
 
-    fadeInfo.mode = "OUT"
-    fadeInfo.timeToFade = timeToFade
-    fadeInfo.startAlpha = startAlpha
-    fadeInfo.endAlpha = endAlpha
-    UIFrameFade(frame, fadeInfo)
+    if frame.__fadeObject then
+        frame.__fadeObject.fadeTimer = nil
+    else
+        frame.__fadeObject = {}
+    end
+
+    frame.__fadeObject.mode = "OUT"
+    frame.__fadeObject.timeToFade = timeToFade
+    frame.__fadeObject.startAlpha = startAlpha
+    frame.__fadeObject.endAlpha = endAlpha
+    frame.__fadeObject.diffAlpha = startAlpha - endAlpha
+
+    E:UIFrameFade(frame, frame.__fadeObject)
 end
 
---ButtonBarFader func
+function E:UIFrameFadeRemoveFrame(frame)
+    if frame and FADEFRAMES[frame] then
+        if frame.__fadeObject then
+            frame.__fadeObject.fadeTimer = nil
+        end
+        FADEFRAMES[frame] = nil
+    end
+end
+
+----------------------------------------------------------------------------------------
+-- Bar / Frame Fader Utilities
+----------------------------------------------------------------------------------------
+
 function E:ButtonBarFader(frame, buttonList, fadeIn, fadeOut)
     if not frame or not buttonList then
         return
@@ -111,8 +166,6 @@ function E:ButtonBarFader(frame, buttonList, fadeIn, fadeOut)
     end
 end
 
---SpellFlyoutFader func
---the flyout is special, when hovering the flyout the parented bar must not fade out
 function E:SpellFlyoutFader(frame, buttonList, fadeIn, fadeOut)
     if not frame or not buttonList then
         return
@@ -143,7 +196,6 @@ function E:SpellFlyoutFader(frame, buttonList, fadeIn, fadeOut)
     end
 end
 
---FrameFader func
 function E:FrameFader(frame, fadeIn, fadeOut)
     if not frame then
         return
@@ -165,7 +217,6 @@ function E:FrameFader(frame, fadeIn, fadeOut)
     E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
 end
 
---CombatFrameFader func
 function E:CombatFrameFader(frame, fadeIn, fadeOut)
     if not frame then
         return
