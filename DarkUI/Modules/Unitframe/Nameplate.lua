@@ -256,7 +256,7 @@ local function healthPostUpdate(self, unit)
         self.bg:SetVertexColor(r * mu, g * mu, b * mu)
     end
 
-    if cfg.customUnits[main.unitName] or cfg.customUnits[main.npcID] then
+    if cfg.customUnits[main.npcID] then
         r, g, b = unpack(cfg.custom_color)
         self:SetStatusBarColor(r, g, b)
         self.bg:SetVertexColor(r * mu, g * mu, b * mu)
@@ -342,7 +342,7 @@ local function callback(self, event, unit)
     if unit then
         local unitGUID = UnitGUID(unit)
         if unitGUID and canaccessvalue(unitGUID) then
-            self.npcID = select(6, strsplit('-', unitGUID))
+            self.npcID = tonumber(select(6, strsplit('-', unitGUID)))
         else
             self.npcID = nil
         end
