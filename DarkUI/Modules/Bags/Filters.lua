@@ -17,8 +17,12 @@ local cbNivaya = cargBags:NewImplementation("Nivaya")
 if C.bags and C.bags.enable then
     cbNivaya:RegisterBlizzard()
 end
-cbNivaya:HookScript("OnShow", function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end)
-cbNivaya:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
+cbNivaya:HookScript("OnShow", function()
+    PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
+end)
+cbNivaya:HookScript("OnHide", function()
+    PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
+end)
 
 function cbNivaya:UpdateBags()
     for i = 0, ACCOUNT_BANK_END do
@@ -94,8 +98,12 @@ end
 ------------------------------------------------------------------------
 
 filters.fItemClass = function(item, container)
-    if not item.id or not item.name then return false end
-    if not itemClass[item.id] then cbNivaya:ClassifyItem(item) end
+    if not item.id or not item.name then
+        return false
+    end
+    if not itemClass[item.id] then
+        cbNivaya:ClassifyItem(item)
+    end
 
     local t = itemClass[item.id]
     local isBankBag = item.bagId >= BANK_START and item.bagId <= BANK_END
@@ -115,23 +123,35 @@ end
 
 function cbNivaya:ClassifyItem(item)
     local tC = module.catInfo and module.catInfo[item.id]
-    if tC then itemClass[item.id] = tC; return true end
+    if tC then
+        itemClass[item.id] = tC
+        return true
+    end
 
-    if item.quality == 0 then itemClass[item.id] = "Junk"; return true end
+    if item.quality == 0 then
+        itemClass[item.id] = "Junk"
+        return true
+    end
 
     if item.type then
         if item.type == L.BAG_ARMOR or item.type == L.BAG_WEAPON then
-            itemClass[item.id] = "Armor"; return true
+            itemClass[item.id] = "Armor"
+            return true
         elseif item.type == L.BAG_GEM then
-            itemClass[item.id] = "Gem"; return true
+            itemClass[item.id] = "Gem"
+            return true
         elseif item.type == L.BAG_QUEST then
-            itemClass[item.id] = "Quest"; return true
+            itemClass[item.id] = "Quest"
+            return true
         elseif item.type == L.BAG_TRADES then
-            itemClass[item.id] = "TradeGoods"; return true
+            itemClass[item.id] = "TradeGoods"
+            return true
         elseif item.type == L.BAG_CONSUMABLES then
-            itemClass[item.id] = "Consumables"; return true
+            itemClass[item.id] = "Consumables"
+            return true
         elseif item.type == L.BAG_BATTLEPET then
-            itemClass[item.id] = "BattlePet"; return true
+            itemClass[item.id] = "BattlePet"
+            return true
         end
     end
 
@@ -143,12 +163,22 @@ end
 ------------------------------------------------------------------------
 
 filters.fNewItems = function(item)
-    if not module.opts.NewItems then return false end
-    if not (item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS) then return false end
-    if not item.link then return false end
+    if not module.opts.NewItems then
+        return false
+    end
+    if not (item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS) then
+        return false
+    end
+    if not item.link then
+        return false
+    end
     local knownItems = module.knownItems
-    if not knownItems then return false end
-    if not knownItems[item.id] then return true end
+    if not knownItems then
+        return false
+    end
+    if not knownItems[item.id] then
+        return true
+    end
     local t = GetItemCount(item.id)
     return t > knownItems[item.id]
 end
@@ -158,7 +188,11 @@ end
 ------------------------------------------------------------------------
 
 filters.fItemSets = function(item)
-    if not filterEnabled["ItemSets"] then return false end
-    if not item.link then return false end
+    if not filterEnabled["ItemSets"] then
+        return false
+    end
+    if not item.link then
+        return false
+    end
     return item.isInSet or false
 end

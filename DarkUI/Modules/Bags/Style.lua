@@ -53,7 +53,9 @@ local BagFrames, BankFrames = {}, {}
 local QuickSort
 do
     local func = function(v1, v2)
-        if v1 == nil or v2 == nil then return v1 and true or false end
+        if v1 == nil or v2 == nil then
+            return v1 and true or false
+        end
         if v1[1] == -1 or v2[1] == -1 then
             return v1[1] > v2[1]
         elseif v1[2] ~= v2[2] then
@@ -68,7 +70,9 @@ do
             return v1[4] > v2[4]
         end
     end
-    QuickSort = function(tbl) table.sort(tbl, func) end
+    QuickSort = function(tbl)
+        table.sort(tbl, func)
+    end
 end
 
 ------------------------------------------------------------------------
@@ -138,12 +142,16 @@ function MyContainer:OnContentsChanged()
 
     self.ContainerHeight = (row + (col > 0 and 1 or 0)) * (itemSlotSize + 2)
 
-    if self.UpdateDimensions then self:UpdateDimensions() end
+    if self.UpdateDimensions then
+        self:UpdateDimensions()
+    end
     self:SetWidth((itemSlotSize + 2) * self.Columns + 2)
 
     local t = (tName == "cBniv_Bag") or (tName == "cBniv_Bank") or (tName == "cBniv_BankReagent") or (tName == "cBniv_BankAccount")
     local bags = module.bags
-    if not bags or not bags.bank or not bags.main then return end
+    if not bags or not bags.bank or not bags.main then
+        return
+    end
     local bankShown = bags.bank:IsShown()
 
     if (not tBankBags and bags.main:IsShown() and not t) or (tBankBags and bankShown) then
@@ -234,13 +242,17 @@ local function IconButton_OnEnter(self)
         classColor = { GetClassColor(select(2, UnitClass("player"))) }
     end
     self.icon:SetVertexColor(classColor[1], classColor[2], classColor[3])
-    if self.tooltip then self.tooltip:Show() end
+    if self.tooltip then
+        self.tooltip:Show()
+    end
 end
 
 local function IconButton_OnLeave(self)
     self.mouseover = false
     self.icon:SetVertexColor(0.8, 0.8, 0.8)
-    if self.tooltip then self.tooltip:Hide() end
+    if self.tooltip then
+        self.tooltip:Hide()
+    end
 end
 
 local function createIconButton(name, parent, texture, point, hint, isBag)
@@ -250,7 +262,7 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
     button:SetNormalTexture(0)
     button:SetPushedTexture(0)
     button:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
-    button:GetHighlightTexture():SetVertexColor(1, 1, 1, .25)
+    button:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
     button:GetHighlightTexture():SetInside()
 
     button.icon = button:CreateTexture(nil, "ARTWORK")
@@ -269,8 +281,12 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
     button.tooltip:Hide()
 
     button.tag = name
-    button:SetScript("OnEnter", function() IconButton_OnEnter(button) end)
-    button:SetScript("OnLeave", function() IconButton_OnLeave(button) end)
+    button:SetScript("OnEnter", function()
+        IconButton_OnEnter(button)
+    end)
+    button:SetScript("OnLeave", function()
+        IconButton_OnLeave(button)
+    end)
     button.mouseover = false
 
     return button
@@ -291,7 +307,9 @@ local function GetFirstFreeSlot(bagtype)
     elseif bagtype == "bankAccount" then
         containerIDs = { 12, 13, 14, 15, 16 }
     end
-    if not containerIDs then return false end
+    if not containerIDs then
+        return false
+    end
 
     for _, i in next, containerIDs do
         local t = GetContainerNumFreeSlots(i)
@@ -326,6 +344,7 @@ function MyContainer:OnCreate(name, settings)
     self:EnableMouse(true)
     self.UpdateDimensions = UpdateDimensions
     self:SetFrameStrata("HIGH")
+    tinsert(UISpecialFrames, self:GetName())
 
     if tBag or tBank then
         SetFrameMovable(self, module.opts.Unlocked)
@@ -348,7 +367,9 @@ function MyContainer:OnCreate(name, settings)
     local caption = background:CreateFontString(nil, "OVERLAY", nil)
     caption:SetFont(unpack(cfg.fonts.standard))
     local t = L["BAG_CAPTIONS_" .. self.name:upper():sub(7)] or (tBankBags and self.name:sub(5))
-    if not t then t = self.name end
+    if not t then
+        t = self.name
+    end
     caption:SetText(t)
     caption:SetPoint("TOPLEFT", 7.5, -7.5)
     self.Caption = caption
@@ -376,7 +397,9 @@ function MyContainer:OnCreate(name, settings)
 
         local bagButtons = self:SpawnPlugin("BagBar", tS)
         bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))
-        bagButtons.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
+        bagButtons.highlightFunction = function(button, match)
+            button:SetAlpha(match and 1 or 0.1)
+        end
         bagButtons.isGlobal = true
         bagButtons:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, tBag and 32 or 20)
         bagButtons:Hide()
@@ -396,7 +419,9 @@ function MyContainer:OnCreate(name, settings)
         if tBag and module.opts.NewItems then
             self.resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, "BOTTOMRIGHT", L.BAG_HINT_RESET_NEW, tBag)
             self.resetBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
-            self.resetBtn:SetScript("OnClick", function() resetNewItems() end)
+            self.resetBtn:SetScript("OnClick", function()
+                resetNewItems()
+            end)
         end
 
         if module.opts.Restack then
@@ -406,7 +431,9 @@ function MyContainer:OnCreate(name, settings)
             else
                 self.restackBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
             end
-            self.restackBtn:SetScript("OnClick", function() restackItems(self) end)
+            self.restackBtn:SetScript("OnClick", function()
+                restackItems(self)
+            end)
         end
 
         if tBank then
@@ -422,11 +449,19 @@ function MyContainer:OnCreate(name, settings)
         end
 
         local btnTable = { self.bagToggle }
-        if self.restackBtn then tinsert(btnTable, self.restackBtn) end
-        if tBag and self.resetBtn then tinsert(btnTable, self.resetBtn) end
-        if tBank and self.reagentBtn then tinsert(btnTable, self.reagentBtn) end
+        if self.restackBtn then
+            tinsert(btnTable, self.restackBtn)
+        end
+        if tBag and self.resetBtn then
+            tinsert(btnTable, self.resetBtn)
+        end
+        if tBank and self.reagentBtn then
+            tinsert(btnTable, self.reagentBtn)
+        end
         local ttPos = -(#btnTable * 24 + 16)
-        if tBank then ttPos = ttPos + 3 end
+        if tBank then
+            ttPos = ttPos + 3
+        end
         for _, v in pairs(btnTable) do
             v.tooltip:ClearAllPoints()
             v.tooltip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", ttPos, 5.5)
@@ -437,7 +472,9 @@ function MyContainer:OnCreate(name, settings)
         local bagWarband = self:SpawnPlugin("BagWarband", "accountbank")
         bagWarband:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
         bagWarband:SetSize(bagWarband:LayoutButtons("grid", 5))
-        bagWarband.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
+        bagWarband.highlightFunction = function(button, match)
+            button:SetAlpha(match and 1 or 0.1)
+        end
         self.BagBar = bagWarband
 
         self.depositBtn = createIconButton("SendAccount", self, Textures.Deposit, "BOTTOMRIGHT", ACCOUNT_BANK_DEPOSIT_BUTTON_LABEL, false)
@@ -465,13 +502,15 @@ function MyContainer:OnCreate(name, settings)
     if tBag or tBank or tReagent or tAccount then
         self.DropTarget = CreateFrame("ItemButton", self.name .. "DropTarget", self)
         local dtNT = _G[self.DropTarget:GetName() .. "NormalTexture"]
-        if dtNT then dtNT:SetTexture(nil) end
+        if dtNT then
+            dtNT:SetTexture(nil)
+        end
 
         local function DropTargetProcessItem()
-            local bID, sID = GetFirstFreeSlot(
-                (tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false
-            )
-            if bID then PickupContainerItem(bID, sID) end
+            local bID, sID = GetFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
+            if bID then
+                PickupContainerItem(bID, sID)
+            end
         end
 
         self.DropTarget:SetScript("OnMouseUp", DropTargetProcessItem)
@@ -483,7 +522,9 @@ function MyContainer:OnCreate(name, settings)
         self.DropTarget.__backdrop:SetBackdrop({
             bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
             edgeFile = "Interface\\Buttons\\WHITE8x8",
-            tile = false, tileSize = 16, edgeSize = 1,
+            tile = false,
+            tileSize = 16,
+            edgeSize = 1,
         })
         self.DropTarget.__backdrop:SetBackdropColor(1, 1, 1, 0.1)
         self.DropTarget.__backdrop:SetBackdropBorderColor(0, 0, 0, 1)
@@ -511,7 +552,9 @@ function MyContainer:OnCreate(name, settings)
 
         local search = self:SpawnPlugin("SearchBar", infoFrame)
         search.isGlobal = true
-        search.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
+        search.highlightFunction = function(button, match)
+            button:SetAlpha(match and 1 or 0.1)
+        end
 
         local searchIcon = background:CreateTexture(nil, "ARTWORK")
         searchIcon:SetTexture(Textures.Search)
@@ -541,12 +584,12 @@ function BagButton:OnCreate()
     self:SetNormalTexture(0)
     self:SetPushedTexture(0)
     self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
-    self:GetHighlightTexture():SetVertexColor(1, 1, 1, .25)
+    self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
     self:GetHighlightTexture():SetInside()
 
     self:SetSize(itemSlotSize, itemSlotSize)
     self:CreateBackdrop()
-    self.__backdrop:SetBackdropColor(.3, .3, .3, .3)
+    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
 end
@@ -555,9 +598,13 @@ function BagButton:OnUpdateButton()
     self.__backdrop:SetBackdropBorderColor(0, 0, 0)
 
     local id = GetInventoryItemID("player", (self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
-    if not id then return end
+    if not id then
+        return
+    end
     local _, _, quality = C_Item.GetItemInfo(id)
-    if not quality or quality <= 1 then return end
+    if not quality or quality <= 1 then
+        return
+    end
     local color = C.media.qualityColors[quality]
     if not self.hidden and not self.notBought and color then
         self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
@@ -576,7 +623,9 @@ function MyButton:OnAdd()
         if mouseButton == "RightButton" then
             local slotId, bagId = btn:GetSlotAndBagID()
             local tID = C_Container.GetContainerItemID(bagId, slotId)
-            if not tID then return end
+            if not tID then
+                return
+            end
             if IsControlKeyDown() and cbNivaya:AtBank() then
                 C_Container.UseContainerItem(bagId, slotId, nil, true)
             end
@@ -588,13 +637,13 @@ function MyButton:OnCreate()
     self:SetNormalTexture(0)
     self:SetPushedTexture(0)
     self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
-    self:GetHighlightTexture():SetVertexColor(1, 1, 1, .25)
+    self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
     self:GetHighlightTexture():SetInside()
     self:SetSize(itemSlotSize - 4, itemSlotSize - 4)
     self:CreateBackdrop()
 
     self.__backdrop:SetOutside()
-    self.__backdrop:SetBackdropColor(.3, .3, .3, .3)
+    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
@@ -657,7 +706,9 @@ local function isItemNeedsLevel(item)
 end
 
 local function getIconOverlayAtlas(item)
-    if not item.link then return end
+    if not item.link then
+        return
+    end
     if C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID(item.link) then
         return "AzeriteIconFrame"
     elseif IsCosmeticItem(item.link) then
@@ -716,7 +767,7 @@ function MyButton:OnUpdateButton(item)
         self.durability:SetText("")
     end
 
-    self.__backdrop:SetBackdropColor(.3, .3, .3, .3)
+    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
     if not item.texture and GameTooltip:GetOwner() == self then
         GameTooltip:Hide()
@@ -748,7 +799,7 @@ function MyButton:OnUpdateQuest(item)
     end
 
     if item.questID or item.isQuestItem then
-        self.__backdrop:SetBackdropBorderColor(.8, .8, 0)
+        self.__backdrop:SetBackdropBorderColor(0.8, 0.8, 0)
     elseif item.quality and item.quality > -1 then
         local color = C.media.qualityColors[item.quality]
         self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)

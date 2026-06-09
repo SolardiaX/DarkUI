@@ -46,7 +46,9 @@ local optDefaults = {
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then return end
+    if not cfg or not cfg.enable then
+        return
+    end
 
     self:LoadDefaults()
 
@@ -69,12 +71,22 @@ function module:OnInit()
 end
 
 function module:LoadDefaults()
-    if not SavedStats then SavedStats = {} end
-    if not SavedStatsPerChar then SavedStatsPerChar = {} end
+    if not SavedStats then
+        SavedStats = {}
+    end
+    if not SavedStatsPerChar then
+        SavedStatsPerChar = {}
+    end
 
-    if not SavedStats.cBnivCfg then SavedStats.cBnivCfg = {} end
-    if not SavedStats.cBniv_CatInfo then SavedStats.cBniv_CatInfo = {} end
-    if not SavedStatsPerChar.cB_KnownItems then SavedStatsPerChar.cB_KnownItems = {} end
+    if not SavedStats.cBnivCfg then
+        SavedStats.cBnivCfg = {}
+    end
+    if not SavedStats.cBniv_CatInfo then
+        SavedStats.cBniv_CatInfo = {}
+    end
+    if not SavedStatsPerChar.cB_KnownItems then
+        SavedStatsPerChar.cB_KnownItems = {}
+    end
     if not SavedStatsPerChar.cBniv then
         SavedStatsPerChar.cBniv = { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }
     end
@@ -166,7 +178,9 @@ function cbNivaya:CreateAnchors()
         tar.AnchorTo = src
         tar.AnchorDir = dir
         if src then
-            if not src.AnchorTargets then src.AnchorTargets = {} end
+            if not src.AnchorTargets then
+                src.AnchorTargets = {}
+            end
             src.AnchorTargets[tar] = true
         end
     end
@@ -217,7 +231,9 @@ end
 module.bagHidden = {}
 
 function cbNivaya:UpdateAnchors(src)
-    if not src.AnchorTargets then return end
+    if not src.AnchorTargets then
+        return
+    end
     for v in pairs(src.AnchorTargets) do
         local t, u = v.AnchorTo, v.AnchorDir
         if t then
@@ -263,7 +279,8 @@ end
 function cbNivaya:OnOpen()
     local bags = module.bags
     bags.main:Show()
-    showBags(self,
+    showBags(
+        self,
         bags.armor,
         bags.bagNew,
         bags.bagItemSets,
@@ -300,7 +317,8 @@ function cbNivaya:OnBankOpened()
 
     local bags = module.bags
     bags.bank:Show()
-    showBags(self,
+    showBags(
+        self,
         bags.bankSets,
         bags.bankReagent,
         bags.bankArmor,
