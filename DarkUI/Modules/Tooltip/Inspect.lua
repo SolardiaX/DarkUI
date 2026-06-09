@@ -1,14 +1,14 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- ItemLevel
+-- Inspect
 ------------------------------------------------------------------------
-local module = E:Module("Tooltip"):Sub("ItemLevel")
+local module = E:Module("Tooltip"):Sub("Inspect")
 
 local cfg = C.tooltip
 
 local format, strfind, strmatch, max = format, strfind, strmatch, math.max
-local select, wipe = select, wipe
+local select = select
 local GetTime = GetTime
 local CanInspect = CanInspect
 local NotifyInspect = NotifyInspect
@@ -24,6 +24,10 @@ local GetInventoryItemTexture = GetInventoryItemTexture
 local GetAverageItemLevel = GetAverageItemLevel
 local InCombatLockdown = InCombatLockdown
 local IsShiftKeyDown = IsShiftKeyDown
+local GetSpecialization = GetSpecialization
+local GetSpecializationInfo = GetSpecializationInfo
+local GetInspectSpecialization = GetInspectSpecialization
+local GetSpecializationInfoByID = GetSpecializationInfoByID
 
 local STAT_AVERAGE_ITEM_LEVEL = STAT_AVERAGE_ITEM_LEVEL
 local ITEM_LEVEL = ITEM_LEVEL
@@ -35,6 +39,7 @@ local ITEM_LEVEL_PATTERN = "^" .. gsub(ITEM_LEVEL, "%%d", "")
 local CACHE_TIMEOUT = 900
 local INSPECT_FREQ = 0.5
 local LEVEL_PREFIX = STAT_AVERAGE_ITEM_LEVEL .. ": "
+local SPEC_PREFIX = SPECIALIZATION .. ": "
 local SLOTS = { 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 }
 
 local TWO_HANDERS = {
@@ -51,7 +56,7 @@ local currentUnit, currentGUID
 local updater
 
 ------------------------------------------------------------------------
--- Helpers
+-- Item Level
 ------------------------------------------------------------------------
 local function getSlotItemLevel(unit, slot)
     local data = C_TooltipInfo.GetInventoryItem(unit, slot)
@@ -153,22 +158,87 @@ local function setupItemLevel(level)
 end
 
 ------------------------------------------------------------------------
+-- Specialization
+------------------------------------------------------------------------
+local function getUnitSpec(unit)
+    if UnitIsUnit(unit, "player") then
+        local specIndex = GetSpecialization()
+        if not specIndex then return nil end
+        local _, name, _, icon = GetSpecializationInfo(specIndex)
+        return name, icon
+    end
+
+    local specID = GetInspectSpecialization(unit)
+    if not specID or specID == 0 then return nil end
+    local _, name, _, icon = GetSpecializationInfoByID(specID)
+    return name, icon
+end
+
+local function setupSpec(name, icon)
+    if not GameTooltip:IsShown() then return end
+    if not currentGUID or UnitGUID("mouseover") ~= currentGUID then return end
+
+    local specLine
+    for i = 2, GameTooltip:NumLines() do
+        local line = _G["GameTooltipTextLeft" .. i]
+        local text = line and line:GetText()
+        if text and canaccessvalue(text) and text:find(SPEC_PREFIX) then
+            specLine = line
+            break
+        end
+    end
+
+    local text
+    if name then
+        if icon then
+            text = format("%s|T%d:0:0:0:0:64:64:4:60:4:60|t %s", SPEC_PREFIX, icon, name)
+        else
+            text = SPEC_PREFIX .. name
+        end
+    else
+        text = SPEC_PREFIX .. "|cff9a9a9a...|r"
+    end
+
+    if specLine then
+        specLine:SetText(text)
+    else
+        GameTooltip:AddLine(text)
+    end
+    GameTooltip:Show()
+end
+
+------------------------------------------------------------------------
 -- Inspect flow
 ------------------------------------------------------------------------
 local function onInspectReady(_, _, guid)
     if not canaccessvalue(guid) then return end
     if guid ~= currentGUID then return end
 
-    local level = calcAverageItemLevel(currentUnit)
-    if level then
-        if not cache[guid] then cache[guid] = {} end
-        cache[guid].level = level
-        cache[guid].getTime = GetTime()
-        setupItemLevel(level)
-    else
-        updater:Show()
+    local db = cache[guid]
+    if not db then db = {}; cache[guid] = db end
+
+    if cfg.talents then
+        local name, icon = getUnitSpec(currentUnit)
+        if name then
+            db.specName = name
+            db.specIcon = icon
+            setupSpec(name, icon)
+        end
     end
 
+    if cfg.average_lvl then
+        local level = calcAverageItemLevel(currentUnit)
+        if level then
+            db.level = level
+            db.getTime = GetTime()
+            setupItemLevel(level)
+        else
+            updater:Show()
+            return
+        end
+    end
+
+    db.getTime = db.getTime or GetTime()
     module:UnregisterEvent("INSPECT_READY")
 end
 
@@ -177,7 +247,7 @@ local function onInventoryChanged(_, _, unit)
     if not currentUnit or not currentGUID then return end
     local guid = UnitGUID(unit)
     if not canaccessvalue(guid) then return end
-    if guid == currentGUID then
+    if guid == currentGUID and cfg.average_lvl then
         local level = calcAverageItemLevel(unit)
         if level then
             if not cache[guid] then cache[guid] = {} end
@@ -205,25 +275,44 @@ local function inspectOnUpdate(self, elapsed)
     end
 end
 
+------------------------------------------------------------------------
+-- Unit inspect entry
+------------------------------------------------------------------------
 local function inspectUnit(unit)
     if UnitIsUnit(unit, "player") then
-        local level = calcAverageItemLevel("player")
-        if level then setupItemLevel(level) end
+        if cfg.talents then
+            local name, icon = getUnitSpec("player")
+            if name then setupSpec(name, icon) end
+        end
+        if cfg.average_lvl then
+            local level = calcAverageItemLevel("player")
+            if level then setupItemLevel(level) end
+        end
         return
     end
 
     if not UnitIsPlayer(unit) or not CanInspect(unit) then return end
 
-    local guid = currentGUID
-    local cached = cache[guid]
+    local db = cache[currentGUID]
 
-    if cached and cached.level then
-        setupItemLevel(cached.level)
-        if not IsShiftKeyDown() and (GetTime() - cached.getTime < CACHE_TIMEOUT) then
-            return
+    if cfg.talents then
+        if db and db.specName then
+            setupSpec(db.specName, db.specIcon)
+        else
+            setupSpec(nil)
         end
-    else
-        setupItemLevel(nil)
+    end
+
+    if cfg.average_lvl then
+        if db and db.level then
+            setupItemLevel(db.level)
+        else
+            setupItemLevel(nil)
+        end
+    end
+
+    if db and db.getTime and not IsShiftKeyDown() and (GetTime() - db.getTime < CACHE_TIMEOUT) then
+        return
     end
 
     if not UnitIsVisible(unit) or UnitIsDeadOrGhost("player") or UnitOnTaxi("player") then return end
@@ -255,7 +344,7 @@ end
 -- Lifecycle
 ------------------------------------------------------------------------
 function module:OnInit()
-    if not cfg.average_lvl then return end
+    if not cfg.average_lvl and not cfg.talents then return end
 
     updater = CreateFrame("Frame")
     updater:SetScript("OnUpdate", inspectOnUpdate)
@@ -270,5 +359,7 @@ function module:OnInit()
         module:UnregisterEvent("INSPECT_READY")
     end)
 
-    self:RegisterEvent("UNIT_INVENTORY_CHANGED", onInventoryChanged)
+    if cfg.average_lvl then
+        self:RegisterEvent("UNIT_INVENTORY_CHANGED", onInventoryChanged)
+    end
 end
