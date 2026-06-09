@@ -15,11 +15,8 @@ local oUF = select(2, ...).oUF
 local issecretvalue = issecretvalue
 local SetCVar = SetCVar
 local InCombatLockdown = InCombatLockdown
-local GetSpecializationInfoByID, GetSpecialization = GetSpecializationInfoByID, GetSpecialization
-local GetNumBattlefieldScores, GetBattlefieldScore = GetNumBattlefieldScores, GetBattlefieldScore
 local UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation = UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation
 local UnitIsTapDenied = UnitIsTapDenied
-local GetArenaOpponentSpec = GetArenaOpponentSpec
 local UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass = UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass
 local UnitExists = UnitExists
 local UnitDetailedThreatSituation = UnitDetailedThreatSituation
@@ -31,39 +28,11 @@ local UnitWidgetSet = UnitWidgetSet
 local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
 local IsInInstance, IsInGroup, IsInRaid = IsInInstance, IsInGroup, IsInRaid
 local GetNumGroupMembers = GetNumGroupMembers
-local GetSpellName = C_Spell.GetSpellName
 
 local cfg = C.nameplate
 
 local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
 local arrow = C.media.path .. "uf_nameplate_arrow"
-
-local totemData = {}
-do
-    local spellIcons = {
-        [192058] = 136013,    -- Capacitor Totem
-        [98008]  = 237586,    -- Spirit Link Totem
-        [192077] = 538576,    -- Wind Rush Totem
-        [204331] = 511726,    -- Counterstrike Totem
-        [204332] = 136114,    -- Windfury Totem
-        [204336] = 136039,    -- Grounding Totem
-        [157153] = 971076,    -- Cloudburst Totem
-        [5394]   = 135127,    -- Healing Stream Totem
-        [108280] = 538569,    -- Healing Tide Totem
-        [207399] = 136080,    -- Ancestral Protection Totem
-        [198838] = 136098,    -- Earthen Wall Totem
-        [51485]  = 136100,    -- Earthgrab Totem
-        [196932] = 136232,    -- Voodoo Totem
-        [192222] = 971079,    -- Liquid Magma Totem
-        [204330] = 135829,    -- Skyfury Totem
-    }
-    for spellID, icon in pairs(spellIcons) do
-        local name = GetSpellName(spellID)
-        if name then
-            totemData[name] = icon
-        end
-    end
-end
 
 local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
 local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
@@ -82,89 +51,6 @@ local function castColorUpdateStart(self)
     self:GetStatusBarTexture():SetVertexColorFromBoolean(
         self.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
     )
-end
-
-local healList, exClass, healerSpecs = {}, {}, {}
-local healerCheckFrame = CreateFrame("Frame")
-local testing = false
-
-exClass.DEATHKNIGHT = true
-exClass.DEMONHUNTER = true
-exClass.HUNTER = true
-exClass.MAGE = true
-exClass.ROGUE = true
-exClass.WARLOCK = true
-exClass.WARRIOR = true
-
-local healerFactions = {
-    ["Horde"] = 1,
-    ["Alliance"] = 0,
-}
-
-local healerSpecIDs = {
-    105,    -- Druid Restoration
-    1468,   -- Evoker Preservation
-    270,    -- Monk Mistweaver
-    65,        -- Paladin Holy
-    256,    -- Priest Discipline
-    257,    -- Priest Holy
-    264,    -- Shaman Restoration
-}
-
-local lastCheck = 20
-local function checkBattleFieldHealers(_, elapsed)
-    lastCheck = lastCheck + elapsed
-    if lastCheck > 25 then
-        lastCheck = 0
-        healList = {}
-        for i = 1, GetNumBattlefieldScores() do
-            local name, _, _, _, _, faction, _, _, _, _, _, _, _, _, _, talentSpec = GetBattlefieldScore(i)
-            if issecretvalue and (issecretvalue(name) or issecretvalue(talentSpec)) then
-                break
-            end
-
-            if name and healerSpecs[talentSpec] and healerFactions[UnitFactionGroup("player")] == faction then
-                name = name:match("(.+)%-.+") or name
-                healList[name] = talentSpec
-            end
-        end
-    end
-end
-
-local function checkArenaHealers(_, elapsed)
-    lastCheck = lastCheck + elapsed
-    if lastCheck > 10 then
-        lastCheck = 0
-        healList = {}
-        for i = 1, 5 do
-            local specID = GetArenaOpponentSpec(i)
-            if specID and specID > 0 then
-                local name = UnitName(format("arena%d", i))
-                local _, talentSpec = GetSpecializationInfoByID(specID)
-                if name and healerSpecs[talentSpec] then
-                    healList[name] = talentSpec
-                    local nameplate = C_NamePlate.GetNamePlateForUnit(format("arena%d", i))
-                    if nameplate then
-                        nameplate.unitFrame:UpdateAllElements("UNIT_NAME_UPDATE")
-                    end
-                end
-            end
-        end
-    end
-end
-
-local function checkHealers(_, event)
-    if event == "PLAYER_ENTERING_WORLD" then
-        local _, instanceType = IsInInstance()
-        if instanceType == "pvp" then
-            healerCheckFrame:SetScript("OnUpdate", checkBattleFieldHealers)
-        elseif instanceType == "arena" then
-            healerCheckFrame:SetScript("OnUpdate", checkArenaHealers)
-        else
-            healList = {}
-            healerCheckFrame:SetScript("OnUpdate", nil)
-        end
-    end
 end
 
 local function createBorderFrame(frame, point)
@@ -247,21 +133,6 @@ local function updateTarget(self)
 end
 
 local function updateName(self)
-    if cfg.healer_icon == true then
-        local name = self.unitName
-        if name then
-            if healList[name] then
-                if exClass[healList[name]] then
-                    self.HealerIcon:Hide()
-                else
-                    self.HealerIcon:Show()
-                end
-            else
-                self.HealerIcon:Hide()
-            end
-        end
-    end
-
     if cfg.class_icons == true then
         local reaction = UnitReaction(self.unit, "player")
         if UnitIsPlayer(self.unit) and (reaction and reaction <= 4) then
@@ -274,18 +145,6 @@ local function updateName(self)
             self.Class.Icon:SetTexCoord(0, 0, 0, 0)
             self.Class:Hide()
             self.Level:SetPoint("RIGHT", self.Health, "LEFT", -12, 0)
-        end
-    end
-
-    if cfg.totem_icons == true then
-        local name = self.unitName
-        if name then
-            if totemData[name] then
-                self.Totem.Icon:SetTexture(totemData[name])
-                self.Totem:Show()
-            else
-                self.Totem:Hide()
-            end
         end
     end
 end
@@ -482,8 +341,13 @@ local function callback(self, event, unit)
     if not self then return end
     if unit then
         local unitGUID = UnitGUID(unit)
-        self.npcID = unitGUID and select(6, strsplit('-', unitGUID))
-        self.unitName = UnitName(unit)
+        if unitGUID and canaccessvalue(unitGUID) then
+            self.npcID = select(6, strsplit('-', unitGUID))
+        else
+            self.npcID = nil
+        end
+        local unitName = UnitName(unit)
+        self.unitName = unitName and canaccessvalue(unitName) and unitName or nil
         self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
 
         if UnitIsUnit(unit, "player") then
@@ -685,23 +549,6 @@ local function style(self, unit)
         self.Class.Icon:SetTexCoord(0, 0, 0, 0)
     end
 
-    -- Totem Icon
-    if cfg.totem_icons == true then
-        self.Totem = CreateFrame("Frame", nil, self)
-        self.Totem.Icon = self.Totem:CreateTexture(nil, "OVERLAY")
-        self.Totem.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
-        self.Totem.Icon:SetPoint("BOTTOM", self.Health, "TOP", 0, 16)
-        self.Totem.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-    end
-
-    -- Healer Icon
-    if cfg.healer_icon == true then
-        self.HealerIcon = self.Health:CreateTexture(nil, "OVERLAY")
-        self.HealerIcon:SetSize(16, 16)
-        self.HealerIcon:SetTexture(C.media.path .. "icon_healer")
-        self.HealerIcon:SetPoint("BOTTOM", self.Name, "TOP", 0, cfg.track_auras == true and 13 or 0)
-    end
-
     -- Quest Icon
     if cfg.quest then
         self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
@@ -787,17 +634,6 @@ function module:PLAYER_ENTERING_WORLD()
     else
         SetCVar("nameplateShowEnemies", 0)
     end
-
-    if cfg.healer_icon == true then
-        for _, specID in pairs(healerSpecIDs) do
-            local _, name = GetSpecializationInfoByID(specID)
-            if name and not healerSpecs[name] then
-                healerSpecs[name] = true
-            end
-        end
-
-        checkHealers()
-    end
 end
 
 function module:PLAYER_LOGIN()
@@ -820,6 +656,29 @@ function module:PLAYER_LOGIN()
 
     if cfg.only_name then
         SetCVar("nameplateShowOnlyNames", 1)
+    end
+
+    local vis = cfg.visibility
+    if vis then
+        SetCVar("nameplateShowAll", vis.showAll and 1 or 0)
+
+        local enemy = vis.enemy
+        if enemy then
+            SetCVar("nameplateShowEnemyTotems", enemy.totems and 1 or 0)
+            SetCVar("nameplateShowEnemyMinions", enemy.minions and 1 or 0)
+            SetCVar("nameplateShowEnemyGuardians", enemy.guardians and 1 or 0)
+            SetCVar("nameplateShowEnemyPets", enemy.pets and 1 or 0)
+            SetCVar("nameplateShowEnemyMinus", enemy.minus and 1 or 0)
+        end
+
+        local friendly = vis.friendly
+        if friendly then
+            SetCVar("nameplateShowFriendlyNPCs", friendly.npcs and 1 or 0)
+            SetCVar("nameplateShowFriendlyPlayerTotems", friendly.totems and 1 or 0)
+            SetCVar("nameplateShowFriendlyPlayerMinions", friendly.minions and 1 or 0)
+            SetCVar("nameplateShowFriendlyPlayerGuardians", friendly.guardians and 1 or 0)
+            SetCVar("nameplateShowFriendlyPlayerPets", friendly.pets and 1 or 0)
+        end
     end
 
     local function changeFont(self)

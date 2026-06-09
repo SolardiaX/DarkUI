@@ -72,9 +72,7 @@ oUF.Tags.Events["dd:nameLong"] = "UNIT_NAME_UPDATE"
 
 oUF.Tags.Methods["dd:nameLongAbbrev"] = function(unit)
     local name = UnitName(unit)
-    if not canaccessvalue(name) then return "" end
-    local newname = (len(name) > 18) and gsub(name, "%s?(.[\128-\191]*)%S+%s", "%1. ") or name
-    return E:UTF(newname, 18, false)
+    return E:UTF(name, 18, false)
 end
 oUF.Tags.Events["dd:nameLongAbbrev"] = "UNIT_NAME_UPDATE"
 

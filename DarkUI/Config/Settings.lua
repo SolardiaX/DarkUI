@@ -249,6 +249,41 @@ C.bags = {
 }
 
 ----------------------------------------------------------------------------------------
+-- DataText
+----------------------------------------------------------------------------------------
+C.stats = {
+    enable = true,
+    font = {
+        font = STANDARD_TEXT_FONT,
+        color = { 1, 1, 1 },
+        size = 12,
+        alpha = 1,
+        outline = 3,
+        shadow = { alpha = 1, x = 1, y = -1 },
+    },
+    icon_size = 12,
+    -- Element toggles
+    latency = true,
+    memory = true,
+    fps = true,
+    friend = true,
+    guild = true,
+    location = true,
+    coords = true,
+    durability = true,
+    bags = true,
+    currencies = true,
+    -- Currency tooltip options
+    currency_expansion = true,
+    currency_tracking = true,
+    currency_archaeology = true,
+    currency_cooking = true,
+    currency_raid = true,
+    currency_pvp = true,
+    currency_other = true,
+}
+
+----------------------------------------------------------------------------------------
 -- Blizzard
 ----------------------------------------------------------------------------------------
 C.blizzard = {
@@ -471,6 +506,7 @@ C.nameplate = {
     class_icons = true,
     name_abbrev = true,
     clamp = true,
+    only_name = false,
     good_color = { 0.2, 0.8, 0.2 },
     near_color = { 1, 1, 0 },
     bad_color = { 1, 0, 0 },
@@ -481,13 +517,28 @@ C.nameplate = {
     player_aura_only = true,
     show_stealable_buffs = true,
     auras_size = 22,
-    healer_icon = true,
-    totem_icons = true,
     show_spiral = true,
     show_timers = true,
     icon_spacing = 4,
     arrow = true,
     quest = true,
+    visibility = {
+        showAll = true,
+        enemy = {
+            totems = true,
+            minions = false,
+            guardians = false,
+            pets = false,
+            minus = true,
+        },
+        friendly = {
+            npcs = true,
+            totems = false,
+            minions = false,
+            guardians = false,
+            pets = false,
+        },
+    },
 }
 
 ----------------------------------------------------------------------------------------
