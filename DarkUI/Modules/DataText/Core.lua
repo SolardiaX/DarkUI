@@ -1,14 +1,11 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.stats or not C.stats.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- DataText Core
 ------------------------------------------------------------------------
 
 local module = E:Module("DataText")
+module:SetConfigKey("stats")
 local cfg = C.stats
 
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
@@ -179,7 +176,7 @@ function module:Inject(name, stat)
     end
 
     local m = self.config[name]
-    if not m then
+    if not m or m.enable == false then
         return
     end
 

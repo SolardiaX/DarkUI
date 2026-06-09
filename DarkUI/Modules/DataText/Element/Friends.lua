@@ -1,9 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.stats or not C.stats.friend or not C.stats.friend.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- Friends
 ------------------------------------------------------------------------

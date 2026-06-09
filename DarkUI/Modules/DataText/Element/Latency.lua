@@ -1,9 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.stats or not C.stats.latency or not C.stats.latency.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- Latency
 ------------------------------------------------------------------------

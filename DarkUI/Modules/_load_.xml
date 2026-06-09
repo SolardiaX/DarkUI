@@ -2,6 +2,7 @@
     <Include file="Actionbar\_load_.xml" />
     <Include file="Aura\_load_.xml" />
     <Include file="Bags\_load_.xml" />
+    <Include file="Chat\_load_.xml" />
     <Include file="DataText\_load_.xml" />
     <Include file="Map\_load_.xml" />
     <Include file="Tooltip\_load_.xml" />

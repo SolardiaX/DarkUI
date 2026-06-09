@@ -1,10 +1,6 @@
 local _, ns = ...
 local E, C, L = ns:unpack()
 
-if not C.stats or not C.stats.bags or not C.stats.bags.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- Bags
 ------------------------------------------------------------------------

@@ -1,9 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.stats or not C.stats.memory or not C.stats.memory.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- Memory
 ------------------------------------------------------------------------

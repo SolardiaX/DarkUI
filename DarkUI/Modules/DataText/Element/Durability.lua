@@ -1,9 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.stats or not C.stats.durability or not C.stats.durability.enable then
-    return
-end
-
 ------------------------------------------------------------------------
 -- Durability
 ------------------------------------------------------------------------
