@@ -344,4 +344,49 @@ function module:OnInit()
     self.DebuffFrame = createAuraHeader("HARMFUL")
     self.DebuffFrame:ClearAllPoints()
     self.DebuffFrame:SetPoint(unpack(cfg.debuff_pos))
+
+    -- PrivateAuras (Blizzard-rendered, top-center growing down)
+    local paSize = cfg.private_aura_size
+    local paSpacing = cfg.spacing
+    local paNum = 5
+
+    local pa = CreateFrame("Frame", "DarkUI_PrivateAuras", UIParent)
+    pa:SetPoint(unpack(cfg.private_aura_pos))
+    pa:SetSize(paSize * paNum + paSpacing * (paNum - 1), paSize)
+
+    pa.auraIcons = {}
+    for i = 1, paNum do
+        local aura = CreateFrame("Frame", "DarkUI_PrivateAura" .. i, pa)
+        aura:SetSize(paSize, paSize)
+        aura:ClearAllPoints()
+        if i == 1 then
+            aura:SetPoint("TOP", pa)
+        else
+            aura:SetPoint("TOP", pa.auraIcons[i - 1], "BOTTOM", 0, -paSpacing)
+        end
+
+        aura.anchorID = C_UnitAuras.AddPrivateAuraAnchor({
+            unitToken = "player",
+            auraIndex = i,
+            parent = aura,
+            isContainer = false,
+            showCountdownFrame = true,
+            showCountdownNumbers = true,
+            iconInfo = {
+                iconWidth = paSize,
+                iconHeight = paSize,
+                iconAnchor = {
+                    point = "CENTER",
+                    relativeTo = aura,
+                    relativePoint = "CENTER",
+                    offsetX = 0,
+                    offsetY = 0,
+                },
+            },
+        })
+
+        pa.auraIcons[i] = aura
+    end
+
+    self.PrivateAuras = pa
 end
