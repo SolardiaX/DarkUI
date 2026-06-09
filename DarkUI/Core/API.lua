@@ -202,143 +202,120 @@ end
 -- SetTemplate
 ------------------------------------------------------------------------
 
+local DEFAULT_EDGE = {
+	shadow = 6,
+	border = 12,
+}
+
 local function setTemplate(f, t, edge, insets)
 	Mixin(f, BackdropTemplateMixin)
-	if not t then
-		t = "Default"
-	end
+	t = t or "Default"
+
+	local tkey = t:lower()
+	local bd = BACKDROP[tkey] or BACKDROP.default
+	edge = edge or DEFAULT_EDGE[tkey] or Mult
+	insets = insets or Mult
+
+	f:SetBackdrop({
+		bgFile = bd.bgFile,
+		edgeFile = bd.edgeFile,
+		tile = false,
+		tileEdge = tkey == "blur" or nil,
+		tileSize = (tkey == "shadow" or tkey == "border") and 32 or (tkey == "blur" and 16 or nil),
+		edgeSize = edge,
+		insets = { left = insets, right = insets, top = insets, bottom = insets },
+	})
 
 	local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
 	local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
-	local overlay_color = C.media.overlay_color
 
-	if t == "Shadow" then
-		if not edge then
-			edge = 6
-		end
-		if not insets then
-			insets = Mult
-		end
-		f:SetBackdrop({
-			bgFile = nil,
-			edgeFile = C.media.texture.shadow,
-			tile = false,
-			tileSize = 32,
-			edgeSize = edge,
-			insets = { left = insets, right = insets, top = insets, bottom = insets },
-		})
-
+	if tkey == "shadow" then
 		borderr, borderg, borderb, bordera = unpack(C.media.shadow_color)
-	elseif t == "Border" then
-		if not edge then
-			edge = 12
-		end
-		if not insets then
-			insets = Mult
-		end
-		f:SetBackdrop({
-			bgFile = C.media.texture.blank,
-			edgeFile = C.media.texture.border,
-			tile = false,
-			tileSize = 32,
-			edgeSize = edge,
-			insets = { left = insets, right = insets, top = insets, bottom = insets },
-		})
+	elseif tkey == "border" then
 		backdropa = 0
-	elseif t == "Blur" then
-		if not edge then
-			edge = Mult
-		end
-		if not insets then
-			insets = Mult
-		end
-		f:SetBackdrop({
-			bgFile = C.media.texture.blank,
-			edgeFile = C.media.texture.shadow,
-			tile = false,
-			tileEdge = true,
-			tileSize = 16,
-			edgeSize = edge,
-			insets = { left = insets, right = insets, top = insets, bottom = insets },
-		})
-	else
-		if not edge then
-			edge = Mult
-		end
-		if not insets then
-			insets = Mult
-		end
-		f:SetBackdrop({
-			bgFile = C.media.texture.blank,
-			edgeFile = C.media.texture.blank,
-			edgeSize = edge,
-			insets = { left = insets, right = insets, top = insets, bottom = insets },
-		})
-	end
-
-	if t == "Transparent" then
-		backdropa = overlay_color[4]
-	elseif t == "Overlay" then
+	elseif tkey == "transparent" then
+		backdropa = C.media.overlay_color[4]
+	elseif tkey == "overlay" then
 		backdropa = 1
-	elseif t == "Invisible" then
+	elseif tkey == "invisible" then
 		backdropa = 0
 		bordera = 0
 	end
 
 	f:SetBackdropBorderColor(borderr, borderg, borderb, bordera)
 
-	if t ~= "Shadow" then
+	if tkey ~= "shadow" then
 		f:SetBackdropColor(backdropr, backdropg, backdropb, backdropa)
 	end
 end
 
 ------------------------------------------------------------------------
--- CreateTemplate — create a child frame with SetTemplate style
+-- CreateBackdrop / CreateShadow / CreateBorder
 ------------------------------------------------------------------------
 
-local function createTemplate(f, t, margin)
+local function createBackdrop(f, t, margin)
+	if f.__backdrop then return f.__backdrop end
+
 	t = t or "Default"
-	local key = "__" .. t:lower()
-	if f[key] then
-		return f[key]
-	end
+	margin = margin or Mult
 
 	local frame = f
 	if f:IsObjectType("Texture") then
 		frame = f:GetParent()
 	end
 
-	margin = margin or Mult
 	local lvl = frame:GetFrameLevel()
 
 	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	child:SetOutside(f, margin, margin)
-
-	if t == "Shadow" then
-		child:SetFrameLevel(0)
-	elseif t == "Border" then
-		child:SetFrameLevel(lvl + 1)
-	else
-		child:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
-	end
+	child:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
 
 	setTemplate(child, t)
 
-	f[key] = child
+	f.__backdrop = child
 	return child
 end
 
--- Convenience aliases
-local function createBG(f, margin)
-	return createTemplate(f, "Default", margin)
-end
-
 local function createShadow(f, margin)
-	return createTemplate(f, "Shadow", margin or 4)
+	if f.__shadow then return f.__shadow end
+
+	margin = margin or 4
+
+	local frame = f
+	if f:IsObjectType("Texture") then
+		frame = f:GetParent()
+	end
+
+	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	child:SetOutside(f, margin, margin)
+	child:SetFrameLevel(0)
+
+	setTemplate(child, "Shadow")
+
+	f.__shadow = child
+	return child
 end
 
 local function createBorder(f, margin)
-	return createTemplate(f, "Border", margin)
+	if f.__border then return f.__border end
+
+	margin = margin or Mult
+
+	local frame = f
+	if f:IsObjectType("Texture") then
+		frame = f:GetParent()
+	end
+
+	local lvl = frame:GetFrameLevel()
+
+	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+	child:SetOutside(f, margin, margin)
+	child:SetFrameLevel(lvl + 1)
+
+	setTemplate(child, "Border")
+
+	f.__border = child
+	return child
 end
 
 ------------------------------------------------------------------------
@@ -429,8 +406,7 @@ local function addapi(object)
 	mt.Kill = kill
 	mt.StripTextures = stripTextures
 	mt.SetTemplate = setTemplate
-	mt.CreateTemplate = createTemplate
-	mt.CreateBG = createBG
+	mt.CreateBackdrop = createBackdrop
 	mt.CreateShadow = createShadow
 	mt.CreateBorder = createBorder
 	mt.CreateOverlay = createOverlay
