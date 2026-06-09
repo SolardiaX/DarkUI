@@ -317,7 +317,6 @@ C.chat = {
     pos = { "BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 24, 26 },
     bn_popup = { "BOTTOMLEFT", "ChatFrame1", "TOPLEFT", 0, 55 },
     background = false,
-    background_alpha = 0.7,
     filter = true,
     spam = true,
     auto_width = true,
@@ -325,16 +324,13 @@ C.chat = {
     height = 112,
     chat_bar = true,
     chat_bar_mouseover = false,
+    chat_copy = true,
     time_color = { 1, 1, 0 },
-    whisp_sound = true,
     alt_invite = true,
-    bubbles = true,
     combatlog = true,
     tabs_mouseover = true,
     sticky = true,
     loot_icons = true,
-    role_icons = true,
-    chat_copy = true,
 }
 
 ----------------------------------------------------------------------------------------
