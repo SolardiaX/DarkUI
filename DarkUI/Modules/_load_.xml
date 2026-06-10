@@ -1,5 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Include file="Actionbar\_load_.xml" />
+    <Include file="Announcement\_load_.xml" />
     <Include file="Aura\_load_.xml" />
     <Include file="Automation\_load_.xml" />
     <Include file="Bags\_load_.xml" />
