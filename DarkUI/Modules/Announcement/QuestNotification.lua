@@ -4,9 +4,9 @@ local E, C, L = select(2, ...):unpack()
 -- Quest Notification
 ------------------------------------------------------------------------
 
-local module = E:Module("Quest"):Sub("QuestNotification")
+local module = E:Module("Announcement"):Sub("QuestNotification")
 
-local cfg = C.quest
+local cfg = C.announcement
 
 local strmatch, strfind, gsub, format, floor = strmatch, strfind, gsub, format, floor
 local wipe, mod, tonumber, pairs = wipe, mod, tonumber, pairs
@@ -137,8 +137,7 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then return end
-    if not cfg.quest_notification then return end
+    if not cfg or not cfg.quest_notification then return end
 
     self:RegisterEvent("QUEST_ACCEPTED", onQuestAccepted)
     self:RegisterEvent("QUEST_LOG_UPDATE", onQuestLogUpdate)

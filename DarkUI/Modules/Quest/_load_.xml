@@ -4,5 +4,4 @@
     <Script file="ObjectiveTracker.lua" />
     <Script file="AutoCollapse.lua" />
     <Script file="AutoButton.lua" />
-    <Script file="QuestNotification.lua" />
 </Ui>

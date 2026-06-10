@@ -168,6 +168,7 @@ C.announcement = {
         enable = true,
         channel = 6,
     },
+    quest_notification = true,
 }
 
 ----------------------------------------------------------------------------------------
@@ -451,7 +452,6 @@ C.quest = {
     enable = true,
     auto_collapse = "SCENARIO", -- "NONE", "RAID", "SCENARIO", "RELOAD", or true (= RAID)
     auto_button = true,
-    quest_notification = true,
 }
 
 ----------------------------------------------------------------------------------------
