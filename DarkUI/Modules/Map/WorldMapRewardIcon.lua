@@ -248,42 +248,6 @@ function DarkUIWorldQuestPinMixin:AddIconWidgets()
 end
 
 ------------------------------------------------------------------------
--- Taint Workarounds
-------------------------------------------------------------------------
-
-local function applyTaintWorkarounds()
-	if EmbeddedItemTooltip_UpdateSize then
-		local orig = EmbeddedItemTooltip_UpdateSize
-		EmbeddedItemTooltip_UpdateSize = function(...)
-			local args = { ... }
-			C_Timer.After(0, function()
-				orig(unpack(args))
-			end)
-		end
-	end
-
-	if MoneyFrame_Update then
-		local orig = MoneyFrame_Update
-		MoneyFrame_Update = function(...)
-			local args = { ... }
-			C_Timer.After(0, function()
-				orig(unpack(args))
-			end)
-		end
-	end
-
-	if GameTooltip_ClearWidgetSet then
-		local orig = GameTooltip_ClearWidgetSet
-		GameTooltip_ClearWidgetSet = function(...)
-			local args = { ... }
-			C_Timer.After(0, function()
-				orig(unpack(args))
-			end)
-		end
-	end
-end
-
-------------------------------------------------------------------------
 -- World Quest Provider Override
 ------------------------------------------------------------------------
 
@@ -436,7 +400,6 @@ function module:OnInit()
 		return
 	end
 
-	applyTaintWorkarounds()
 	setupWorldQuestProvider()
 	setupPOIProvider()
 	setupEventProvider()

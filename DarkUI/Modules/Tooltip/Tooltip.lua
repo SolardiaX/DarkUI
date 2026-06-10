@@ -407,26 +407,14 @@ local function skinCompareTooltips()
         end
     end)
 
-    hooksecurefunc("SetTooltipMoney", function()
-        for i = 1, 2 do
-            if _G["GameTooltipMoneyFrame" .. i] then
-                _G["GameTooltipMoneyFrame" .. i .. "PrefixText"]:SetFontObject("GameTooltipText")
-                _G["GameTooltipMoneyFrame" .. i .. "SuffixText"]:SetFontObject("GameTooltipText")
-                _G["GameTooltipMoneyFrame" .. i .. "GoldButton"]:SetNormalFontObject("GameTooltipText")
-                _G["GameTooltipMoneyFrame" .. i .. "SilverButton"]:SetNormalFontObject("GameTooltipText")
-                _G["GameTooltipMoneyFrame" .. i .. "CopperButton"]:SetNormalFontObject("GameTooltipText")
-            end
-        end
-        for i = 1, 2 do
-            if _G["ShoppingTooltip1MoneyFrame" .. i] then
-                _G["ShoppingTooltip1MoneyFrame" .. i .. "PrefixText"]:SetFontObject("GameTooltipText")
-                _G["ShoppingTooltip1MoneyFrame" .. i .. "SuffixText"]:SetFontObject("GameTooltipText")
-                _G["ShoppingTooltip1MoneyFrame" .. i .. "GoldButton"]:SetNormalFontObject("GameTooltipText")
-                _G["ShoppingTooltip1MoneyFrame" .. i .. "SilverButton"]:SetNormalFontObject("GameTooltipText")
-                _G["ShoppingTooltip1MoneyFrame" .. i .. "CopperButton"]:SetNormalFontObject("GameTooltipText")
-            end
-        end
-    end)
+    -- WoW 12.0: money amounts are secret values, and Blizzard's MoneyFrame_Update
+    -- does width arithmetic on them that crashes under addon taint (e.g. when our
+    -- loot/tooltip code triggers GameTooltip:SetLootItem). Replace SetTooltipMoney
+    -- with a coin-text line so all money formatting stays inside the secure
+    -- C_CurrencyInfo function and never touches a tainted MoneyFrame widget.
+    function SetTooltipMoney(frame, money, _, prefixText, suffixText)
+        frame:AddLine((prefixText or "") .. " " .. C_CurrencyInfo.GetCoinTextureString(money) .. " " .. (suffixText or ""), 1, 1, 1)
+    end
 end
 
 ------------------------------------------------------------------------
