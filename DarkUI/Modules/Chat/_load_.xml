@@ -9,5 +9,7 @@
     <Script file="MouseScroll.lua" />
     <Script file="RealLinks.lua" />
     <Script file="ChatCopy.lua" />
+    <Script file="URLCopy.lua" />
+    <Script file="VoicePanel.lua" />
     <Script file="Bubbles.lua" />
 </Ui>

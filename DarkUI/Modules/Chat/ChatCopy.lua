@@ -19,7 +19,7 @@ local sizes = {
 
 local function createCopyFrame()
     frame = CreateFrame("Frame", "DarkUI_CopyChat", UIParent, "BackdropTemplate")
-    frame:SetTemplate("Transparent")
+    frame:SetTemplate("Default")
     frame:SetSize(540, 300)
     frame:SetPoint("CENTER", UIParent, "CENTER", 0, 100)
     frame:SetFrameStrata("DIALOG")
@@ -112,6 +112,8 @@ function module:OnInit()
         return
     end
 
+    local buttons = {}
+
     for i = 1, NUM_CHAT_WINDOWS do
         local cf = _G[format("ChatFrame%d", i)]
         local button = CreateFrame("Button", nil, cf)
@@ -119,7 +121,7 @@ function module:OnInit()
         button:SetSize(20, 20)
         button:SetAlpha(0)
 
-        local icon = button:CreateTexture(nil, "BORDER")
+        local icon = button:CreateTexture(nil, "ARTWORK")
         icon:SetPoint("CENTER")
         icon:SetTexture("Interface\\BUTTONS\\UI-GuildButton-PublicNote-Up")
         icon:SetSize(16, 16)
@@ -140,6 +142,17 @@ function module:OnInit()
         end)
         button:SetScript("OnLeave", function()
             button:FadeOut()
+        end)
+
+        buttons[i] = button
+    end
+
+    if buttons[1] then
+        ChatFrame1:HookScript("OnEnter", function()
+            buttons[1]:FadeIn()
+        end)
+        ChatFrame1:HookScript("OnLeave", function()
+            buttons[1]:FadeOut()
         end)
     end
 

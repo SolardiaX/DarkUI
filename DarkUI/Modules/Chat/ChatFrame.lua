@@ -10,6 +10,7 @@ module:SetConfigKey("chat")
 local gsub, strfind, format = gsub, strfind, string.format
 
 local cfg = C.chat
+local isScaling = false
 
 ------------------------------------------------------------------------
 -- Global Chat Strings
@@ -86,48 +87,47 @@ local function setChatStyle(frame)
     tab.HighlightMiddle:Kill()
     tab.HighlightRight:Kill()
 
-    _G[format("ChatFrame%sButtonFrameMinimizeButton", id)]:Kill()
-    _G[format("ChatFrame%sButtonFrame", id)]:Kill()
-    _G[format("ChatFrame%sEditBoxLeft", id)]:Kill()
-    _G[format("ChatFrame%sEditBoxMid", id)]:Kill()
-    _G[format("ChatFrame%sEditBoxRight", id)]:Kill()
+    local bf = frame.buttonFrame
+    if bf then bf:SetGhost() end
+
     _G[format("ChatFrame%sTabGlow", id)]:Kill()
-
     frame.ScrollBar:Kill()
-    frame.ScrollToBottomButton:ClearAllPoints()
-    frame.ScrollToBottomButton:SetPoint("BOTTOMRIGHT", frame, 0, -4)
-    frame:HookScript("OnUpdate", function(self)
-        if not self:AtBottom() then
-            frame.ScrollToBottomButton:Show()
-        else
-            frame.ScrollToBottomButton:Hide()
-        end
-    end)
 
-    local art1, art2, art3 = select(6, _G[chat .. "EditBox"]:GetRegions())
-    art1:Kill()
-    art2:Kill()
-    art3:Kill()
+    local editLeft = _G[format("ChatFrame%sEditBoxLeft", id)]
+    if editLeft then editLeft:Kill() end
+    local editMid = _G[format("ChatFrame%sEditBoxMid", id)]
+    if editMid then editMid:Kill() end
+    local editRight = _G[format("ChatFrame%sEditBoxRight", id)]
+    if editRight then editRight:Kill() end
 
-    if _G[chat .. "Tab"].conversationIcon then
-        _G[chat .. "Tab"].conversationIcon:Kill()
+    _G[chat .. "EditBox"]:StripTextures(2)
+
+    if frame.ScrollToBottomButton then
+        frame.ScrollToBottomButton:ClearAllPoints()
+        frame.ScrollToBottomButton:SetPoint("BOTTOMRIGHT", frame, 0, -4)
+        frame:HookScript("OnUpdate", function(self)
+            if not self:AtBottom() then
+                frame.ScrollToBottomButton:Show()
+            else
+                frame.ScrollToBottomButton:Hide()
+            end
+        end)
     end
 
-    _G[chat .. "EditBox"]:SetAltArrowKeyMode(false)
-    _G[chat .. "EditBox"]:Hide()
+    local tab_convo = _G[chat .. "Tab"].conversationIcon
+    if tab_convo then tab_convo:Kill() end
 
-    _G[chat .. "EditBox"]:HookScript("OnEditFocusGained", function(self)
-        self:Show()
-    end)
-    _G[chat .. "EditBox"]:HookScript("OnEditFocusLost", function(self)
-        if self:GetText() == "" then
-            self:Hide()
-        end
-    end)
+    local eb = _G[chat .. "EditBox"]
+    eb:SetAltArrowKeyMode(false)
+    eb:SetClampedToScreen(true)
 
-    _G[chat .. "Tab"]:HookScript("OnClick", function()
-        _G[chat .. "EditBox"]:Hide()
-    end)
+    local lang = _G[chat .. "EditBoxLanguage"]
+    if lang then
+        lang:GetRegions():SetAlpha(0)
+        lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 5, 0)
+        lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 29, 0)
+        E:ApplyBackdrop(lang, true)
+    end
 
     if cfg.background == true and cfg.tabs_mouseover ~= true then
         local editBoxBg = CreateFrame("Frame", nil, _G[chat .. "EditBox"], "BackdropTemplate")
@@ -138,8 +138,8 @@ local function setChatStyle(frame)
         E:ApplyBackdrop(editBoxBg, true)
 
         local function colorize(r, g, b)
-            if editBoxBg.backdrop then
-                editBoxBg.backdrop:SetBackdropBorderColor(r, g, b)
+            if editBoxBg.__backdrop then
+                editBoxBg.__backdrop:SetBackdropBorderColor(r, g, b)
             end
         end
 
@@ -167,16 +167,16 @@ local function setChatStyle(frame)
         if CombatLogQuickButtonFrame_Custom then
             CombatLogQuickButtonFrame_Custom:StripTextures()
             CombatLogQuickButtonFrame_Custom:CreateBackdrop()
-            CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("TOPLEFT", 1, -4)
-            CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
+            CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("TOPLEFT", 1, -4)
+            CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
 
-            E:ReskinCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.backdrop)
+            E:ReskinCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.__backdrop)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetSize(12, 12)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetHitRectInsets(0, 0, 0, 0)
 
             CombatLogQuickButtonFrame_CustomProgressBar:ClearAllPoints()
-            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.backdrop, 2, -2)
-            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.backdrop, -2, 2)
+            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.__backdrop, 2, -2)
+            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.__backdrop, -2, 2)
             CombatLogQuickButtonFrame_CustomProgressBar:SetStatusBarTexture(C.media.texture.status_f)
 
             CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
@@ -233,6 +233,12 @@ local cycles = {
         end,
     },
     {
+        chatType = "OFFICER",
+        use = function()
+            return C_GuildInfo.IsGuildOfficer()
+        end,
+    },
+    {
         chatType = "SAY",
         use = function()
             return 1
@@ -245,6 +251,13 @@ local function updateTabChannelSwitch(self)
         return
     end
     local currChatType = self:GetAttribute("chatType")
+
+    if IsShiftKeyDown() and (currChatType == "WHISPER" or currChatType == "BN_WHISPER") then
+        self:SetAttribute("chatType", "SAY")
+        ChatEdit_UpdateHeader(self)
+        return
+    end
+
     for i, curr in ipairs(cycles) do
         if curr.chatType == currChatType then
             local h, r, step = i + 1, #cycles, 1
@@ -305,22 +318,13 @@ function module:OnInit()
         return
     end
 
-    if cfg.auto_width then
-        local renderScale = UIParent:GetEffectiveScale()
-        cfg.width = ((E.screenWidth - 1024) / 3 - 120) * renderScale
-    end
+    SetCVar("chatStyle", "classic")
+    SetCVar("chatMouseScroll", 1)
 
-    if ChatFrameMenuButton then
-        ChatFrameMenuButton:Kill()
-    end
-    if ChatFrameChannelButton then
-        ChatFrameChannelButton:Kill()
-    end
-    if ChatFrameToggleVoiceDeafenButton then
-        ChatFrameToggleVoiceDeafenButton:Kill()
-    end
-    if ChatFrameToggleVoiceMuteButton then
-        ChatFrameToggleVoiceMuteButton:Kill()
+    if cfg.auto_width then
+        -- local renderScale = UIParent:GetEffectiveScale()
+        -- cfg.width = ((E.screenWidth - 1024) / 2 - 200) * renderScale
+        -- cfg.width = ((E.screenWidth - 1024) / 2 - 200)
     end
 
     GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
@@ -388,6 +392,22 @@ function module:OnInit()
 end
 
 function module:OnEnable()
+    local function updateChatSize()
+        if isScaling then return end
+        isScaling = true
+
+        ChatFrame1:ClearAllPoints()
+        -- ChatFrame1:SetSize(cfg.width, cfg.height)
+        if cfg.background then
+            ChatFrame1:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5] + 4)
+        else
+            ChatFrame1:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5])
+        end
+        FCF_SavePositionAndDimensions(ChatFrame1)
+
+        isScaling = false
+    end
+
     for i = 1, NUM_CHAT_WINDOWS do
         local chat = _G[format("ChatFrame%s", i)]
         local id = chat:GetID()
@@ -403,14 +423,7 @@ function module:OnEnable()
         chat:SetShadowOffset(1, -1)
 
         if i == 1 then
-            chat:ClearAllPoints()
-            chat:SetSize(cfg.width, cfg.height)
-            if cfg.background then
-                chat:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5] + 4)
-            else
-                chat:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5])
-            end
-            FCF_SavePositionAndDimensions(chat)
+            updateChatSize()
         elseif i == 2 then
             if not cfg.combatlog then
                 FCF_DockFrame(chat)
@@ -425,53 +438,12 @@ function module:OnEnable()
         chat:SetScript("OnMouseWheel", FloatingChatFrame_OnMouseScroll)
     end
 
-    QuickJoinToastButton:ClearAllPoints()
-    QuickJoinToastButton:SetPoint("TOPLEFT", 0, 90)
-    QuickJoinToastButton.ClearAllPoints = E.Dummy
-    QuickJoinToastButton.SetPoint = E.Dummy
-    QuickJoinToastButton.Toast:ClearAllPoints()
-    QuickJoinToastButton.Toast:SetPoint(unpack(cfg.bn_popup))
-    QuickJoinToastButton.Toast.Background:SetTexture("")
-    E:ApplyBackdrop(QuickJoinToastButton.Toast, true)
-    QuickJoinToastButton.Toast.backdrop:SetPoint("TOPLEFT", 0, 0)
-    QuickJoinToastButton.Toast.backdrop:SetPoint("BOTTOMRIGHT", 0, 0)
-    QuickJoinToastButton.Toast.backdrop:Hide()
-    QuickJoinToastButton.Toast:SetWidth(cfg.width + 7)
-    QuickJoinToastButton.Toast.Text:SetWidth(cfg.width - 20)
+    self:RegisterEvent("UI_SCALE_CHANGED", updateChatSize)
 
-    hooksecurefunc(QuickJoinToastButton, "ShowToast", function()
-        QuickJoinToastButton.Toast.backdrop:Show()
-    end)
-    hooksecurefunc(QuickJoinToastButton, "HideToast", function()
-        QuickJoinToastButton.Toast.backdrop:Hide()
-    end)
-
-    BNToastFrame:ClearAllPoints()
-    BNToastFrame:SetPoint(unpack(cfg.bn_popup))
-    hooksecurefunc(BNToastFrame, "SetPoint", function(self, _, anchor)
-        if anchor == QuickJoinToastButton then
-            self:ClearAllPoints()
-            self:SetPoint(unpack(cfg.bn_popup))
-        end
-    end)
-
-    hooksecurefunc(BNToastFrame, "ShowToast", function(self)
-        if not self.IsSkinned then
-            self.CloseButton:SetSize(16, 16)
-            E:ReskinCloseButton(self.CloseButton, self)
-            self.IsSkinned = true
-        end
-    end)
-
-    hooksecurefunc(ChatFrame1, "SetPoint", function(self, _, _, _, x)
+    hooksecurefunc(ChatFrame1, "SetPoint", function(_, _, _, _, x)
+        if isScaling then return end
         if x ~= cfg.pos[4] then
-            self:ClearAllPoints()
-            self:SetSize(cfg.width, cfg.height)
-            if cfg.background then
-                self:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5] + 4)
-            else
-                self:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5])
-            end
+            updateChatSize()
         end
     end)
 end
