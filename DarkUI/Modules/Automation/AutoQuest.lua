@@ -5,7 +5,6 @@ local E, C, L = select(2, ...):unpack()
 ------------------------------------------------------------------------
 
 local module = E:Module("Automation"):Sub("AutoQuest")
-E:Module("Automation"):SetConfigKey("automation")
 
 local cfg = C.automation
 
