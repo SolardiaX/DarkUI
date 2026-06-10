@@ -391,6 +391,11 @@ local function fadeOut(f)
 	E:UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
 end
 
+local function setGhost(f)
+	f:SetAlpha(0)
+	f:SetScale(0.0001)
+end
+
 ------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
@@ -418,6 +423,9 @@ local function addapi(object)
 	end
 	if not mt.FadeOut then
 		mt.FadeOut = fadeOut
+	end
+	if not mt.SetGhost then
+		mt.SetGhost = setGhost
 	end
 
 	if mt.SetTexture then
