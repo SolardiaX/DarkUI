@@ -4,6 +4,7 @@
     <Include file="Aura\_load_.xml" />
     <Include file="Automation\_load_.xml" />
     <Include file="Bags\_load_.xml" />
+    <Include file="Blizzard\_load_.xml" />
     <Include file="Chat\_load_.xml" />
     <Include file="DataText\_load_.xml" />
     <Include file="Loot\_load_.xml" />
