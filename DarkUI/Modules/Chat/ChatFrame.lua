@@ -321,12 +321,6 @@ function module:OnInit()
     SetCVar("chatStyle", "classic")
     SetCVar("chatMouseScroll", 1)
 
-    if cfg.auto_width then
-        -- local renderScale = UIParent:GetEffectiveScale()
-        -- cfg.width = ((E.screenWidth - 1024) / 2 - 200) * renderScale
-        -- cfg.width = ((E.screenWidth - 1024) / 2 - 200)
-    end
-
     GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
     hooksecurefunc(GeneralDockManagerScrollFrame, "SetPoint", function(self, point, anchor, attachTo, x, y)
         if anchor == GeneralDockManagerOverflowButton and x == 0 and y == 0 then

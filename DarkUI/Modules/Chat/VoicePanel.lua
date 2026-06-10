@@ -12,9 +12,7 @@ local BUTTON_SIZE = 24
 local BUTTON_SPACING = 2
 local PANEL_PADDING = 2
 
-local friendTex = "Interface\\HELPFRAME\\ReportLagIcon-Chat"
-local queueTex = "Interface\\HELPFRAME\\HelpIcon-ItemRestoration"
-local homeTex = "Interface\\Buttons\\UI-HomeButton"
+local homeTex = "Interface\\HELPFRAME\\ReportLagIcon-Chat"
 
 ------------------------------------------------------------------------
 -- Fading
@@ -37,9 +35,6 @@ end
 ------------------------------------------------------------------------
 
 local function setupQuickJoin(button)
-    -- button.FriendsButton:SetTexture(friendTex)
-    -- button.QueueButton:SetTexture(queueTex)
-
     hooksecurefunc(button, "ToastToFriendFinished", function(self)
         self.FriendsButton:SetShown(not self.displayedToast)
         if self.FriendCount then
@@ -49,27 +44,16 @@ local function setupQuickJoin(button)
 
     hooksecurefunc(button, "UpdateQueueIcon", function(self)
         if not self.displayedToast then return end
-        self.QueueButton:SetTexture(queueTex)
-        self.FlashingLayer:SetTexture(queueTex)
         self.FriendsButton:SetShown(false)
         if self.FriendCount then
             self.FriendCount:SetShown(false)
         end
     end)
 
-    -- button:HookScript("OnMouseDown", function(self)
-    --     self.FriendsButton:SetTexture(friendTex)
-    -- end)
-    -- button:HookScript("OnMouseUp", function(self)
-    --     self.FriendsButton:SetTexture(friendTex)
-    -- end)
-
     button.Toast:SetParent(UIParent)
     button.Toast:ClearAllPoints()
     button.Toast:SetPoint(unpack(cfg.bn_popup))
     button.Toast.Background:SetTexture("")
-    button.Toast:SetWidth(cfg.width + 7)
-    button.Toast.Text:SetWidth(cfg.width - 20)
  
     BNToastFrame:ClearAllPoints()
     BNToastFrame:SetPoint(unpack(cfg.bn_popup))
@@ -122,7 +106,7 @@ function module:OnInit()
 
     local toggleIcon = toggle:CreateTexture(nil, "ARTWORK")
     toggleIcon:SetAllPoints()
-    toggleIcon:SetTexture(friendTex)
+    toggleIcon:SetTexture(homeTex)
 
     toggle:SetScript("OnEnter", onEnter)
     toggle:SetScript("OnLeave", onLeave)
@@ -163,9 +147,4 @@ function module:OnInit()
     if QuickJoinToastButton then
         setupQuickJoin(QuickJoinToastButton)
     end
-
-    -- if ChatFrameMenuButton then
-    --     ChatFrameMenuButton:SetNormalTexture(homeTex)
-    --     ChatFrameMenuButton:SetPushedTexture(homeTex)
-    -- end
 end

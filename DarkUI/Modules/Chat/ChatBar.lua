@@ -50,7 +50,7 @@ function module:OnInit()
 
     local frame = CreateFrame("Frame", "ChatBar", UIParent)
     frame:SetWidth(16)
-    frame:SetHeight(cfg.background and cfg.height + 4 or cfg.height - 1)
+    frame:SetHeight(cfg.background and 120 or 110)
     frame:SetPoint("BOTTOMLEFT", UIParent, 2, cfg.background and 30 or 26)
 
     if cfg.chat_bar_mouseover then
