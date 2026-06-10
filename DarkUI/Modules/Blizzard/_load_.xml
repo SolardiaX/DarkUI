@@ -11,4 +11,5 @@
     <Script file="Mail.lua" />
     <Script file="MoveBlizzFrames.lua" />
     <Script file="ShiftMark.lua" />
+    <Script file="Styles.lua" />
 </Ui>
