@@ -342,7 +342,7 @@ local function callback(self, event, unit)
     if unit then
         local unitGUID = UnitGUID(unit)
         if unitGUID and canaccessvalue(unitGUID) then
-            self.npcID = tonumber(select(6, strsplit('-', unitGUID)))
+            self.npcID = tonumber((select(6, strsplit('-', unitGUID))))
         else
             self.npcID = nil
         end
