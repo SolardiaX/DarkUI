@@ -179,8 +179,7 @@ function E:ReskinCloseButton(button, anchor)
 
 	button:StripTextures()
 	button:SetSize(18, 18)
-	button:SetTemplate("Overlay")
-	button:CreateBorder()
+	E:ReskinButton(button)
 
 	if not button.text then
 		button.text = button:CreateFontText(16, "x")
@@ -197,14 +196,14 @@ function E:ReskinCloseButton(button, anchor)
 		if self:IsEnabled() then
 			self:SetBackdropBorderColor(r, g, b)
 			if self.__border then
-				self.__border:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1)
+				self.__border:SetBackdropBorderColor(r * 0.3, g * 0.3, b * 0.3, 1)
 			end
 		end
 	end)
 	button:HookScript("OnLeave", function(self)
 		self:SetBackdropBorderColor(unpack(C.media.border_color))
 		if self.__border then
-			self.__border:SetVertexColor(0.1, 0.1, 0.1, 1)
+			self.__border:SetBackdropBorderColor(0.1, 0.1, 0.1, 1)
 		end
 	end)
 
