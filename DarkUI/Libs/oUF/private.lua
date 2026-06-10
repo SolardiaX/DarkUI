@@ -31,9 +31,21 @@ function Private.unitExists(unit)
 end
 
 function Private.unitIsUnit(unit1, unit2)
-	-- TODO: use C_Secrets.CanCompareUnitTokens instead of pcall
+	if(not (unit1 and unit2)) then return false end
+
+	-- 12.0: UnitIsUnit may return a secret boolean for protected units; guard
+	-- with C_Secrets.CanCompareUnitTokens and reject secret results so callers
+	-- can safely do boolean tests (e.g. `not unitIsUnit(...)`).
+	if(C_Secrets and C_Secrets.CanCompareUnitTokens and not C_Secrets.CanCompareUnitTokens(unit1, unit2)) then
+		return false
+	end
+
 	local isOk, isUnit = pcall(UnitIsUnit, unit1, unit2)
-	return isOk and isUnit
+	if(isOk and not issecretvalue(isUnit)) then
+		return isUnit
+	end
+
+	return false
 end
 
 local validator = CreateFrame('Frame')
