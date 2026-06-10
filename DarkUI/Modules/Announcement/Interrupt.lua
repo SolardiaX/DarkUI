@@ -17,12 +17,13 @@ local CHANNELS = { "SAY", "YELL", "EMOTE", "PARTY", "RAID_ONLY", "RAID" }
 function module:OnInit()
     if not cfg or not cfg.enable then return end
 
-    self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED", function()
+    self:RegisterEvent("UNIT_SPELLCAST_INTERRUPT", function(_, _, unit, _, spellID)
         if not IsInGroup() then return end
+        if unit ~= "player" and unit ~= "pet" then return end
 
-        local _, event, _, sourceGUID, _, _, _, _, destName, _, _, _, _, _, spellID, spellName = C_CombatLog.GetCurrentEventInfo()
-        if event ~= "SPELL_INTERRUPT" then return end
-        if sourceGUID ~= UnitGUID("player") and sourceGUID ~= UnitGUID("pet") then return end
+        local info = C_Spell.GetSpellInfo(spellID)
+        local spellName = info and info.name or tostring(spellID)
+        local spellLink = C_Spell.GetSpellLink(spellID) or spellName
 
         local _, instanceType = GetInstanceInfo()
         local inPartyLFG = IsPartyLFG()
@@ -38,8 +39,7 @@ function module:OnInit()
         end
 
         local channel = CHANNELS[cfg.channel] or "PARTY"
-        local spellLink = C_Spell.GetSpellLink(spellID) or spellName or tostring(spellID)
-        local msg = format(L.CHAT_INTERRUPTED or "Interrupted %s: %s [%s]", destName or "?", spellLink, spellName or "")
+        local msg = format(L.CHAT_INTERRUPTED or "Interrupted: %s", spellLink)
 
         if channel == "PARTY" then
             SendChatMessage(msg, inPartyLFG and "INSTANCE_CHAT" or "PARTY")

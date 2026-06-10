@@ -60,6 +60,7 @@ end
 
 local function darkenFrame(frame, recursive)
     if not frame then return end
+    if frame.IsForbidden and frame:IsForbidden() then return end
     local name = frame.GetName and frame:GetName()
     if name and IGNORE_FRAMES[name] then return end
 
@@ -136,7 +137,6 @@ local PANEL_FRAMES = {
     "TradeFrame",
     "ChannelFrame",
     "LootFrame",
-    "WorldMapFrame",
 }
 
 local ADDON_FRAMES = {
@@ -152,6 +152,7 @@ local ADDON_FRAMES = {
     ["Blizzard_MacroUI"] = { "MacroFrame" },
     ["Blizzard_TalentUI"] = { "PlayerTalentFrame" },
     ["Blizzard_Professions"] = { "ProfessionsFrame" },
+    ["Blizzard_WorldMap"] = { "WorldMapFrame" },
 }
 
 ------------------------------------------------------------------------
@@ -202,4 +203,60 @@ function module:OnInit()
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
         C_Timer.After(0.5, processBaseFrames)
     end)
+
+    -- Dynamic content: GossipFrame / QuestFrame
+    local function darkenScrollContent(frame)
+        if not frame then return end
+        C_Timer.After(0.2, function()
+            darkenFrame(frame, true)
+        end)
+    end
+
+    if GossipFrame then
+        GossipFrame:HookScript("OnShow", function()
+            darkenScrollContent(GossipFrame)
+        end)
+        if GossipFrame.GreetingPanel and GossipFrame.GreetingPanel.ScrollBox then
+            hooksecurefunc(GossipFrame.GreetingPanel.ScrollBox, "FullUpdate", function()
+                darkenScrollContent(GossipFrame.GreetingPanel)
+            end)
+        end
+    end
+
+    if QuestFrame then
+        QuestFrame:HookScript("OnShow", function()
+            darkenScrollContent(QuestFrame)
+        end)
+    end
+
+    -- Vigor bar decorations
+    local function darkenVigor()
+        if not UIWidgetPowerBarContainerFrame then return end
+        for i = 1, select("#", UIWidgetPowerBarContainerFrame:GetChildren()) do
+            local child = select(i, UIWidgetPowerBarContainerFrame:GetChildren())
+            if child then
+                if child.DecorLeft and child.DecorLeft.GetAtlas then
+                    local atlas = child.DecorLeft:GetAtlas()
+                    if atlas and atlas:find("vigor", 1, true) then
+                        darkenTexture(child.DecorLeft)
+                        darkenTexture(child.DecorRight)
+                    end
+                end
+                for j = 1, select("#", child:GetChildren()) do
+                    local grandchild = select(j, child:GetChildren())
+                    if grandchild and grandchild.Frame and grandchild.Frame.GetAtlas then
+                        local atlas = grandchild.Frame:GetAtlas()
+                        if atlas and atlas:find("vigor", 1, true) then
+                            darkenTexture(grandchild.Frame)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", function()
+        C_Timer.After(0.3, darkenVigor)
+    end)
+    C_Timer.After(1.5, darkenVigor)
 end

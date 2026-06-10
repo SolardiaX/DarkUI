@@ -46,7 +46,11 @@ function Event:Register(event, handler, owner)
 
     if not registry[event] then
         registry[event] = {}
-        frame:RegisterEvent(event)
+        local ok = pcall(frame.RegisterEvent, frame, event)
+        if not ok then
+            registry[event] = nil
+            return
+        end
     end
 
     local handlers = registry[event]

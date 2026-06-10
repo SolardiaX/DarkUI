@@ -125,7 +125,8 @@ local function setCastbarInterruptible(Castbar)
     if kickID > 0 then
         local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
         local start = cooldownInfo and cooldownInfo.startTime or 0
-        if start ~= 0 then
+        local onCD = issecretvalue(start) or start ~= 0
+        if onCD then
             Castbar:SetStatusBarColor(CastbarKickOnCDColor:GetRGB())
         else
             Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())

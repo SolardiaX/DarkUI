@@ -101,7 +101,8 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
 
     if not NoTaint2_CleanStaticPopups then
         function NoTaint2_CleanStaticPopups()
-            for index = 1, STATICPOPUP_NUMDIALOGS do
+            local numDialogs = not issecretvalue(STATICPOPUP_NUMDIALOGS) and STATICPOPUP_NUMDIALOGS or 4
+            for index = 1, numDialogs do
                 local frame = _G["StaticPopup" .. index]
                 if not issecurevariable(frame, "which") then
                     if frame:IsShown() then

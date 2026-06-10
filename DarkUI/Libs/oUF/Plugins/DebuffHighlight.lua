@@ -159,7 +159,7 @@ local function Update(object, _, unit)
         color = C_UnitAuras.GetAuraDispelTypeColor(unit, aura.auraInstanceID, dispelColorCurve)
     end
 
-    if color and color.a and color.a > 0 then
+    if color and color.a and (issecretvalue(color.a) or color.a > 0) then
         local r, g, b, a = color:GetRGBA()
         local alpha = object.DebuffHighlightAlpha or 0.5
         if object.DebuffHighlightBackdrop or object.DebuffHighlightBackdropBorder then
