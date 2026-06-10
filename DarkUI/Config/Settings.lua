@@ -449,10 +449,9 @@ C.misc = {
 ----------------------------------------------------------------------------------------
 C.quest = {
     enable = true,
-    auto_collapse = true,
-    quest_tracker_pos = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", 0, -60 },
+    auto_collapse = "SCENARIO", -- "NONE", "RAID", "SCENARIO", "RELOAD", or true (= RAID)
     auto_button = true,
-    auto_button_pos = { "CENTER", "UIParent", "CENTER", 0, -240 },
+    quest_notification = true,
 }
 
 ----------------------------------------------------------------------------------------
