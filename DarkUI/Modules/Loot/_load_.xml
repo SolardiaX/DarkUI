@@ -1,0 +1,5 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <Script file="Loot.lua" />
+    <Script file="FasterLoot.lua" />
+    <Script file="GroupLoot.lua" />
+</Ui>
