@@ -175,8 +175,8 @@ StaticPopupDialogs["RESETUI_CONFIRM"] = {
     button1 = ACCEPT,
     button2 = CANCEL,
     OnAccept = function()
-        DarkUI_DB = nil
-        DarkUI_CharDB = nil
+        SavedConfig = nil
+        SavedConfigPerChar = nil
         SavedStats = nil
         SavedStatsPerChar = nil
         ReloadUI()

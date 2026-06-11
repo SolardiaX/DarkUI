@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- WorldMap
@@ -324,7 +324,7 @@ local function setupFogRemoval()
     bu:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
         cfg.removeFog = checked
-        SavedStatsPerChar.removeFog = checked
+        DB:Set("map.worldmap.removeFog", checked)
         for i = 1, #shownMapCache do
             shownMapCache[i]:SetShown(not checked)
         end

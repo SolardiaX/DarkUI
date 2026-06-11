@@ -165,13 +165,13 @@ end
 
 -- Toggle global vs per-character
 function DB:SetUseGlobal(useGlobal)
-    DarkUI_DB.useGlobal = useGlobal
-    overrides = useGlobal and DarkUI_DB.global or DarkUI_CharDB.overrides
+    SavedConfig.useGlobal = useGlobal
+    overrides = useGlobal and SavedConfig.global or SavedConfigPerChar.overrides
     self:BuildProxy()
 end
 
 function DB:IsGlobal()
-    return DarkUI_DB and DarkUI_DB.useGlobal or false
+    return SavedConfig and SavedConfig.useGlobal or false
 end
 
 ----------------------------------------------------------------------------------------
@@ -187,24 +187,24 @@ end
 ----------------------------------------------------------------------------------------
 
 function DB:Initialize()
-    if not DarkUI_DB then
-        DarkUI_DB = { version = E.version, useGlobal = true, global = {} }
+    if not SavedConfig then
+        SavedConfig = { version = E.version, useGlobal = true, global = {} }
     end
-    if not DarkUI_CharDB then
-        DarkUI_CharDB = { version = E.version, overrides = {} }
+    if not SavedConfigPerChar then
+        SavedConfigPerChar = { version = E.version, overrides = {} }
     end
 
     -- Version mismatch: full reset (user accepted this design)
-    if DarkUI_DB.version ~= E.version then
-        local useGlobal = DarkUI_DB.useGlobal
-        DarkUI_DB = { version = E.version, useGlobal = useGlobal ~= false, global = {} }
+    if SavedConfig.version ~= E.version then
+        local useGlobal = SavedConfig.useGlobal
+        SavedConfig = { version = E.version, useGlobal = useGlobal ~= false, global = {} }
     end
-    if DarkUI_CharDB.version ~= E.version then
-        DarkUI_CharDB = { version = E.version, overrides = {} }
+    if SavedConfigPerChar.version ~= E.version then
+        SavedConfigPerChar = { version = E.version, overrides = {} }
     end
 
     -- Point to active override source
-    overrides = DarkUI_DB.useGlobal and DarkUI_DB.global or DarkUI_CharDB.overrides
+    overrides = SavedConfig.useGlobal and SavedConfig.global or SavedConfigPerChar.overrides
 
     -- Apply user overrides onto C (defaults already written by Config/Defaults.lua)
     self:BuildProxy()
