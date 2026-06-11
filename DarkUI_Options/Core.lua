@@ -539,23 +539,40 @@ local function addGameMenuButton()
     end)
     btn:Hide()
 
+    local offset = btn:GetHeight()
+
     hooksecurefunc(GameMenuFrame, "Layout", function(self)
         local anchor
-        local offset = btn:GetHeight()
+        local others = {}
         for button in self.buttonPool:EnumerateActive() do
             if button:GetText() == ADDONS then
                 anchor = button
-            else
-                local point, relativeTo, relativePoint, xOfs, yOfs = button:GetPoint()
-                if point and relativeTo and yOfs then
-                    button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs - offset)
+            elseif button ~= btn then
+                others[#others + 1] = button
+            end
+        end
+        if not anchor then
+            return
+        end
+
+        local anchorTop = anchor:GetTop()
+
+        local p, rel, rp, x, y = anchor:GetPoint()
+        if p and rel and y then
+            anchor:SetPoint(p, rel, rp, x, y - offset)
+        end
+
+        for _, button in ipairs(others) do
+            if button:GetTop() < anchorTop then
+                local p2, rel2, rp2, x2, y2 = button:GetPoint()
+                if p2 and rel2 and y2 then
+                    button:SetPoint(p2, rel2, rp2, x2, y2 - offset)
                 end
             end
         end
-        if not anchor then return end
 
         btn:ClearAllPoints()
-        btn:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -10)
+        btn:SetPoint("BOTTOMLEFT", anchor, "TOPLEFT", 0, 10)
         btn:Show()
 
         self:SetHeight(self:GetHeight() + offset)
