@@ -352,7 +352,7 @@ C.map = {
     },
     worldmap = {
         enable = true,
-        removeFog = true,
+        removeFog = false,
         revealGlow = true,
         scale = 0.8,
         maxScale = 0.7,

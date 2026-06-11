@@ -11,9 +11,12 @@ local format, select = string.format, select
 local strmatch, gmatch = strmatch, gmatch
 local wipe, tinsert, pairs, ceil, mod = wipe, tinsert, pairs, ceil, mod
 local tonumber = tonumber
+local CreateFrame = CreateFrame
 local CreateVector2D = CreateVector2D
 local UnitPosition = UnitPosition
+local hooksecurefunc = hooksecurefunc
 local WorldMapFrame = WorldMapFrame
+local GameFontNormal = GameFontNormal
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 local C_Map_GetWorldPosFromMapPos = C_Map.GetWorldPosFromMapPos
 local C_Map_GetMapArtID = C_Map.GetMapArtID
@@ -209,15 +212,19 @@ local function mapDataRefreshOverlays(self, fullUpdate)
                     texture:SetPoint("TOPLEFT", offsetX + (TILE_SIZE_WIDTH * (k - 1)), -(offsetY + (TILE_SIZE_HEIGHT * (j - 1))))
                     texture:SetTexture(fileDataIDs[((j - 1) * numTexturesWide) + k], nil, nil, "TRILINEAR")
 
-                    if cfg.revealGlow then
-                        texture:SetVertexColor(0.7, 0.7, 0.7)
+                    if not cfg.removeFog then
+                        if cfg.revealGlow then
+                            texture:SetVertexColor(.7, .7, .7)
+                        else
+                            texture:SetVertexColor(1, 1, 1)
+                        end
+                        texture:SetDrawLayer("ARTWORK", -1)
+                        texture:Show()
+                        if fullUpdate then
+                            self.textureLoadGroup:AddTexture(texture)
+                        end
                     else
-                        texture:SetVertexColor(1, 1, 1)
-                    end
-                    texture:SetDrawLayer("ARTWORK", -1)
-                    texture:Show()
-                    if fullUpdate then
-                        self.textureLoadGroup:AddTexture(texture)
+                        texture:Hide()
                     end
                     tinsert(shownMapCache, texture)
                 end
@@ -297,14 +304,31 @@ local function setupCoords()
 end
 
 local function setupFogRemoval()
-    if not cfg.removeFog then
-        return
-    end
+    local bu = CreateFrame("CheckButton", nil, WorldMapFrame.BorderFrame.TitleContainer, "OptionsBaseCheckButtonTemplate")
+    bu:SetHitRectInsets(-5, -5, -5, -5)
+    bu:SetPoint("BOTTOMLEFT", WorldMapFrameHomeButton, "TOPLEFT", 25, 2)
+    bu:SetSize(26, 26)
+    E:ReskinCheckBox(bu)
+    bu:SetChecked(cfg.removeFog)
+
+    bu.f = bu:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    bu.f:SetFont(GameFontNormal:GetFont(), 14, "")
+    bu.f:SetPoint("LEFT", bu, "RIGHT", 5, 0)
+    bu.f:SetText(L.MAP_REMOVEFOG)
 
     for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
         hooksecurefunc(pin, "RefreshOverlays", mapDataRefreshOverlays)
         pin.overlayTexturePool.resetterFunc = mapDataResetTexturePool
     end
+
+    bu:SetScript("OnClick", function(self)
+        local checked = self:GetChecked()
+        cfg.removeFog = checked
+        SavedStatsPerChar.removeFog = checked
+        for i = 1, #shownMapCache do
+            shownMapCache[i]:SetShown(not checked)
+        end
+    end)
 end
 
 ------------------------------------------------------------------------

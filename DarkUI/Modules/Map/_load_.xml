@@ -8,7 +8,7 @@
     <Button name="DarkUIWorldQuestEventTemplate" inherits="AreaPOIEventPinTemplate" virtual="true" />
 
     <Script file="Minimap.lua" />
-    <Script file="WorldMapData.lua" />
+    <Script file="WorldMapFog.lua" />
     <Script file="WorldMap.lua" />
     <Script file="WorldMapRewardIcon.lua" />
 </Ui>
