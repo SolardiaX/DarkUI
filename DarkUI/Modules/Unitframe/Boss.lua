@@ -268,10 +268,6 @@ local function createStyle(self)
     pa.borderScale = 0
     pa.disableCooldown = false
     pa.disableCooldownText = false
-    pa.PostCreateAura = function(_, aura)
-        aura:CreateOverlay()
-        aura:CreateShadow()
-    end
     self.PrivateAuras = pa
 
     core:SetFader(self, cfg.boss.fader)
