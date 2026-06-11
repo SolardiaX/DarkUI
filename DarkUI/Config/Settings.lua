@@ -368,6 +368,8 @@ C.misc = {
         enable = true,
         position = { "TOPLEFT", "UIParent", "TOPLEFT", 400, 1 },
     },
+    focuser = true,
+    faster_movie_skip = true,
     train_all = true,
     already_known = true,
     profession_tabs = true,
