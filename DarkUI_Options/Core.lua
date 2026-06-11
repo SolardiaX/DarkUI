@@ -18,6 +18,8 @@ addon.BUTTON = BUTTON
 
 addon.TabList = {}
 addon.OptionList = {}
+addon.Hooks = {}
+addon.widgets = {}
 
 function addon:RegisterTab(key, label)
     self.TabList[#self.TabList + 1] = { key = key, label = label }
@@ -129,7 +131,7 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
     text:SetTextColor(1, 1, 1)
     cb.label = text
 
-    return WIDGET_OFFSET_CHECK
+    return WIDGET_OFFSET_CHECK, cb
 end
 
 local function createSlider(parent, dbPath, label, offset, extra)
@@ -167,7 +169,7 @@ local function createSlider(parent, dbPath, label, offset, extra)
         needReload = true
     end)
 
-    return WIDGET_OFFSET_SLIDER
+    return WIDGET_OFFSET_SLIDER, slider
 end
 
 local function createDropDown(parent, dbPath, label, offset, options)
@@ -266,7 +268,7 @@ local function createDropDown(parent, dbPath, label, offset, options)
         end
     end)
 
-    return WIDGET_OFFSET_DROP
+    return WIDGET_OFFSET_DROP, frame
 end
 
 local function createActionButton(parent, cmd, label, offset)
@@ -298,7 +300,7 @@ local function createActionButton(parent, cmd, label, offset)
         end
     end)
 
-    return WIDGET_OFFSET_BUTTON
+    return WIDGET_OFFSET_BUTTON, btn
 end
 
 ------------------------------------------------------------------------
@@ -316,6 +318,7 @@ local function clearContent()
             region:SetParent(nil)
         end
     end
+    wipe(addon.widgets)
 end
 
 local function populateContent(key)
@@ -332,18 +335,36 @@ local function populateContent(key)
         local dbPath = opt[2]
         local label = opt[3]
         local extra = opt[4]
+        local initFn = opt[5]
+        local h, widget
 
         if optType == HEADER then
-            offset = offset + createHeader(scrollChild, label or dbPath, offset)
+            h = createHeader(scrollChild, label or dbPath, offset)
         elseif optType == CHECK then
-            offset = offset + createCheckBox(scrollChild, dbPath, label, offset, extra)
+            h, widget = createCheckBox(scrollChild, dbPath, label, offset, extra)
         elseif optType == SLIDER then
-            offset = offset + createSlider(scrollChild, dbPath, label, offset, extra)
+            h, widget = createSlider(scrollChild, dbPath, label, offset, extra)
         elseif optType == DROP then
-            offset = offset + createDropDown(scrollChild, dbPath, label, offset, extra)
+            h, widget = createDropDown(scrollChild, dbPath, label, offset, extra)
         elseif optType == BUTTON then
-            offset = offset + createActionButton(scrollChild, dbPath, label, offset)
+            h, widget = createActionButton(scrollChild, dbPath, label, offset)
         end
+
+        if h then
+            offset = offset + h
+        end
+
+        if widget and dbPath then
+            addon.widgets[dbPath] = widget
+        end
+
+        if initFn and widget then
+            initFn(widget, addon)
+        end
+    end
+
+    if addon.Hooks[key] then
+        addon.Hooks[key](addon)
     end
 
     scrollChild:SetHeight(offset + 20)

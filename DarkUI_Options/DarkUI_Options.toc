@@ -14,4 +14,17 @@
 
 Locales\load.xml
 Core.lua
-Options.lua
+Modules\01-General.lua
+Modules\02-Actionbar.lua
+Modules\03-Unitframe.lua
+Modules\04-Nameplate.lua
+Modules\05-Aura.lua
+Modules\06-Map.lua
+Modules\07-Loot.lua
+Modules\08-DataText.lua
+Modules\09-Tooltip.lua
+Modules\10-Chat.lua
+Modules\11-Quest.lua
+Modules\12-Automation.lua
+Modules\13-Misc.lua
+Modules\14-Commands.lua

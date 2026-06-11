@@ -19,6 +19,8 @@ L_CATEGORIES_COMMAND = "Commands"
 
 -- General
 L_OPT_GENERAL_THEME = "Theme"
+L_OPT_GENERAL_THEME_COLD = "Cold"
+L_OPT_GENERAL_THEME_WARM = "Warm"
 L_OPT_GENERAL_THEME_LITEMODE = "Use Lite style"
 L_OPT_GENERAL_BLIZZARD_STYLE = "Beautify Blizzard Frames"
 L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION = "Optimize raw frames layout (e.g. Achievement/NPC Dialogue/BreathBar etc.)"
@@ -92,6 +94,7 @@ L_OPT_NAMEPLATE_PLAYER_AURA_ONLY = "Only shows player cast buff/debuff"
 L_OPT_NAMEPLATE_SHOW_STEALABLE_BUFFS = "Show stealable buff"
 L_OPT_NAMEPLATE_SHOW_TIMERS = "Cooldown timer with buff/debuff"
 L_OPT_NAMEPLATE_SHOW_SPIRAL = "Cooldown spiral with buff/debuff"
+L_OPT_NAMEPLATE_TOTEM_ICONS = "Show totem icons"
 L_OPT_NAMEPLATE_ARROW = "Show arrow to current target"
 L_OPT_NAMEPLATE_QUEST = "Show quest info"
 
