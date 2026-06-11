@@ -155,71 +155,96 @@ SLASH_FRAME1 = "/frame"
 local tplFrames
 
 local function createTemplatePreview()
-	local frames = {}
-	local templates = { "Overlay", "Default", "Blur", "Transparent", "Shadow", "Border" }
-	local startX = -(#templates - 1) * 50
+    local frames = {}
+    local templates = { "Overlay", "Default", "Blur", "Transparent", "Shadow", "Border" }
+    local startX = -(#templates - 1) * 50
 
-	for i, tpl in ipairs(templates) do
-		local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-		box:SetSize(64, 64)
-		box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 200)
-		box:SetFrameStrata("DIALOG")
-		box:SetTemplate(tpl)
-		box:CreateFontText(12, tpl, false, "TOP", 0, 15)
+    for i, tpl in ipairs(templates) do
+        local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+        box:SetSize(64, 64)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 200)
+        box:SetFrameStrata("DIALOG")
+        box:SetTemplate(tpl)
+        box:CreateFontText(12, tpl, false, "TOP", 0, 15)
         box:Hide()
-		frames[#frames + 1] = box
-	end
+        frames[#frames + 1] = box
+    end
 
-	-- Row 2: Create* API demos
-	local apis = {
-		{ label = "CreateBackdrop", fn = function(box)
-			box:CreateBackdrop()
-		end },
-        { label = "CreateShadow", fn = function(box)
-			box:CreateShadow()
-		end },
-        { label = "CreateBorder", fn = function(box)
-			box:CreateBorder()
-		end },
-		{ label = "CreateOverlay", fn = function(box)
-			box:CreateOverlay()
-		end },
-		{ label = "ReskinIcon", fn = function(box)
-			local tex = box:CreateTexture(nil, "ARTWORK")
-			tex:SetAllPoints()
-			tex:SetTexture(134400)
-			E:ReskinIcon(tex, true, box)
-		end },
-	}
+    -- Row 2: Create* API demos
+    local apis = {
+        {
+            label = "CreateBackdrop",
+            fn = function(box)
+                box:CreateBackdrop()
+            end,
+        },
+        {
+            label = "CreateShadow",
+            fn = function(box)
+                box:CreateShadow()
+            end,
+        },
+        {
+            label = "CreateBorder",
+            fn = function(box)
+                box:CreateBorder()
+            end,
+        },
+        {
+            label = "CreateOverlay",
+            fn = function(box)
+                box:CreateOverlay()
+            end,
+        },
+        {
+            label = "ReskinIcon",
+            fn = function(box)
+                local tex = box:CreateTexture(nil, "ARTWORK")
+                tex:SetAllPoints()
+                tex:SetTexture(134400)
+                E:ReskinIcon(tex, true, box)
+            end,
+        },
+    }
 
-	startX = -(#apis - 1) * 50
-	for i, demo in ipairs(apis) do
-		local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
-		box:SetSize(48, 48)
-		box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 100)
-		box:SetFrameStrata("DIALOG")
+    startX = -(#apis - 1) * 50
+    for i, demo in ipairs(apis) do
+        local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+        box:SetSize(48, 48)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 100)
+        box:SetFrameStrata("DIALOG")
         box:Hide()
-		demo.fn(box)
-		box:CreateFontText(10, demo.label, false, "TOP", 0, 13)
-		frames[#frames + 1] = box
-	end
+        demo.fn(box)
+        box:CreateFontText(10, demo.label, false, "TOP", 0, 13)
+        frames[#frames + 1] = box
+    end
 
-	return frames
+    return frames
 end
 
 SLASH_DARKUI1 = "/darkui"
 SlashCmdList["DARKUI"] = function(msg)
-	msg = msg and msg:lower():trim() or ""
-	if msg == "tpl" or msg == "template" then
-		if not tplFrames then
-			tplFrames = createTemplatePreview()
-		end
-		local visible = tplFrames[1]:IsShown()
-		for _, frame in ipairs(tplFrames) do
-			frame:SetShown(not visible)
-		end
-	else
-		print("|cff00ff00DarkUI|r commands:")
-		print("  /darkui tpl — Template style preview")
-	end
+    msg = msg and msg:lower():trim() or ""
+    if msg == "tpl" or msg == "template" then
+        if not tplFrames then
+            tplFrames = createTemplatePreview()
+        end
+        local visible = tplFrames[1]:IsShown()
+        for _, frame in ipairs(tplFrames) do
+            frame:SetShown(not visible)
+        end
+    elseif msg == "" then
+        if C_AddOns.IsAddOnLoaded("DarkUI_Options") then
+            DarkUI_Options:Toggle()
+        else
+            C_AddOns.LoadAddOn("DarkUI_Options")
+            if DarkUI_Options then
+                DarkUI_Options:Toggle()
+            end
+        end
+    else
+        print("|cff00ff00DarkUI|r commands:")
+        print("  /darkui — Open options panel")
+        print("  /darkui tpl — Template style preview")
+    end
 end

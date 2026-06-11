@@ -1,4 +1,4 @@
-## Interface: 120000
+## Interface: 120001
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - Options
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - 配置管理
 ## Notes: DarkUI Configuration GUI
@@ -13,3 +13,5 @@
 ## Category-zhTW: UI重構
 
 Locales\load.xml
+Core.lua
+Options.lua
