@@ -154,8 +154,8 @@ function module:CreateContainers(cbNivaya)
     bags.tradegoods:SetExtendedFilter(filters.fItemClass, "TradeGoods")
     bags.main:SetMultipleFilters(true, filters.fBags, filters.fHideEmpty)
 
-    bags.main:SetPoint(unpack(self.opts.BagPos))
-    bags.bank:SetPoint(unpack(self.opts.BankPos))
+    bags.main:SetPoint(unpack(self.charOpts.BagPos or self.opts.BagPos))
+    bags.bank:SetPoint(unpack(self.charOpts.BankPos or self.opts.BankPos))
 
     -- All containers default hidden (shown by OnOpen / OnBankOpened)
     for _, bag in pairs(bags) do
