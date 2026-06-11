@@ -7,7 +7,7 @@ Used for finding original sources when iterating or fixing bugs.
 
 | File | Reference | Notes |
 |------|-----------|-------|
-| `Modules/Map/WorldMap.lua` | NDui `Modules/Maps/WorldMap.lua` | Coords, scale, UIPanel removal, fog removal logic |
+| `Modules/Map/WorldMap.lua` | NDui `Modules/Maps/WorldMap.lua`; ElvUI `Game/Shared/Modules/Maps/Worldmap.lua` | Coords & fog removal from NDui; scale/anchor kept inside the secure panel system (no UIPanelLayout detach, no drag) follows ElvUI to avoid taint |
 | `Modules/Map/WorldMapData.lua` | NDui `Modules/Maps/RawMapData.lua` | Fog removal zone texture data |
 | `Modules/Map/WorldMapRewardIcon.lua` | BetterWorldQuests (provider/pin/poi/events) | World quest reward icons, POI/event providers |
 | `Modules/Map/Minimap.lua` | NDui `Modules/Maps/Minimap.lua` | RecycleBin, icon layout patterns |
