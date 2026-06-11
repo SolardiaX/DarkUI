@@ -20,7 +20,7 @@ local config = {
 
     texCoord = { 0.08, 0.92, 0.08, 0.92 },
 
-    standard_font = { STANDARD_TEXT_FONT, 10, "THINOUTLINE" },
+    standard_font = { STANDARD_TEXT_FONT, 14, "THINOUTLINE" },
 
     button = {
         border = path .. "btn_border",
