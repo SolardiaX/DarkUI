@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Currencies
@@ -274,7 +274,7 @@ module:Inject("Currencies", {
             ToggleCharacter("TokenFrame")
         elseif button == "RightButton" then
             C.automation.auto_sell = not C.automation.auto_sell
-            E:SetVariable("automation", "auto_sell", C.automation.auto_sell)
+            DB:Set("automation.auto_sell", C.automation.auto_sell)
             self:GetScript("OnEnter")(self)
         end
     end,

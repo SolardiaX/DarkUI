@@ -145,12 +145,6 @@ function E:CheckChat(warning)
     return "SAY"
 end
 
--- Set Variable in game (delegates to Database system)
-function E:SetVariable(group, key, value)
-    local path = group .. "." .. key
-    DB:Set(path, value)
-end
-
 -- Global EasyMenu function
 local function EasyMenu_Initialize(frame, level, menuList)
     for index = 1, #menuList do

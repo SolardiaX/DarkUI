@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Durability
@@ -144,7 +144,7 @@ module:Inject("Durability", {
             ToggleCharacter("PaperDollFrame")
         elseif button == "RightButton" then
             C.automation.auto_repair = not C.automation.auto_repair
-            E:SetVariable("automation", "auto_repair", C.automation.auto_repair)
+            DB:Set("automation.auto_repair", C.automation.auto_repair)
             self:GetScript("OnEnter")(self)
         end
     end,
