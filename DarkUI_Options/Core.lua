@@ -63,19 +63,21 @@ StaticPopupDialogs["DARKUI_RELOAD_UI"] = {
 ------------------------------------------------------------------------
 
 local needReload = false
-local panel, tabFrame, scrollFrame, scrollChild
+local panel, tabFrame, scrollFrame, scrollChild, applyButton
 local tabs = {}
 local activeTab
 
-local PANEL_WIDTH = 800
-local PANEL_HEIGHT = 560
-local TAB_WIDTH = 140
-local TAB_HEIGHT = 26
-local TAB_SPACING = 4
+local PANEL_WIDTH = 1024
+local PANEL_HEIGHT = 600
+local TAB_WIDTH = 200
+local TAB_HEIGHT = 28
+local TAB_SPACING = 2
 local CONTENT_PADDING = 20
-local WIDGET_OFFSET_CHECK = 30
-local WIDGET_OFFSET_SLIDER = 60
-local WIDGET_OFFSET_DROP = 60
+local CONTENT_LEFT = 240
+local HORIZON_OFFSET = 330
+local WIDGET_OFFSET_CHECK = 35
+local WIDGET_OFFSET_SLIDER = 70
+local WIDGET_OFFSET_DROP = 70
 local WIDGET_OFFSET_HEADER = 35
 local WIDGET_OFFSET_BUTTON = 32
 
@@ -112,16 +114,20 @@ end
 
 local function createCheckBox(parent, dbPath, label, offset, horizon)
     local font = getFont()
-    local xOffset = horizon and (PANEL_WIDTH - TAB_WIDTH) / 2 or CONTENT_PADDING
 
     local cb = CreateFrame("CheckButton", nil, parent, "InterfaceOptionsCheckButtonTemplate")
-    cb:SetPoint("TOPLEFT", xOffset, -offset)
+    if horizon then
+        cb:SetPoint("TOPLEFT", HORIZON_OFFSET, -(offset - WIDGET_OFFSET_CHECK))
+    else
+        cb:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
+    end
     cb:SetChecked(DB:Get(dbPath) and true or false)
     E:ReskinCheckBox(cb)
 
     cb:SetScript("OnClick", function(self)
         DB:Set(dbPath, self:GetChecked())
         needReload = true
+        if applyButton then applyButton:Show() end
     end)
 
     local text = cb:CreateFontString(nil, "OVERLAY")
@@ -131,6 +137,9 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
     text:SetTextColor(1, 1, 1)
     cb.label = text
 
+    if horizon then
+        return 0, cb
+    end
     return WIDGET_OFFSET_CHECK, cb
 end
 
@@ -142,10 +151,10 @@ local function createSlider(parent, dbPath, label, offset, extra)
     name:SetFont(font, 12, "THINOUTLINE")
     name:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
     name:SetText(label)
-    name:SetTextColor(1, 1, 1)
+    name:SetTextColor(1, 0.8, 0)
 
     local slider = CreateFrame("Slider", nil, parent, "OptionsSliderTemplate")
-    slider:SetPoint("TOPLEFT", CONTENT_PADDING, -offset - 22)
+    slider:SetPoint("TOPLEFT", CONTENT_PADDING + 20, -offset - 24)
     slider:SetWidth(200)
     slider:SetMinMaxValues(minVal, maxVal)
     slider:SetValueStep(step)
@@ -157,16 +166,32 @@ local function createSlider(parent, dbPath, label, offset, extra)
     slider.High:SetText(maxVal)
     slider.Text:SetText("")
 
-    local valueText = slider:CreateFontString(nil, "OVERLAY")
-    valueText:SetFont(font, 11, "THINOUTLINE")
-    valueText:SetPoint("LEFT", slider, "RIGHT", 10, 0)
-    valueText:SetText(format("%.2f", DB:Get(dbPath) or minVal))
+    local editBox = CreateFrame("EditBox", nil, slider, "BackdropTemplate")
+    editBox:SetSize(50, 20)
+    editBox:SetPoint("TOP", slider, "BOTTOM", 0, -2)
+    editBox:SetAutoFocus(false)
+    editBox:SetTextInsets(5, 5, 0, 0)
+    editBox:SetFont(font, 11, "THINOUTLINE")
+    editBox:SetJustifyH("CENTER")
+    editBox:SetTemplate("Blur")
+    editBox:SetText(format("%.2f", DB:Get(dbPath) or minVal))
+
+    editBox:SetScript("OnEnterPressed", function(self)
+        local value = tonumber(self:GetText())
+        if not value then return end
+        value = max(minVal, min(maxVal, value))
+        slider:SetValue(value)
+        self:SetText(format("%.2f", value))
+        self:ClearFocus()
+    end)
+    editBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 
     slider:SetScript("OnValueChanged", function(self, value)
         value = E:Round(value, 2)
         DB:Set(dbPath, value)
-        valueText:SetText(format("%.2f", value))
+        editBox:SetText(format("%.2f", value))
         needReload = true
+        if applyButton then applyButton:Show() end
     end)
 
     return WIDGET_OFFSET_SLIDER, slider
@@ -183,16 +208,15 @@ local function createDropDown(parent, dbPath, label, offset, options)
     name:SetTextColor(1, 1, 1)
 
     local frame = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-    frame:SetSize(180, 22)
+    frame:SetSize(200, 28)
     frame:SetPoint("TOPLEFT", CONTENT_PADDING, -offset - 20)
     frame:SetTemplate("Blur")
+    frame:SetBackdropBorderColor(1, 1, 1, 0.2)
 
     local currentValue = DB:Get(dbPath)
     local displayText = frame:CreateFontString(nil, "OVERLAY")
-    displayText:SetFont(font, 11, "THINOUTLINE")
-    displayText:SetPoint("LEFT", 8, 0)
-    displayText:SetPoint("RIGHT", -22, 0)
-    displayText:SetJustifyH("LEFT")
+    displayText:SetFont(font, 12, "THINOUTLINE")
+    displayText:SetPoint("CENTER")
 
     local currentIndex
     for i, opt in ipairs(options) do
@@ -214,18 +238,12 @@ local function createDropDown(parent, dbPath, label, offset, options)
         displayText:SetText(tostring(currentValue or ""))
     end
 
-    local arrow = frame:CreateFontString(nil, "OVERLAY")
-    arrow:SetFont(font, 12, "THINOUTLINE")
-    arrow:SetPoint("RIGHT", -6, 0)
-    arrow:SetText("v")
-    arrow:SetTextColor(0.7, 0.7, 0.7)
-
     local list = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     list:SetPoint("TOP", frame, "BOTTOM", 0, -2)
-    list:SetWidth(180)
+    list:SetWidth(200)
     list:SetFrameStrata("TOOLTIP")
     list:SetTemplate("Default")
-    list:CreateShadow()
+    list:SetBackdropBorderColor(1, 1, 1, 0.2)
     list:Hide()
 
     for i, opt in ipairs(options) do
@@ -236,31 +254,47 @@ local function createDropDown(parent, dbPath, label, offset, options)
             optLabel, optValue = opt, i
         end
 
-        local btn = CreateFrame("Button", nil, list)
-        btn:SetSize(172, 20)
-        btn:SetPoint("TOPLEFT", 4, -(i - 1) * 20 - 4)
+        local btn = CreateFrame("Button", nil, list, "BackdropTemplate")
+        btn:SetSize(192, 28)
+        btn:SetPoint("TOPLEFT", 4, -(i - 1) * 30 - 4)
+        btn:SetTemplate("Default")
 
         local btnText = btn:CreateFontString(nil, "OVERLAY")
-        btnText:SetFont(font, 11, "THINOUTLINE")
-        btnText:SetAllPoints()
+        btnText:SetFont(font, 12, "THINOUTLINE")
+        btnText:SetPoint("LEFT", 5, 0)
+        btnText:SetPoint("RIGHT", -5, 0)
         btnText:SetJustifyH("LEFT")
-        btnText:SetText("  " .. optLabel)
+        btnText:SetText(optLabel)
         btn.text = btnText
-
-        btn:SetHighlightTexture(C.media.texture.status)
-        btn:GetHighlightTexture():SetVertexColor(cc.r, cc.g, cc.b, 0.2)
 
         btn:SetScript("OnClick", function()
             DB:Set(dbPath, optValue)
             displayText:SetText(optLabel)
             list:Hide()
             needReload = true
+            if applyButton then applyButton:Show() end
+        end)
+        btn:SetScript("OnEnter", function(self)
+            self:SetBackdropColor(1, 1, 1, 0.25)
+        end)
+        btn:SetScript("OnLeave", function(self)
+            self:SetBackdropColor(0, 0, 0, 0.3)
         end)
     end
 
-    list:SetHeight(#options * 20 + 8)
+    list:SetHeight(#options * 30 + 8)
 
-    frame:SetScript("OnMouseUp", function()
+    local gear = CreateFrame("Button", nil, frame)
+    gear:SetSize(22, 22)
+    gear:SetPoint("LEFT", frame, "RIGHT", -2, 0)
+    gear.Icon = gear:CreateTexture(nil, "ARTWORK")
+    gear.Icon:SetAllPoints()
+    gear.Icon:SetTexture("Interface\\WorldMap\\Gear_64")
+    gear.Icon:SetTexCoord(0, 0.5, 0, 0.5)
+    gear:SetHighlightTexture("Interface\\WorldMap\\Gear_64")
+    gear:GetHighlightTexture():SetTexCoord(0, 0.5, 0, 0.5)
+
+    gear:SetScript("OnClick", function()
         if list:IsShown() then
             list:Hide()
         else
@@ -379,10 +413,12 @@ local function selectTab(index)
     local cc = getClassColor()
     for i, tab in ipairs(tabs) do
         if i == index then
-            tab:SetBackdropBorderColor(cc.r, cc.g, cc.b)
+            tab:SetBackdropColor(cc.r, cc.g, cc.b, 0.3)
+            tab.checked = true
             tab.text:SetTextColor(cc.r, cc.g, cc.b)
         else
-            tab:SetBackdropBorderColor(unpack(C.media.border_color))
+            tab:SetBackdropColor(0, 0, 0, 0.3)
+            tab.checked = false
             tab.text:SetTextColor(0.8, 0.8, 0.8)
         end
     end
@@ -410,6 +446,7 @@ local function createPanel()
     panel:SetFrameLevel(10)
     panel:EnableMouse(true)
     panel:SetMovable(true)
+    panel:SetClampedToScreen(true)
     panel:RegisterForDrag("LeftButton")
     panel:SetScript("OnDragStart", panel.StartMoving)
     panel:SetScript("OnDragStop", panel.StopMovingOrSizing)
@@ -420,42 +457,70 @@ local function createPanel()
     -- Title
     local title = panel:CreateFontString(nil, "OVERLAY")
     title:SetFont(font, 15, "OUTLINE")
-    title:SetPoint("TOPLEFT", 15, -12)
+    title:SetPoint("TOP", 0, -10)
     title:SetText("|cffFFCC99Dark|r|cffffffffUI|r " .. (L_DARKUI_CONSOLE or "Options"))
 
-    -- Close button
-    local close = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
-    E:ReskinCloseButton(close, panel)
-    close:SetScript("OnClick", function()
+    -- Version
+    local version = panel:CreateFontString(nil, "OVERLAY")
+    version:SetFont(font, 12, "THINOUTLINE")
+    version:SetPoint("TOP", 0, -28)
+    version:SetText(E.version or "")
+    version:SetTextColor(0.6, 0.6, 0.6)
+
+    -- Close (X) button
+    local closeX = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
+    E:ReskinCloseButton(closeX, panel)
+    closeX:SetScript("OnClick", function()
         addon:Hide()
     end)
 
-    -- Global/Character toggle
+    -- Bottom buttons
+    local closeButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    closeButton:SetSize(80, 22)
+    closeButton:SetPoint("BOTTOMRIGHT", -20, 15)
+    E:ReskinButton(closeButton)
+    closeButton:SetText(CLOSE)
+    closeButton:SetScript("OnClick", function() addon:Hide() end)
+
+    applyButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+    applyButton:SetSize(80, 22)
+    applyButton:SetPoint("RIGHT", closeButton, "LEFT", -20, 0)
+    E:ReskinButton(applyButton)
+    applyButton:SetText(APPLY)
+    applyButton:Hide()
+    applyButton:SetScript("OnClick", function()
+        StaticPopup_Show("DARKUI_RELOAD_UI")
+        needReload = false
+        applyButton:Hide()
+    end)
+
+    -- Global/Character toggle (bottom-left)
     local globalCB = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
-    globalCB:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -30, -8)
+    globalCB:SetPoint("BOTTOMLEFT", 20, 15)
     globalCB:SetChecked(DB:IsGlobal())
     E:ReskinCheckBox(globalCB)
     globalCB:SetScript("OnClick", function(self)
         DB:SetUseGlobal(self:GetChecked())
         needReload = true
+        applyButton:Show()
     end)
 
     local globalText = globalCB:CreateFontString(nil, "OVERLAY")
-    globalText:SetFont(font, 11, "THINOUTLINE")
-    globalText:SetPoint("RIGHT", globalCB, "LEFT", -4, 0)
+    globalText:SetFont(font, 12, "THINOUTLINE")
+    globalText:SetPoint("LEFT", globalCB, "RIGHT", 4, 0)
     globalText:SetText(L_GLOBAL_OPTION or "Global")
     globalText:SetTextColor(0.8, 0.8, 0.8)
 
     -- Tab frame (left side)
     tabFrame = CreateFrame("Frame", nil, panel)
-    tabFrame:SetPoint("TOPLEFT", 10, -40)
-    tabFrame:SetPoint("BOTTOMLEFT", 10, 10)
-    tabFrame:SetWidth(TAB_WIDTH)
+    tabFrame:SetPoint("TOPLEFT", 0, -50)
+    tabFrame:SetPoint("BOTTOMLEFT", 0, 40)
+    tabFrame:SetWidth(CONTENT_LEFT)
 
     -- Scroll frame (right side)
     scrollFrame = CreateFrame("ScrollFrame", nil, panel, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", TAB_WIDTH + 20, -40)
-    scrollFrame:SetPoint("BOTTOMRIGHT", -28, 10)
+    scrollFrame:SetPoint("TOPLEFT", CONTENT_LEFT, -50)
+    scrollFrame:SetPoint("BOTTOMRIGHT", -28, 40)
 
     local scrollBar = scrollFrame.ScrollBar or _G[scrollFrame:GetName() .. "ScrollBar"]
     if scrollBar then
@@ -470,9 +535,9 @@ local function createPanel()
     -- Build tabs
     for i, tabInfo in ipairs(addon.TabList) do
         local tab = CreateFrame("Button", nil, tabFrame, "BackdropTemplate")
-        tab:SetSize(TAB_WIDTH - 10, TAB_HEIGHT)
-        tab:SetPoint("TOPLEFT", 0, -(i - 1) * (TAB_HEIGHT + TAB_SPACING))
-        tab:SetTemplate("Overlay")
+        tab:SetSize(TAB_WIDTH, TAB_HEIGHT)
+        tab:SetPoint("TOPLEFT", 20, -(i - 1) * (TAB_HEIGHT + TAB_SPACING))
+        tab:SetTemplate("Default", nil, 0)
 
         local text = tab:CreateFontString(nil, "OVERLAY")
         text:SetFont(font, 12, "THINOUTLINE")
@@ -486,12 +551,12 @@ local function createPanel()
         end)
         tab:SetScript("OnEnter", function(self)
             if activeTab ~= i then
-                self.text:SetTextColor(1, 1, 1)
+                self:SetBackdropColor(cc.r, cc.g, cc.b, 0.3)
             end
         end)
         tab:SetScript("OnLeave", function(self)
             if activeTab ~= i then
-                self.text:SetTextColor(0.8, 0.8, 0.8)
+                self:SetBackdropColor(0, 0, 0, 0.3)
             end
         end)
 

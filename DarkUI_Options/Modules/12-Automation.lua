@@ -14,7 +14,7 @@ addon.OptionList["automation"] = {
     { CHECK, "automation.auto_greed", L_OPT_MISC_AUTOMATION_AUTO_GREED },
     { CHECK, "automation.auto_quest", L_OPT_MISC_AUTOMATION_AUTO_QUEST },
     { CHECK, "automation.tab_binder", L_OPT_MISC_AUTOMATION_TAB_BINDER },
-    { HEADER, nil, "Announcement" },
+    { HEADER, nil, L_HEADER_ANNOUNCEMENT },
     { CHECK, "announcement.interrupt.enable", L_OPT_ANNOUNCEMENT_INTERRUPT_ENABLE, nil, function(widget, a)
         widget:HookScript("OnClick", function(self)
             local w = a.widgets["announcement.interrupt.channel"]
