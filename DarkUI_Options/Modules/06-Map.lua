@@ -10,16 +10,16 @@ addon.OptionList["map"] = {
     { HEADER, nil, "World Map" },
     { CHECK, "map.worldmap.enable", L_OPT_MAP_WORLDMAP_ENABLE, nil, function(widget, a)
         widget:HookScript("OnClick", function(self)
-            local w = a.widgets["map.worldmap.removeFog"]
+            local w = a.widgets["map.worldmap.revealMap"]
             if w then w:SetEnabled(self:GetChecked()) end
         end)
     end},
-    { CHECK, "map.worldmap.removeFog", L_OPT_MAP_WORLDMAP_REMOVEFOG },
+    { CHECK, "map.worldmap.revealMap", L_OPT_MAP_WORLDMAP_REVEALMAP },
 }
 
 addon.Hooks["map"] = function(a)
     local master = a.widgets["map.worldmap.enable"]
-    local child = a.widgets["map.worldmap.removeFog"]
+    local child = a.widgets["map.worldmap.revealMap"]
     if master and child then
         child:SetEnabled(master:GetChecked())
     end

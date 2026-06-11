@@ -211,20 +211,18 @@ local function mapDataRefreshOverlays(self, fullUpdate)
                     texture:SetTexCoord(0, texturePixelWidth / textureFileWidth, 0, texturePixelHeight / textureFileHeight)
                     texture:SetPoint("TOPLEFT", offsetX + (TILE_SIZE_WIDTH * (k - 1)), -(offsetY + (TILE_SIZE_HEIGHT * (j - 1))))
                     texture:SetTexture(fileDataIDs[((j - 1) * numTexturesWide) + k], nil, nil, "TRILINEAR")
+                    texture:SetDrawLayer("ARTWORK", -1)
 
-                    if not cfg.removeFog then
-                        if cfg.revealGlow then
-                            texture:SetVertexColor(.7, .7, .7)
-                        else
-                            texture:SetVertexColor(1, 1, 1)
-                        end
-                        texture:SetDrawLayer("ARTWORK", -1)
-                        texture:Show()
-                        if fullUpdate then
-                            self.textureLoadGroup:AddTexture(texture)
-                        end
+                    if cfg.revealGlow then
+                        texture:SetVertexColor(0.7, 0.7, 0.7)
                     else
-                        texture:Hide()
+                        texture:SetVertexColor(1, 1, 1)
+                    end
+
+                    texture:SetShown(cfg.revealMap)
+
+                    if fullUpdate then
+                        self.textureLoadGroup:AddTexture(texture)
                     end
                     tinsert(shownMapCache, texture)
                 end
@@ -303,30 +301,33 @@ local function setupCoords()
     coordsUpdater:SetScript("OnUpdate", updateCoords)
 end
 
-local function setupFogRemoval()
+local explorationPin
+
+local function setupRevealMap()
     local bu = CreateFrame("CheckButton", nil, WorldMapFrame.BorderFrame.TitleContainer, "OptionsBaseCheckButtonTemplate")
     bu:SetHitRectInsets(-5, -5, -5, -5)
     bu:SetPoint("BOTTOMLEFT", WorldMapFrameHomeButton, "TOPLEFT", 25, 2)
     bu:SetSize(26, 26)
     E:ReskinCheckBox(bu)
-    bu:SetChecked(cfg.removeFog)
+    bu:SetChecked(cfg.revealMap)
 
     bu.f = bu:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     bu.f:SetFont(GameFontNormal:GetFont(), 14, "")
     bu.f:SetPoint("LEFT", bu, "RIGHT", 5, 0)
-    bu.f:SetText(L.MAP_REMOVEFOG)
+    bu.f:SetText(L.MAP_REVEALMAP)
 
     for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
+        explorationPin = pin
         hooksecurefunc(pin, "RefreshOverlays", mapDataRefreshOverlays)
         pin.overlayTexturePool.resetterFunc = mapDataResetTexturePool
     end
 
     bu:SetScript("OnClick", function(self)
         local checked = self:GetChecked()
-        cfg.removeFog = checked
-        DB:Set("map.worldmap.removeFog", checked)
-        for i = 1, #shownMapCache do
-            shownMapCache[i]:SetShown(not checked)
+        cfg.revealMap = checked
+        DB:Set("map.worldmap.revealMap", checked)
+        if explorationPin then
+            explorationPin:RefreshOverlays(true)
         end
     end)
 end
@@ -345,5 +346,5 @@ function module:OnInit()
 
     setupMapScale()
     setupCoords()
-    setupFogRemoval()
+    setupRevealMap()
 end

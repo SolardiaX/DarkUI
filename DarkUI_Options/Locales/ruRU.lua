@@ -55,7 +55,7 @@ L_OPT_BARS_EXP_DISABLE_AT_MAX_LVL = "Скрывать полосу опыта/р
 L_OPT_MAP_MINIMAP_ENABLE = "Включить модуль мини-карты"
 L_OPT_MAP_MINIMAP_AUTOZOOM = "Включить автомасштабирование мини-карты"
 L_OPT_MAP_WORLDMAP_ENABLE = "Включить модуль карты мира"
-L_OPT_MAP_WORLDMAP_REMOVEFOG = "Включить снятие тумана на карте мира"
+L_OPT_MAP_WORLDMAP_REVEALMAP = "Включить показ неисследованных зон на карте мира"
 
 -- Unitframe
 L_OPT_UF_ENABLE = "Включить модуль рамок юнитов"

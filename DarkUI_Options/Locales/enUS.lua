@@ -53,7 +53,7 @@ L_OPT_BARS_EXP_DISABLE_AT_MAX_LVL = "Disable experience/reputation bar when play
 L_OPT_MAP_MINIMAP_ENABLE = "Enable minimap module"
 L_OPT_MAP_MINIMAP_AUTOZOOM = "Enable minimap auto zoom"
 L_OPT_MAP_WORLDMAP_ENABLE = "Enable worldmap module"
-L_OPT_MAP_WORLDMAP_REMOVEFOG = "Enable removal fog option in worldmap"
+L_OPT_MAP_WORLDMAP_REVEALMAP = "Enable map reveal (show unexplored areas)"
 
 -- Unitframe
 L_OPT_UF_ENABLE = "Enable Unitframe module"

@@ -18,7 +18,7 @@ L.WELCOME_LINE = "歡迎使用 DarkUI "
 L.POPUP_INSTALLUI = "該角色首次使用 DarkUI. 你必須重新加載UI來配置."
 L.POPUP_RESETUI = "此操作將重置 DarkUI 的全部配置為默認參數."
 
-L.MAP_REMOVEFOG = "地圖全亮"
+L.MAP_REVEALMAP = "地圖全亮"
 L.MAP_MOUSEOVER = "鼠標"
 L.MAP_HIDE_TASK_POI = "隱藏任務地點標記"
 L.MAP_PLAYER = "玩家"

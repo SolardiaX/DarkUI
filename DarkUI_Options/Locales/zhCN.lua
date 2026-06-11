@@ -55,7 +55,7 @@ L_OPT_BARS_EXP_DISABLE_AT_MAX_LVL = "玩家满级后禁用经验/声望条"
 L_OPT_MAP_MINIMAP_ENABLE = "启用小地图模块"
 L_OPT_MAP_MINIMAP_AUTOZOOM = "启用小地图自动缩放"
 L_OPT_MAP_WORLDMAP_ENABLE = "启用大地图模块"
-L_OPT_MAP_WORLDMAP_REMOVEFOG = "启用大地图移除迷雾选项"
+L_OPT_MAP_WORLDMAP_REVEALMAP = "启用大地图全亮（显示未探索区域）"
 
 -- Unitframe
 L_OPT_UF_ENABLE = "启用单位框体模块"

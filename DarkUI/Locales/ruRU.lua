@@ -13,7 +13,7 @@ L.POPUP_INSTALLUI =
     "Вы впервые используете DarkUI. Требуется ПЕРЕЗАГРУЗКА интерфейса для завершения настройки."
 L.POPUP_RESETUI = "Сбросит DarkUI до стандартной конфигурации."
 
-L.MAP_REMOVEFOG = "Убрать туман"
+L.MAP_REVEALMAP = "Показать карту"
 L.MAP_MOUSEOVER = "Мышь"
 L.MAP_HIDE_TASK_POI = "Скрыть точки задач"
 L.MAP_PLAYER = "Игрок"

@@ -8,7 +8,7 @@ L.WELCOME_LINE = "Welcome to DarkUI "
 L.POPUP_INSTALLUI = "You are the first time to use DarkUI. Require RELOAD UI to complete setup."
 L.POPUP_RESETUI = "Will reset DarkUI to default configration."
 
-L.MAP_REMOVEFOG = "Remove Fog"
+L.MAP_REVEALMAP = "Reveal Map"
 L.MAP_MOUSEOVER = "Mouse"
 L.MAP_HIDE_TASK_POI = "Hide task POI"
 L.MAP_PLAYER = "Player"
