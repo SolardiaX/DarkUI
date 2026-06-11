@@ -26,6 +26,7 @@ local IGNORE_FRAMES = {
     StoreFrame = true,
     CinematicFrame = true,
     MovieFrame = true,
+    WorldMapFrame = true,
 }
 
 local IGNORE_TEXTURES = {}
@@ -191,7 +192,6 @@ local ADDON_FRAMES = {
     ["Blizzard_MacroUI"] = { "MacroFrame" },
     ["Blizzard_TalentUI"] = { "PlayerTalentFrame" },
     ["Blizzard_Professions"] = { "ProfessionsFrame" },
-    ["Blizzard_WorldMap"] = { "WorldMapFrame" },
 }
 
 ------------------------------------------------------------------------

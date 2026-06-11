@@ -293,7 +293,7 @@ local function onLootOpened(_, _, autoLoot)
             local color = ITEM_QUALITY_COLORS[quality] or { r = 1, g = 1, b = 1 }
             local r, g, b = color.r, color.g, color.b
 
-            if GetLootSlotType(i) == Enum.LootSlotType.Money then
+            if GetLootSlotType(i) == Enum.LootSlotType.Money and item and not issecretvalue(item) then
                 item = item:gsub("\n", ", ")
             end
 
@@ -332,6 +332,9 @@ local function onLootOpened(_, _, autoLoot)
             if texture then
                 slot:Enable()
                 slot:Show()
+            else
+                slot:Disable()
+                slot:Hide()
             end
         end
     else
