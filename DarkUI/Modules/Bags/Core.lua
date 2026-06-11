@@ -62,13 +62,6 @@ function module:OnInit()
 end
 
 function module:LoadDefaults()
-    if not SavedStats then
-        SavedStats = {}
-    end
-    if not SavedStatsPerChar then
-        SavedStatsPerChar = {}
-    end
-
     if not SavedStats.cBnivCfg then
         SavedStats.cBnivCfg = {}
     end

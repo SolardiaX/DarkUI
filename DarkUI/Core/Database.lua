@@ -193,6 +193,12 @@ function DB:Initialize()
     if not SavedConfigPerChar then
         SavedConfigPerChar = { version = E.version, overrides = {} }
     end
+    if not SavedStats then
+        SavedStats = {}
+    end
+    if not SavedStatsPerChar then
+        SavedStatsPerChar = {}
+    end
 
     -- Version mismatch: full reset (user accepted this design)
     if SavedConfig.version ~= E.version then

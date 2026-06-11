@@ -496,9 +496,6 @@ function module:OnInit()
         return
     end
 
-    if not SavedStats then
-        SavedStats = {}
-    end
     if not SavedStats[E.realm] then
         SavedStats[E.realm] = {}
     end

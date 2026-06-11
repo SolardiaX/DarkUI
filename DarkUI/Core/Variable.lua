@@ -137,10 +137,6 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not SavedStatsPerChar then
-        SavedStatsPerChar = {}
-    end
-
     if not SavedStatsPerChar.inited or SavedStatsPerChar.version ~= E.version then
         firstTimeSetup()
         SavedStatsPerChar.version = E.version
