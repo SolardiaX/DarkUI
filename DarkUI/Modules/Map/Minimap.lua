@@ -18,7 +18,7 @@ local ICON_SIZE = 20
 local ICON_POS = {
     mail = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", -30, -8 },
     garrison = { "CENTER", "Minimap", "CENTER", 90, 130 },
-    queue = { "RIGHT", "Minimap", "LEFT", 40, -50 },
+    queue = { "TOPLEFT", "Minimap", "TOPRIGHT", -56, 12 },
     instance = { "TOPRIGHT", "Minimap", "TOPRIGHT", 20, 20 },
     time = { "BOTTOM", "Minimap", "BOTTOM", 1, 1 },
     clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
@@ -172,12 +172,13 @@ local function resetIcons()
 
     -- Queue Status (use flag to prevent recursion)
     if QueueStatusButton then
-        QueueStatusFrame:SetClampedToScreen(true)
-        QueueStatusFrame:SetFrameStrata("TOOLTIP")
         QueueStatusButton:SetParent(Minimap)
         QueueStatusButton:ClearAllPoints()
         QueueStatusButton:SetPoint(unpack(ICON_POS.queue))
-        QueueStatusButton:SetScale(0.48)
+        QueueStatusButton:SetScale(0.52)
+        QueueStatusButtonIcon:SetScale(0.52)
+        QueueStatusFrame:ClearAllPoints()
+	    QueueStatusFrame:SetPoint("TOPRIGHT", QueueStatusButton, "TOPLEFT")
 
         local isSettingQueuePoint
         hooksecurefunc(QueueStatusButton, "SetPoint", function(self)
