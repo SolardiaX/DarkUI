@@ -21,7 +21,7 @@ local GameTooltip = GameTooltip
 local WorldMapFrame = WorldMapFrame
 
 local cfg = module.config.Location
-local font = C.stats.font
+local font = C.datatext.font
 
 module:Inject("Location", {
     OnLoad = function(self)

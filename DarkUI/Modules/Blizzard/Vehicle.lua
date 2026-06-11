@@ -17,7 +17,7 @@ function module:OnInit()
 
     local anchor = CreateFrame("Frame", "DarkUI_VehicleAnchor", UIParent)
     anchor:SetSize(130, 130)
-    anchor:SetPoint("BOTTOM", UIParent, "BOTTOM", -350, 80)
+    anchor:SetPoint(unpack(cfg.vehicle_pos))
 
     hooksecurefunc(VehicleSeatIndicator, "SetPoint", function(self, _, parent)
         if parent and parent ~= anchor then

@@ -28,7 +28,7 @@ local NONE = NONE
 local DurabilityFrame = DurabilityFrame
 local GameTooltip = GameTooltip
 
-local t_icon = C.stats.icon_size or 20
+local t_icon = C.datatext.icon_size or 20
 local cfg = module.config.Durability
 
 module:Inject("Durability", {

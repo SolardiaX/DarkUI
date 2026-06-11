@@ -9,10 +9,8 @@ E:Module("Quest"):SetConfigKey("quest")
 
 local cfg = C.quest
 
-local TRACKER_POS = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", 0, -60 }
-
 local function getTrackerPos()
-    local pos = { unpack(TRACKER_POS) }
+    local pos = { unpack(cfg.tracker_pos) }
     local bars = C.actionbar and C.actionbar.bars
     if bars then
         for i = 4, 6 do

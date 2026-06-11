@@ -252,7 +252,7 @@ C.bags = {
 ----------------------------------------------------------------------------------------
 -- DataText
 ----------------------------------------------------------------------------------------
-C.stats = {
+C.datatext = {
     enable = true,
     font = {
         font = STANDARD_TEXT_FONT,
@@ -290,13 +290,9 @@ C.stats = {
 ----------------------------------------------------------------------------------------
 C.blizzard = {
     custom_position = true,
-    hide_maw_buffs = false,
     achievement_pos = { "TOP", "UIParent", "TOP", 0, -21 },
-    capturebar_pos = { "TOP", "UIParent", "TOP", 0, -20 },
-    battlescore_pos = { "TOP", "UIParent", "TOP", 0, -25 },
     talking_head_pos = { "TOP", "UIParent", "TOP", 0, -45 },
     alt_powerbar_pos = { "TOP", "UIParent", "TOP", 0, -45 },
-    quest_tracker_pos = { "TOPRIGHT", "MinimapCluster", "BOTTOMRIGHT", -70, -25 },
     uiwidget_top_pos = { "TOP", "UIParent", "TOP", 0, -21 },
     uiwidget_below_pos = { "TOP", "UIWidgetTopCenterContainerFrame", "BOTTOM", 0, -15 },
     mirrorbar = {
@@ -308,6 +304,7 @@ C.blizzard = {
     slot_durability = true,
     shift_mark = true,
     style = true,
+    vehicle_pos = { "BOTTOM", "UIParent", "BOTTOM", -350, 80 },
 }
 
 ----------------------------------------------------------------------------------------
@@ -329,70 +326,6 @@ C.chat = {
     tabs_mouseover = true,
     sticky = true,
     loot_icons = true,
-}
-
-----------------------------------------------------------------------------------------
--- Combat
-----------------------------------------------------------------------------------------
-C.combat = {
-    combattext = {
-        enable = true,
-        blizz_head_numbers = false,
-        damage_style = true,
-        damage = true,
-        healing = true,
-        show_hots = true,
-        show_overhealing = true,
-        incoming = true,
-        pet_damage = true,
-        dot_damage = true,
-        damage_color = true,
-        short_numbers = true,
-        crit_prefix = "*",
-        crit_postfix = "*",
-        icons = true,
-        icon_size = 16,
-        treshold = 1,
-        heal_treshold = 1,
-        scrollable = false,
-        max_lines = 15,
-        time_visible = 3,
-        dk_runes = true,
-        killingblow = true,
-        merge_aoe_spam = true,
-        merge_melee = true,
-        dispel = true,
-        interrupt = true,
-        direction = true,
-        font = {
-            combat_text_font = STANDARD_TEXT_FONT,
-            combat_text_font_size = 16,
-            combat_text_font_style = "THINOUTLINE",
-            combat_text_font_shadow = true,
-        },
-    },
-    damagemeter = {
-        enable = true,
-        pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -20, 35 },
-        classcolorbar = true,
-        onlyboss = false,
-        classcolorname = false,
-        mergeHealAbsorbs = false,
-        sortby = DAMAGE,
-        barheight = 8,
-        spacing = 18,
-        maxbars = 8,
-        width = 240,
-        maxfights = 10,
-        reportstrings = 10,
-        backdrop_color = { 0.01, 0.01, 0.01, 0 },
-        border_color = { 0.01, 0.01, 0.01, 0 },
-        border_size = 1,
-        font_style = "OUTLINE",
-        font_size = 13,
-        hidetitle = true,
-        barcolor = { 0.4, 0.4, 0.4, 1 },
-    },
 }
 
 ----------------------------------------------------------------------------------------
@@ -452,6 +385,7 @@ C.quest = {
     enable = true,
     auto_collapse = "SCENARIO", -- "NONE", "RAID", "SCENARIO", "RELOAD", or true (= RAID)
     auto_button = true,
+    tracker_pos = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", 0, -60 },
 }
 
 ----------------------------------------------------------------------------------------

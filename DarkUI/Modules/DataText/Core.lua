@@ -6,7 +6,7 @@ local E, C, L = select(2, ...):unpack()
 
 local module = E:Module("DataText")
 module:SetConfigKey("stats")
-local cfg = C.stats
+local cfg = C.datatext
 
 local C_Map_GetBestMapForUnit = C_Map.GetBestMapForUnit
 local IsAltKeyDown = IsAltKeyDown

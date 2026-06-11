@@ -28,7 +28,7 @@ local TRACKING = TRACKING
 local WEEKLY = WEEKLY
 local GameTooltip = GameTooltip
 
-local t_icon = C.stats.icon_size or 20
+local t_icon = C.datatext.icon_size or 20
 local cfg = module.config.Currencies
 
 local function hasAvailableChildren(list, withZero)
@@ -225,13 +225,13 @@ module:Inject("Currencies", {
         end
 
         local orders = {
-            { name = TRACKING, withZero = true, visible = C.stats.currencies.tracking },
-            { name = CURRENT_EXPANSION, withZero = true, visible = C.stats.currencies.expansion },
-            { name = PROFESSIONS_ARCHAEOLOGY, withZero = false, visible = C.stats.currencies.archaeology },
-            { name = PROFESSIONS_COOKING, withZero = false, visible = C.stats.currencies.cooking },
-            { name = DUNGEONS_AND_RAIDS, withZero = false, visible = C.stats.currencies.raid },
-            { name = PVP, withZero = false, visible = C.stats.currencies.pvp },
-            { name = OTHER, withZero = false, visible = C.stats.currencies.other },
+            { name = TRACKING, withZero = true, visible = C.datatext.currencies.tracking },
+            { name = CURRENT_EXPANSION, withZero = true, visible = C.datatext.currencies.expansion },
+            { name = PROFESSIONS_ARCHAEOLOGY, withZero = false, visible = C.datatext.currencies.archaeology },
+            { name = PROFESSIONS_COOKING, withZero = false, visible = C.datatext.currencies.cooking },
+            { name = DUNGEONS_AND_RAIDS, withZero = false, visible = C.datatext.currencies.raid },
+            { name = PVP, withZero = false, visible = C.datatext.currencies.pvp },
+            { name = OTHER, withZero = false, visible = C.datatext.currencies.other },
         }
 
         for _, tip in ipairs(orders) do
