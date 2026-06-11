@@ -12,4 +12,6 @@
     <Script file="MoveBlizzFrames.lua" />
     <Script file="ShiftMark.lua" />
     <Script file="Styles.lua" />
+    <Script file="TimerTracker.lua" />
+    <Script file="Vehicle.lua" />
 </Ui>

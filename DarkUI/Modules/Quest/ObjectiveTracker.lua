@@ -474,4 +474,36 @@ function module:OnInit()
     -- Mythic+ block
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "Activate", skinChallengeBlock)
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "SetUpAffixes", skinAffixes)
+
+    -- Combat auto-collapse
+    if cfg.auto_collapse and cfg.auto_collapse ~= "NONE" then
+        local collapseMode = cfg.auto_collapse
+        local wasCollapsed = false
+
+        self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
+            local inInstance, instanceType = IsInInstance()
+            local shouldCollapse = false
+
+            if collapseMode == true or collapseMode == "RAID" then
+                shouldCollapse = inInstance and (instanceType == "raid" or instanceType == "party")
+            elseif collapseMode == "SCENARIO" then
+                shouldCollapse = inInstance
+            elseif collapseMode == "RELOAD" then
+                shouldCollapse = true
+            end
+
+            if shouldCollapse and not ObjectiveTrackerFrame:IsCollapsed() then
+                wasCollapsed = false
+                ObjectiveTrackerFrame:SetCollapsed(true)
+            else
+                wasCollapsed = ObjectiveTrackerFrame:IsCollapsed()
+            end
+        end)
+
+        self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+            if not wasCollapsed and ObjectiveTrackerFrame:IsCollapsed() then
+                ObjectiveTrackerFrame:SetCollapsed(false)
+            end
+        end)
+    end
 end
