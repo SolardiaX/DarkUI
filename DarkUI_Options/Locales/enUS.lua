@@ -210,6 +210,7 @@ L_OPT_COMMAND_TESTROLL = "Test roll frame position"
 L_OPT_COMMAND_RC = "Ready check"
 L_OPT_COMMAND_GM = "Call GM"
 L_OPT_COMMAND_RL = "Reload UI"
+L_OPT_COMMAND_RESETUI = "Reset DarkUI to defaults"
 
 -- UI
 L_GLOBAL_OPTION = "Set as global options (available for all characters)"

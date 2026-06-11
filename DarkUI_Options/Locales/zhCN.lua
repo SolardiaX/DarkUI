@@ -212,6 +212,7 @@ L_OPT_COMMAND_TESTROLL = "测试掷骰窗体位置"
 L_OPT_COMMAND_RC = "就位确认"
 L_OPT_COMMAND_GM = "呼叫游戏内 GM"
 L_OPT_COMMAND_RL = "立即重载插件"
+L_OPT_COMMAND_RESETUI = "重置 DarkUI 配置为默认值"
 
 -- UI
 L_GLOBAL_OPTION = "使用全局设置 (对当前账号下全部角色有效)"

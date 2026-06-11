@@ -310,4 +310,5 @@ addon.OptionList["commands"] = {
     { BUTTON, "/rc", L_OPT_COMMAND_RC },
     { BUTTON, "/gm", L_OPT_COMMAND_GM },
     { BUTTON, "/rl", L_OPT_COMMAND_RL },
+    { BUTTON, "/resetui", L_OPT_COMMAND_RESETUI },
 }
