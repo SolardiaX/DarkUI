@@ -11,10 +11,10 @@ local IsPlayerSpell = IsPlayerSpell
 local IsInRaid = IsInRaid
 local select, pairs, ipairs, unpack, tinsert = select, pairs, ipairs, unpack, table.insert
 
-local CastbarCompleteColor = {.1, .8, 0}
-local CastbarFailColor = {1, .1, 0}
+local CastbarCompleteColor = { 0.1, 0.8, 0 }
+local CastbarFailColor = { 1, 0.1, 0 }
 
-local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
+local CastbarInterruptibleColor = CreateColor(0.11, 0.58, 0.89)
 local CastbarKickOnCDColor = CreateColor(1, 0.5, 0)
 local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
 
@@ -164,7 +164,7 @@ function module:PostCastStart(unit)
             end
         end
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
-        setCastbarInterruptible(Castbar)
+        Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
     elseif not UnitIsUnit(unit, "player") then
         Castbar:GetStatusBarTexture():SetVertexColorFromBoolean(
             Castbar.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
