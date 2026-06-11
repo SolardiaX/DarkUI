@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 local cargBags = select(2, ...).cargBags
 
 ------------------------------------------------------------------------
@@ -62,29 +62,30 @@ function module:OnInit()
 end
 
 function module:LoadDefaults()
-    if not SavedStats.cBnivCfg then
-        SavedStats.cBnivCfg = {}
+    if not DB:GetStats("cBnivCfg") then
+        DB:SetStats("cBnivCfg", {})
     end
-    if not SavedStats.cBniv_CatInfo then
-        SavedStats.cBniv_CatInfo = {}
+    if not DB:GetStats("cBniv_CatInfo") then
+        DB:SetStats("cBniv_CatInfo", {})
     end
-    if not SavedStatsPerChar.cB_KnownItems then
-        SavedStatsPerChar.cB_KnownItems = {}
+    if not DB:GetStats("cB_KnownItems", true) then
+        DB:SetStats("cB_KnownItems", {}, true)
     end
-    if not SavedStatsPerChar.cBniv then
-        SavedStatsPerChar.cBniv = { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }
+    if not DB:GetStats("cBniv", true) then
+        DB:SetStats("cBniv", { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }, true)
     end
 
+    local opts = DB:GetStats("cBnivCfg")
     for k, v in pairs(optDefaults) do
-        if type(SavedStats.cBnivCfg[k]) == "nil" then
-            SavedStats.cBnivCfg[k] = v
+        if type(opts[k]) == "nil" then
+            opts[k] = v
         end
     end
 
-    self.opts = SavedStats.cBnivCfg
-    self.knownItems = SavedStatsPerChar.cB_KnownItems
-    self.charOpts = SavedStatsPerChar.cBniv
-    self.catInfo = SavedStats.cBniv_CatInfo or {}
+    self.opts = opts
+    self.knownItems = DB:GetStats("cB_KnownItems", true)
+    self.charOpts = DB:GetStats("cBniv", true)
+    self.catInfo = DB:GetStats("cBniv_CatInfo") or {}
 end
 
 ------------------------------------------------------------------------

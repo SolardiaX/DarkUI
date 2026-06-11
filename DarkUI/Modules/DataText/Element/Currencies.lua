@@ -142,7 +142,7 @@ module:Inject("Currencies", {
         local total = 0
         local goldTable = {}
         wipe(goldTable)
-        for char, sts in pairs(SavedStats[E.realm]) do
+        for char, sts in pairs(DB:GetStats(E.realm) or {}) do
             if sts.Gold and sts.Gold > 99 then
                 goldTable[#goldTable + 1] = { char, module:FormatGold(5, sts.Gold), sts.Gold }
             end

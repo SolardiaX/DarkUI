@@ -175,6 +175,30 @@ function DB:IsGlobal()
 end
 
 ----------------------------------------------------------------------------------------
+-- Stats API (runtime state persistence, not merged into C)
+----------------------------------------------------------------------------------------
+
+function DB:GetStats(path, perChar)
+    local root = perChar and SavedStatsPerChar or SavedStats
+    if not path or path == "" then
+        return root
+    end
+    local tbl, key = traverse(root, path, false)
+    if tbl then
+        return tbl[key]
+    end
+    return nil
+end
+
+function DB:SetStats(path, value, perChar)
+    local root = perChar and SavedStatsPerChar or SavedStats
+    local tbl, key = traverse(root, path, true)
+    if tbl then
+        tbl[key] = value
+    end
+end
+
+----------------------------------------------------------------------------------------
 -- Proxy Builder
 ----------------------------------------------------------------------------------------
 

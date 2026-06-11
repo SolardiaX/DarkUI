@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- DataText Core
@@ -496,13 +496,13 @@ function module:OnInit()
         return
     end
 
-    if not SavedStats[E.realm] then
-        SavedStats[E.realm] = {}
+    if not DB:GetStats(E.realm) then
+        DB:SetStats(E.realm, {})
     end
-    if not SavedStats[E.realm][E.myName] then
-        SavedStats[E.realm][E.myName] = {}
+    if not DB:GetStats(E.realm .. "." .. E.myName) then
+        DB:SetStats(E.realm .. "." .. E.myName, {})
     end
-    self.conf = SavedStats[E.realm][E.myName]
+    self.conf = DB:GetStats(E.realm .. "." .. E.myName)
 
     -- panels referencing other panel names need LP_ prefix for _G lookup
     for _, f in ipairs(layout) do

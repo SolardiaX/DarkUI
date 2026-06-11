@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 local cargBags = select(2, ...).cargBags
 
 ------------------------------------------------------------------------
@@ -213,9 +213,9 @@ local function setFrameMovable(f, v)
             x = E:Round(x or 0)
             y = E:Round(y or 0)
             if f.name == "cBniv_Bag" then
-                SavedStatsPerChar.cBniv.BagPos = { orig, "UIParent", tar, x, y }
+                DB:SetStats("cBniv.BagPos", { orig, "UIParent", tar, x, y }, true)
             else
-                SavedStatsPerChar.cBniv.BankPos = { orig, "UIParent", tar, x, y }
+                DB:SetStats("cBniv.BankPos", { orig, "UIParent", tar, x, y }, true)
             end
         end)
     else

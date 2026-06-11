@@ -1,4 +1,4 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Variables & CVar Initialization
@@ -137,11 +137,11 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not SavedStatsPerChar.inited or SavedStatsPerChar.version ~= E.version then
+    if not DB:GetStats("inited", true) or DB:GetStats("version", true) ~= E.version then
         firstTimeSetup()
-        SavedStatsPerChar.version = E.version
+        DB:SetStats("version", E.version, true)
 
-        if not SavedStatsPerChar.inited then
+        if not DB:GetStats("inited", true) then
             StaticPopup_Show("INSTALLUI_CONFIRM")
         end
     end
@@ -161,7 +161,7 @@ StaticPopupDialogs["INSTALLUI_CONFIRM"] = {
     button1 = ACCEPT,
     button2 = CANCEL,
     OnAccept = function()
-        SavedStatsPerChar.inited = true
+        DB:SetStats("inited", true, true)
         ReloadUI()
     end,
     whileDead = true,
