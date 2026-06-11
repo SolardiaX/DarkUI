@@ -234,13 +234,8 @@ SlashCmdList["DARKUI"] = function(msg)
             frame:SetShown(not visible)
         end
     elseif msg == "" then
-        if C_AddOns.IsAddOnLoaded("DarkUI_Options") then
+        if DarkUI_Options then
             DarkUI_Options:Toggle()
-        else
-            C_AddOns.LoadAddOn("DarkUI_Options")
-            if DarkUI_Options then
-                DarkUI_Options:Toggle()
-            end
         end
     else
         print("|cff00ff00DarkUI|r commands:")

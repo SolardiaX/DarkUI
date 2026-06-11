@@ -1,6 +1,3 @@
-local ns = _G["DarkUI"]
-local E, C, L, DB = ns:unpack()
-
 ------------------------------------------------------------------------
 -- DarkUI Options Panel
 ------------------------------------------------------------------------
@@ -15,25 +12,34 @@ addon.DROP = DROP
 addon.HEADER = HEADER
 addon.BUTTON = BUTTON
 
-local needReload = false
-local panel, tabFrame, contentFrame, scrollFrame, scrollChild
-local tabs = {}
-local activeTab
+------------------------------------------------------------------------
+-- Tab & Option Data (populated by Options.lua)
+------------------------------------------------------------------------
 
-local PANEL_WIDTH = 800
-local PANEL_HEIGHT = 560
-local TAB_WIDTH = 140
-local TAB_HEIGHT = 26
-local TAB_SPACING = 4
-local CONTENT_PADDING = 20
-local WIDGET_OFFSET_CHECK = 30
-local WIDGET_OFFSET_SLIDER = 60
-local WIDGET_OFFSET_DROP = 60
-local WIDGET_OFFSET_HEADER = 35
-local WIDGET_OFFSET_BUTTON = 32
+addon.TabList = {}
+addon.OptionList = {}
 
-local font = C.media.standard_font[1]
-local classColor = E.myColor
+function addon:RegisterTab(key, label)
+    self.TabList[#self.TabList + 1] = { key = key, label = label }
+end
+
+------------------------------------------------------------------------
+-- Deferred DarkUI namespace access
+------------------------------------------------------------------------
+
+local E, C, L, DB
+
+local function ensureNamespace()
+    if E then
+        return true
+    end
+    local ns = _G["DarkUI"]
+    if not ns then
+        return false
+    end
+    E, C, L, DB = ns:unpack()
+    return true
+end
 
 ------------------------------------------------------------------------
 -- Reload Popup
@@ -51,26 +57,59 @@ StaticPopupDialogs["DARKUI_RELOAD_UI"] = {
 }
 
 ------------------------------------------------------------------------
--- Widget Factory
+-- Constants
 ------------------------------------------------------------------------
 
+local needReload = false
+local panel, tabFrame, scrollFrame, scrollChild
+local tabs = {}
+local activeTab
+
+local PANEL_WIDTH = 800
+local PANEL_HEIGHT = 560
+local TAB_WIDTH = 140
+local TAB_HEIGHT = 26
+local TAB_SPACING = 4
+local CONTENT_PADDING = 20
+local WIDGET_OFFSET_CHECK = 30
+local WIDGET_OFFSET_SLIDER = 60
+local WIDGET_OFFSET_DROP = 60
+local WIDGET_OFFSET_HEADER = 35
+local WIDGET_OFFSET_BUTTON = 32
+
+------------------------------------------------------------------------
+-- Widget Factory (all use E/C/DB at runtime)
+------------------------------------------------------------------------
+
+local function getFont()
+    return C.media.standard_font[1]
+end
+
+local function getClassColor()
+    return E.myColor
+end
+
 local function createHeader(parent, text, offset)
+    local font = getFont()
+    local cc = getClassColor()
+
     local header = parent:CreateFontString(nil, "OVERLAY")
     header:SetFont(font, 13, "OUTLINE")
     header:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
     header:SetText(text)
-    header:SetTextColor(classColor.r, classColor.g, classColor.b)
+    header:SetTextColor(cc.r, cc.g, cc.b)
 
     local line = parent:CreateTexture(nil, "ARTWORK")
     line:SetHeight(1)
     line:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
     line:SetPoint("RIGHT", parent, "RIGHT", -CONTENT_PADDING, 0)
-    line:SetColorTexture(classColor.r, classColor.g, classColor.b, 0.3)
+    line:SetColorTexture(cc.r, cc.g, cc.b, 0.3)
 
     return WIDGET_OFFSET_HEADER
 end
 
 local function createCheckBox(parent, dbPath, label, offset, horizon)
+    local font = getFont()
     local xOffset = horizon and (PANEL_WIDTH - TAB_WIDTH) / 2 or CONTENT_PADDING
 
     local cb = CreateFrame("CheckButton", nil, parent, "InterfaceOptionsCheckButtonTemplate")
@@ -79,8 +118,7 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
     E:ReskinCheckBox(cb)
 
     cb:SetScript("OnClick", function(self)
-        local checked = self:GetChecked()
-        DB:Set(dbPath, checked)
+        DB:Set(dbPath, self:GetChecked())
         needReload = true
     end)
 
@@ -95,6 +133,7 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
 end
 
 local function createSlider(parent, dbPath, label, offset, extra)
+    local font = getFont()
     local minVal, maxVal, step = extra[1], extra[2], extra[3]
 
     local name = parent:CreateFontString(nil, "OVERLAY")
@@ -132,6 +171,9 @@ local function createSlider(parent, dbPath, label, offset, extra)
 end
 
 local function createDropDown(parent, dbPath, label, offset, options)
+    local font = getFont()
+    local cc = getClassColor()
+
     local name = parent:CreateFontString(nil, "OVERLAY")
     name:SetFont(font, 12, "THINOUTLINE")
     name:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
@@ -204,7 +246,7 @@ local function createDropDown(parent, dbPath, label, offset, options)
         btn.text = btnText
 
         btn:SetHighlightTexture(C.media.texture.status)
-        btn:GetHighlightTexture():SetVertexColor(classColor.r, classColor.g, classColor.b, 0.2)
+        btn:GetHighlightTexture():SetVertexColor(cc.r, cc.g, cc.b, 0.2)
 
         btn:SetScript("OnClick", function()
             DB:Set(dbPath, optValue)
@@ -228,6 +270,8 @@ local function createDropDown(parent, dbPath, label, offset, options)
 end
 
 local function createActionButton(parent, cmd, label, offset)
+    local font = getFont()
+
     local btn = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
     btn:SetSize(120, 22)
     btn:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
@@ -260,13 +304,6 @@ end
 ------------------------------------------------------------------------
 -- Tab System
 ------------------------------------------------------------------------
-
-addon.TabList = {}
-addon.OptionList = {}
-
-function addon:RegisterTab(key, label)
-    self.TabList[#self.TabList + 1] = { key = key, label = label }
-end
 
 local function clearContent()
     if scrollChild then
@@ -318,10 +355,11 @@ local function selectTab(index)
     end
     activeTab = index
 
+    local cc = getClassColor()
     for i, tab in ipairs(tabs) do
         if i == index then
-            tab:SetBackdropBorderColor(classColor.r, classColor.g, classColor.b)
-            tab.text:SetTextColor(classColor.r, classColor.g, classColor.b)
+            tab:SetBackdropBorderColor(cc.r, cc.g, cc.b)
+            tab.text:SetTextColor(cc.r, cc.g, cc.b)
         else
             tab:SetBackdropBorderColor(unpack(C.media.border_color))
             tab.text:SetTextColor(0.8, 0.8, 0.8)
@@ -335,10 +373,13 @@ local function selectTab(index)
 end
 
 ------------------------------------------------------------------------
--- Main Panel
+-- Main Panel (created on first Toggle)
 ------------------------------------------------------------------------
 
 local function createPanel()
+    local font = getFont()
+    local cc = getClassColor()
+
     panel = CreateFrame("Frame", "DarkUI_OptionsPanel", UIParent, "BackdropTemplate")
     panel:SetSize(PANEL_WIDTH, PANEL_HEIGHT)
     panel:SetPoint("CENTER")
@@ -442,6 +483,11 @@ end
 ------------------------------------------------------------------------
 
 function addon:Toggle()
+    if not ensureNamespace() then
+        print("|cffff0000DarkUI_Options:|r DarkUI not loaded.")
+        return
+    end
+
     if not panel then
         createPanel()
     end
@@ -457,6 +503,9 @@ function addon:Toggle()
 end
 
 function addon:Show()
+    if not ensureNamespace() then
+        return
+    end
     if not panel then
         createPanel()
     end
@@ -475,3 +524,49 @@ function addon:Hide()
         needReload = false
     end
 end
+
+------------------------------------------------------------------------
+-- Game Menu Button
+------------------------------------------------------------------------
+
+local function addGameMenuButton()
+    local btn = CreateFrame("Button", "GameMenuButtonDarkUI", GameMenuFrame, "MainMenuFrameButtonTemplate")
+    btn:SetSize(200, 35)
+    btn:SetText("|cffFFCC99Dark|r|cffffffffUI|r")
+    btn:SetScript("OnClick", function()
+        HideUIPanel(GameMenuFrame)
+        addon:Toggle()
+    end)
+    btn:Hide()
+
+    hooksecurefunc(GameMenuFrame, "Layout", function(self)
+        local anchor
+        local offset = btn:GetHeight()
+        for button in self.buttonPool:EnumerateActive() do
+            if button:GetText() == ADDONS then
+                anchor = button
+            else
+                local point, relativeTo, relativePoint, xOfs, yOfs = button:GetPoint()
+                if point and relativeTo and yOfs then
+                    button:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs - offset)
+                end
+            end
+        end
+        if not anchor then return end
+
+        btn:ClearAllPoints()
+        btn:SetPoint("TOPLEFT", anchor, "BOTTOMLEFT", 0, -10)
+        btn:Show()
+
+        self:SetHeight(self:GetHeight() + offset)
+    end)
+end
+
+local menuFrame = CreateFrame("Frame")
+menuFrame:RegisterEvent("PLAYER_LOGIN")
+menuFrame:SetScript("OnEvent", function(self)
+    self:UnregisterEvent("PLAYER_LOGIN")
+    if GameMenuFrame then
+        addGameMenuButton()
+    end
+end)

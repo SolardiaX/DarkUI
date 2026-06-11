@@ -6,7 +6,7 @@
 ## Notes-ruRU: DarkUI - Управление конфигурацией
 ## Author: SolardiaX
 ## Version: 12.0.0-2.0.0
-## RequiredDeps: DarkUI
+## Dependencies: DarkUI
 ## Category-enUS: UI Overhaul
 ## Category-ruRU: Переработка интерфейса
 ## Category-zhCN: UI重构

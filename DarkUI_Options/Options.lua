@@ -1,5 +1,6 @@
-local ns = _G["DarkUI"]
-local E, C, L, DB = ns:unpack()
+------------------------------------------------------------------------
+-- DarkUI Options — Option List Definitions
+------------------------------------------------------------------------
 
 local addon = DarkUI_Options
 local CHECK, SLIDER, DROP, HEADER, BUTTON = addon.CHECK, addon.SLIDER, addon.DROP, addon.HEADER, addon.BUTTON
