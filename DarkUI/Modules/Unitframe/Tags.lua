@@ -187,7 +187,7 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
         hpval = L.UNITFRAME_OFFLINE
     else
         local loss = TruncateWhenZero(UnitHealthMissing(unit))
-        if loss ~= "0" and loss ~= "" then
+        if issecretvalue(loss) then
             hpval = "-" .. loss
         end
     end
