@@ -13,6 +13,8 @@ local cfg = C.blizzard
 ------------------------------------------------------------------------
 
 local DARK_COLOR = { 0.36, 0.36, 0.36, 1 }
+local TEXT_COLOR_WARM = { 0.9, 0.8, 0.6 }
+local TEXT_COLOR_NEUTRAL = { 1, 1, 1 }
 
 ------------------------------------------------------------------------
 -- Core Engine
@@ -58,6 +60,39 @@ local function darkenTexture(texture)
     end
 end
 
+local function lightenText(fontString)
+    if not fontString or not fontString.GetTextColor then return end
+    if fontString.__darkStyled then return end
+
+    local r, g, b = fontString:GetTextColor()
+    local max = math.max(r, g, b)
+    if max >= 0.5 then return end
+
+    local nr, ng, nb
+    if r > g and r > b then
+        nr, ng, nb = unpack(TEXT_COLOR_WARM)
+    else
+        nr, ng, nb = unpack(TEXT_COLOR_NEUTRAL)
+    end
+
+    fontString:SetTextColor(nr, ng, nb)
+    fontString.__darkStyled = true
+
+    hooksecurefunc(fontString, "SetTextColor", function(self, sr, sg, sb)
+        if self.__darkLock then return end
+        local mx = math.max(sr, sg, sb)
+        if mx >= 0.5 then return end
+
+        self.__darkLock = true
+        if sr > sg and sr > sb then
+            self:SetTextColor(unpack(TEXT_COLOR_WARM))
+        else
+            self:SetTextColor(unpack(TEXT_COLOR_NEUTRAL))
+        end
+        self.__darkLock = false
+    end)
+end
+
 local function darkenFrame(frame, recursive)
     if not frame then return end
     if frame.IsForbidden and frame:IsForbidden() then return end
@@ -67,8 +102,12 @@ local function darkenFrame(frame, recursive)
     if frame.GetRegions then
         for i = 1, frame:GetNumRegions() do
             local region = select(i, frame:GetRegions())
-            if region and region.IsObjectType and region:IsObjectType("Texture") then
-                darkenTexture(region)
+            if region and region.IsObjectType then
+                if region:IsObjectType("Texture") then
+                    darkenTexture(region)
+                elseif region:IsObjectType("FontString") then
+                    lightenText(region)
+                end
             end
         end
     end
@@ -77,7 +116,7 @@ local function darkenFrame(frame, recursive)
         for i = 1, select("#", frame:GetChildren()) do
             local child = select(i, frame:GetChildren())
             if child then
-                darkenFrame(child, false)
+                darkenFrame(child, true)
             end
         end
     end

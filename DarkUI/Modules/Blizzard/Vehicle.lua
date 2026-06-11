@@ -30,27 +30,23 @@ function module:OnInit()
     VehicleSeatIndicator:SetAlpha(0)
     VehicleSeatIndicator:HookScript("OnShow", function(self)
         self:SetAlpha(0)
+        for i = 1, self:GetNumChildren() do
+            local child = select(i, self:GetChildren())
+            if child and child:IsObjectType("Button") and not child.__darkHooked then
+                child:HookScript("OnEnter", function()
+                    VehicleSeatIndicator:SetAlpha(1)
+                end)
+                child:HookScript("OnLeave", function()
+                    VehicleSeatIndicator:SetAlpha(0)
+                end)
+                child.__darkHooked = true
+            end
+        end
     end)
     VehicleSeatIndicator:HookScript("OnEnter", function(self)
         self:SetAlpha(1)
     end)
     VehicleSeatIndicator:HookScript("OnLeave", function(self)
         self:SetAlpha(0)
-    end)
-
-    hooksecurefunc("VehicleSeatIndicator_SetUpVehicle", function(self, vehicleID)
-        if not self:IsShown() then return end
-        local _, numSeat = GetVehicleUIIndicator(vehicleID)
-        for i = 1, numSeat do
-            local button = _G["VehicleSeatIndicatorButton" .. i]
-            if button then
-                button:HookScript("OnEnter", function()
-                    VehicleSeatIndicator:SetAlpha(1)
-                end)
-                button:HookScript("OnLeave", function()
-                    VehicleSeatIndicator:SetAlpha(0)
-                end)
-            end
-        end
     end)
 end
