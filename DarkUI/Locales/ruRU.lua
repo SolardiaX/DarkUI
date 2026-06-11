@@ -92,7 +92,7 @@ L.CHAT_OFFICER = "О"
 L.CHAT_PET_BATTLE = "БП"
 L.CHAT_COME_ONLINE = "появился |cff298F00в сети|r."
 L.CHAT_GONE_OFFLINE = "ушел |cffff0000из сети|r."
-L.CHAT_INTERRUPTED = "Прервано: %s - \124cff71d5ff\124Hspell:%d:0\124h[%s]\124h\124r！"
+L.CHAT_INTERRUPTED = "Прервано: %s"
 
 L.LOOT_RANDOM = "Случайный игрок"
 L.LOOT_SELF = "Собственный лут"
@@ -114,49 +114,12 @@ L.AUTO_REPAIR_INFO = "Стоимость ремонта"
 L.AUTO_REPAIR_NOTENOUGH_INFO = "Недостаточно денег для авторемонта!"
 L.AUTO_SELL_INFO = "Автопродажа хлама "
 
--- Combat text
-L.COMBATTEXT_ALREADY_UNLOCKED = "Боевой текст уже разблокирован."
-L.COMBATTEXT_ALREADY_LOCKED = "Боевой текст уже заблокирован."
-L.COMBATTEXT_TEST_DISABLED = "Режим тестирования боевого текста отключен."
-L.COMBATTEXT_TEST_ENABLED = "Режим тестирования боевого текста включен."
-L.COMBATTEXT_TEST_USE_UNLOCK =
-    "Введите /xct unlock, чтобы перемещать и изменять размер рамок боевого текста."
-L.COMBATTEXT_TEST_USE_LOCK = "Введите /xct lock, чтобы заблокировать рамки боевого текста."
-L.COMBATTEXT_TEST_USE_TEST =
-    "Введите /xct test, чтобы включить/выключить режим тестирования боевого текста."
-L.COMBATTEXT_TEST_USE_RESET = "Введите /xct reset, чтобы восстановить позиции по умолчанию."
-L.COMBATTEXT_POPUP =
-    "Для сохранения позиций окон боевого текста необходимо перезагрузить интерфейс."
-L.COMBATTEXT_UNSAVED =
-    "Позиции окон боевого текста не сохранены, не забудьте перезагрузить интерфейс."
-L.COMBATTEXT_UNLOCKED = "Боевой текст разблокирован."
-
-L.DAMAGEMETER_CURRENT = "Текущий"
-L.DAMAGEMETER_TOTAL = "Общий"
-L.DAMAGEMETER_OPTION_VISIBLE_BARS = "Видимые полосы"
-L.DAMAGEMETER_OPTION_BAR_WIDTH = "Ширина полосы"
-L.DAMAGEMETER_OPTION_BAR_HEIGHT = "Высота полосы"
-L.DAMAGEMETER_OPTION_SPACING = "Интервал между полосами"
-L.DAMAGEMETER_OPTION_FONT_SIZE = "Размер шрифта"
-L.DAMAGEMETER_OPTION_HIDE_TITLE = "Скрыть заголовок"
-L.DAMAGEMETER_OPTION_CLASS_COLOR_BAR = "Окраска полосы по классу"
-L.DAMAGEMETER_OPTION_CLASS_COLOR_NAME = "Окраска имени по классу"
-L.DAMAGEMETER_OPTION_SAVE_ONLY_BOSS_FIGHTS = "Сохранять только информацию о боях с боссами"
-L.DAMAGEMETER_OPTION_MERGE_HEAL_AND_ABSORBS = "Объединять исцеление и поглощение"
-L.DAMAGEMETER_OPTION_BAR_COLOR = "Цвет полосы"
-L.DAMAGEMETER_OPTION_BACKDROP_COLOR = "Цвет фона"
-L.DAMAGEMETER_OPTION_BORDER_COLOR = "Цвет границы"
-
 L.MAIL_MESSAGES = "Новая почта"
 L.MAIL_NEEDMAILBOX = "Нужен почтовый ящик"
 L.MAIL_NOMAIL = "Нет почты"
 L.MAIL_COMPLETE = "Все готово"
 L.MAIL_ENVFULL = "Инвентарь полон"
 L.MAIL_MAXCOUNT = "Достигнуто максимальное количество предметов"
-
-L.PANELS_AFK = "ВЫ ОТОШЛИ!"
-L.PANELS_AFK_RCLICK = "Щелкните правой кнопкой мыши, чтобы скрыть."
-L.PANELS_AFK_LCLICK = "Щелкните левой кнопкой мыши, чтобы вернуться."
 
 L.DATATEXT_DAY = "Д"
 L.DATATEXT_HOUR = "Ч"
