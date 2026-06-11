@@ -15,12 +15,7 @@ local CastbarCompleteColor = { 0.1, 0.8, 0 }
 local CastbarFailColor = { 1, 0.1, 0 }
 
 local CastbarInterruptibleColor = CreateColor(0.11, 0.58, 0.89)
-local CastbarKickOnCDColor = CreateColor(1, 0.5, 0)
 local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
-
-local C_Spell_GetSpellCooldown = C_Spell.GetSpellCooldown
-
-local kickID = 0
 
 local channelingTicks = {
     [740] = 4,        -- 宁静
@@ -50,23 +45,6 @@ module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE", function()
         channelingTicks[47757] = numTicks
         channelingTicks[47758] = numTicks
     end
-
-    local classKicks = {
-        DEATHKNIGHT = 47528,
-        DEMONHUNTER = 183752,
-        DRUID = 106839,
-        EVOKER = 351338,
-        HUNTER = GetSpecialization() == 3 and 187707 or 147362,
-        MAGE = 2139,
-        MONK = 116705,
-        PALADIN = 96231,
-        PRIEST = 15487,
-        ROGUE = 1766,
-        SHAMAN = 57994,
-        WARLOCK = 119910,
-        WARRIOR = 6552,
-    }
-    kickID = classKicks[E.myClass] or 0
 end)
 
 ------------------------------------------------------------------
@@ -122,18 +100,7 @@ local function setBarTicks(Castbar, ticks, numTicks)
 end
 
 local function setCastbarInterruptible(Castbar)
-    if kickID > 0 then
-        local cooldownInfo = C_Spell_GetSpellCooldown(kickID)
-        local start = cooldownInfo and cooldownInfo.startTime or 0
-        local onCD = issecretvalue(start) or start ~= 0
-        if onCD then
-            Castbar:SetStatusBarColor(CastbarKickOnCDColor:GetRGB())
-        else
-            Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
-        end
-    else
-        Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
-    end
+    Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
     if Castbar.Spark then Castbar.Spark:SetVertexColor(0.8, 0.6, 0, 1) end
 end
 module.SetCastbarInterruptible = setCastbarInterruptible
