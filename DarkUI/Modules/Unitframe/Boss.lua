@@ -10,15 +10,7 @@ local oUF = select(2, ...).oUF or oUF
 
 local cfg = C.unitframe
 
-local mediaPath = cfg.mediaPath
-
-local media = {
-    portrait_overlay = mediaPath .. "uf_portrait_overlay",
-    foreground       = mediaPath .. C.general.style .. "\\" .. "uf_tot_foreground",
-    background       = mediaPath .. C.general.style .. "\\" .. "uf_tot_background",
-    hpTex            = mediaPath .. "uf_bartex_normal",
-    mpTex            = mediaPath .. "uf_bartex_normal"
-}
+local media
 
 local function createTexture(self)
     -- foreground
@@ -38,7 +30,7 @@ local function createTexture(self)
     self.FrameBG:SetFrameLevel(4)
     self.FrameBG:SetSize(256, 128)
     self.FrameBG:SetPoint("CENTER", self, 0, 0)
-    
+
     self.FrameBG.texture = self.FrameBG:CreateTexture(nil, "BACKGROUND")
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
@@ -70,7 +62,7 @@ local function createBar(self)
     self.Power:SetStatusBarTexture(media.mpTex)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
-    self.Power.bg.multiplier = .45
+    self.Power.bg.multiplier = 0.45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
 
@@ -84,12 +76,12 @@ local function createBar(self)
     self.AlternativePower:SetPoint("CENTER")
     self.AlternativePower:SetFrameStrata("LOW")
     self.AlternativePower:SetFrameLevel(4)
-    self.AlternativePower:SetPoint('TOP', self.Health, 'TOP', 0, 0)
+    self.AlternativePower:SetPoint("TOP", self.Health, "TOP", 0, 0)
     self.AlternativePower:SetSize(94, 4)
     self.AlternativePower:SetStatusBarTexture(media.mpTex)
 
     self.AlternativePower.bg = self.AlternativePower:CreateTexture(nil, "BORDER")
-    self.AlternativePower.bg.multiplier = .45
+    self.AlternativePower.bg.multiplier = 0.45
     self.AlternativePower.bg:SetAllPoints()
     self.AlternativePower.bg:SetTexture(media.mpTex)
 
@@ -132,54 +124,52 @@ local function createTag(self)
     self.Tags = {}
 
     self.Tags.name = self:CreateTag(self.FrameFG, "[raidcolor][dd:realname]")
-                         :SetFont(STANDARD_TEXT_FONT, 14, "THICKOUTLINE")
-                         :SetPoint("TOPLEFT", self, "CENTER", -5, -18)
-                         :done()
+        :SetFont(STANDARD_TEXT_FONT, 14, "THICKOUTLINE")
+        :SetPoint("TOPLEFT", self, "CENTER", -5, -18)
+        :done()
 
-    self.Tags.level = self:CreateTag(self.FrameFG, "[dd:difficulty][level]")
-                          :SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
-                          :SetPoint("CENTER", self, -20, -17)
-                          :done()
+    self.Tags.level =
+        self:CreateTag(self.FrameFG, "[dd:difficulty][level]"):SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE"):SetPoint("CENTER", self, -20, -17):done()
 
     self.Tags.smarthp = self:CreateTag(self.FrameFG, "[dd:smarthp]")
-                            :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                            :SetPoint("CENTER", self.Health, 0, -2)
-                            :SetJustifyH("CENTER")
-                            :done()
+        :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+        :SetPoint("CENTER", self.Health, 0, -2)
+        :SetJustifyH("CENTER")
+        :done()
 end
 
 local function createAuraIcon(self)
     -- Buffs (above)
-    local buffs = CreateFrame('Frame', nil, self)
+    local buffs = CreateFrame("Frame", nil, self)
     buffs:SetFrameStrata("HIGH")
     buffs:SetFrameLevel(1)
     buffs.size = 22
     buffs.spacing = 4
-    buffs.initialAnchor = 'BOTTOMLEFT'
-    buffs['growth-x'] = 'RIGHT'
-    buffs['growth-y'] = 'UP'
+    buffs.initialAnchor = "BOTTOMLEFT"
+    buffs["growth-x"] = "RIGHT"
+    buffs["growth-y"] = "UP"
     buffs.num = 6
     buffs.showStealableBuffs = cfg.boss.aura.show_Stealable_buffs
     buffs:SetSize((buffs.size + buffs.spacing) * buffs.num, buffs.size)
-    buffs:SetPoint('BOTTOMLEFT', self, 'TOPLEFT', 0, 8)
+    buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 8)
     buffs.PostCreateButton = core.PostCreateButton
     buffs.PostUpdateButton = core.PostUpdateButton
     buffs.FilterAura = core.FilterAuras
     self.Buffs = buffs
 
     -- Debuffs (below)
-    local debuffs = CreateFrame('Frame', nil, self)
+    local debuffs = CreateFrame("Frame", nil, self)
     debuffs:SetFrameStrata("HIGH")
     debuffs:SetFrameLevel(1)
     debuffs.size = 22
     debuffs.spacing = 4
-    debuffs.initialAnchor = 'TOPLEFT'
-    debuffs['growth-x'] = 'RIGHT'
-    debuffs['growth-y'] = 'DOWN'
+    debuffs.initialAnchor = "TOPLEFT"
+    debuffs["growth-x"] = "RIGHT"
+    debuffs["growth-y"] = "DOWN"
     debuffs.num = 6
     debuffs.onlyShowPlayer = cfg.boss.aura.player_aura_only
     debuffs:SetSize((debuffs.size + debuffs.spacing) * debuffs.num, debuffs.size)
-    debuffs:SetPoint('TOPLEFT', self, 'BOTTOMLEFT', 0, -8)
+    debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -8)
     debuffs.PostCreateButton = core.PostCreateButton
     debuffs.PostUpdateButton = core.PostUpdateButton
     debuffs.FilterAura = core.FilterAuras
@@ -274,6 +264,15 @@ local function createStyle(self)
 end
 
 function module:OnInit()
+    local mediaPath = cfg.mediaPath
+    media = {
+        portrait_overlay = mediaPath .. "uf_portrait_overlay",
+        foreground = mediaPath .. C.general.style .. "\\" .. "uf_tot_foreground",
+        background = mediaPath .. C.general.style .. "\\" .. "uf_tot_background",
+        hpTex = mediaPath .. "uf_bartex_normal",
+        mpTex = mediaPath .. "uf_bartex_normal",
+    }
+
     oUF:RegisterStyle("DarkUI:boss", createStyle)
     oUF:SetActiveStyle("DarkUI:boss")
 

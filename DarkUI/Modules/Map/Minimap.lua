@@ -24,35 +24,8 @@ local ICON_POS = {
     clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
 }
 
-local media = {
-    map_gloss = C.media.path .. "map_gloss",
-    map_overlay = C.media.path .. C.general.style .. "\\" .. "map_overlay",
-}
-
-local FRAMES_TO_ROTATE = {
-    {
-        texture = C.media.path .. "map_rotating_1",
-        width = 250,
-        height = 250,
-        color_red = C.general.style == "cold" and 126 / 255 or 255 / 255,
-        color_green = C.general.style == "cold" and 206 / 255 or 255 / 255,
-        color_blue = C.general.style == "cold" and 244 / 255 or 0 / 255,
-        alpha = 0.2,
-        duration = 60,
-        direction = 1,
-    },
-    {
-        texture = C.media.path .. "map_rotating_2",
-        width = 250,
-        height = 250,
-        color_red = C.general.style == "cold" and 126 / 255 or 255 / 255,
-        color_green = C.general.style == "cold" and 206 / 255 or 255 / 255,
-        color_blue = C.general.style == "cold" and 244 / 255 or 0 / 255,
-        alpha = 0.6,
-        duration = 60,
-        direction = 0,
-    },
-}
+local media
+local FRAMES_TO_ROTATE
 
 ------------------------------------------------------------------------
 -- Disable Blizzard Elements
@@ -178,7 +151,7 @@ local function resetIcons()
         QueueStatusButton:SetScale(0.52)
         QueueStatusButtonIcon:SetScale(0.52)
         QueueStatusFrame:ClearAllPoints()
-	    QueueStatusFrame:SetPoint("TOPRIGHT", QueueStatusButton, "TOPLEFT")
+        QueueStatusFrame:SetPoint("TOPRIGHT", QueueStatusButton, "TOPLEFT")
 
         local isSettingQueuePoint
         hooksecurefunc(QueueStatusButton, "SetPoint", function(self)
@@ -521,8 +494,10 @@ local function setupRecycleBin()
             local region = select(i, child:GetRegions())
             if region:IsObjectType("Texture") then
                 local texture = region:GetTexture() or ""
-                if removedTextures[texture]
-                    or (type(texture) == "string" and (texture:find("Interface\\CharacterFrame") or texture:find("Interface\\Minimap"))) then
+                if
+                    removedTextures[texture]
+                    or (type(texture) == "string" and (texture:find("Interface\\CharacterFrame") or texture:find("Interface\\Minimap")))
+                then
                     region:SetTexture(nil)
                     region:Hide()
                 elseif not region.__ignored then
@@ -592,9 +567,7 @@ local function setupRecycleBin()
             btn:ClearAllPoints()
             local col = (i - 1) % ICONS_PER_ROW
             local row = math.floor((i - 1) / ICONS_PER_ROW)
-            btn:SetPoint("BOTTOMRIGHT", bin, "BOTTOMRIGHT",
-                -(col * (BUTTON_SIZE + SPACING) + SPACING),
-                row * (BUTTON_SIZE + SPACING) + SPACING)
+            btn:SetPoint("BOTTOMRIGHT", bin, "BOTTOMRIGHT", -(col * (BUTTON_SIZE + SPACING) + SPACING), row * (BUTTON_SIZE + SPACING) + SPACING)
         end
     end
 
@@ -607,8 +580,7 @@ local function setupRecycleBin()
                 local child = select(i, Minimap:GetChildren())
                 local name = child and child.GetName and child:GetName()
                 if name and not child.__binExamed and not blackList[name] then
-                    if (child:IsObjectType("Button") or name:upper():find("BUTTON"))
-                        and not isButtonIgnored(name) then
+                    if (child:IsObjectType("Button") or name:upper():find("BUTTON")) and not isButtonIgnored(name) then
                         reskinButton(child)
                     end
                     child.__binExamed = true
@@ -669,6 +641,36 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
+    media = {
+        map_gloss = C.media.path .. "map_gloss",
+        map_overlay = C.media.path .. C.general.style .. "\\" .. "map_overlay",
+    }
+
+    FRAMES_TO_ROTATE = {
+        {
+            texture = C.media.path .. "map_rotating_1",
+            width = 250,
+            height = 250,
+            color_red = C.general.style == "cold" and 126 / 255 or 255 / 255,
+            color_green = C.general.style == "cold" and 206 / 255 or 255 / 255,
+            color_blue = C.general.style == "cold" and 244 / 255 or 0 / 255,
+            alpha = 0.2,
+            duration = 60,
+            direction = 1,
+        },
+        {
+            texture = C.media.path .. "map_rotating_2",
+            width = 250,
+            height = 250,
+            color_red = C.general.style == "cold" and 126 / 255 or 255 / 255,
+            color_green = C.general.style == "cold" and 206 / 255 or 255 / 255,
+            color_blue = C.general.style == "cold" and 244 / 255 or 0 / 255,
+            alpha = 0.6,
+            duration = 60,
+            direction = 0,
+        },
+    }
+
     if not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager") then
         C_AddOns.LoadAddOn("Blizzard_TimeManager")
     end

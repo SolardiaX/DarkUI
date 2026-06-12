@@ -10,40 +10,28 @@ local oUF = select(2, ...).oUF or oUF
 
 local cfg = C.unitframe
 
-local mediaPath = cfg.mediaPath
-
-local media = {
-    portrait_overlay = mediaPath .. "uf_portrait_overlay",
-
-    foreground       = mediaPath .. C.general.style .. "\\" .. "uf_tot_foreground",
-    background       = mediaPath .. C.general.style .. "\\" .. "uf_tot_background",
-
-    hpTex            = mediaPath .. "uf_bartex_normal",
-    mpTex            = mediaPath .. "uf_bartex_normal",
-
-    Incoming_barTex  = mediaPath .. "uf_bartex_normal",
-}
+local media
 
 local function createTexture(self)
     -- foreground
-    self.FrameFG = CreateFrame('Frame', nil, self)
+    self.FrameFG = CreateFrame("Frame", nil, self)
     self.FrameFG:SetFrameStrata("LOW")
     self.FrameFG:SetFrameLevel(5)
     self.FrameFG:SetSize(256, 128)
-    self.FrameFG:SetPoint('CENTER', self, 0, 0)
+    self.FrameFG:SetPoint("CENTER", self, 0, 0)
 
-    self.FrameFG.texture = self.FrameFG:CreateTexture(nil, 'BORDER')
+    self.FrameFG.texture = self.FrameFG:CreateTexture(nil, "BORDER")
     self.FrameFG.texture:SetTexture(media.foreground)
     self.FrameFG.texture:SetAllPoints(self.FrameFG)
 
     -- background
-    self.FrameBG = CreateFrame('Frame', nil, self)
-    self.FrameBG:SetFrameStrata('BACKGROUND')
+    self.FrameBG = CreateFrame("Frame", nil, self)
+    self.FrameBG:SetFrameStrata("BACKGROUND")
     self.FrameBG:SetFrameLevel(1)
     self.FrameBG:SetSize(256, 128)
     self.FrameBG:SetPoint("CENTER", self, 0, 0)
 
-    self.FrameBG.texture = self.FrameBG:CreateTexture(nil, 'BACKGROUND')
+    self.FrameBG.texture = self.FrameBG:CreateTexture(nil, "BACKGROUND")
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
 end
@@ -53,7 +41,7 @@ local function createBar(self)
     self.Health:SetFrameStrata("LOW")
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(80, 16)
-    self.Health:SetPoint('CENTER', self, 25, 4)
+    self.Health:SetPoint("CENTER", self, 25, 4)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -69,15 +57,15 @@ local function createBar(self)
     self.Power:SetPoint("CENTER")
     self.Power:SetFrameStrata("LOW")
     self.Power:SetFrameLevel(4)
-    self.Power:SetPoint('TOP', self.Health, 'BOTTOM', 0, 0)
+    self.Power:SetPoint("TOP", self.Health, "BOTTOM", 0, 0)
     self.Power:SetSize(80, 4)
     self.Power:SetStatusBarTexture(media.mpTex)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
-    self.Power.bg.multiplier = .45
+    self.Power.bg.multiplier = 0.45
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
-    
+
     self.Power.frequentUpdates = true
     self.Power.colorClass = true
     self.Power.colorReaction = true
@@ -91,24 +79,24 @@ local function createPortrait(self)
     local overlayFrame
 
     if cfg.portrait3D == false then
-        self.Portrait = self.FrameBG:CreateTexture(nil, 'BACKGROUND', nil, 3)
+        self.Portrait = self.FrameBG:CreateTexture(nil, "BACKGROUND", nil, 3)
         self.Portrait:SetSize(42, 42)
 
-        overlayFrame = CreateFrame('Frame', nil, self.FrameBG)
+        overlayFrame = CreateFrame("Frame", nil, self.FrameBG)
     else
-        self.Portrait = CreateFrame('PlayerModel', nil, self.FrameBG)
+        self.Portrait = CreateFrame("PlayerModel", nil, self.FrameBG)
         self.Portrait:SetFrameLevel(3)
         self.Portrait:SetSize(38, 38)
 
-        overlayFrame = CreateFrame('Frame', nil, self.Portrait)
+        overlayFrame = CreateFrame("Frame", nil, self.Portrait)
     end
 
-    self.Portrait:SetPoint('CENTER', self, 'LEFT', 2, 0)
+    self.Portrait:SetPoint("CENTER", self, "LEFT", 2, 0)
 
     overlayFrame:SetFrameLevel(4)
     overlayFrame:SetAllPoints(self.Portrait)
 
-    local overlay = overlayFrame:CreateTexture(nil, 'BACKGROUND', nil, -7)
+    local overlay = overlayFrame:CreateTexture(nil, "BACKGROUND", nil, -7)
     overlay:SetTexture(media.portrait_overlay)
     overlay:SetPoint("TOPLEFT", overlayFrame, -2, 2)
     overlay:SetPoint("BOTTOMRIGHT", overlayFrame, 2, -2)
@@ -120,21 +108,19 @@ end
 local function createTag(self)
     self.Tags = {}
 
-    self.Tags.name = self:CreateTag(self.FrameFG, '[raidcolor][dd:realname]')
-                         :SetFont(STANDARD_TEXT_FONT, 14, 'THICKOUTLINE')
-                         :SetPoint('TOPLEFT', self, 'CENTER', -5, -18)
-                         :done()
+    self.Tags.name = self:CreateTag(self.FrameFG, "[raidcolor][dd:realname]")
+        :SetFont(STANDARD_TEXT_FONT, 14, "THICKOUTLINE")
+        :SetPoint("TOPLEFT", self, "CENTER", -5, -18)
+        :done()
 
-    self.Tags.level = self:CreateTag(self.FrameFG, '[dd:difficulty][level]')
-                          :SetFont(STANDARD_TEXT_FONT, 14, 'OUTLINE')
-                          :SetPoint('CENTER', self, -20, -17)
-                          :done()
+    self.Tags.level =
+        self:CreateTag(self.FrameFG, "[dd:difficulty][level]"):SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE"):SetPoint("CENTER", self, -20, -17):done()
 
     self.Tags.smarthp = self:CreateTag(self.FrameFG, "[dd:smarthp]")
-                            :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                            :SetPoint("CENTER", self.Health, 0, -2)
-                            :SetJustifyH('CENTER')
-                            :done()
+        :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+        :SetPoint("CENTER", self.Health, 0, -2)
+        :SetJustifyH("CENTER")
+        :done()
 end
 
 local function createStyle(self)
@@ -161,6 +147,19 @@ local function createStyle(self)
 end
 
 function module:OnInit()
+    local mediaPath = cfg.mediaPath
+    media = {
+        portrait_overlay = mediaPath .. "uf_portrait_overlay",
+
+        foreground = mediaPath .. C.general.style .. "\\" .. "uf_tot_foreground",
+        background = mediaPath .. C.general.style .. "\\" .. "uf_tot_background",
+
+        hpTex = mediaPath .. "uf_bartex_normal",
+        mpTex = mediaPath .. "uf_bartex_normal",
+
+        Incoming_barTex = mediaPath .. "uf_bartex_normal",
+    }
+
     oUF:RegisterStyle("DarkUI:targettarget", createStyle)
     oUF:SetActiveStyle("DarkUI:targettarget")
     oUF:Spawn("targettarget", "DarkUIToTFrame")

@@ -10,25 +10,17 @@ local oUF = select(2, ...).oUF or oUF
 
 local cfg = C.unitframe
 
-local mediaPath = cfg.mediaPath
-
-local media = {
-    background             = mediaPath .. C.general.style .. "\\" .. "uf_miniframe",
-
-    hpTex                  = mediaPath .. "uf_bartex_normal",
-
-    incoming_barTex        = mediaPath .. "uf_bartex_normal",
-}
+local media
 
 local function createTexture(self)
     -- background
-    self.FrameBG = CreateFrame('Frame', nil, self)
-    self.FrameBG:SetFrameStrata('BACKGROUND')
+    self.FrameBG = CreateFrame("Frame", nil, self)
+    self.FrameBG:SetFrameStrata("BACKGROUND")
     self.FrameBG:SetFrameLevel(1)
     self.FrameBG:SetSize(256, 64)
     self.FrameBG:SetPoint("CENTER", self, 0, 0)
 
-    self.FrameBG.texture = self.FrameBG:CreateTexture(nil, 'BACKGROUND')
+    self.FrameBG.texture = self.FrameBG:CreateTexture(nil, "BACKGROUND")
     self.FrameBG.texture:SetTexture(media.background)
     self.FrameBG.texture:SetAllPoints(self.FrameBG)
     self.FrameBG.texture:SetTexCoord(1, 0, 0, 1)
@@ -39,11 +31,11 @@ local function createBar(self)
     self.Health:SetFrameStrata("LOW")
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(90, 18)
-    self.Health:SetPoint('CENTER', self.FrameBG, 0, 2)
+    self.Health:SetPoint("CENTER", self.FrameBG, 0, 2)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
-    self.Health.bg = self.Health:CreateTexture(nil, 'BORDER')
+    self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
     self.Health.bg:SetTexture(media.hpTex)
     self.Health.bg:SetAllPoints(self.Health)
     self.Health.bg.multiplier = 0.3
@@ -76,7 +68,7 @@ local function createBar(self)
     overDamageAbsorbIndicator:SetWidth(15)
     overDamageAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
     overDamageAbsorbIndicator:SetBlendMode("ADD")
-    overDamageAbsorbIndicator:SetAlpha(.7)
+    overDamageAbsorbIndicator:SetAlpha(0.7)
     overDamageAbsorbIndicator:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
     overDamageAbsorbIndicator:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
 
@@ -87,14 +79,14 @@ local function createBar(self)
     healAbsorb:SetWidth(90)
     healAbsorb:SetReverseFill(true)
     healAbsorb:SetStatusBarTexture(media.incoming_barTex)
-    healAbsorb:SetStatusBarColor(0, .5, .8, .5)
+    healAbsorb:SetStatusBarColor(0, 0.5, 0.8, 0.5)
     healAbsorb:SetFrameLevel(self.Health:GetFrameLevel())
 
     local overHealAbsorbIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
     overHealAbsorbIndicator:SetWidth(15)
     overHealAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
     overHealAbsorbIndicator:SetBlendMode("ADD")
-    overHealAbsorbIndicator:SetAlpha(.5)
+    overHealAbsorbIndicator:SetAlpha(0.5)
     overHealAbsorbIndicator:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
     overHealAbsorbIndicator:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
 
@@ -109,10 +101,10 @@ local function createTag(self)
     self.Tags = {}
 
     self.Tags.smarthp = self:CreateTag(self.Health, "[dd:smarthp]")
-                            :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                            :SetPoint("CENTER", self.Health, 0, 0)
-                            :SetJustifyH('CENTER')
-                            :done()
+        :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+        :SetPoint("CENTER", self.Health, 0, 0)
+        :SetJustifyH("CENTER")
+        :done()
 end
 
 local function createStyle(self)
@@ -136,7 +128,18 @@ local function createStyle(self)
 end
 
 function module:OnInit()
-    if not C.unitframe.partypet.enable then return end
+    if not C.unitframe.partypet.enable then
+        return
+    end
+
+    local mediaPath = cfg.mediaPath
+    media = {
+        background = mediaPath .. C.general.style .. "\\" .. "uf_miniframe",
+
+        hpTex = mediaPath .. "uf_bartex_normal",
+
+        incoming_barTex = mediaPath .. "uf_bartex_normal",
+    }
 
     oUF:Factory(function()
         oUF:RegisterStyle("DarkUI:partypet", createStyle)
@@ -146,23 +149,35 @@ function module:OnInit()
         local unitsPerColumn = cfg.party.unitsPerColumn
         local xOffset = 50
         local yOffset = 120
-        local columnAnchorPoint = 'BOTTOM'
+        local columnAnchorPoint = "BOTTOM"
 
         local partypet = oUF:SpawnHeader(
-                "DarkUIPartyPetHeader",
-                nil,
-                "point", 'LEFT',
-                "columnAnchorPoint", columnAnchorPoint,
-                "unitsPerColumn", unitsPerColumn,
-                "showSolo", cfg.party.showSolo,
-                "showPlayer", showPlayer,
-                "showParty", true,
-                "showRaid", false,
-                "maxColumns", 5,
-                "columnSpacing", 60,
-                "xOffset", xOffset,
-                "yOffset", yOffset,
-                "oUF-initialConfigFunction", ([[
+            "DarkUIPartyPetHeader",
+            nil,
+            "point",
+            "LEFT",
+            "columnAnchorPoint",
+            columnAnchorPoint,
+            "unitsPerColumn",
+            unitsPerColumn,
+            "showSolo",
+            cfg.party.showSolo,
+            "showPlayer",
+            showPlayer,
+            "showParty",
+            true,
+            "showRaid",
+            false,
+            "maxColumns",
+            5,
+            "columnSpacing",
+            60,
+            "xOffset",
+            xOffset,
+            "yOffset",
+            yOffset,
+            "oUF-initialConfigFunction",
+            ([[
                     self:SetAttribute("useOwnerUnit", "true")
                     self:SetAttribute("unitsuffix", "pet")
                     self:SetWidth(%d)

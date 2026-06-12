@@ -1,6 +1,8 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.nameplate.enable then return end
+if not C.nameplate.enable then
+    return
+end
 
 ------------------------------------------------------------------------
 -- Nameplates
@@ -31,8 +33,8 @@ local GetNumGroupMembers = GetNumGroupMembers
 
 local cfg = C.nameplate
 
-local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
-local arrow = C.media.path .. "uf_nameplate_arrow"
+local bar_border
+local arrow
 
 local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
 local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
@@ -48,14 +50,16 @@ local function castColorUpdateInterruptible(self)
 end
 
 local function castColorUpdateStart(self)
-    self:GetStatusBarTexture():SetVertexColorFromBoolean(
-        self.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
-    )
+    self:GetStatusBarTexture():SetVertexColorFromBoolean(self.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor)
 end
 
 local function createBorderFrame(frame, point)
-    if point == nil then point = frame end
-    if point.backdrop then return end
+    if point == nil then
+        point = frame
+    end
+    if point.backdrop then
+        return
+    end
 
     frame.backdrop = frame:CreateTexture(nil, "BORDER")
     frame.backdrop:SetDrawLayer("BORDER", -8)
@@ -112,7 +116,9 @@ local function updateTarget(self)
         end
 
         self:SetAlpha(1)
-        if self.arrow then self.arrow:Show() end
+        if self.arrow then
+            self.arrow:Show()
+        end
     else
         self:SetSize(cfg.width, cfg.height)
         self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - cfg.height)
@@ -126,7 +132,9 @@ local function updateTarget(self)
             self:SetAlpha(1)
         end
 
-        if self.arrow then self.arrow:Hide() end
+        if self.arrow then
+            self.arrow:Hide()
+        end
     end
 
     self.Health.border:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
@@ -153,15 +161,21 @@ end
 local function castColor(self)
     local spellID = self.spellID
     if not issecretvalue(spellID) and cfg.majorSpells[spellID] then
-        if LCG then LCG.ShowOverlayGlow(self.Icon.glowFrame) end
+        if LCG then
+            LCG.ShowOverlayGlow(self.Icon.glowFrame)
+        end
     else
-        if LCG then LCG.HideOverlayGlow(self.Icon.glowFrame) end
+        if LCG then
+            LCG.HideOverlayGlow(self.Icon.glowFrame)
+        end
     end
 end
 
 -- Threat color
 local function threatColor(self, forced)
-    if UnitIsPlayer(self.unit) then return end
+    if UnitIsPlayer(self.unit) then
+        return
+    end
     local combat = UnitAffectingCombat("player")
     local threatStatus = UnitThreatSituation("player", self.unit)
 
@@ -338,11 +352,13 @@ local function aurasPostUpdateIcon(element, button, unit, data)
 end
 
 local function callback(self, event, unit)
-    if not self then return end
+    if not self then
+        return
+    end
     if unit then
         local unitGUID = UnitGUID(unit)
         if unitGUID and canaccessvalue(unitGUID) then
-            self.npcID = tonumber((select(6, strsplit('-', unitGUID))))
+            self.npcID = tonumber((select(6, strsplit("-", unitGUID))))
         else
             self.npcID = nil
         end
@@ -406,7 +422,7 @@ local function style(self, unit)
 
     self.Health.bg = self.Health:CreateTexture(nil, "BACKGROUND")
     self.Health.bg:SetAllPoints()
-    self.Health.bg:SetAlpha(.6)
+    self.Health.bg:SetAlpha(0.6)
     self.Health.bg:SetTexture(C.media.texture.status)
     self.Health.bg.multiplier = 0.2
 
@@ -437,7 +453,7 @@ local function style(self, unit)
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints()
     self.Power.bg:SetTexture(C.media.texture.status)
-    self.Power.bg.multiplier = .2
+    self.Power.bg.multiplier = 0.2
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
     -- Hide Blizzard Power Bar
@@ -532,7 +548,7 @@ local function style(self, unit)
 
     self.Castbar.Icon.glowFrame = CreateFrame("Frame", nil, self)
     self.Castbar.Icon.glowFrame:SetPoint("CENTER", self.Castbar.Icon, "CENTER")
-    self.Castbar.Icon.glowFrame:SetSize(self.Castbar.Icon:GetWidth()+8, self.Castbar.Icon:GetHeight()+8)
+    self.Castbar.Icon.glowFrame:SetSize(self.Castbar.Icon:GetWidth() + 8, self.Castbar.Icon:GetHeight() + 8)
 
     -- Raid Icon
     self.RaidTargetIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
@@ -603,11 +619,11 @@ local function style(self, unit)
 
     -- Absorb
     local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-        ahpb:SetTexture(C.media.path .. "uf_bartex_normal")
-        ahpb:SetVertexColor(1, 1, 0, 1)
-        self.HealthPrediction = {
-            absorbBar = ahpb
-        }
+    ahpb:SetTexture(C.media.path .. "uf_bartex_normal")
+    ahpb:SetVertexColor(1, 1, 0, 1)
+    self.HealthPrediction = {
+        absorbBar = ahpb,
+    }
 
     -- Every event should be register with this
     table.insert(self.__elements, updateName)
@@ -689,6 +705,9 @@ function module:PLAYER_LOGIN()
 end
 
 function module:OnInit()
+    bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
+    arrow = C.media.path .. "uf_nameplate_arrow"
+
     self:RegisterEvent("PLAYER_LOGIN")
 
     if cfg.combat == true then

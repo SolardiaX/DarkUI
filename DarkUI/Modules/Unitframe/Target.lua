@@ -10,29 +10,7 @@ local oUF = select(2, ...).oUF or oUF
 
 local cfg = C.unitframe
 
-local mediaPath = cfg.mediaPath
-
-local media = {
-    portrait_overlay   = mediaPath .. "uf_portrait_overlay",
-    foreground         = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground",
-    foreground_boss    = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_boss",
-    foreground_elite   = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_elite",
-    foreground_rare    = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_rare",
-    background         = mediaPath .. C.general.style .. "\\" .. "uf_target_background",
-    debuffHighlight    = mediaPath .. "uf_main_debuffHighlight",
-
-    hpTex              = mediaPath .. "uf_bartex_main_hp",
-    mpTex              = mediaPath .. "uf_bartex_main_power",
-
-    castbar_barTex     = mediaPath .. "uf_bartex_normal",
-    castbar_foreground = mediaPath .. C.general.style .. "\\" .. "uf_castbar_foreground",
-    castbar_background = mediaPath .. C.general.style .. "\\" .. "uf_castbar_background",
-
-    incoming_barTex    = mediaPath .. "uf_bartex_normal",
-
-    assistant_Tex          = mediaPath .. "uf_icon_assistant",
-    leader_Tex             = mediaPath .. "uf_icon_leader",
-}
+local media
 
 local function createTexture(self)
     -- foreground
@@ -76,7 +54,7 @@ local function createBar(self)
     self.Health:SetFrameStrata("LOW")
     self.Health:SetFrameLevel(4)
     self.Health:SetSize(212, 28)
-    self.Health:SetPoint('CENTER', self, -40, -2)
+    self.Health:SetPoint("CENTER", self, -40, -2)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
@@ -91,14 +69,14 @@ local function createBar(self)
     self.Power = CreateFrame("StatusBar", nil, self)
     self.Power:SetFrameStrata("LOW")
     self.Power:SetFrameLevel(3)
-    self.Power:SetPoint('CENTER', self, -40, -2)
+    self.Power:SetPoint("CENTER", self, -40, -2)
     self.Power:SetSize(200, 40)
     self.Power:SetStatusBarTexture(media.mpTex)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
     self.Power.bg:SetAllPoints(self.Power)
     self.Power.bg:SetTexture(media.mpTex)
-    self.Power.bg.multiplier = .45
+    self.Power.bg.multiplier = 0.45
 
     self.Power.frequentUpdates = true
     self.Power.colorClass = true
@@ -129,7 +107,7 @@ local function createBar(self)
     overDamageAbsorbIndicator:SetWidth(15)
     overDamageAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
     overDamageAbsorbIndicator:SetBlendMode("ADD")
-    overDamageAbsorbIndicator:SetAlpha(.7)
+    overDamageAbsorbIndicator:SetAlpha(0.7)
     overDamageAbsorbIndicator:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
     overDamageAbsorbIndicator:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
 
@@ -140,14 +118,14 @@ local function createBar(self)
     healAbsorb:SetWidth(212)
     healAbsorb:SetReverseFill(true)
     healAbsorb:SetStatusBarTexture(media.incoming_barTex)
-    healAbsorb:SetStatusBarColor(0, .5, .8, .5)
+    healAbsorb:SetStatusBarColor(0, 0.5, 0.8, 0.5)
     healAbsorb:SetFrameLevel(self.Health:GetFrameLevel())
 
     local overHealAbsorbIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
     overHealAbsorbIndicator:SetWidth(15)
     overHealAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
     overHealAbsorbIndicator:SetBlendMode("ADD")
-    overHealAbsorbIndicator:SetAlpha(.5)
+    overHealAbsorbIndicator:SetAlpha(0.5)
     overHealAbsorbIndicator:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
     overHealAbsorbIndicator:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
 
@@ -155,23 +133,23 @@ local function createBar(self)
     self.Health.DamageAbsorb = damageAbsorb
     self.Health.OverDamageAbsorbIndicator = overDamageAbsorbIndicator
     self.Health.HealAbsorb = healAbsorb
-    self.Health.OverHealAbsorbIndicator = overHealAbsorbIndicator   
+    self.Health.OverHealAbsorbIndicator = overHealAbsorbIndicator
 end
 
 local function createPortrait(self)
     local overlayFrame
 
     if cfg.portrait3D == false then
-        self.Portrait = self.FrameBG:CreateTexture(nil, 'BACKGROUND', nil, 3)
+        self.Portrait = self.FrameBG:CreateTexture(nil, "BACKGROUND", nil, 3)
         self.Portrait:SetSize(64, 64)
 
-        overlayFrame = CreateFrame('Frame', nil, self.FrameBG)
+        overlayFrame = CreateFrame("Frame", nil, self.FrameBG)
     else
-        self.Portrait = CreateFrame('PlayerModel', nil, self.FrameBG)
+        self.Portrait = CreateFrame("PlayerModel", nil, self.FrameBG)
         self.Portrait:SetFrameLevel(3)
         self.Portrait:SetSize(60, 60)
 
-        overlayFrame = CreateFrame('Frame', nil, self.Portrait)
+        overlayFrame = CreateFrame("Frame", nil, self.Portrait)
     end
 
     self.Portrait:SetPoint("CENTER", self, 110, 6)
@@ -179,7 +157,7 @@ local function createPortrait(self)
     overlayFrame:SetFrameLevel(4)
     overlayFrame:SetAllPoints(self.Portrait)
 
-    local overlay = overlayFrame:CreateTexture(nil, 'BACKGROUND', nil, -7)
+    local overlay = overlayFrame:CreateTexture(nil, "BACKGROUND", nil, -7)
     overlay:SetTexture(media.portrait_overlay)
     overlay:SetPoint("TOPLEFT", overlayFrame, -10, 10)
     overlay:SetPoint("BOTTOMRIGHT", overlayFrame, 10, -10)
@@ -192,28 +170,22 @@ local function createTag(self)
     self.Tags = {}
 
     self.Tags.name = self:CreateTag(self.FrameFG, "[raidcolor][dd:realname]")
-                         :SetFont(STANDARD_TEXT_FONT, 14, "THICKOUTLINE")
-                         :SetPoint("RIGHT", self.Health, -2, 35)
-                         :SetJustifyH('RIGHT')
-                         :done()
+        :SetFont(STANDARD_TEXT_FONT, 14, "THICKOUTLINE")
+        :SetPoint("RIGHT", self.Health, -2, 35)
+        :SetJustifyH("RIGHT")
+        :done()
 
     self.Tags.level = self:CreateTag(self.FrameFG, "[dd:difficulty][level]")
-                          :SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
-                          :SetPoint("CENTER", self.Health, "RIGHT", 90, -20)
-                          :SetJustifyH('CENTER')
-                          :done()
+        :SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
+        :SetPoint("CENTER", self.Health, "RIGHT", 90, -20)
+        :SetJustifyH("CENTER")
+        :done()
 
-    self.Tags.hp = self:CreateTag(self.FrameFG, "[dd:smarthp]")
-                       :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                       :SetPoint("LEFT", self.Health, 6, 0)
-                       :SetJustifyH('LEFT')
-                       :done()
+    self.Tags.hp =
+        self:CreateTag(self.FrameFG, "[dd:smarthp]"):SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE"):SetPoint("LEFT", self.Health, 6, 0):SetJustifyH("LEFT"):done()
 
-    self.Tags.pp = self:CreateTag(self.FrameFG, "[dd:pp]")
-                       :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                       :SetPoint("RIGHT", self.Health, -6, 0)
-                       :SetJustifyH('RIGHT')
-                       :done()
+    self.Tags.pp =
+        self:CreateTag(self.FrameFG, "[dd:pp]"):SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE"):SetPoint("RIGHT", self.Health, -6, 0):SetJustifyH("RIGHT"):done()
 end
 
 local function createCastbar(self)
@@ -269,7 +241,7 @@ local function createCastbar(self)
 
     local text = core:CreateFont(castbar, STANDARD_TEXT_FONT, 12, "OUTLINE")
     text:SetPoint("BOTTOMRIGHT", castbar, "TOPRIGHT", 0, 10)
-    text:SetJustifyH('RIGHT')
+    text:SetJustifyH("RIGHT")
     castbar.Text = text
 
     local time = core:CreateFont(castbar, STANDARD_TEXT_FONT, 12, "OUTLINE")
@@ -278,7 +250,7 @@ local function createCastbar(self)
     castbar.Time = time
 
     castbar.enableFader = cfg.target.castbar.enableFader
-    castbar.timeToHold = .5
+    castbar.timeToHold = 0.5
     castbar.PostCastStart = core.PostCastStart
     castbar.PostCastFail = core.PostCastFail
     castbar.PostCastInterruptible = core.PostCastInterruptible
@@ -289,8 +261,8 @@ end
 
 local function createTargetType(self)
     local fg_files = {
-        elite     = media.foreground_elite,
-        rare      = media.foreground_rare,
+        elite = media.foreground_elite,
+        rare = media.foreground_rare,
         rareelite = media.foreground_elite,
         worldboss = media.foreground_boss,
     }
@@ -308,21 +280,21 @@ local function createTargetType(self)
 end
 
 local function createAuraIcon(self)
-    local f = CreateFrame('Frame', nil, self)
+    local f = CreateFrame("Frame", nil, self)
 
     f.size = 28
     f.spacing = 6
     f.gap = true
-    f.initialAnchor = 'TOPLEFT'
+    f.initialAnchor = "TOPLEFT"
     f.onlyShowPlayer = cfg.target.aura.player_aura_only
     f.showStealableBuffs = cfg.target.aura.show_stealable_buffs
-    f['growth-x'] = 'RIGHT'
-    f['growth-y'] = 'DOWN'
+    f["growth-x"] = "RIGHT"
+    f["growth-y"] = "DOWN"
 
     local h = (f.size + f.spacing) * 6
     local w = (f.size + f.spacing) * 4
     f:SetSize(h, w)
-    f:SetPoint('TOPLEFT', self, 'CENTER', 30, -60)
+    f:SetPoint("TOPLEFT", self, "CENTER", 30, -60)
 
     f.reanchorIfVisibleChanged = true
     f.PostCreateButton = core.PostCreateButton
@@ -354,11 +326,11 @@ local function createStyle(self)
     createAuraIcon(self)
 
     self.PvPClassificationIndicator = core:CreateIcon(self, "BACKGROUND", 24, -1, self, "LEFT", "RIGHT", -32, 0)
-    self.PvPTimer = self:CreateTag(self, "[dd:pvptimer]", .5)
-                        :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
-                        :SetPoint("TOP", self.PvPClassificationIndicator, 'BOTTOM', 2, -2)
-                        :SetJustifyH('CENTER')
-                        :done()
+    self.PvPTimer = self:CreateTag(self, "[dd:pvptimer]", 0.5)
+        :SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+        :SetPoint("TOP", self.PvPClassificationIndicator, "BOTTOM", 2, -2)
+        :SetJustifyH("CENTER")
+        :done()
 
     self.CombatIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "RIGHT", "LEFT", -28, 0)
 
@@ -380,6 +352,29 @@ local function createStyle(self)
 end
 
 function module:OnInit()
+    local mediaPath = cfg.mediaPath
+    media = {
+        portrait_overlay = mediaPath .. "uf_portrait_overlay",
+        foreground = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground",
+        foreground_boss = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_boss",
+        foreground_elite = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_elite",
+        foreground_rare = mediaPath .. C.general.style .. "\\" .. "uf_target_foreground_rare",
+        background = mediaPath .. C.general.style .. "\\" .. "uf_target_background",
+        debuffHighlight = mediaPath .. "uf_main_debuffHighlight",
+
+        hpTex = mediaPath .. "uf_bartex_main_hp",
+        mpTex = mediaPath .. "uf_bartex_main_power",
+
+        castbar_barTex = mediaPath .. "uf_bartex_normal",
+        castbar_foreground = mediaPath .. C.general.style .. "\\" .. "uf_castbar_foreground",
+        castbar_background = mediaPath .. C.general.style .. "\\" .. "uf_castbar_background",
+
+        incoming_barTex = mediaPath .. "uf_bartex_normal",
+
+        assistant_Tex = mediaPath .. "uf_icon_assistant",
+        leader_Tex = mediaPath .. "uf_icon_leader",
+    }
+
     oUF:RegisterStyle("DarkUI:target", createStyle)
     oUF:SetActiveStyle("DarkUI:target")
     oUF:Spawn("target", "DarkUITargetFrame")
