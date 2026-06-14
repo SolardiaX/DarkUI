@@ -88,13 +88,8 @@ local function styleTooltip(tip)
 
             tt:DisableDrawLayer("BACKGROUND")
 
-            E:ApplyBackdrop(tt, true)
-
-            tt.__backdrop:SetPoint("TOPLEFT")
-            tt.__backdrop:SetPoint("BOTTOMRIGHT")
-
-            tt.__gradient:SetPoint("TOPLEFT", 2, -2)
-            tt.__gradient:SetPoint("BOTTOMRIGHT", tt, "TOPRIGHT", -2, -32)
+            tt:CreateBackdrop("Default", 10, true)
+            tt.__backdrop:SetBackdropEdge("bold")
 
             tt.styled = true
         end
@@ -586,24 +581,16 @@ function module:OnInit()
     if statusBar then
         GameTooltipStatusBar:SetScript("OnValueChanged", nil)
         statusBar:ClearAllPoints()
-        statusBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 1, 3)
-        statusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", -1, 3)
+        statusBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 1, 5)
+        statusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", -1, 5)
         statusBar:SetStatusBarTexture(C.media.texture.status)
         statusBar:SetHeight(5)
 
-        local border = statusBar:CreateTexture(nil, "BACKGROUND", nil, -1)
-        border:SetTexture("Interface\\Buttons\\WHITE8x8")
-        border:SetPoint("TOPLEFT", -1, 1)
-        border:SetPoint("BOTTOMRIGHT", 1, -1)
-        border:SetVertexColor(0, 0, 0)
-
-        local bg = statusBar:CreateTexture(nil, "BACKGROUND")
-        bg:SetTexture("Interface\\Buttons\\WHITE8x8")
-        bg:SetAllPoints()
-        bg:SetVertexColor(0, 0, 0, 0.5)
+        statusBar:CreateBackdrop("Default", 2)
+        statusBar.__backdrop:SetBackdropEdge("thin")
 
         statusBar.text = statusBar:CreateFontString(nil, "OVERLAY")
-        statusBar.text:SetFont(STANDARD_TEXT_FONT, 9, "THINOUTLINE")
+        statusBar.text:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
         statusBar.text:SetAllPoints()
         statusBar.text:SetJustifyH("CENTER")
 
@@ -641,8 +628,9 @@ function module:OnInit()
         if menuBackdrops[menuFrame] then
             menuFrame.__backdrop = menuBackdrops[menuFrame]
         else
-            menuFrame:CreateBackdrop("Default")
-            menuFrame.__backdrop:CreateShadow()
+            menuFrame:CreateBackdrop("Default", 10, true)
+            menuFrame.__backdrop:SetBackdropEdge("bold")
+                
             menuBackdrops[menuFrame] = menuFrame.__backdrop
         end
 
