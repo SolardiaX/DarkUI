@@ -25,7 +25,7 @@ function module:OnInit()
         button.Arrow:SetAlpha(0)
     end
 
-    E:StyleActionButton(button, true)
+    E:Module("Actionbar").StyleActionButton(button, true)
 
     button:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
