@@ -39,7 +39,9 @@ local config = {
 
     texture = {
         overlay = path .. "tex_overlay",
-        border = path .. "tex_border",
+        border_thin = path .. "tex_border_thin",
+        border_regular = path .. "tex_border_regular",
+        border_bold = path .. "tex_border_bold",
         status = path .. "tex_status",
         status_f = path .. "tex_status_f",
         status_s = path .. "tex_status_s",

@@ -156,13 +156,14 @@ local tplFrames
 
 local function createTemplatePreview()
     local frames = {}
-    local templates = { "Overlay", "Default", "Blur", "Transparent", "Shadow", "Border" }
+    local templates = { "Fill", "Default", "Transparent", "Invisible" }
     local startX = -(#templates - 1) * 50
 
+    -- Row 1: BACKDROP templates
     for i, tpl in ipairs(templates) do
         local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
         box:SetSize(64, 64)
-        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 200)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 250)
         box:SetFrameStrata("DIALOG")
         box:SetTemplate(tpl)
         box:CreateFontText(12, tpl, false, "TOP", 0, 15)
@@ -170,52 +171,41 @@ local function createTemplatePreview()
         frames[#frames + 1] = box
     end
 
-    -- Row 2: Create* API demos
-    local apis = {
-        {
-            label = "CreateBackdrop",
-            fn = function(box)
-                box:CreateBackdrop()
-            end,
-        },
-        {
-            label = "CreateShadow",
-            fn = function(box)
-                box:CreateShadow()
-            end,
-        },
-        {
-            label = "CreateBorder",
-            fn = function(box)
-                box:CreateBorder()
-            end,
-        },
-        {
-            label = "CreateOverlay",
-            fn = function(box)
-                box:CreateOverlay()
-            end,
-        },
-        {
-            label = "ReskinIcon",
-            fn = function(box)
-                local tex = box:CreateTexture(nil, "ARTWORK")
-                tex:SetAllPoints()
-                tex:SetTexture(134400)
-                E:ReskinIcon(tex, true, box)
-            end,
-        },
-    }
+    -- Row 2: EDGE types
+    local edges = { "pixel", "blur", "thin", "regular", "bold" }
+    startX = -(#edges - 1) * 50
 
-    startX = -(#apis - 1) * 50
-    for i, demo in ipairs(apis) do
+    for i, edge in ipairs(edges) do
+        local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+        box:SetSize(64, 64)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 150)
+        box:SetFrameStrata("DIALOG")
+        box:SetTemplate("Default")
+        box:SetBackdropEdge(edge)
+        box:CreateFontText(10, "Edge: " .. edge, false, "TOP", 0, 15)
+        box:Hide()
+        frames[#frames + 1] = box
+    end
+
+    -- Row 3: EFFECT (CreateShadow / CreateBorder) + CreateOverlay
+    local effects = {
+        { label = "CreateShadow", fn = function(box) box:CreateShadow() end },
+        { label = "CreateBorder", fn = function(box) box:CreateBorder() end },
+        { label = "Shadow+Border", fn = function(box) box:CreateShadow(); box:CreateBorder() end },
+        { label = "CreateOverlay", fn = function(box) box:CreateOverlay(4) end },
+        { label = "CreateGradient", fn = function(box) box:CreateGradient() end },
+    }
+    startX = -(#effects - 1) * 50
+
+    for i, demo in ipairs(effects) do
         local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
         box:SetSize(48, 48)
-        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 100)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 50)
         box:SetFrameStrata("DIALOG")
-        box:Hide()
+        box:SetTemplate("Default")
         demo.fn(box)
         box:CreateFontText(10, demo.label, false, "TOP", 0, 13)
+        box:Hide()
         frames[#frames + 1] = box
     end
 

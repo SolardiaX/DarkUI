@@ -11,6 +11,8 @@ local CreateFrame = CreateFrame
 local unpack = unpack
 
 local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
+local onEnterHighlight = E.onEnterHighlight
+local onLeaveHighlight = E.onLeaveHighlight
 
 ------------------------------------------------------------------------
 -- Skin Registration (ADDON_LOADED dispatch)
@@ -49,26 +51,6 @@ end
 E.Event:Register("ADDON_LOADED", onAddonLoaded, E)
 
 ------------------------------------------------------------------------
--- Shared Hover Helpers
-------------------------------------------------------------------------
-
-local function onEnterHighlight(self)
-	if self:IsEnabled() then
-		self:SetBackdropBorderColor(r, g, b)
-		if self.__overlay then
-			self.__overlay:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1)
-		end
-	end
-end
-
-local function onLeaveHighlight(self)
-	self:SetBackdropBorderColor(unpack(C.media.border_color))
-	if self.__overlay then
-		self.__overlay:SetVertexColor(0.1, 0.1, 0.1, 1)
-	end
-end
-
-------------------------------------------------------------------------
 -- E:ReskinFrame — generic frame skin
 ------------------------------------------------------------------------
 
@@ -88,7 +70,7 @@ function E:ReskinFrame(frame)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinButton — button skin (strips + overlay + hover)
+-- E:ReskinButton — button skin (strips + fill + hover)
 ------------------------------------------------------------------------
 
 function E:ReskinButton(button)
@@ -161,51 +143,9 @@ function E:ReskinButton(button)
 		button.MiddleMiddle:Hide()
 	end
 
-	button:SetTemplate("Overlay")
+	button:SetTemplate("Fill")
 	button:HookScript("OnEnter", onEnterHighlight)
 	button:HookScript("OnLeave", onLeaveHighlight)
-
-	button.__styled = true
-end
-
-------------------------------------------------------------------------
--- E:ReskinCloseButton — close button (X)
-------------------------------------------------------------------------
-
-function E:ReskinCloseButton(button, anchor)
-	if not button or button.__styled then
-		return
-	end
-
-	button:StripTextures()
-	button:SetSize(18, 18)
-	E:ReskinButton(button)
-
-	if not button.text then
-		button.text = button:CreateFontText(16, "x")
-		button.text:SetPoint("CENTER", 0, 1)
-	end
-
-	if anchor then
-		button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -4, -4)
-	else
-		button:SetPoint("TOPRIGHT", -4, -4)
-	end
-
-	button:HookScript("OnEnter", function(self)
-		if self:IsEnabled() then
-			self:SetBackdropBorderColor(r, g, b)
-			if self.__border then
-				self.__border:SetBackdropBorderColor(r * 0.3, g * 0.3, b * 0.3, 1)
-			end
-		end
-	end)
-	button:HookScript("OnLeave", function(self)
-		self:SetBackdropBorderColor(unpack(C.media.border_color))
-		if self.__border then
-			self.__border:SetBackdropBorderColor(0.1, 0.1, 0.1, 1)
-		end
-	end)
 
 	button.__styled = true
 end
@@ -227,7 +167,7 @@ function E:ReskinTab(tab)
 	local bg = CreateFrame("Frame", nil, tab, "BackdropTemplate")
 	bg:SetInside(tab, 4, 4)
 	bg:SetFrameLevel(tab:GetFrameLevel() - 1)
-	bg:SetTemplate("Overlay")
+	bg:SetTemplate("Fill")
 	tab.__bg = bg
 
 	tab:HookScript("OnEnter", function(self)
@@ -277,7 +217,8 @@ function E:ReskinEditBox(editbox)
 	end
 
 	editbox:StripTextures()
-	editbox:SetTemplate("Blur")
+	editbox:SetTemplate("Default")
+	editbox:SetBackdropEdge("blur")
 
 	editbox.__styled = true
 end
@@ -295,7 +236,7 @@ function E:ReskinSlider(slider)
 	end
 
 	slider:StripTextures()
-	slider:SetTemplate("Overlay")
+	slider:SetTemplate("Fill")
 
 	local thumb = slider.GetThumbTexture and slider:GetThumbTexture()
 	if thumb then
@@ -320,12 +261,13 @@ function E:ReskinDropDown(dropdown)
 	end
 
 	dropdown:StripTextures()
-	dropdown:SetTemplate("Blur")
+	dropdown:SetTemplate("Default")
+	dropdown:SetBackdropEdge("blur")
 
 	local button = dropdown.Button or (dropdown.GetName and _G[dropdown:GetName() .. "Button"])
 	if button then
 		button:StripTextures()
-		button:SetTemplate("Overlay")
+		button:SetTemplate("Fill")
 		button:SetSize(20, 20)
 		button:SetPoint("RIGHT", -2, 0)
 	end
@@ -349,7 +291,7 @@ function E:ReskinStatusBar(bar)
 	bar:SetStatusBarTexture(C.media.texture.status)
 
 	local bg = bar:CreateBackdrop()
-	bg:SetTemplate("Overlay")
+	bg:SetTemplate("Fill")
 
 	bar.__styled = true
 end
@@ -423,7 +365,7 @@ function E:ReskinTrimScrollBar(scrollBar)
 	end
 	if scrollBar.Thumb then
 		scrollBar.Thumb:StripTextures()
-		scrollBar.Thumb:SetTemplate("Overlay")
+		scrollBar.Thumb:SetTemplate("Fill")
 		scrollBar.Thumb:SetFixedPanelTemplate(nil)
 	end
 	if scrollBar.Back then
@@ -454,14 +396,3 @@ function E:ReskinInsetFrame(frame)
 	frame.__styled = true
 end
 
-------------------------------------------------------------------------
--- E:ReskinCheckBox — checkbox (delegates to StyleCheckBox)
-------------------------------------------------------------------------
-
-function E:ReskinCheckBox(frame)
-	if not frame or frame.__styled then
-		return
-	end
-	E:StyleCheckBox(frame)
-	frame.__styled = true
-end

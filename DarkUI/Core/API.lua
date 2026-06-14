@@ -27,14 +27,47 @@ E.noscalemult = E.mult * C.general.uiScale
 local Mult = E.mult
 
 ------------------------------------------------------------------------
--- Backdrop Constants
+-- Backdrop / Edge / Effect Presets
 ------------------------------------------------------------------------
 
 local BACKDROP = {
-	default = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.blank },
-	shadow = { edgeFile = C.media.texture.shadow },
-	border = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.border },
-	blur = { bgFile = C.media.texture.blank, edgeFile = C.media.texture.shadow },
+	default = {
+		bgFile = C.media.texture.blank,
+		edgeFile = C.media.texture.blank,
+		bgColor = C.media.backdrop_color,
+		borderColor = C.media.border_color,
+	},
+	transparent = {
+		bgFile = C.media.texture.blank,
+		edgeFile = C.media.texture.blank,
+		bgColor = { C.media.backdrop_color[1], C.media.backdrop_color[2], C.media.backdrop_color[3], C.media.overlay_color[4] },
+		borderColor = C.media.border_color,
+	},
+	fill = {
+		bgFile = C.media.texture.blank,
+		edgeFile = C.media.texture.blank,
+		bgColor = { C.media.backdrop_color[1], C.media.backdrop_color[2], C.media.backdrop_color[3], 1 },
+		borderColor = C.media.border_color,
+	},
+	invisible = {
+		bgFile = C.media.texture.blank,
+		edgeFile = C.media.texture.blank,
+		bgColor = false,
+		borderColor = false,
+	},
+}
+
+local EDGE = {
+	pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
+	blur = { edgeFile = C.media.texture.shadow, edgeSize = Mult, insets = Mult },
+	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 2, insets = 0 },
+	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, insets = 2 },
+	bold = { edgeFile = C.media.texture.border_bold, edgeSize = 32, insets = { left = 8, right = 8, top = 16, bottom = 16 }, borderColor = { 1, 1, 1, 1 } }
+}
+
+local EFFECT = {
+	shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4 },
+	border = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult },
 }
 
 ------------------------------------------------------------------------
@@ -199,53 +232,71 @@ local function setInside(obj, anchor, xOffset, yOffset)
 end
 
 ------------------------------------------------------------------------
--- SetTemplate
+-- SetTemplate / SetBackdropEdge
 ------------------------------------------------------------------------
 
-local DEFAULT_EDGE = {
-	shadow = 6,
-	border = 12,
-}
-
-local function setTemplate(f, t, edge, insets)
+local function setTemplate(f, t, tile)
 	Mixin(f, BackdropTemplateMixin)
-	t = t or "Default"
 
-	local tkey = t:lower()
-	local bd = BACKDROP[tkey] or BACKDROP.default
-	edge = edge or DEFAULT_EDGE[tkey] or Mult
-	insets = insets or Mult
+	local cfg = BACKDROP[t and t:lower() or "default"] or BACKDROP.default
+	local edge = EDGE.pixel
 
-	f:SetBackdrop({
-		bgFile = bd.bgFile,
-		edgeFile = bd.edgeFile,
-		tile = false,
-		tileEdge = tkey == "blur" or nil,
-		tileSize = (tkey == "shadow" or tkey == "border") and 32 or (tkey == "blur" and 16 or nil),
-		edgeSize = edge,
-		insets = { left = insets, right = insets, top = insets, bottom = insets },
-	})
+	local bd = {
+		bgFile = cfg.bgFile,
+		edgeFile = edge.edgeFile,
+		edgeSize = edge.edgeSize,
+		tile = tile or false,
+		insets = { left = edge.insets, right = edge.insets, top = edge.insets, bottom = edge.insets },
+	}
 
-	local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color)
-	local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
+	f:SetBackdrop(bd)
+	f.__template = bd
 
-	if tkey == "shadow" then
-		borderr, borderg, borderb, bordera = unpack(C.media.shadow_color)
-	elseif tkey == "border" then
-		backdropa = 0
-	elseif tkey == "transparent" then
-		backdropa = C.media.overlay_color[4]
-	elseif tkey == "overlay" then
-		backdropa = 1
-	elseif tkey == "invisible" then
-		backdropa = 0
-		bordera = 0
+	if cfg.bgColor then
+		f.__bgColor = cfg.bgColor
+		f:SetBackdropColor(unpack(cfg.bgColor))
+	else
+		f.__bgColor = nil
+		f:SetBackdropColor(0, 0, 0, 0)
 	end
 
-	f:SetBackdropBorderColor(borderr, borderg, borderb, bordera)
+	if cfg.borderColor then
+		f.__borderColor = cfg.borderColor
+		f:SetBackdropBorderColor(unpack(cfg.borderColor))
+	else
+		f.__borderColor = nil
+		f:SetBackdropBorderColor(0, 0, 0, 0)
+	end
+end
 
-	if tkey ~= "shadow" then
-		f:SetBackdropColor(backdropr, backdropg, backdropb, backdropa)
+local function setBackdropEdge(f, t, size)
+	local cfg = EDGE[t]
+	if not cfg or not f.__template then return end
+
+	local bd = {
+		bgFile = f.__template.bgFile,
+		edgeFile = cfg.edgeFile,
+		edgeSize = size or cfg.edgeSize,
+		tile = f.__template.tile,
+		insets = type(cfg.insets) == "table" and cfg.insets
+			or { left = cfg.insets, right = cfg.insets, top = cfg.insets, bottom = cfg.insets },
+	}
+	f:SetBackdrop(bd)
+	f.__template = bd
+
+	-- SetBackdrop() resets colors, restore them
+	if f.__bgColor then
+		f:SetBackdropColor(unpack(f.__bgColor))
+	else
+		f:SetBackdropColor(0, 0, 0, 0)
+	end
+
+	if cfg.borderColor then
+		f:SetBackdropBorderColor(unpack(cfg.borderColor))
+	elseif f.__borderColor then
+		f:SetBackdropBorderColor(unpack(f.__borderColor))
+	else
+		f:SetBackdropBorderColor(0, 0, 0, 0)
 	end
 end
 
@@ -253,7 +304,7 @@ end
 -- CreateBackdrop / CreateShadow / CreateBorder
 ------------------------------------------------------------------------
 
-local function createBackdrop(f, t, margin)
+local function createBackdrop(f, t, margin, tile)
 	if f.__backdrop then return f.__backdrop end
 
 	t = t or "Default"
@@ -270,7 +321,7 @@ local function createBackdrop(f, t, margin)
 	child:SetOutside(f, margin, margin)
 	child:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
 
-	setTemplate(child, t)
+	setTemplate(child, t, tile)
 
 	f.__backdrop = child
 	return child
@@ -279,7 +330,8 @@ end
 local function createShadow(f, margin)
 	if f.__shadow then return f.__shadow end
 
-	margin = margin or 4
+	local cfg = EFFECT.shadow
+	margin = margin or cfg.margin
 
 	local frame = f
 	if f:IsObjectType("Texture") then
@@ -289,8 +341,8 @@ local function createShadow(f, margin)
 	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	child:SetOutside(f, margin, margin)
 	child:SetFrameLevel(0)
-
-	setTemplate(child, "Shadow")
+	child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
+	child:SetBackdropBorderColor(unpack(C.media.shadow_color))
 
 	f.__shadow = child
 	return child
@@ -299,7 +351,8 @@ end
 local function createBorder(f, margin)
 	if f.__border then return f.__border end
 
-	margin = margin or Mult
+	local cfg = EFFECT.border
+	margin = margin or cfg.margin
 
 	local frame = f
 	if f:IsObjectType("Texture") then
@@ -311,8 +364,8 @@ local function createBorder(f, margin)
 	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
 	child:SetOutside(f, margin, margin)
 	child:SetFrameLevel(lvl + 1)
-
-	setTemplate(child, "Border")
+	child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
+	child:SetBackdropBorderColor(unpack(C.media.border_color))
 
 	f.__border = child
 	return child
@@ -323,9 +376,7 @@ end
 ------------------------------------------------------------------------
 
 local function createOverlay(f, margin)
-	if f.__overlay then
-		return f.__overlay
-	end
+	if f.__overlay then return f.__overlay end
 
 	margin = margin or 2
 
@@ -344,9 +395,7 @@ end
 ------------------------------------------------------------------------
 
 local function createGradient(f)
-	if f.__gradient then
-		return f.__gradient
-	end
+	if f.__gradient then return f.__gradient end
 
 	local gradient = f:CreateTexture(nil, "BORDER")
 	gradient:SetInside(f)
@@ -411,6 +460,7 @@ local function addapi(object)
 	mt.Kill = kill
 	mt.StripTextures = stripTextures
 	mt.SetTemplate = setTemplate
+	mt.SetBackdropEdge = setBackdropEdge
 	mt.CreateBackdrop = createBackdrop
 	mt.CreateShadow = createShadow
 	mt.CreateBorder = createBorder
