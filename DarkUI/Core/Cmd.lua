@@ -116,7 +116,6 @@ SlashCmdList["FRAME"] = function(arg)
         _G.FRAME = arg
     end
     if arg ~= nil and not arg:IsForbidden() then
-        local point, relativeTo, relativePoint, xOfs, yOfs = arg:GetPoint()
         ChatFrame1:AddMessage("|cffCC0000~~~~~~~~~~~~~~~~~~~~~~~~~")
         ChatFrame1:AddMessage("Name: |cffFFD100" .. (arg:GetName() or "<unamed>"))
         if arg:GetParent() and arg:GetParent():GetName() then
@@ -130,14 +129,20 @@ SlashCmdList["FRAME"] = function(arg)
         ChatFrame1:AddMessage("Level: |cffFFD100" .. arg:GetFrameLevel())
         ChatFrame1:AddMessage("Visibility: |cffFFD100" .. (arg:IsShown() and "True" or "False"))
 
-        if relativeTo and relativeTo:GetName() then
-            ChatFrame1:AddMessage("Point: |cffFFD100" .. point .. "|r anchored to " .. relativeTo:GetName() .. "'s |cffFFD100" .. relativePoint)
-        end
-        if xOfs then
-            ChatFrame1:AddMessage("X: |cffFFD100" .. format("%.2f", xOfs))
-        end
-        if yOfs then
-            ChatFrame1:AddMessage("Y: |cffFFD100" .. format("%.2f", yOfs))
+        local numPoints = arg:GetNumPoints()
+        for i = 1, numPoints do
+            local point, relativeTo, relativePoint, xOfs, yOfs = arg:GetPoint(i)
+            local targetName = relativeTo and relativeTo:GetName() or "UIParent"
+
+            if targetName then
+                ChatFrame1:AddMessage("Point-" .. i .. ": |cffFFD100" .. point .. "|r anchored to " .. relativeTo:GetName() .. "'s |cffFFD100" .. relativePoint)
+            end
+            if xOfs then
+                ChatFrame1:AddMessage("X: |cffFFD100" .. format("%.2f", xOfs))
+            end
+            if yOfs then
+                ChatFrame1:AddMessage("Y: |cffFFD100" .. format("%.2f", yOfs))
+            end
         end
         ChatFrame1:AddMessage("|cffCC0000~~~~~~~~~~~~~~~~~~~~~~~~~")
     elseif arg == nil then
