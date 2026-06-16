@@ -308,7 +308,7 @@ local function setupRevealMap()
     bu:SetHitRectInsets(-5, -5, -5, -5)
     bu:SetPoint("BOTTOMLEFT", WorldMapFrameHomeButton, "TOPLEFT", 25, 2)
     bu:SetSize(26, 26)
-    E:ReskinCheckBox(bu)
+    E:StyleCheckBox(bu)
     bu:SetChecked(cfg.revealMap)
 
     bu.f = bu:CreateFontString(nil, "OVERLAY", "GameFontNormal")

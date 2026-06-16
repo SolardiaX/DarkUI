@@ -159,7 +159,7 @@ local function skinQuestIcons(_, block)
         finder:SetPushedTexture(0)
 
         finder.bg = CreateFrame("Frame", nil, finder, "BackdropTemplate")
-        finder.bg:SetTemplate("Overlay")
+        finder.bg:SetTemplate("Fill")
         finder.bg:SetPoint("TOPLEFT", finder, 2, -2)
         finder.bg:SetPoint("BOTTOMRIGHT", finder, -2, 2)
         finder.bg:SetFrameLevel(1)
@@ -277,7 +277,8 @@ end
 
 local function skinStageBlock(block)
     if not block.backdrop then
-        block:CreateBackdrop("Overlay")
+        block:CreateBackdrop("fill")
+        block.__backdrop:SetBackdropEdge("thin")
         block.__backdrop:SetPoint("TOPLEFT", block.NormalBG, 3, -3)
         block.__backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 3)
 
@@ -296,7 +297,7 @@ local function skinStageWidgets(self)
             local bar = widgetFrame.TimerBar
             if bar and not bar.styled then
                 bar:SetStatusBarTexture(C.media.texture.status)
-                bar:CreateBackdrop("Overlay")
+                bar:CreateBackdrop("fill")
                 bar:CreateBorder()
                 bar:SetStatusBarColor(0, 0.6, 1)
                 bar:SetFrameLevel(bar:GetFrameLevel() + 3)
@@ -322,7 +323,8 @@ end
 
 local function skinChallengeBlock(block)
     if not block.__styled then
-        block:CreateBackdrop("Overlay")
+        block:CreateBackdrop("default")
+        block.__backdrop:SetBackdropEdge("thin")
         block.__backdrop:SetPoint("TOPLEFT", block, 3, -3)
         block.__backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
         block.__backdrop.__overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
@@ -334,7 +336,8 @@ local function skinChallengeBlock(block)
         block.TimerBG:SetAlpha(0)
 
         block.StatusBar:SetStatusBarTexture(C.media.texture.status)
-        block.StatusBar:CreateBackdrop("Overlay")
+        block.StatusBar:CreateBackdrop("default")
+        block.StatusBar.__backdrop:SetBackdropEdge("thin")
         block.StatusBar.__backdrop:SetFrameLevel(block.__backdrop:GetFrameLevel() + 1)
         block.StatusBar:SetStatusBarColor(0, 0.6, 1)
         block.StatusBar:SetFrameLevel(block.StatusBar:GetFrameLevel() + 3)
