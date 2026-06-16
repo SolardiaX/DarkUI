@@ -10,14 +10,11 @@ addon.OptionList["tooltip"] = {
     { CHECK, "tooltip.hide_combat", L_OPT_TOOLTIP_HIDE_COMBAT },
     { CHECK, "tooltip.hideforactionbar", L_OPT_TOOLTIP_HIDEFORACTIONBAR },
     { CHECK, "tooltip.health_value", L_OPT_TOOLTIP_HEALTH_VALUE },
-    { CHECK, "tooltip.target", L_OPT_TOOLTIP_TARGET },
     { CHECK, "tooltip.title", L_OPT_TOOLTIP_TITLE },
     { CHECK, "tooltip.realm", L_OPT_TOOLTIP_REALM },
     { CHECK, "tooltip.rank", L_OPT_TOOLTIP_RANK },
     { CHECK, "tooltip.raid_icon", L_OPT_TOOLTIP_RAID_ICON },
-    { CHECK, "tooltip.who_targetting", L_OPT_TOOLTIP_WHO_TARGETTING },
     { CHECK, "tooltip.achievements", L_OPT_TOOLTIP_ACHIEVEMENTS },
-    { CHECK, "tooltip.item_transmogrify", L_OPT_TOOLTIP_ITEM_TRANSMOGRIFY },
     { CHECK, "tooltip.instance_lock", L_OPT_TOOLTIP_INSTANCE_LOCK },
     { CHECK, "tooltip.item_count", L_OPT_TOOLTIP_ITEM_COUNT },
     { CHECK, "tooltip.item_icon", L_OPT_TOOLTIP_ITEM_ICON },
@@ -26,6 +23,8 @@ addon.OptionList["tooltip"] = {
     { CHECK, "tooltip.talents", L_OPT_TOOLTIP_TALENTS },
     { CHECK, "tooltip.mount", L_OPT_TOOLTIP_MOUNT },
     { CHECK, "tooltip.unit_role", L_OPT_TOOLTIP_UNIT_ROLE },
+    { CHECK, "tooltip.unit_target", L_OPT_TOOLTIP_UNIT_TARGET },
+    { CHECK, "tooltip.mythic_score", L_OPT_TOOLTIP_MYTHIC_SCORE },
 }
 
 addon.Hooks["tooltip"] = function(a)
