@@ -67,6 +67,7 @@ local EDGE = {
 }
 
 local EFFECT = {
+	pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
 	shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4, borderColor = C.media.shadow_color },
 	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, margin = 4 },
 	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult, borderColor = C.media.border_color },

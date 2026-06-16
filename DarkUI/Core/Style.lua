@@ -34,19 +34,20 @@ E.onLeaveHighlight = onLeaveHighlight
 -- E:StyleFrame — full styled panel (bg + shadow + optional gradient)
 ------------------------------------------------------------------------
 
-function E:StyleFrame(frame, gradient)
-	if frame.__styled then
-		return
-	end
-	if not frame or frame:IsForbidden() then
-		return
+function E:StyleFrame(frame, opts)
+	if not frame or frame:IsForbidden() then return end
+	if frame.__styled then return end
+
+	if type(opts) ~= "table" then
+		opts = { gradient = opts }
 	end
 
-	frame:CreateBackdrop()	
-	frame:CreateBorder()
-	frame.__border:CreateShadow()
-
-	if gradient then
+	frame:CreateBackdrop(opts.backdrop)
+	frame:CreateBorder(opts.border)
+	if opts.shadow ~= false then
+		frame.__border:CreateShadow()
+	end
+	if opts.gradient then
 		frame:CreateGradient()
 	end
 
