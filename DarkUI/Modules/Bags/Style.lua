@@ -11,16 +11,18 @@ local cfg = C.bags
 local CHAR_BANK_TYPE = Enum.BankType.Character or 0
 local ACCOUNT_BANK_TYPE = Enum.BankType.Account or 2
 
-local ipairs, unpack = ipairs, unpack
-local strfind = string.find
-
+local ipairs, unpack, ceil, strmatch = ipairs, unpack, math.ceil, string.match
 local C_Container_GetContainerItemDurability = C_Container.GetContainerItemDurability
 local C_Container_GetContainerNumFreeSlots = C_Container.GetContainerNumFreeSlots
 local C_Container_GetContainerNumSlots = C_Container.GetContainerNumSlots
 local C_Container_GetContainerItemLink = C_Container.GetContainerItemLink
 local C_Container_PickupContainerItem = C_Container.PickupContainerItem
 
-local itemSlotSize = cfg.itemSlotSize or 32
+local iconSize = cfg.iconSize or 28
+local fontSize = cfg.fontSize or 12
+local SPACING = 3
+local HEADER_HEIGHT = 38
+local FOOTER_HEIGHT = 32
 
 local Textures = {
     Search = C.media.path .. "bag_search",
@@ -30,202 +32,77 @@ local Textures = {
     Deposit = C.media.path .. "bag_deposit",
 }
 
-local FONT_STANDARD = { STANDARD_TEXT_FONT, 12, "OUTLINE" }
+local FONT_STANDARD = { STANDARD_TEXT_FONT, fontSize, "OUTLINE" }
 
 ------------------------------------------------------------------------
--- Container Class
+-- Container & Button Classes
 ------------------------------------------------------------------------
 
-local cbNivaya = cargBags:GetImplementation("Nivaya")
-local MyContainer = cbNivaya:GetContainerClass()
+module.MyContainer = nil
+module.MyButton = nil
 
-------------------------------------------------------------------------
--- Sort
-------------------------------------------------------------------------
-
-local quickSort
-do
-    local func = function(v1, v2)
-        if v1 == nil or v2 == nil then
-            return v1 and true or false
-        end
-        if v1[1] == -1 or v2[1] == -1 then
-            return v1[1] > v2[1]
-        elseif v1[2] ~= v2[2] then
-            if v1[2] and v2[2] then
-                return v1[2] > v2[2]
-            else
-                return v1[2] and true or false
-            end
-        elseif v1[1] ~= v2[1] then
-            return v1[1] > v2[1]
-        else
-            return v1[4] > v2[4]
-        end
-    end
-    quickSort = function(tbl)
-        table.sort(tbl, func)
-    end
+function module:GetClasses(impl)
+    self.MyContainer = impl:GetContainerClass()
+    self.MyButton = impl:GetItemButtonClass()
+    self.MyButton:Scaffold("Default")
+    return self.MyContainer, self.MyButton
 end
 
 ------------------------------------------------------------------------
--- Container Layout
+-- Container Label Map
 ------------------------------------------------------------------------
 
-function MyContainer:OnContentsChanged()
-    local col, row = 0, 0
-    local yPosOffs = self.Caption and 24 or 4
-    local isEmpty = true
+local containerLabels = {
+    AzeriteItem = L.BAG_LABEL_AZERITE,
+    Equipment = L.BAG_LABEL_EQUIPMENT,
+    EquipSet = L.BAG_LABEL_EQUIPSET,
+    Consumable = L.BAG_LABEL_CONSUMABLE,
+    Junk = L.BAG_LABEL_JUNK,
+    BagReagent = L.BAG_LABEL_REAGENT,
+    BagGoods = L.BAG_LABEL_GOODS,
+    BagQuest = L.BAG_LABEL_QUEST,
+    BagCollection = L.BAG_LABEL_COLLECTION,
+    BagAnima = L.BAG_LABEL_ANIMA,
+    BagStone = L.BAG_LABEL_STONE,
+    BagAOE = L.BAG_LABEL_AOE,
+    BagLegacy = L.BAG_LABEL_LEGACY,
+    BagLower = L.BAG_LABEL_LOWER,
+    BagDecor = L.BAG_LABEL_DECOR,
+    BankEquipment = L.BAG_LABEL_EQUIPMENT,
+    BankEquipSet = L.BAG_LABEL_EQUIPSET,
+    BankAzeriteItem = L.BAG_LABEL_AZERITE,
+    BankConsumable = L.BAG_LABEL_CONSUMABLE,
+    BankGoods = L.BAG_LABEL_GOODS,
+    BankQuest = L.BAG_LABEL_QUEST,
+    BankCollection = L.BAG_LABEL_COLLECTION,
+    BankAnima = L.BAG_LABEL_ANIMA,
+    BankAOE = L.BAG_LABEL_AOE,
+    BankLegacy = L.BAG_LABEL_LEGACY,
+    BankLower = L.BAG_LABEL_LOWER,
+    BankDecor = L.BAG_LABEL_DECOR,
+    BankJunk = L.BAG_LABEL_JUNK,
+    AccountEquipment = L.BAG_LABEL_EQUIPMENT,
+    AccountAOE = L.BAG_LABEL_AOE,
+    AccountGoods = L.BAG_LABEL_GOODS,
+    AccountConsumable = L.BAG_LABEL_CONSUMABLE,
+    AccountLegacy = L.BAG_LABEL_LEGACY,
+}
 
-    local tName = self.name
-    local tBankBags = strfind(tName, "Bank")
-    local tBank = tBankBags or (tName == "cBniv_Bank")
-    local tReagent = (tName == "cBniv_BankReagent")
-    local tAccount = (tName == "cBniv_BankAccount")
+------------------------------------------------------------------------
+-- Helpers
+------------------------------------------------------------------------
 
-    local buttonIDs = {}
-    for i, button in pairs(self.buttons) do
-        local slotId, bagId = button:GetSlotAndBagID()
-        local item = cbNivaya:GetItemInfo(bagId, slotId)
-        if item.link then
-            buttonIDs[i] = { item.id, item.quality, button, item.count }
-        else
-            buttonIDs[i] = { -1, -2, button, -1 }
-        end
-    end
+local function highlightFunction(button, match)
+    button:SetAlpha(match and 1 or 0.1)
+end
 
-    local opts = module.opts
-    if (tBank or tReagent) and opts.SortBank or (not (tBank or tReagent) and opts.SortBags) then
-        quickSort(buttonIDs)
-    end
-
-    for _, v in ipairs(buttonIDs) do
-        local button = v[3]
-        button:ClearAllPoints()
-
-        local xPos = col * (itemSlotSize + 2) + 4
-        local yPos = (-1 * row * (itemSlotSize + 2)) - yPosOffs
-
-        button:SetPoint("TOPLEFT", self, "TOPLEFT", xPos, yPos)
-        if col >= self.Columns - 1 then
-            col = 0
-            row = row + 1
-        else
-            col = col + 1
-        end
-        isEmpty = false
-    end
-
-    if opts.CompressEmpty then
-        local xPos = col * (itemSlotSize + 2) + 2
-        local yPos = (-1 * row * (itemSlotSize + 2)) - yPosOffs
-
-        local tDrop = self.DropTarget
-        if tDrop then
-            tDrop:ClearAllPoints()
-            tDrop:SetPoint("TOPLEFT", self, "TOPLEFT", xPos, yPos)
-            if col >= self.Columns - 1 then
-                col = 0
-                row = row + 1
-            else
-                col = col + 1
-            end
-        end
-    end
-
-    self.ContainerHeight = (row + (col > 0 and 1 or 0)) * (itemSlotSize + 2)
-
-    if self.UpdateDimensions then
-        self:UpdateDimensions()
-    end
-    self:SetWidth((itemSlotSize + 2) * self.Columns + 2)
-
-    local t = (tName == "cBniv_Bag") or (tName == "cBniv_Bank") or (tName == "cBniv_BankReagent") or (tName == "cBniv_BankAccount")
-    local bags = module.bags
-    if not bags or not bags.bank or not bags.main then
-        return
-    end
-    local bankShown = bags.bank:IsShown()
-
-    if (not tBankBags and bags.main:IsShown() and not t) or (tBankBags and bankShown) then
-        if isEmpty then
-            self:Hide()
-            if bankShown then
-                bags.bank:Show()
-                bags.bankReagent:Show()
-                bags.bankAccount:Show()
-            end
-        else
-            self:Show()
-        end
-    end
-
-    module.bagHidden[tName] = (not t) and isEmpty or false
-    cbNivaya:UpdateAnchors(self)
+local function getCustomGroupTitle(index)
+    local names = module.customNames
+    return (names and names[index]) or (PREFERENCES .. " " .. index)
 end
 
 ------------------------------------------------------------------------
--- Buttons
-------------------------------------------------------------------------
-
-local function restackItems(self)
-    local tBag = (self.name == "cBniv_Bag")
-    local tBank = (self.name == "cBniv_Bank")
-    if tBank then
-        C_Container.SortBankBags()
-    elseif tBag then
-        C_Container.SortBags()
-    end
-end
-
-local function resetNewItems()
-    module:ResetNewItems()
-end
-
-local function updateDimensions(self)
-    local height = 0
-    if self.BagBar and self.BagBar:IsShown() then
-        height = height + 40
-    end
-    if self.Space then
-        height = height + 16
-    end
-    if self.bagToggle then
-        height = height + 24
-    end
-    if self.Caption then
-        height = height + self.Caption:GetStringHeight() + 16
-    end
-    self:SetHeight(self.ContainerHeight + height)
-end
-
-local function setFrameMovable(f, v)
-    f:SetMovable(true)
-    f:SetUserPlaced(true)
-    f:RegisterForDrag("LeftButton")
-    if v then
-        f:SetScript("OnDragStart", function()
-            f:StartMoving()
-        end)
-        f:SetScript("OnDragStop", function()
-            f:StopMovingOrSizing()
-            local orig, _, tar, x, y = f:GetPoint()
-            x = E:Round(x or 0)
-            y = E:Round(y or 0)
-            if f.name == "cBniv_Bag" then
-                DB:SetStats("cBniv.BagPos", { orig, "UIParent", tar, x, y }, true)
-            else
-                DB:SetStats("cBniv.BankPos", { orig, "UIParent", tar, x, y }, true)
-            end
-        end)
-    else
-        f:SetScript("OnDragStart", nil)
-        f:SetScript("OnDragStop", nil)
-    end
-end
-
-------------------------------------------------------------------------
--- Icon Button Helpers
+-- Icon Button
 ------------------------------------------------------------------------
 
 local classColor
@@ -248,10 +125,9 @@ local function iconButtonOnLeave(self)
     end
 end
 
-local function createIconButton(name, parent, texture, point, hint, isBag)
+local function createIconButton(name, parent, texture, hint)
     local button = CreateFrame("Button", nil, parent)
-    button:SetWidth(24)
-    button:SetHeight(24)
+    button:SetSize(24, 24)
     button:SetNormalTexture(0)
     button:SetPushedTexture(0)
     button:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
@@ -259,45 +135,41 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
     button:GetHighlightTexture():SetInside()
 
     button.icon = button:CreateTexture(nil, "ARTWORK")
-    button.icon:SetPoint(point, button, point, point == "BOTTOMLEFT" and 2 or -2, 2)
-    button.icon:SetWidth(22)
-    button.icon:SetHeight(22)
+    button.icon:SetSize(22, 22)
+    button.icon:SetPoint("CENTER")
     button.icon:SetTexture(texture)
     button.icon:SetVertexColor(0.8, 0.8, 0.8)
 
     button.tooltip = button:CreateFontString()
-    button.tooltip:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", isBag and -76 or -59, 4.5)
     button.tooltip:SetFont(unpack(FONT_STANDARD))
     button.tooltip:SetJustifyH("RIGHT")
-    button.tooltip:SetText(hint)
+    button.tooltip:SetText(hint or "")
     button.tooltip:SetTextColor(0.8, 0.8, 0.8)
     button.tooltip:Hide()
 
     button.tag = name
-    button:SetScript("OnEnter", function()
-        iconButtonOnEnter(button)
-    end)
-    button:SetScript("OnLeave", function()
-        iconButtonOnLeave(button)
-    end)
+    button:SetScript("OnEnter", iconButtonOnEnter)
+    button:SetScript("OnLeave", iconButtonOnLeave)
     button.mouseover = false
 
     return button
 end
 
 ------------------------------------------------------------------------
--- Free Slot Helper
+-- Free Slot
 ------------------------------------------------------------------------
 
-local function getFirstFreeSlot(bagtype)
+local freeSlotContainerTypes = { Bag = "Bag", Bank = "Bank", BagReagent = "BagReagent", Account = "BankAccount" }
+
+local function getFirstFreeSlot(name)
     local containerIDs
-    if bagtype == "bag" then
+    if name == "Bag" then
         containerIDs = { 0, 1, 2, 3, 4 }
-    elseif bagtype == "bankReagent" then
+    elseif name == "BagReagent" then
         containerIDs = { 5 }
-    elseif bagtype == "bank" then
+    elseif name == "Bank" then
         containerIDs = { 6, 7, 8, 9, 10, 11 }
-    elseif bagtype == "bankAccount" then
+    elseif name == "BankAccount" then
         containerIDs = { 12, 13, 14, 15, 16 }
     end
     if not containerIDs then
@@ -319,480 +191,511 @@ local function getFirstFreeSlot(bagtype)
 end
 
 ------------------------------------------------------------------------
--- Container OnCreate
+-- Container: OnCreate
 ------------------------------------------------------------------------
 
-function MyContainer:OnCreate(name, settings)
-    self.Settings = settings or {}
-    self.name = name
+function module:SetupContainerClass(MyContainer, impl)
+    function MyContainer:OnCreate(name, settings)
+        self.Settings = settings or {}
+        self.name = name
+        self:SetFrameStrata("HIGH")
+        self:SetClampedToScreen(true)
+        self.iconSize = iconSize
 
-    local tBag = name == "cBniv_Bag"
-    local tBank = name == "cBniv_Bank"
-    local tReagent = name == "cBniv_BankReagent"
-    local tAccount = name == "cBniv_BankAccount"
-    local tBankBags = strfind(name, "Bank")
-
-    self:EnableMouse(true)
-    self.UpdateDimensions = updateDimensions
-    self:SetFrameStrata("HIGH")
-
-    if tBag or tBank then
-        setFrameMovable(self, module.opts.Unlocked)
+        -- Main panels have settings.Bags
+        if settings and settings.Bags then
+            self:SetupMainPanel(name, settings, impl)
+        else
+            self:SetupSubContainer(name, settings)
+        end
     end
 
-    self.Columns = (tBankBags and cfg.columns.bank) or cfg.columns.bag
-    self.ContainerHeight = 0
-    self:UpdateDimensions()
-    self:SetWidth((itemSlotSize + 2) * self.Columns + 2)
+    function MyContainer:SetupSubContainer(name, settings)
+        -- Sub-container: label only, no background (covered by main panel's unified bg)
+        -- Enable drag to move parent (main panel)
+        self:EnableMouse(true)
+        self:RegisterForDrag("LeftButton")
+        self:SetScript("OnDragStart", function(s)
+            local parent = s:GetParent()
+            if parent and parent.StartMoving then
+                parent:StartMoving()
+            end
+        end)
+        self:SetScript("OnDragStop", function(s)
+            local parent = s:GetParent()
+            if parent and parent.StopMovingOrSizing then
+                parent:StopMovingOrSizing()
+            end
+        end)
 
-    -- Background
-    local background = CreateFrame("Frame", nil, self)
-    background:SetFrameStrata("HIGH")
-    background:SetFrameLevel(1)
-    background:SetPoint("TOPLEFT", -4, 4)
-    background:SetPoint("BOTTOMRIGHT", 4, -4)
-    E:ApplyBackdrop(background, false)
+        local label
+        if strmatch(name, "Custom%d") then
+            label = getCustomGroupTitle(settings and settings.Index or 0)
+        else
+            label = containerLabels[name]
+        end
 
-    -- Caption
-    local caption = background:CreateFontString(nil, "OVERLAY", nil)
-    caption:SetFont(unpack(FONT_STANDARD))
-    local t = L["BAG_CAPTIONS_" .. self.name:upper():sub(7)] or (tBankBags and self.name:sub(5))
-    if not t then
-        t = self.name
+        if label then
+            self.label = self:CreateFontString(nil, "OVERLAY")
+            self.label:SetFont(unpack(FONT_STANDARD))
+            self.label:SetPoint("TOPLEFT", 5, -8)
+            self.label:SetText(label)
+            self.label:SetTextColor(1, 0.82, 0)
+        end
+
+        -- FreeSlot for reagent container
+        if name == "BagReagent" then
+            self:CreateFreeSlotButton("BagReagent")
+        end
     end
-    caption:SetText(t)
-    caption:SetPoint("TOPLEFT", 7.5, -7.5)
-    self.Caption = caption
 
-    if tBag or tBank then
-        self.closeBtn = createIconButton("Close", self, "Interface\\RAIDFRAME\\ReadyCheck-NotReady", "BOTTOMRIGHT", "", tBag)
+    function MyContainer:SetupMainPanel(name, settings, backpack)
+        -- Unified background frame (covers main panel + all sub-containers above)
+        local bgFrame = CreateFrame("Frame", nil, self)
+        bgFrame:SetFrameStrata("HIGH")
+        bgFrame:SetFrameLevel(0)
+        bgFrame:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -4, -4)
+        bgFrame:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 4, -4)
+        bgFrame:SetPoint("TOPLEFT", self, "TOPLEFT", -4, 4)
+        bgFrame:SetPoint("TOPRIGHT", self, "TOPRIGHT", 4, 4)
+        E:StyleFrame(bgFrame, false)
+        self.bgFrame = bgFrame
+
+        -- Caption (top-left label)
+        local captionText = (name == "Bag") and INVENTORY_TOOLTIP
+            or (name == "Bank") and BANK
+            or (name == "Account") and ACCOUNT_BANK_PANEL_TITLE
+            or name
+        local caption = self:CreateFontString(nil, "OVERLAY")
+        caption:SetFont(unpack(FONT_STANDARD))
+        caption:SetText(captionText)
+        caption:SetPoint("TOPLEFT", 7.5, -7.5)
+        self.Caption = caption
+
+        -- Movable
+        self:EnableMouse(true)
+        self:SetMovable(true)
+        self:SetUserPlaced(true)
+        self:RegisterForDrag("LeftButton")
+        self:SetScript("OnDragStart", self.StartMoving)
+        self:SetScript("OnDragStop", function(f)
+            f:StopMovingOrSizing()
+            local point, _, relPoint, x, y = f:GetPoint()
+            x = E:Round(x or 0)
+            y = E:Round(y or 0)
+            DB:SetStats("cBniv." .. name .. "Pos", { point, "UIParent", relPoint, x, y }, true)
+        end)
+
+        -- Close button (top-right)
+        self.closeBtn = createIconButton("Close", self, "Interface\\RAIDFRAME\\ReadyCheck-NotReady", "")
         self.closeBtn:SetSize(16, 16)
         self.closeBtn.icon:ClearAllPoints()
         self.closeBtn.icon:SetAllPoints()
-        self.closeBtn:ClearAllPoints()
         self.closeBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", -2, -2)
         self.closeBtn:SetScript("OnClick", function()
-            if cbNivaya:AtBank() then
+            if backpack:AtBank() then
                 C_Bank.CloseBankFrame()
             else
                 CloseAllBags()
             end
         end)
-    end
 
-    if tBag or tBank then
-        local tS = tBag and "backpack+bags" or "bank"
-        local tI = tBag and 5 or 7
+        -- Function buttons (bottom-right, right to left)
+        local buttons = {}
 
-        local bagButtons = self:SpawnPlugin("BagBar", tS)
-        bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))
-        bagButtons.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
+        local bagToggle = createIconButton("Bags", self, Textures.BagToggle, L.BAG_HINT_TOGGLE)
+        bagToggle:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
+        buttons[#buttons + 1] = bagToggle
+        local lastBtn = bagToggle
+
+        if name == "Bag" and cfg.showNewItem then
+            local resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, L.BAG_HINT_RESET_NEW)
+            resetBtn:SetPoint("BOTTOMRIGHT", lastBtn, "BOTTOMLEFT", 0, 0)
+            resetBtn:SetScript("OnClick", function()
+                module:ResetNewItems()
+            end)
+            buttons[#buttons + 1] = resetBtn
+            lastBtn = resetBtn
         end
-        bagButtons.isGlobal = true
-        bagButtons:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, tBag and 32 or 20)
-        bagButtons:Hide()
-        self.BagBar = bagButtons
 
-        self.bagToggle = createIconButton("Bags", self, Textures.BagToggle, "BOTTOMRIGHT", L.BAG_HINT_TOGGLE, tBag)
-        self.bagToggle:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
-        self.bagToggle:SetScript("OnClick", function()
+        local sortBtn = createIconButton("Sort", self, Textures.Restack, L.BAG_HINT_RESTACK)
+        sortBtn:SetPoint("BOTTOMRIGHT", lastBtn, "BOTTOMLEFT", 0, 0)
+        sortBtn:SetScript("OnClick", function()
+            if cfg.sortMode == 3 then
+                return
+            end
+            if name == "Bank" then
+                C_Container.SortBankBags()
+            elseif name == "Account" then
+                if C_Container.SortAccountBankBags then
+                    C_Container.SortAccountBankBags()
+                end
+            else
+                C_Container.SortBags()
+            end
+        end)
+        buttons[#buttons + 1] = sortBtn
+        lastBtn = sortBtn
+
+        if name == "Bank" or name == "Account" then
+            local depositBtn = createIconButton("Deposit", self, Textures.Deposit, L.BAG_HINT_DEPOSIT)
+            depositBtn:SetPoint("BOTTOMRIGHT", lastBtn, "BOTTOMLEFT", 0, 0)
+            depositBtn:SetScript("OnClick", function()
+                if name == "Account" then
+                    C_Bank.AutoDepositItemsIntoBank(ACCOUNT_BANK_TYPE)
+                else
+                    C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE)
+                end
+            end)
+            buttons[#buttons + 1] = depositBtn
+            lastBtn = depositBtn
+        end
+
+        self.widgetButtons = buttons
+
+        -- Bag bar
+        local bagSettings = settings.Bags
+        local bagColumns = (name == "Bag") and 5 or (name == "Bank") and 6 or 5
+        local bagBar = self:SpawnPlugin("BagBar", bagSettings)
+        bagBar:SetSize(bagBar:LayoutButtons("grid", bagColumns))
+        bagBar.highlightFunction = highlightFunction
+        bagBar.isGlobal = true
+        bagBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, (name == "Bag") and 32 or 20)
+        bagBar:Hide()
+        self.BagBar = bagBar
+
+        bagToggle:SetScript("OnClick", function()
             if self.BagBar:IsShown() then
                 self.BagBar:Hide()
             else
                 self.BagBar:Show()
             end
-            self:UpdateDimensions()
         end)
 
-        if tBag and module.opts.NewItems then
-            self.resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, "BOTTOMRIGHT", L.BAG_HINT_RESET_NEW, tBag)
-            self.resetBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
-            self.resetBtn:SetScript("OnClick", function()
-                resetNewItems()
-            end)
+        -- Warband bag bar (account bank)
+        if name == "Account" then
+            local warbandBar = self:SpawnPlugin("BagWarband", "accountbank")
+            warbandBar:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
+            warbandBar:SetSize(warbandBar:LayoutButtons("grid", 5))
+            warbandBar.highlightFunction = highlightFunction
+            self.BagBar = warbandBar
         end
 
-        if module.opts.Restack then
-            self.restackBtn = createIconButton("Restack", self, Textures.Restack, "BOTTOMRIGHT", L.BAG_HINT_RESTACK, tBag)
-            if self.resetBtn then
-                self.restackBtn:SetPoint("BOTTOMRIGHT", self.resetBtn, "BOTTOMLEFT", 0, 0)
+        -- Search bar (bag only, bottom-left)
+        if name == "Bag" then
+            local infoFrame = CreateFrame("Button", nil, self)
+            infoFrame:SetPoint("BOTTOMLEFT", 5, -6)
+            infoFrame:SetPoint("BOTTOMRIGHT", -86, -6)
+            infoFrame:SetHeight(32)
+
+            local searchIcon = self:CreateTexture(nil, "ARTWORK")
+            searchIcon:SetTexture(Textures.Search)
+            searchIcon:SetVertexColor(0.8, 0.8, 0.8)
+            searchIcon:SetPoint("BOTTOMLEFT", infoFrame, "BOTTOMLEFT", -3, 8)
+            searchIcon:SetSize(16, 16)
+
+            local search = self:SpawnPlugin("SearchBar", infoFrame)
+            search.isGlobal = true
+            search.highlightFunction = highlightFunction
+        end
+
+        -- Money display (top-right)
+        if name == "Bag" then
+            local money = self:SpawnPlugin("TagDisplay", "[money]", self)
+            money:SetPoint("TOPRIGHT", self, -32, -2)
+            money:SetFont(unpack(FONT_STANDARD))
+            money:SetJustifyH("RIGHT")
+            money:SetShadowColor(0, 0, 0, 0)
+        end
+
+        -- Free slot
+        self:CreateFreeSlotButton(name)
+    end
+
+    function MyContainer:CreateFreeSlotButton(name)
+        local tagName = freeSlotContainerTypes[name]
+        if not tagName then
+            return
+        end
+
+        local slot = CreateFrame("Button", self:GetName() .. "FreeSlot", self, "BackdropTemplate")
+        slot:SetSize(iconSize, iconSize)
+        slot:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        slot:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
+        slot:GetHighlightTexture():SetInside()
+        slot:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
+        slot:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+        slot:SetBackdropBorderColor(0, 0, 0, 1)
+        slot.__name = tagName
+        slot:SetScript("OnMouseUp", function(s)
+            local bagID, slotID = getFirstFreeSlot(s.__name)
+            if slotID then
+                C_Container_PickupContainerItem(bagID, slotID)
+            end
+        end)
+        slot:SetScript("OnReceiveDrag", function(s)
+            local bagID, slotID = getFirstFreeSlot(s.__name)
+            if slotID then
+                C_Container_PickupContainerItem(bagID, slotID)
+            end
+        end)
+
+        local tag = self:SpawnPlugin("TagDisplay", "[space]", slot)
+        tag:SetFont(STANDARD_TEXT_FONT, fontSize + 2, "OUTLINE")
+        tag:SetTextColor(0.6, 0.8, 1)
+        tag:SetPoint("CENTER", 1, 0)
+        tag.__type = tagName
+        slot.tag = tag
+
+        self.freeSlot = slot
+    end
+
+    -----------------------------------------------------------------------
+    -- Container: OnContentsChanged
+    -----------------------------------------------------------------------
+
+    function MyContainer:OnContentsChanged()
+        self:SortButtons("bagSlot")
+
+        local bagType = self.Settings.BagType or "Bag"
+        local columns = module:GetContainerColumns(bagType)
+        local offset = self.Settings.Bags and HEADER_HEIGHT or (self.label and 32 or 4)
+        local xOffset = 5
+        local yOffset = -offset + xOffset
+
+        local _, height = self:LayoutButtons("grid", columns, SPACING, xOffset, yOffset)
+
+        -- Free slot positioning
+        if self.freeSlot then
+            if cfg.gatherEmpty then
+                local numSlots = #self.buttons + 1
+                local row = ceil(numSlots / columns)
+                local col = numSlots % columns
+                if col == 0 then
+                    col = columns
+                end
+
+                local xPos = (col - 1) * (iconSize + SPACING)
+                local yPos = -1 * (row - 1) * (iconSize + SPACING)
+
+                self.freeSlot:ClearAllPoints()
+                self.freeSlot:SetPoint("TOPLEFT", self, "TOPLEFT", xPos + xOffset, yPos + yOffset)
+                self.freeSlot:Show()
+
+                if height < 0 then
+                    height = iconSize
+                elseif col == 1 then
+                    height = height + iconSize + SPACING
+                end
             else
-                self.restackBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
+                self.freeSlot:Hide()
             end
-            self.restackBtn:SetScript("OnClick", function()
-                restackItems(self)
-            end)
         end
 
-        if tBank then
-            self.reagentBtn = createIconButton("Deposit", self, Textures.Deposit, "BOTTOMRIGHT", REAGENTBANK_DEPOSIT, tBag)
-            if self.restackBtn then
-                self.reagentBtn:SetPoint("BOTTOMRIGHT", self.restackBtn, "BOTTOMLEFT", 0, 0)
+        local width = columns * (iconSize + SPACING) - SPACING
+        local footer = self.Settings.Bags and FOOTER_HEIGHT or 0
+        self:SetSize(width + xOffset * 2, height + offset + footer)
+
+        module:UpdateAllAnchors()
+    end
+end
+
+------------------------------------------------------------------------
+-- Item Button Style
+------------------------------------------------------------------------
+
+function module:SetupItemButtonClass(MyButton)
+    function MyButton:OnCreate()
+        self:SetNormalTexture(0)
+        self:SetPushedTexture(0)
+        self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
+        self:GetHighlightTexture():SetInside()
+        self:SetSize(iconSize, iconSize)
+
+        self:CreateBackdrop("default", 0)
+        self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+
+        self.Icon:SetInside()
+        self.Icon:SetTexCoord(unpack(C.media.texCoord))
+
+        self.Count:SetPoint("BOTTOMRIGHT", -1, 2)
+        self.Count:SetFont(unpack(C.media.standard_font))
+
+        self.Cooldown:SetInside()
+        self.IconOverlay:SetInside()
+        self.IconOverlay2:SetInside()
+
+        local parentFrame = CreateFrame("Frame", nil, self)
+        parentFrame:SetAllPoints()
+        parentFrame:SetFrameLevel(5)
+
+        self.QuestIcon = self:CreateTexture(nil, "ARTWORK")
+        self.QuestIcon:SetTexture("Interface\\GossipFrame\\AvailableQuestIcon")
+        self.QuestIcon:SetTexCoord(0, 1, 0, 1)
+        self.QuestIcon:SetSize(14, iconSize / 2)
+        self.QuestIcon:SetPoint("TOPRIGHT", -1, -1)
+
+        self.iLvl = self:CreateFontString(nil, "OVERLAY")
+        self.iLvl:SetJustifyH("LEFT")
+        self.iLvl:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 1, 2)
+        self.iLvl:SetFont(unpack(C.media.standard_font))
+
+        self.durability = self:CreateFontString(nil, "OVERLAY")
+        self.durability:SetJustifyH("LEFT")
+        self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", 1, -1)
+        self.durability:SetFont(unpack(C.media.standard_font))
+
+        if C_AddOns.IsAddOnLoaded("CanIMogIt") then
+            self.canIMogIt = parentFrame:CreateTexture(nil, "OVERLAY")
+            self.canIMogIt:SetSize(13, 13)
+            self.canIMogIt:SetPoint(unpack(CanIMogIt.ICON_LOCATIONS[CanIMogItOptions["iconLocation"]]))
+        end
+
+        if not self.ProfessionQualityOverlay then
+            self.ProfessionQualityOverlay = self:CreateTexture(nil, "OVERLAY")
+            self.ProfessionQualityOverlay:SetPoint("TOPLEFT", -3, 2)
+        end
+    end
+
+    local function getIconOverlayAtlas(item)
+        if not item.link then
+            return
+        end
+        if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(item.link) then
+            return "AzeriteIconFrame"
+        elseif IsCosmeticItem and IsCosmeticItem(item.link) then
+            return "CosmeticIconFrame"
+        end
+    end
+
+    local function itemColorGradient(perc, ...)
+        if perc >= 1 then
+            return select(select("#", ...) - 2, ...)
+        end
+        if perc <= 0 then
+            return ...
+        end
+        local num = select("#", ...) / 3
+        local segment, relperc = math.modf(perc * (num - 1))
+        local r1, g1, b1, r2, g2, b2 = select((segment * 3) + 1, ...)
+        return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
+    end
+
+    function MyButton:OnUpdateButton(item)
+        self.IconOverlay:SetVertexColor(1, 1, 1)
+        self.IconOverlay:Hide()
+        self.IconOverlay2:Hide()
+
+        local atlas = getIconOverlayAtlas(item)
+        if atlas then
+            self.IconOverlay:SetAtlas(atlas)
+            self.IconOverlay:Show()
+        end
+
+        if self.ProfessionQualityOverlay then
+            self.ProfessionQualityOverlay:SetAtlas(nil)
+            SetItemCraftingQualityOverlay(self, item.link)
+        end
+
+        -- Item level
+        self.iLvl:SetText("")
+        if cfg.showItemLevel and item.ilvl and item.quality and item.quality > 1 then
+            local color = C.media.qualityColors[item.quality]
+            if color then
+                self.iLvl:SetText(item.ilvl)
+                self.iLvl:SetTextColor(color.r, color.g, color.b)
+            end
+        end
+
+        -- Durability
+        local dCur, dMax = C_Container_GetContainerItemDurability(item.bagId, item.slotId)
+        if dMax and dMax > 0 and dCur < dMax then
+            local r, g, b = itemColorGradient(dCur / dMax, 1, 0, 0, 1, 1, 0, 0, 1, 0)
+            self.durability:SetText(Round(dCur / dMax * 100) .. "%")
+            self.durability:SetTextColor(r, g, b)
+        else
+            self.durability:SetText("")
+        end
+
+        self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+
+        if not item.texture and GameTooltip:GetOwner() == self then
+            GameTooltip:Hide()
+        end
+
+        -- CanIMogIt
+        if self.canIMogIt then
+            local text, unmodifiedText = CanIMogIt:GetTooltipText(nil, item.bagId, item.slotId)
+            if text and text ~= "" then
+                self.canIMogIt:SetTexture(CanIMogIt.tooltipOverlayIcons[unmodifiedText])
+                self.canIMogIt:Show()
             else
-                self.reagentBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
-            end
-            self.reagentBtn:SetScript("OnClick", function()
-                C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE)
-            end)
-        end
-
-        local btnTable = { self.bagToggle }
-        if self.restackBtn then
-            tinsert(btnTable, self.restackBtn)
-        end
-        if tBag and self.resetBtn then
-            tinsert(btnTable, self.resetBtn)
-        end
-        if tBank and self.reagentBtn then
-            tinsert(btnTable, self.reagentBtn)
-        end
-        local ttPos = -(#btnTable * 24 + 16)
-        if tBank then
-            ttPos = ttPos + 3
-        end
-        for _, v in pairs(btnTable) do
-            v.tooltip:ClearAllPoints()
-            v.tooltip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", ttPos, 5.5)
-        end
-    end
-
-    if tAccount then
-        local bagWarband = self:SpawnPlugin("BagWarband", "accountbank")
-        bagWarband:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
-        bagWarband:SetSize(bagWarband:LayoutButtons("grid", 5))
-        bagWarband.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
-        end
-        self.BagBar = bagWarband
-
-        self.depositBtn = createIconButton("SendAccount", self, Textures.Deposit, "BOTTOMRIGHT", ACCOUNT_BANK_DEPOSIT_BUTTON_LABEL, false)
-        self.depositBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
-        self.depositBtn:SetScript("OnClick", function()
-            PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
-            C_Bank.AutoDepositItemsIntoBank(ACCOUNT_BANK_TYPE)
-        end)
-        self.depositBtn.tooltip:ClearAllPoints()
-        self.depositBtn.tooltip:SetPoint("RIGHT", self.depositBtn, "LEFT", -5, 0)
-
-        local checkbox = CreateFrame("CheckButton", nil, self, "InterfaceOptionsCheckButtonTemplate")
-        checkbox:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 2, 2)
-        checkbox:SetChecked(GetCVarBool("bankAutoDepositReagents"))
-        checkbox:SetScript("OnClick", function(cb)
-            SetCVar("bankAutoDepositReagents", cb:GetChecked())
-        end)
-        E:ReskinCheckBox(checkbox)
-
-        checkbox.fs = checkbox:CreateFontText(14, "", false, "LEFT", 30, 0)
-        checkbox.fs:SetText(L.BAG_HINT_ACOUNT_DEPOSIT_INCLUDE_REAGENTS)
-    end
-
-    -- Drop target
-    if tBag or tBank or tReagent or tAccount then
-        self.DropTarget = CreateFrame("ItemButton", self.name .. "DropTarget", self)
-        local dtNT = _G[self.DropTarget:GetName() .. "NormalTexture"]
-        if dtNT then
-            dtNT:SetTexture(nil)
-        end
-
-        local function DropTargetProcessItem()
-            local bID, sID = getFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
-            if bID then
-                C_Container_PickupContainerItem(bID, sID)
+                self.canIMogIt:Hide()
             end
         end
 
-        self.DropTarget:SetScript("OnMouseUp", DropTargetProcessItem)
-        self.DropTarget:SetScript("OnReceiveDrag", DropTargetProcessItem)
-        self.DropTarget:SetSize(itemSlotSize, itemSlotSize)
+        -- Pawn
+        if C_AddOns.IsAddOnLoaded("Pawn") and PawnIsContainerItemAnUpgrade and self.UpgradeIcon then
+            self.UpgradeIcon:SetShown(PawnIsContainerItemAnUpgrade(item.bagId, item.slotId))
+        end
+    end
 
-        self.DropTarget:CreateBackdrop()
-        self.DropTarget.__backdrop:SetAllPoints()
-        self.DropTarget.__backdrop:SetBackdrop({
-            bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-            edgeFile = "Interface\\Buttons\\WHITE8x8",
-            tile = false,
-            tileSize = 16,
-            edgeSize = 1,
-        })
-        self.DropTarget.__backdrop:SetBackdropColor(1, 1, 1, 0.1)
-        self.DropTarget.__backdrop:SetBackdropBorderColor(0, 0, 0, 1)
-
-        local freeSlot = self:SpawnPlugin("TagDisplay", "[space]", self.DropTarget)
-        freeSlot.__type = (tBag and "Bag") or (tBank and "Bank") or (tReagent and "BankReagent") or (tAccount and "BankAccount")
-        freeSlot:SetPoint("BOTTOMRIGHT", self.DropTarget, "BOTTOMRIGHT", 1.5, 1.5)
-        freeSlot:SetFont(unpack(FONT_STANDARD))
-        freeSlot:SetJustifyH("RIGHT")
-        freeSlot:SetShadowColor(0, 0, 0, 0)
-        self.NumFreeSlots = freeSlot
-
-        if module.opts.CompressEmpty then
-            self.DropTarget:Show()
+    function MyButton:OnUpdateQuest(item)
+        if item.questID and not item.questActive then
+            self.QuestIcon:Show()
         else
-            self.DropTarget:Hide()
-        end
-    end
-
-    if tBag then
-        local infoFrame = CreateFrame("Button", nil, self)
-        infoFrame:SetPoint("BOTTOMLEFT", 5, -6)
-        infoFrame:SetPoint("BOTTOMRIGHT", -86, -6)
-        infoFrame:SetHeight(32)
-
-        local search = self:SpawnPlugin("SearchBar", infoFrame)
-        search.isGlobal = true
-        search.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
+            self.QuestIcon:Hide()
         end
 
-        local searchIcon = background:CreateTexture(nil, "ARTWORK")
-        searchIcon:SetTexture(Textures.Search)
-        searchIcon:SetVertexColor(0.8, 0.8, 0.8)
-        searchIcon:SetPoint("BOTTOMLEFT", infoFrame, "BOTTOMLEFT", -3, 8)
-        searchIcon:SetWidth(16)
-        searchIcon:SetHeight(16)
-
-        local money = self:SpawnPlugin("TagDisplay", "[money]", self)
-        money:SetPoint("TOPRIGHT", self, -32, -2)
-        money:SetFont(unpack(FONT_STANDARD))
-        money:SetJustifyH("RIGHT")
-        money:SetShadowColor(0, 0, 0, 0)
-    end
-
-    self:SetScale(module.opts.scale)
-    return self
-end
-
-------------------------------------------------------------------------
--- Bag Button (bag bar slots)
-------------------------------------------------------------------------
-
-local BagButton = cbNivaya:GetBagButtonClass()
-
-function BagButton:OnCreate()
-    self:SetNormalTexture(0)
-    self:SetPushedTexture(0)
-    self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
-    self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
-    self:GetHighlightTexture():SetInside()
-
-    self:SetSize(itemSlotSize, itemSlotSize)
-    self:CreateBackdrop()
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
-    self.Icon:SetInside()
-    self.Icon:SetTexCoord(unpack(C.media.texCoord))
-end
-
-function BagButton:OnUpdateButton()
-    self.__backdrop:SetBackdropBorderColor(0, 0, 0)
-
-    local id = GetInventoryItemID("player", (self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
-    if not id then
-        return
-    end
-    local _, _, quality = C_Item.GetItemInfo(id)
-    if not quality or quality <= 1 then
-        return
-    end
-    local color = C.media.qualityColors[quality]
-    if not self.hidden and not self.notBought and color then
-        self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-    end
-end
-
-------------------------------------------------------------------------
--- Item Button
-------------------------------------------------------------------------
-
-local MyButton = cbNivaya:GetItemButtonClass()
-MyButton:Scaffold("Default")
-
-function MyButton:OnAdd()
-    self:SetScript("OnMouseUp", function(btn, mouseButton)
-        if mouseButton == "RightButton" then
-            local slotId, bagId = btn:GetSlotAndBagID()
-            local tID = C_Container.GetContainerItemID(bagId, slotId)
-            if not tID then
-                return
+        if item.questID or item.isQuestItem then
+            self.__backdrop:SetBackdropBorderColor(0.8, 0.8, 0)
+        elseif item.quality and item.quality > -1 then
+            local color = C.media.qualityColors[item.quality]
+            if color then
+                self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+            else
+                self.__backdrop:SetBackdropBorderColor(0, 0, 0)
             end
-            if IsControlKeyDown() and cbNivaya:AtBank() then
-                C_Container.UseContainerItem(bagId, slotId, nil, true)
-            end
-        end
-    end)
-end
-
-function MyButton:OnCreate()
-    self:SetNormalTexture(0)
-    self:SetPushedTexture(0)
-    self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
-    self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
-    self:GetHighlightTexture():SetInside()
-    self:SetSize(itemSlotSize - 4, itemSlotSize - 4)
-    self:CreateBackdrop()
-
-    self.__backdrop:SetOutside()
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
-
-    self.Icon:SetInside()
-    self.Icon:SetTexCoord(unpack(C.media.texCoord))
-
-    self.Count:SetPoint("BOTTOMRIGHT", -1, 1)
-    self.Count:SetFont(unpack(C.media.standard_font))
-
-    self.Cooldown:SetInside()
-    self.IconOverlay:SetInside()
-    self.IconOverlay2:SetInside()
-
-    local parentFrame = CreateFrame("Frame", nil, self)
-    parentFrame:SetAllPoints()
-    parentFrame:SetFrameLevel(5)
-
-    self.QuestIcon = self:CreateTexture(nil, "ARTWORK")
-    self.QuestIcon:SetTexture("Interface\\GossipFrame\\AvailableQuestIcon")
-    self.QuestIcon:SetTexCoord(0, 1, 0, 1)
-    self.QuestIcon:SetSize(14, itemSlotSize / 2)
-    self.QuestIcon:SetPoint("TOPRIGHT", -1, -1)
-
-    self.iLvl = self:CreateFontString(nil, "OVERLAY")
-    self.iLvl:SetJustifyH("RIGHT")
-    self.iLvl:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1)
-    self.iLvl:SetFont(unpack(C.media.standard_font))
-
-    self.durability = self:CreateFontString(nil, "OVERLAY")
-    self.durability:SetJustifyH("LEFT")
-    self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", -1, 1)
-    self.durability:SetFont(unpack(C.media.standard_font))
-
-    if C_AddOns.IsAddOnLoaded("CanIMogIt") then
-        self.canIMogIt = parentFrame:CreateTexture(nil, "OVERLAY")
-        self.canIMogIt:SetSize(13, 13)
-        self.canIMogIt:SetPoint(unpack(CanIMogIt.ICON_LOCATIONS[CanIMogItOptions["iconLocation"]]))
-    end
-
-    if not self.ProfessionQualityOverlay then
-        self.ProfessionQualityOverlay = self:CreateTexture(nil, "OVERLAY")
-        self.ProfessionQualityOverlay:SetPoint("TOPLEFT", -3, 2)
-    end
-end
-
-------------------------------------------------------------------------
--- Item Level Helpers
-------------------------------------------------------------------------
-
-local iLvlClassIDs = {
-    [Enum.ItemClass.Armor] = 0,
-    [Enum.ItemClass.Weapon] = 0,
-}
-
-local function isItemHasLevel(item)
-    local index = iLvlClassIDs[item.classID]
-    return index and (index == 0 or index == item.subClassID)
-end
-
-local function isItemNeedsLevel(item)
-    return item.link and item.quality and item.quality > 1 and isItemHasLevel(item)
-end
-
-local function getIconOverlayAtlas(item)
-    if not item.link then
-        return
-    end
-    if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(item.link) then
-        return "AzeriteIconFrame"
-    elseif IsCosmeticItem(item.link) then
-        return "CosmeticIconFrame"
-    end
-end
-
-local function itemColorGradient(perc, ...)
-    if perc >= 1 then
-        return select(select("#", ...) - 2, ...)
-    elseif perc <= 0 then
-        return ...
-    end
-    local num = select("#", ...) / 3
-    local segment, relperc = math.modf(perc * (num - 1))
-    local r1, g1, b1, r2, g2, b2 = select((segment * 3) + 1, ...)
-    return r1 + (r2 - r1) * relperc, g1 + (g2 - g1) * relperc, b1 + (b2 - b1) * relperc
-end
-
-------------------------------------------------------------------------
--- Item Button Updates
-------------------------------------------------------------------------
-
-function MyButton:OnUpdateButton(item)
-    self.IconOverlay:SetVertexColor(1, 1, 1)
-    self.IconOverlay:Hide()
-    self.IconOverlay2:Hide()
-
-    local atlas = getIconOverlayAtlas(item)
-    if atlas then
-        self.IconOverlay:SetAtlas(atlas)
-        self.IconOverlay:Show()
-    end
-
-    if self.ProfessionQualityOverlay then
-        self.ProfessionQualityOverlay:SetAtlas(nil)
-        SetItemCraftingQualityOverlay(self, item.link)
-    end
-
-    -- iLvl
-    self.iLvl:SetText("")
-    local level = item.level
-    if level and isItemNeedsLevel(item) then
-        local color = C.media.qualityColors[item.quality]
-        self.iLvl:SetText(level)
-        self.iLvl:SetTextColor(color.r, color.g, color.b)
-    end
-
-    -- Durability
-    local dCur, dMax = C_Container_GetContainerItemDurability(item.bagId, item.slotId)
-    if dMax and dMax > 0 and dCur < dMax then
-        local r, g, b = itemColorGradient(dCur / dMax, 1, 0, 0, 1, 1, 0, 0, 1, 0)
-        self.durability:SetText(Round(dCur / dMax * 100) .. "%")
-        self.durability:SetTextColor(r, g, b)
-    else
-        self.durability:SetText("")
-    end
-
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
-
-    if not item.texture and GameTooltip:GetOwner() == self then
-        GameTooltip:Hide()
-    end
-
-    -- CanIMogIt support
-    if self.canIMogIt then
-        local text, unmodifiedText = CanIMogIt:GetTooltipText(nil, item.bagId, item.slotId)
-        if text and text ~= "" then
-            local icon = CanIMogIt.tooltipOverlayIcons[unmodifiedText]
-            self.canIMogIt:SetTexture(icon)
-            self.canIMogIt:Show()
         else
-            self.canIMogIt:Hide()
+            self.__backdrop:SetBackdropBorderColor(0, 0, 0)
         end
-    end
-
-    -- Pawn support
-    if C_AddOns.IsAddOnLoaded("Pawn") and PawnIsContainerItemAnUpgrade and self.UpgradeIcon then
-        self.UpgradeIcon:SetShown(PawnIsContainerItemAnUpgrade(item.bagId, item.slotId))
     end
 end
 
-function MyButton:OnUpdateQuest(item)
-    if item.questID and not item.questActive then
-        self.QuestIcon:Show()
-    else
-        self.QuestIcon:Hide()
+------------------------------------------------------------------------
+-- Bag Button Style
+------------------------------------------------------------------------
+
+function module:SetupBagButtonClass(impl)
+    local BagButton = impl:GetBagButtonClass()
+
+    function BagButton:OnCreate()
+        self:SetNormalTexture(0)
+        self:SetPushedTexture(0)
+        self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
+        self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
+        self:GetHighlightTexture():SetInside()
+        self:SetSize(iconSize, iconSize)
+        self:CreateBackdrop()
+        self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+        self.Icon:SetInside()
+        self.Icon:SetTexCoord(unpack(C.media.texCoord))
     end
 
-    if item.questID or item.isQuestItem then
-        self.__backdrop:SetBackdropBorderColor(0.8, 0.8, 0)
-    elseif item.quality and item.quality > -1 then
-        local color = C.media.qualityColors[item.quality]
-        self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-    else
+    function BagButton:OnUpdateButton()
         self.__backdrop:SetBackdropBorderColor(0, 0, 0)
+        local id = GetInventoryItemID("player", (self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
+        if not id then
+            return
+        end
+        local _, _, quality = C_Item.GetItemInfo(id)
+        if not quality or quality <= 1 then
+            return
+        end
+        local color = C.media.qualityColors[quality]
+        if not self.hidden and not self.notBought and color then
+            self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+        end
     end
 end

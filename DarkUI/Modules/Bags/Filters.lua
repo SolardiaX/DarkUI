@@ -1,198 +1,358 @@
-local E, C, L = select(2, ...):unpack()
-local cargBags = select(2, ...).cargBags
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Bag Filters
 ------------------------------------------------------------------------
 
 local module = E:Module("Bags")
+local cfg = C.bags
 
-local NUM_BAG_SLOTS = 5
-local BANK_START = NUM_BAG_SLOTS + 1
-local BANK_END = 11
-local ACCOUNT_BANK_START = 12
-local ACCOUNT_BANK_END = 16
+local C_Item_IsAnimaItemByID = C_Item.IsAnimaItemByID
+local C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID = C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID
 
-local cbNivaya = cargBags:NewImplementation("Nivaya")
-if C.bags and C.bags.enable then
-    cbNivaya:RegisterBlizzard()
-end
-cbNivaya:HookScript("OnShow", function()
-    PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
-end)
-cbNivaya:HookScript("OnHide", function()
-    PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
-end)
+local CURRENT_EXPANSION = LE_EXPANSION_WAR_WITHIN or 10
 
-function cbNivaya:UpdateBags()
-    for i = 0, ACCOUNT_BANK_END do
-        cbNivaya:UpdateBag(i)
+------------------------------------------------------------------------
+-- Custom Filter Overrides
+------------------------------------------------------------------------
+
+local CustomFilterList = {
+    [37863] = false,
+    [187532] = false,
+    [141333] = true,
+    [141446] = true,
+    [153646] = true,
+    [153647] = true,
+    [161053] = true,
+    [221269] = true,
+    [225896] = true,
+}
+
+local function isCustomFilter(item)
+    if not cfg.itemFilter then
+        return
     end
+    return CustomFilterList[item.id]
 end
 
 ------------------------------------------------------------------------
--- State
+-- Basic Bag Membership
 ------------------------------------------------------------------------
 
-module.filters = {}
-module.itemClass = {}
-module.filterEnabled = {
-    Armor = true,
-    Gem = true,
-    Quest = true,
-    TradeGoods = true,
-    Consumables = true,
-    Junk = true,
-    Stuff = true,
-    ItemSets = true,
-    BattlePet = true,
-}
-module.existsBankBag = {
-    Armor = true,
-    Gem = true,
-    Quest = true,
-    TradeGoods = true,
-    Consumables = true,
-    BattlePet = true,
-    Junk = true,
-}
-
-local filters = module.filters
-local itemClass = module.itemClass
-local filterEnabled = module.filterEnabled
-local existsBankBag = module.existsBankBag
-
-------------------------------------------------------------------------
--- Basic Filters
-------------------------------------------------------------------------
-
-filters.fBags = function(item)
-    return item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS
+local function isItemInBag(item)
+    return item.bagId >= 0 and item.bagId <= 4
 end
 
-filters.fBank = function(item)
-    return item.bagId >= BANK_START and item.bagId <= BANK_END
-end
-
-filters.fBankAccount = function(item)
-    return item.bagId >= ACCOUNT_BANK_START and item.bagId <= ACCOUNT_BANK_END
-end
-
-filters.fBankReagent = function(item)
+local function isItemInBagReagent(item)
     return item.bagId == 5
 end
 
-filters.fBankFilter = function()
-    return module.opts.FilterBank
+local function isItemInBank(item)
+    return item.bagId > 5 and item.bagId < 12
 end
 
-filters.fHideEmpty = function(item)
-    if module.opts.CompressEmpty then
-        return item.link ~= nil
-    end
-    return true
+local function isItemInAccountBank(item)
+    return item.bagId > 11 and item.bagId < 17
+end
+
+local function isEmptySlot(item)
+    return not item.link
 end
 
 ------------------------------------------------------------------------
--- Item Classification
+-- Category Classifiers
 ------------------------------------------------------------------------
 
-filters.fItemClass = function(item, container)
-    if not item.id or not item.name then
-        return false
+local function isItemJunk(item)
+    if not cfg.itemFilter or not cfg.filterJunk then
+        return
     end
-    if not itemClass[item.id] then
-        cbNivaya:ClassifyItem(item)
-    end
-
-    local t = itemClass[item.id]
-    local isBankBag = item.bagId >= BANK_START and item.bagId <= BANK_END
-    local isBankAccountBag = item.bagId >= ACCOUNT_BANK_START and item.bagId <= ACCOUNT_BANK_END
-    local bag
-
-    if isBankBag then
-        bag = (existsBankBag[t] and module.opts.FilterBank and filterEnabled[t]) and "Bank" .. t or "Bank"
-    elseif isBankAccountBag then
-        bag = "BankAccount"
-    else
-        bag = (t ~= "NoClass" and filterEnabled[t]) and t or "Bag"
-    end
-
-    return bag == container
+    return (item.quality == Enum.ItemQuality.Poor or (module.customJunkList and module.customJunkList[item.id])) and item.hasPrice
 end
 
-function cbNivaya:ClassifyItem(item)
-    local tC = module.catInfo and module.catInfo[item.id]
-    if tC then
-        itemClass[item.id] = tC
+local function isItemEquipSet(item)
+    if not cfg.itemFilter or not cfg.filterEquipSet then
+        return
+    end
+    return item.isInSet
+end
+
+local function isAzeriteArmor(item)
+    if not cfg.itemFilter or not cfg.filterAzerite then
+        return
+    end
+    if not item.link then
+        return
+    end
+    return C_AzeriteEmpoweredItem_IsAzeriteEmpoweredItemByID(item.link)
+end
+
+local function checkEquip(item)
+    return item.link and item.quality and item.quality > Enum.ItemQuality.Common and item.ilvl
+end
+
+local function isItemEquipment(item)
+    if not cfg.itemFilter or not cfg.filterEquipment then
+        return
+    end
+    return checkEquip(item)
+end
+
+local function isItemLegacy(item)
+    if not cfg.itemFilter or not cfg.filterLegacy then
+        return
+    end
+    return checkEquip(item) and item.expacID and item.expacID < CURRENT_EXPANSION
+end
+
+local function isItemLowerLevel(item)
+    if not cfg.itemFilter or not cfg.filterLower then
+        return
+    end
+    return checkEquip(item) and item.ilvl < cfg.iLvlToShow
+end
+
+local function isItemDecor(item)
+    if not cfg.itemFilter or not cfg.filterDecor then
+        return
+    end
+    if not item.link then
+        return
+    end
+    return C_Item.IsDecorItem and C_Item.IsDecorItem(item.link)
+end
+
+local consumableClassIDs = {
+    [Enum.ItemClass.Consumable] = true,
+    [Enum.ItemClass.ItemEnhancement] = true,
+}
+
+local function isItemConsumable(item)
+    if not cfg.itemFilter or not cfg.filterConsumable then
+        return
+    end
+    if isCustomFilter(item) == false then
+        return
+    end
+    return consumableClassIDs[item.classID]
+end
+
+local function isTradeGoods(item)
+    if not cfg.itemFilter or not cfg.filterGoods then
+        return
+    end
+    if isCustomFilter(item) == false then
+        return
+    end
+    return item.classID == Enum.ItemClass.Tradegoods
+end
+
+local function isQuestItem(item)
+    if not cfg.itemFilter or not cfg.filterQuest then
+        return
+    end
+    return item.classID == Enum.ItemClass.Questitem or item.isQuestItem
+end
+
+local collectionClassIDs = {
+    [Enum.ItemMiscellaneousSubclass.Mount] = Enum.ItemClass.Miscellaneous,
+    [Enum.ItemMiscellaneousSubclass.CompanionPet] = Enum.ItemClass.Miscellaneous,
+}
+
+local C_ToyBox_GetToyInfo = C_ToyBox.GetToyInfo
+
+local function isItemCollection(item)
+    if not cfg.itemFilter or not cfg.filterCollection then
+        return
+    end
+    if item.id and C_ToyBox_GetToyInfo(item.id) then
         return true
     end
+    return item.subClassID and collectionClassIDs[item.subClassID] == item.classID
+end
 
-    if item.quality == 0 then
-        itemClass[item.id] = "Junk"
-        return true
+local function isAnimaItem(item)
+    if not cfg.itemFilter or not cfg.filterAnima then
+        return
+    end
+    if not item.id then
+        return
+    end
+    return C_Item_IsAnimaItemByID(item.id)
+end
+
+local CREST_SPELL_ID = 404861
+local function isPrimordialStone(item)
+    if not cfg.itemFilter or not cfg.filterStone then
+        return
+    end
+    if not item.link then
+        return
+    end
+    local spellName = C_Spell.GetSpellName(CREST_SPELL_ID)
+    return item.subType and spellName and item.subType == spellName
+end
+
+local function isWarboundUntilEquipped(item)
+    if not cfg.itemFilter or not cfg.filterAOE then
+        return
+    end
+    return item.bindOn and item.bindOn == "accountequip"
+end
+
+local function isItemCustom(item, index)
+    if not cfg.itemFilter then
+        return
+    end
+    return module.customItems and module.customItems[item.id] == index
+end
+
+local function hasReagentBagSlots()
+    return C_Container.GetContainerNumSlots(5) > 0
+end
+
+------------------------------------------------------------------------
+-- GetFilters
+------------------------------------------------------------------------
+
+function module:GetFilters()
+    local filters = {}
+
+    -- Bag filters
+    filters.onlyBags = function(item)
+        return isItemInBag(item) and not isEmptySlot(item)
     end
 
-    if item.type then
-        if item.type == L.BAG_ARMOR or item.type == L.BAG_WEAPON then
-            itemClass[item.id] = "Armor"
-            return true
-        elseif item.type == L.BAG_GEM then
-            itemClass[item.id] = "Gem"
-            return true
-        elseif item.type == L.BAG_QUEST then
-            itemClass[item.id] = "Quest"
-            return true
-        elseif item.type == L.BAG_TRADES then
-            itemClass[item.id] = "TradeGoods"
-            return true
-        elseif item.type == L.BAG_CONSUMABLES then
-            itemClass[item.id] = "Consumables"
-            return true
-        elseif item.type == L.BAG_BATTLEPET then
-            itemClass[item.id] = "BattlePet"
-            return true
+    for i = 1, 5 do
+        filters["bagCustom" .. i] = function(item)
+            return (isItemInBag(item) or isItemInBagReagent(item)) and isItemCustom(item, i)
         end
     end
 
-    itemClass[item.id] = "NoClass"
-end
+    filters.onlyBagReagent = function(item)
+        return (isItemInBagReagent(item) and not isEmptySlot(item)) or (hasReagentBagSlots() and isItemInBag(item) and isTradeGoods(item))
+    end
 
-------------------------------------------------------------------------
--- New Items Filter
-------------------------------------------------------------------------
+    filters.bagAzeriteItem = function(item)
+        return isItemInBag(item) and isAzeriteArmor(item)
+    end
+    filters.bagEquipment = function(item)
+        return isItemInBag(item) and isItemEquipment(item)
+    end
+    filters.bagEquipSet = function(item)
+        return isItemInBag(item) and isItemEquipSet(item)
+    end
+    filters.bagAOE = function(item)
+        return isItemInBag(item) and isWarboundUntilEquipped(item)
+    end
+    filters.bagCollection = function(item)
+        return isItemInBag(item) and isItemCollection(item)
+    end
+    filters.bagDecor = function(item)
+        return isItemInBag(item) and isItemDecor(item)
+    end
+    filters.bagGoods = function(item)
+        return isItemInBag(item) and isTradeGoods(item)
+    end
+    filters.bagAnima = function(item)
+        return isItemInBag(item) and isAnimaItem(item)
+    end
+    filters.bagStone = function(item)
+        return isItemInBag(item) and isPrimordialStone(item)
+    end
+    filters.bagConsumable = function(item)
+        return isItemInBag(item) and isItemConsumable(item)
+    end
+    filters.bagQuest = function(item)
+        return isItemInBag(item) and isQuestItem(item)
+    end
+    filters.bagLegacy = function(item)
+        return isItemInBag(item) and isItemLegacy(item)
+    end
+    filters.bagLower = function(item)
+        return isItemInBag(item) and isItemLowerLevel(item)
+    end
+    filters.bagsJunk = function(item)
+        return isItemInBag(item) and isItemJunk(item)
+    end
 
-filters.fNewItems = function(item)
-    if not module.opts.NewItems then
-        return false
+    -- Bank filters
+    filters.onlyBank = function(item)
+        return isItemInBank(item) and not isEmptySlot(item)
     end
-    if not (item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS) then
-        return false
-    end
-    if not item.link then
-        return false
-    end
-    local knownItems = module.knownItems
-    if not knownItems then
-        return false
-    end
-    if not knownItems[item.id] then
-        return true
-    end
-    local t = GetItemCount(item.id)
-    return t > knownItems[item.id]
-end
 
-------------------------------------------------------------------------
--- Item Set Filter
-------------------------------------------------------------------------
+    for i = 1, 5 do
+        filters["bankCustom" .. i] = function(item)
+            return isItemInBank(item) and isItemCustom(item, i)
+        end
+    end
 
-filters.fItemSets = function(item)
-    if not filterEnabled["ItemSets"] then
-        return false
+    filters.bankAzeriteItem = function(item)
+        return isItemInBank(item) and isAzeriteArmor(item)
     end
-    if not item.link then
-        return false
+    filters.bankEquipment = function(item)
+        return isItemInBank(item) and isItemEquipment(item)
     end
-    return item.isInSet or false
+    filters.bankEquipSet = function(item)
+        return isItemInBank(item) and isItemEquipSet(item)
+    end
+    filters.bankAOE = function(item)
+        return isItemInBank(item) and isWarboundUntilEquipped(item)
+    end
+    filters.bankCollection = function(item)
+        return isItemInBank(item) and isItemCollection(item)
+    end
+    filters.bankDecor = function(item)
+        return isItemInBank(item) and isItemDecor(item)
+    end
+    filters.bankGoods = function(item)
+        return isItemInBank(item) and isTradeGoods(item)
+    end
+    filters.bankAnima = function(item)
+        return isItemInBank(item) and isAnimaItem(item)
+    end
+    filters.bankConsumable = function(item)
+        return isItemInBank(item) and isItemConsumable(item)
+    end
+    filters.bankQuest = function(item)
+        return isItemInBank(item) and isQuestItem(item)
+    end
+    filters.bankLegacy = function(item)
+        return isItemInBank(item) and isItemLegacy(item)
+    end
+    filters.bankLower = function(item)
+        return isItemInBank(item) and isItemLowerLevel(item)
+    end
+    filters.bankJunk = function(item)
+        return isItemInBank(item) and isItemJunk(item)
+    end
+
+    -- Account bank filters
+    filters.accountBank = function(item)
+        return isItemInAccountBank(item) and not isEmptySlot(item)
+    end
+
+    for i = 1, 5 do
+        filters["accountCustom" .. i] = function(item)
+            return isItemInAccountBank(item) and isItemCustom(item, i)
+        end
+    end
+
+    filters.accountEquipment = function(item)
+        return isItemInAccountBank(item) and isItemEquipment(item)
+    end
+    filters.accountAOE = function(item)
+        return isItemInAccountBank(item) and isWarboundUntilEquipped(item)
+    end
+    filters.accountGoods = function(item)
+        return isItemInAccountBank(item) and isTradeGoods(item)
+    end
+    filters.accountConsumable = function(item)
+        return isItemInAccountBank(item) and isItemConsumable(item)
+    end
+    filters.accountLegacy = function(item)
+        return isItemInAccountBank(item) and isItemLegacy(item)
+    end
+
+    return filters
 end
