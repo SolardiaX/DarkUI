@@ -122,7 +122,7 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
         cb:SetPoint("TOPLEFT", CONTENT_PADDING, -offset)
     end
     cb:SetChecked(DB:Get(dbPath) and true or false)
-    E:ReskinCheckBox(cb)
+    E:StyleCheckBox(cb)
 
     cb:SetScript("OnClick", function(self)
         DB:Set(dbPath, self:GetChecked())
@@ -469,7 +469,7 @@ local function createPanel()
 
     -- Close (X) button
     local closeX = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
-    E:ReskinCloseButton(closeX, panel)
+    E:StyleCloseButton(closeX, panel)
     closeX:SetScript("OnClick", function()
         addon:Hide()
     end)
@@ -498,7 +498,7 @@ local function createPanel()
     local globalCB = CreateFrame("CheckButton", nil, panel, "InterfaceOptionsCheckButtonTemplate")
     globalCB:SetPoint("BOTTOMLEFT", 20, 15)
     globalCB:SetChecked(DB:IsGlobal())
-    E:ReskinCheckBox(globalCB)
+    E:StyleCheckBox(globalCB)
     globalCB:SetScript("OnClick", function(self)
         DB:SetUseGlobal(self:GetChecked())
         needReload = true
