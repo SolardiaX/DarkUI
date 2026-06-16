@@ -42,6 +42,7 @@ local config = {
         border_thin = path .. "tex_border_thin",
         border_regular = path .. "tex_border_regular",
         border_bold = path .. "tex_border_bold",
+        border_bolder = path .. "tex_border_bolder",
         status = path .. "tex_status",
         status_f = path .. "tex_status_f",
         status_s = path .. "tex_status_s",

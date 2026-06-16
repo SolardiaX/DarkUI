@@ -401,14 +401,11 @@ C.tooltip = {
     hide_combat = false,
     hideforactionbar = false,
     health_value = true,
-    target = true,
     title = true,
     realm = true,
     rank = true,
     raid_icon = true,
-    who_targetting = true,
     achievements = true,
-    item_transmogrify = true,
     instance_lock = true,
     item_count = true,
     item_icon = true,
@@ -417,6 +414,8 @@ C.tooltip = {
     talents = true,
     mount = true,
     unit_role = true,
+    unit_target = true,
+    mythic_score = true,
 }
 
 ----------------------------------------------------------------------------------------

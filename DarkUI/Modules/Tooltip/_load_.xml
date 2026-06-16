@@ -12,6 +12,9 @@
     <Script file="ItemIcons.lua" />
     <Script file="MountSource.lua" />
     <Script file="MultiItemRef.lua" />
+    <Script file="MythicScore.lua" />
+    <Script file="RaidIcon.lua" />
     <Script file="SpellID.lua" />
     <Script file="UnitRole.lua" />
+    <Script file="UnitTarget.lua" />
 </Ui>

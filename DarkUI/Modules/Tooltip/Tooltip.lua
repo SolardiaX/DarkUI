@@ -9,22 +9,19 @@ local cfg = C.tooltip
 
 local _G = _G
 local CreateFrame = CreateFrame
-local select, unpack, wipe = select, unpack, wipe
+local select, unpack = select, unpack
 local hooksecurefunc = hooksecurefunc
 
 local UnitFactionGroup = UnitFactionGroup
-local UnitIsAFK, UnitIsDND, UnitSex = UnitIsAFK, UnitIsDND, UnitSex
+local UnitIsAFK, UnitIsDND = UnitIsAFK, UnitIsDND
 local InCombatLockdown, IsShiftKeyDown = InCombatLockdown, IsShiftKeyDown
 local GetCreatureDifficultyColor = GetCreatureDifficultyColor
-local GetRaidTargetIndex, GetGuildInfo = GetRaidTargetIndex, GetGuildInfo
-local GetNumSubgroupMembers, GetNumGroupMembers = GetNumSubgroupMembers, GetNumGroupMembers
+local GetGuildInfo = GetGuildInfo
 local UnitCreatureType, UnitClassification = UnitCreatureType, UnitClassification
 local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
 local UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel = UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel
 local UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction = UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction
-local UnitHealth = UnitHealth
 local UnitIsInMyGuild, UnitExists = UnitIsInMyGuild, UnitExists
-local UnitIsEnemy, UnitIsFriend = UnitIsEnemy, UnitIsFriend
 local GetCVar = GetCVar
 
 local C_PetBattles_GetNumAuras = C_PetBattles.GetNumAuras
@@ -33,15 +30,37 @@ local C_PetBattles_GetAuraInfo = C_PetBattles.GetAuraInfo
 local LEVEL, FACTION_HORDE, FACTION_ALLIANCE = LEVEL, FACTION_HORDE, FACTION_ALLIANCE
 local UNKNOWN, RANK, PVP_ENABLED = UNKNOWN, RANK, PVP_ENABLED
 local RAID_CLASS_COLORS, CUSTOM_CLASS_COLORS = RAID_CLASS_COLORS, CUSTOM_CLASS_COLORS
-local LOCALIZED_CLASS_NAMES_MALE = LOCALIZED_CLASS_NAMES_MALE
-local LOCALIZED_CLASS_NAMES_FEMALE = LOCALIZED_CLASS_NAMES_FEMALE
 local ENCOUNTER_JOURNAL_ENCOUNTER = ENCOUNTER_JOURNAL_ENCOUNTER
 local FRIENDS_LIST_REALM = FRIENDS_LIST_REALM
-local STATUS_TEXT_TARGET, UNIT_YOU = STATUS_TEXT_TARGET, UNIT_YOU
+
+local LEVEL_PATTERN = strlower(TOOLTIP_UNIT_LEVEL:gsub("%%s", ""))
+
+local function getLevelLine(tooltip)
+    for i = 2, tooltip:NumLines() do
+        local line = _G["GameTooltipTextLeft" .. i]
+        if not line then break end
+        local text = line:GetText()
+        if not text or not canaccessvalue(text) then break end
+        if strfind(strlower(text), LEVEL_PATTERN) then
+            return line, i
+        end
+    end
+end
 
 ------------------------------------------------------------------------
 -- Tooltip lists
 ------------------------------------------------------------------------
+module.InfoColor = "|cff99ccff"
+
+module.whiteTooltips = {
+    [GameTooltip] = true,
+    [ItemRefTooltip] = true,
+    [ItemRefShoppingTooltip1] = true,
+    [ItemRefShoppingTooltip2] = true,
+    [ShoppingTooltip1] = true,
+    [ShoppingTooltip2] = true,
+}
+
 local defaultTooltips = {
     GameTooltip,
     EmbeddedItemTooltip,
@@ -88,24 +107,20 @@ local function styleTooltip(tip)
 
             tt:DisableDrawLayer("BACKGROUND")
 
-            tt:CreateBackdrop("Default", 10, true)
-            tt.__backdrop:SetBackdropEdge("bold")
+            tt:CreateBackdrop("default", 2, true)
+            tt.__backdrop:CreateGradient()
+            tt.__backdrop:CreateShadow()
+            tt.__backdrop:SetBackdropEdge("regular")
+
+            local header = tt.CompareHeader
+            if header then
+                header:StripTextures()
+                header:CreateBackdrop("default")
+                header.__backdrop:CreateGradient()
+                header.__backdrop:SetBackdropEdge("pixel", 2)
+            end
 
             tt.styled = true
-        end
-
-        local frameName = tt:GetName()
-        if not frameName then return end
-
-        if tt.shopping and not tt.ftipFontSet then
-            _G[frameName .. "TextLeft1"]:SetFontObject(GameTooltipTextSmall)
-            _G[frameName .. "TextRight1"]:SetFontObject(GameTooltipText)
-            _G[frameName .. "TextLeft2"]:SetFontObject(GameTooltipHeaderText)
-            _G[frameName .. "TextRight2"]:SetFontObject(GameTooltipTextSmall)
-            _G[frameName .. "TextLeft3"]:SetFontObject(GameTooltipTextSmall)
-            _G[frameName .. "TextRight3"]:SetFontObject(GameTooltipTextSmall)
-
-            tt.ftipFontSet = true
         end
     end)
 end
@@ -198,7 +213,7 @@ local function onTooltipSetUnit(self)
         elseif UnitIsDND(unit) then
             self:AppendText((" %s"):format("|cffFF0000" .. L.CHAT_DND .. "|r"))
         end
-        if englishRace and (englishRace == "Pandaren" or englishRace == "Dracthyr" or englishRace == "EarthenDwarf") and faction ~= nil and faction ~= playerFaction then
+        if englishRace and (englishRace == "Pandaren" or englishRace == "Dracthyr" or englishRace == "EarthenDwarf" or englishRace == "Harronir") and faction ~= nil and faction ~= playerFaction then
             local hex = "cffff3333"
             if faction == "Alliance" then
                 hex = "cff69ccf0"
@@ -219,31 +234,13 @@ local function onTooltipSetUnit(self)
             end
         end
 
-        local n = guildName and 3 or 2
-        if GetCVar("colorblindMode") == "1" then
-            n = n + 1
-            local class = UnitClass(unit)
-            _G["GameTooltipTextLeft" .. n]:SetFormattedText("|cff%02x%02x%02x%s|r %s %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN, class or "")
-        else
-            _G["GameTooltipTextLeft" .. n]:SetFormattedText("|cff%02x%02x%02x%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN)
-        end
-
-        local unitRace = UnitRace(unit)
-        local _, unitClass = UnitClass(unit)
-        if UnitSex(unit) == 2 then
-            unitClass = LOCALIZED_CLASS_NAMES_MALE[unitClass]
-        else
-            unitClass = LOCALIZED_CLASS_NAMES_FEMALE[unitClass]
-        end
-
-        local pattern = ""
-        for i = 2, GameTooltip:NumLines() do
-            local line = _G["GameTooltipTextLeft" .. i]
-            local text = line and line:GetText()
-            if text and canaccessvalue(text) and text:find(unitRace) then
-                pattern = pattern .. " %s %s (%s)"
-                _G["GameTooltipTextLeft" .. i]:SetText((pattern):format(level, unitRace, unitClass):trim())
-                break
+        local levelLine = getLevelLine(self)
+        if levelLine then
+            if GetCVar("colorblindMode") == "1" then
+                local class = UnitClass(unit)
+                levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN, class or "")
+            else
+                levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN)
             end
         end
     else
@@ -268,34 +265,6 @@ local function onTooltipSetUnit(self)
         end
     end
 
-    if cfg.target and UnitExists(unit .. "target") then
-        local tr, tg, tb = getUnitColor(unit .. "target")
-
-        if UnitIsEnemy("player", unit .. "target") then
-            tr, tg, tb = unpack(C.oUF_colors.reaction[1])
-        elseif not UnitIsFriend("player", unit .. "target") then
-            tr, tg, tb = unpack(C.oUF_colors.reaction[4])
-        end
-
-        local text
-        if C_Secrets and C_Secrets.ShouldUnitComparisonBeSecret and not C_Secrets.ShouldUnitComparisonBeSecret("player", unit .. "target") and UnitIsUnit("player", unit .. "target") then
-            text = "|cfffed100" .. STATUS_TEXT_TARGET .. ":|r " .. "|cffff0000> " .. UNIT_YOU .. " <|r"
-        else
-            text = "|cfffed100" .. STATUS_TEXT_TARGET .. ":|r " .. UnitName(unit .. "target")
-        end
-
-        self:AddLine(text, tr, tg, tb)
-    end
-
-    if cfg.raid_icon then
-        local raidIndex = GetRaidTargetIndex(unit)
-        if raidIndex then
-            module.ricon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_" .. raidIndex)
-        else
-            module.ricon:SetTexture(0)
-        end
-    end
-
     -- Setup inline health bar
     if not UnitIsDeadOrGhost(unit) then
         local bar = GameTooltip.StatusBar
@@ -312,7 +281,7 @@ end
 local function skinItemTooltips()
     GameTooltip.ItemTooltip.Icon:SetTexCoord(unpack(C.media.texCoord))
 
-    GameTooltip.ItemTooltip.Icon:CreateBackdrop("Default")
+    GameTooltip.ItemTooltip.Icon:CreateBackdrop("default")
     local itemBD = GameTooltip.ItemTooltip.Icon.__backdrop
     itemBD:SetPoint("TOPLEFT", GameTooltip.ItemTooltip.Icon, "TOPLEFT", -2, 2)
     itemBD:SetPoint("BOTTOMRIGHT", GameTooltip.ItemTooltip.Icon, "BOTTOMRIGHT", 2, -2)
@@ -337,7 +306,7 @@ local function skinItemTooltips()
     local icon = reward.Icon
     if icon then
         icon:SetTexCoord(unpack(C.media.texCoord))
-        icon:CreateBackdrop("Default")
+        icon:CreateBackdrop("default")
         local rewardBD = icon.__backdrop
         rewardBD:SetPoint("TOPLEFT", icon, "TOPLEFT", -2, 2)
         rewardBD:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", 2, -2)
@@ -361,7 +330,7 @@ local function skinItemTooltips()
         local label = bar.Label
         if bar then
             bar:StripTextures()
-            bar:CreateBackdrop("Transparent")
+            bar:CreateBackdrop("transparent")
             bar.__backdrop:SetBackdropColor(0.1, 0.1, 0.1, 1)
             bar:SetStatusBarTexture(C.media.texture.status)
             label:ClearAllPoints()
@@ -372,36 +341,7 @@ local function skinItemTooltips()
     end)
 end
 
-local function skinCompareTooltips()
-    hooksecurefunc(TooltipComparisonManager, "AnchorShoppingTooltips", function(self, _, secondaryItemShown)
-        local tooltip = self.tooltip
-        local shoppingTooltip1 = tooltip.shoppingTooltips[1]
-        local shoppingTooltip2 = tooltip.shoppingTooltips[2]
-        local point = shoppingTooltip1:GetPoint(2)
-        if not canaccessvalue(point) then return end
-        if secondaryItemShown then
-            if point == "TOP" then
-                shoppingTooltip1:ClearAllPoints()
-                shoppingTooltip2:ClearAllPoints()
-                shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
-                shoppingTooltip2:SetPoint("TOPLEFT", shoppingTooltip1, "TOPRIGHT", 3, 0)
-            elseif point == "RIGHT" then
-                shoppingTooltip1:ClearAllPoints()
-                shoppingTooltip2:ClearAllPoints()
-                shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
-                shoppingTooltip2:SetPoint("TOPRIGHT", shoppingTooltip1, "TOPLEFT", -3, 0)
-            end
-        else
-            if point == "LEFT" then
-                shoppingTooltip1:ClearAllPoints()
-                shoppingTooltip1:SetPoint("TOPLEFT", self.anchorFrame, "TOPRIGHT", 3, -10)
-            elseif point == "RIGHT" then
-                shoppingTooltip1:ClearAllPoints()
-                shoppingTooltip1:SetPoint("TOPRIGHT", self.anchorFrame, "TOPLEFT", -3, -10)
-            end
-        end
-    end)
-
+local function fixTooltipMoney()
     -- WoW 12.0: money amounts are secret values, and Blizzard's MoneyFrame_Update
     -- does width arithmetic on them that crashes under addon taint (e.g. when our
     -- loot/tooltip code triggers GameTooltip:SetLootItem). Replace SetTooltipMoney
@@ -522,9 +462,22 @@ function module:OnInit()
         end
     end
 
+    -- Tooltip fonts
+    local font, fontSize, fontOutline = unpack(C.media.standard_font)
+    GameTooltipHeaderText:SetFont(font, fontSize, fontOutline)
+    GameTooltipText:SetFont(font, fontSize - 2, fontOutline)
+    GameTooltipTextSmall:SetFont(font, fontSize - 4, fontOutline)
+
     -- Skin item tooltips and hooks
     skinItemTooltips()
-    skinCompareTooltips()
+    fixTooltipMoney()
+
+    -- Re-apply our backdrop after Blizzard sets Azerite/Corrupted item styles
+    hooksecurefunc("SharedTooltip_SetBackdropStyle", function(tt)
+        if tt and not tt:IsForbidden() and tt.styled and tt.__backdrop then
+            tt.__backdrop:Show()
+        end
+    end)
 
     -- Anchor
     local anchor = CreateFrame("Frame", "DarkUI_TooltipAnchor", UIParent)
@@ -532,6 +485,14 @@ function module:OnInit()
     anchor:SetPoint(unpack(cfg.position))
 
     hooksecurefunc("GameTooltip_SetDefaultAnchor", function(tooltip, parent)
+        if cfg.hide_combat and InCombatLockdown() and not IsShiftKeyDown() then
+            tooltip:Hide()
+            return
+        end
+        if cfg.hideforactionbar and parent and parent.action and not IsShiftKeyDown() then
+            tooltip:Hide()
+            return
+        end
         if cfg.cursor then
             tooltip:SetOwner(parent, "ANCHOR_CURSOR_RIGHT", 20, 20)
         else
@@ -542,38 +503,13 @@ function module:OnInit()
         end
     end)
 
-    -- Raid icon
-    if cfg.raid_icon then
-        local ricon = GameTooltip:CreateTexture("GameTooltipRaidIcon", "OVERLAY")
-        ricon:SetSize(18, 18)
-        ricon:SetPoint("CENTER", GameTooltip, "TOP", 0, 0)
-        GameTooltip:HookScript("OnHide", function() ricon:SetTexture(nil) end)
-        module.ricon = ricon
-    end
-
     -- Shift modifier
     if cfg.shift_modifer then
-        GameTooltip:SetScript("OnShow", function(tt)
-            if IsShiftKeyDown() then
-                tt:Show()
-            else
-                if not HoverBind.enabled then
-                    tt:Hide()
-                end
-            end
-        end)
-    end
-
-    -- Hide action bar tooltips
-    if cfg.hideforactionbar then
-        local function combatHideTooltip(tt)
-            if not IsShiftKeyDown() then
+        GameTooltip:HookScript("OnShow", function(tt)
+            if not IsShiftKeyDown() and not (HoverBind and HoverBind.enabled) then
                 tt:Hide()
             end
-        end
-        hooksecurefunc(GameTooltip, "SetAction", combatHideTooltip)
-        hooksecurefunc(GameTooltip, "SetPetAction", combatHideTooltip)
-        hooksecurefunc(GameTooltip, "SetShapeshift", combatHideTooltip)
+        end)
     end
 
     -- Restyle native StatusBar
@@ -581,23 +517,28 @@ function module:OnInit()
     if statusBar then
         GameTooltipStatusBar:SetScript("OnValueChanged", nil)
         statusBar:ClearAllPoints()
-        statusBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 1, 5)
-        statusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", -1, 5)
+        statusBar:SetPoint("BOTTOMLEFT", GameTooltip, "TOPLEFT", 2, 8)
+        statusBar:SetPoint("BOTTOMRIGHT", GameTooltip, "TOPRIGHT", -2, 8)
         statusBar:SetStatusBarTexture(C.media.texture.status)
         statusBar:SetHeight(5)
 
-        statusBar:CreateBackdrop("Default", 2)
-        statusBar.__backdrop:SetBackdropEdge("thin")
+        statusBar:CreateBackdrop("default", 2)
+        statusBar.__backdrop:SetBackdropEdge("pixel")
 
-        statusBar.text = statusBar:CreateFontString(nil, "OVERLAY")
-        statusBar.text:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
-        statusBar.text:SetAllPoints()
-        statusBar.text:SetJustifyH("CENTER")
+        if cfg.health_value then
+            statusBar.text = statusBar:CreateFontString(nil, "OVERLAY")
+            statusBar.text:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
+            statusBar.text:SetAllPoints()
+            statusBar.text:SetJustifyH("CENTER")
+        end
 
         hooksecurefunc(statusBar, "UpdateUnitHealth", function(self)
             if not self.text then return end
-            local unit = select(2, GameTooltip:GetUnit())
-            if unit and canaccessvalue(unit) then
+            local data = GameTooltip:GetTooltipData()
+            local guid = data and data.guid
+            local unit = guid and canaccessvalue(guid) and UnitTokenFromGUID(guid)
+            if not unit then unit = UnitExists("mouseover") and "mouseover" end
+            if unit then
                 local ok, value = pcall(UnitHealth, unit)
                 if ok and value then
                     self.text:SetText(E:AbbreviateNumber(value))
@@ -628,8 +569,9 @@ function module:OnInit()
         if menuBackdrops[menuFrame] then
             menuFrame.__backdrop = menuBackdrops[menuFrame]
         else
-            menuFrame:CreateBackdrop("Default", 10, true)
-            menuFrame.__backdrop:SetBackdropEdge("bold")
+            menuFrame:CreateBackdrop("Default", 8, true)
+            menuFrame.__backdrop:CreateShadow()
+            menuFrame.__backdrop:SetBackdropEdge("regular")
                 
             menuBackdrops[menuFrame] = menuFrame.__backdrop
         end

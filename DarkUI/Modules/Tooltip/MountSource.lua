@@ -20,8 +20,9 @@ local function onSetUnitBuff(self, ...)
     if not UnitIsPlayer(...) or UnitIsUnit(..., "player") then return end
     local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
     local id = aura and aura.spellId
+    if not id or issecretvalue(id) then return end
 
-    if id and MountCache[id] then
+    if MountCache[id] then
         local text = NOT_COLLECTED
         local r, g, b = 1, 0, 0
         local collected = select(11, C_MountJournal.GetMountInfoByID(MountCache[id]))
