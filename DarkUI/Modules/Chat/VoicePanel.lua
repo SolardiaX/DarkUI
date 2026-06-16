@@ -67,7 +67,7 @@ local function setupQuickJoin(button)
     hooksecurefunc(BNToastFrame, "ShowToast", function(self)
         if not self.IsSkinned then
             self.CloseButton:SetSize(16, 16)
-            E:ReskinCloseButton(self.CloseButton, self)
+            E:StyleCloseButton(self.CloseButton, self)
             self.IsSkinned = true
         end
     end)

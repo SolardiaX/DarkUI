@@ -53,7 +53,7 @@ local function createCopyFrame()
 
     local close = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -2, -2)
-    E:ReskinCloseButton(close)
+    E:StyleCloseButton(close)
 
     fontString = frame:CreateFontString(nil, nil, "GameFontNormal")
     fontString:Hide()

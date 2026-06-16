@@ -126,41 +126,44 @@ local function setChatStyle(frame)
         lang:GetRegions():SetAlpha(0)
         lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 5, 0)
         lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 29, 0)
-        E:ApplyBackdrop(lang, true)
+        E:StyleFrame(lang, true)
     end
 
-    if cfg.background == true and cfg.tabs_mouseover ~= true then
-        local editBoxBg = CreateFrame("Frame", nil, _G[chat .. "EditBox"], "BackdropTemplate")
+    if cfg.editbox_color == true then
+        local editBoxBg = CreateFrame("Frame", nil, _G[chat .. "EditBox"])
         editBoxBg:SetPoint("TOPLEFT", _G[chat .. "EditBox"], "TOPLEFT", 7, -5)
         editBoxBg:SetPoint("BOTTOMRIGHT", _G[chat .. "EditBox"], "BOTTOMRIGHT", -7, 4)
         editBoxBg:SetFrameStrata("LOW")
         editBoxBg:SetFrameLevel(1)
-        E:ApplyBackdrop(editBoxBg, true)
+        editBoxBg:SetTemplate("default")
 
         local function colorize(r, g, b)
-            if editBoxBg.__backdrop then
-                editBoxBg.__backdrop:SetBackdropBorderColor(r, g, b)
+            if editBoxBg then
+                editBoxBg:SetBackdropBorderColor(r, g, b)
             end
         end
 
-        hooksecurefunc("ChatEdit_UpdateHeader", function()
-            local chatType = _G[chat .. "EditBox"]:GetAttribute("chatType")
-            if not chatType then
-                return
-            end
-
-            local chanTarget = _G[chat .. "EditBox"]:GetAttribute("channelTarget")
-            local chanName = chanTarget and GetChannelName(chanTarget)
-            if chanName and chatType == "CHANNEL" then
-                if chanName == 0 then
-                    colorize(unpack(C.media.border_color))
-                else
-                    colorize(ChatTypeInfo[chatType .. chanName].r, ChatTypeInfo[chatType .. chanName].g, ChatTypeInfo[chatType .. chanName].b)
+        local eb = _G[chat .. "EditBox"]
+        if eb.UpdateHeader then
+            hooksecurefunc(eb, "UpdateHeader", function(self)
+                local chatType = self:GetAttribute("chatType")
+                if not chatType then
+                    return
                 end
-            else
-                colorize(ChatTypeInfo[chatType].r, ChatTypeInfo[chatType].g, ChatTypeInfo[chatType].b)
-            end
-        end)
+
+                local chanTarget = self:GetAttribute("channelTarget")
+                local chanName = chanTarget and GetChannelName(chanTarget)
+                if chanName and chatType == "CHANNEL" then
+                    if chanName == 0 then
+                        colorize(unpack(C.media.border_color))
+                    else
+                        colorize(ChatTypeInfo[chatType .. chanName].r, ChatTypeInfo[chatType .. chanName].g, ChatTypeInfo[chatType .. chanName].b)
+                    end
+                else
+                    colorize(ChatTypeInfo[chatType].r, ChatTypeInfo[chatType].g, ChatTypeInfo[chatType].b)
+                end
+            end)
+        end
     end
 
     if _G[chat] == _G["ChatFrame2"] then
@@ -170,7 +173,7 @@ local function setChatStyle(frame)
             CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("TOPLEFT", 1, -4)
             CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
 
-            E:ReskinCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.__backdrop)
+            E:StyleCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.__backdrop)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetSize(12, 12)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetHitRectInsets(0, 0, 0, 0)
 
@@ -391,8 +394,8 @@ function module:OnEnable()
         isScaling = true
 
         ChatFrame1:ClearAllPoints()
-        -- ChatFrame1:SetSize(cfg.width, cfg.height)
-        if cfg.background then
+        ChatFrame1:SetHeight(120)
+        if cfg.editbox_color then
             ChatFrame1:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5] + 4)
         else
             ChatFrame1:SetPoint(cfg.pos[1], cfg.pos[2], cfg.pos[3], cfg.pos[4], cfg.pos[5])

@@ -19,7 +19,8 @@ local function reskinChatBubble(chatbubble)
         return
     end
 
-    E:ApplyBackdrop(frame, true)
+    frame:CreateBackdrop("default", 16)
+    frame.__backdrop:SetBackdropEdge("bolder")
 
     if frame.backdrop then
         frame.backdrop:SetScale(UIParent:GetEffectiveScale())
