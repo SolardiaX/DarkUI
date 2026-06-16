@@ -15,7 +15,7 @@ local GetRealZoneText = GetRealZoneText
 local GetQuestDifficultyColor = GetQuestDifficultyColor
 local GetNumGuildMembers = GetNumGuildMembers
 local GetGuildInfo = GetGuildInfo
-local GetGuildRosterInfo, GetGuildRosterMOTD = GetGuildRosterInfo, GetGuildRosterMOTD
+local GetGuildRosterInfo = GetGuildRosterInfo
 local SetItemRef = SetItemRef
 local ToggleGuildFrame = ToggleGuildFrame
 local UnitInParty, UnitInRaid = UnitInParty, UnitInRaid
@@ -76,8 +76,16 @@ module:Inject("Guild", {
         SortGuildRoster(cfg.sorting)
         self:RegisterEvent("GROUP_ROSTER_UPDATE")
         self:RegisterEvent("GUILD_ROSTER_UPDATE")
+        self:RegisterEvent("GUILD_MOTD")
     end,
-    OnEvent = function(self)
+    OnEvent = function(self, event, arg1)
+        if event == "GUILD_MOTD" then
+            self.gmotd = arg1 or ""
+            if self.hovered then
+                self:GetScript("OnEnter")(self)
+            end
+            return
+        end
         if self.hovered then
             self:GetScript("OnEnter")(self)
         end
@@ -88,19 +96,6 @@ module:Inject("Guild", {
     OnUpdate = function(self, u)
         if IsInGuild() then
             module:AltUpdate(self)
-            if not self.gmotd then
-                if self.elapsed > 1 then
-                    C_GuildInfo_GuildRoster()
-                    self.elapsed = 0
-                end
-                if GetGuildRosterMOTD() ~= "" then
-                    self.gmotd = true
-                    if self.hovered then
-                        self:GetScript("OnEnter")(self)
-                    end
-                end
-                self.elapsed = self.elapsed + u
-            end
         end
     end,
     OnClick = function(self, b)
@@ -186,7 +181,7 @@ module:Inject("Guild", {
             C_GuildInfo_GuildRoster()
             local name, rank, level, zone, note, officernote, connected, status, class, isMobile, zone_r, zone_g, zone_b, classc, levelc, grouped
             local total, numOnline, allOnline = GetNumGuildMembers()
-            local gmotd = GetGuildRosterMOTD()
+            local gmotd = self.gmotd or ""
             local online = allOnline or numOnline
 
             GameTooltip:SetOwner(self, "ANCHOR_NONE")
