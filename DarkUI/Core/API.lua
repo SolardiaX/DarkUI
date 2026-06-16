@@ -60,7 +60,7 @@ local BACKDROP = {
 local EDGE = {
 	pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
 	blur = { edgeFile = C.media.texture.shadow, edgeSize = Mult, insets = Mult },
-	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 2, insets = 0 },
+	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 8, insets = 4 },
 	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, insets = 2 },
 	bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, insets = 8, borderColor = { 1, 1, 1, 1 } },
 	bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, insets = { left = 8, right = 8, top = 16, bottom = 16 }, borderColor = { 1, 1, 1, 1 } }
@@ -68,7 +68,7 @@ local EDGE = {
 
 local EFFECT = {
 	shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4, borderColor = C.media.shadow_color },
-	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 2, margin = Mult, borderColor = C.media.border_color },
+	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, margin = 4 },
 	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult, borderColor = C.media.border_color },
 	bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, margin = 8 },
 	bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, margin = { left = 8, right = 8, top = 16, bottom = 16 } },

@@ -39,7 +39,7 @@ local config = {
 
     texture = {
         overlay = path .. "tex_overlay",
-        border_thin = path .. "tex_border_thin",
+        border_thin = path .. "Tooltip_Small",
         border_regular = path .. "tex_border_regular",
         border_bold = path .. "tex_border_bold",
         border_bolder = path .. "tex_border_bolder",
