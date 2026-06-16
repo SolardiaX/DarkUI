@@ -177,7 +177,7 @@ local function createTemplatePreview()
     end
 
     -- Row 2: EDGE types
-    local edges = { "pixel", "blur", "thin", "regular", "bold" }
+    local edges = { "pixel", "blur", "thin", "regular", "bold", "bolder" }
     startX = -(#edges - 1) * 50
 
     for i, edge in ipairs(edges) do
@@ -192,10 +192,25 @@ local function createTemplatePreview()
         frames[#frames + 1] = box
     end
 
-    -- Row 3: EFFECT (CreateShadow / CreateBorder) + CreateOverlay
+    -- Row 3: EFFECT — CreateBorder types
+    local borders = { "thin", "regular", "bold", "bolder" }
+    startX = -(#borders - 1) * 50
+
+    for i, t in ipairs(borders) do
+        local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+        box:SetSize(48, 48)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 50)
+        box:SetFrameStrata("DIALOG")
+        box:SetTemplate("Default")
+        box:CreateBorder(t)
+        box:CreateFontText(10, "Border: " .. t, false, "TOP", 0, 13)
+        box:Hide()
+        frames[#frames + 1] = box
+    end
+
+    -- Row 4: Other decorations
     local effects = {
         { label = "CreateShadow", fn = function(box) box:CreateShadow() end },
-        { label = "CreateBorder", fn = function(box) box:CreateBorder() end },
         { label = "Shadow+Border", fn = function(box) box:CreateShadow(); box:CreateBorder() end },
         { label = "CreateOverlay", fn = function(box) box:CreateOverlay(4) end },
         { label = "CreateGradient", fn = function(box) box:CreateGradient() end },
@@ -205,7 +220,7 @@ local function createTemplatePreview()
     for i, demo in ipairs(effects) do
         local box = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
         box:SetSize(48, 48)
-        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, 50)
+        box:SetPoint("CENTER", UIParent, startX + (i - 1) * 100, -50)
         box:SetFrameStrata("DIALOG")
         box:SetTemplate("Default")
         demo.fn(box)

@@ -67,8 +67,11 @@ local EDGE = {
 }
 
 local EFFECT = {
-	shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4 },
-	border = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult },
+	shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4, borderColor = C.media.shadow_color },
+	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 2, margin = Mult, borderColor = C.media.border_color },
+	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult, borderColor = C.media.border_color },
+	bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, margin = 8 },
+	bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, margin = { left = 8, right = 8, top = 16, bottom = 16 } },
 }
 
 ------------------------------------------------------------------------
@@ -343,16 +346,18 @@ local function createShadow(f, margin)
 	child:SetOutside(f, margin, margin)
 	child:SetFrameLevel(0)
 	child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
-	child:SetBackdropBorderColor(unpack(C.media.shadow_color))
+	if cfg.borderColor then
+		child:SetBackdropBorderColor(unpack(cfg.borderColor))
+	end
 
 	f.__shadow = child
 	return child
 end
 
-local function createBorder(f, margin)
+local function createBorder(f, t, margin)
 	if f.__border then return f.__border end
 
-	local cfg = EFFECT.border
+	local cfg = EFFECT[t] or EFFECT.regular
 	margin = margin or cfg.margin
 
 	local frame = f
@@ -363,10 +368,17 @@ local function createBorder(f, margin)
 	local lvl = frame:GetFrameLevel()
 
 	local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
-	child:SetOutside(f, margin, margin)
+	if type(margin) == "table" then
+		child:SetPoint("TOPLEFT", f, "TOPLEFT", -(margin.left or 0), margin.top or 0)
+		child:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", margin.right or 0, -(margin.bottom or 0))
+	else
+		child:SetOutside(f, margin, margin)
+	end
 	child:SetFrameLevel(lvl + 1)
 	child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
-	child:SetBackdropBorderColor(unpack(C.media.border_color))
+	if cfg.borderColor then
+		child:SetBackdropBorderColor(unpack(cfg.borderColor))
+	end
 
 	f.__border = child
 	return child
