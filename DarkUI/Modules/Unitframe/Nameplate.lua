@@ -36,22 +36,6 @@ local cfg = C.nameplate
 local bar_border
 local arrow
 
-local CastbarInterruptibleColor = CreateColor(1, 0.8, 0)
-local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
-
-local function castColorUpdateInterruptible(self)
-    if self.notInterruptible then
-        core.SetCastbarNotInterruptible(self)
-    else
-        core.SetCastbarInterruptible(self)
-    end
-    local r, g, b = self:GetStatusBarColor()
-    self.bg:SetColorTexture(r, g, b, 0.2)
-end
-
-local function castColorUpdateStart(self)
-    self:GetStatusBarTexture():SetVertexColorFromBoolean(self.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor)
-end
 
 local function createBorderFrame(frame, point)
     if point == nil then
@@ -499,7 +483,7 @@ local function style(self, unit)
     self.Castbar = CreateFrame("StatusBar", nil, self)
     self.Castbar:SetFrameLevel(3)
     self.Castbar:SetStatusBarTexture(C.media.texture.status)
-    self.Castbar:SetStatusBarColor(1, 0.8, 0)
+    self.Castbar:SetStatusBarColor(0.11, 0.58, 0.89)
     self.Castbar:SetPoint("TOPLEFT", self.Health, "BOTTOMLEFT", -4, -8)
     self.Castbar:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMRIGHT", 4, -8 - cfg.height)
     self.Castbar:CreateShadow()
@@ -508,13 +492,19 @@ local function style(self, unit)
     self.Castbar.bg = self.Castbar:CreateTexture(nil, "BORDER")
     self.Castbar.bg:SetAllPoints()
     self.Castbar.bg:SetTexture(C.media.texture.status_bg)
-    self.Castbar.bg:SetColorTexture(1, 0.8, 0, 0.2)
+    self.Castbar.bg:SetColorTexture(0.11, 0.58, 0.89, 0.2)
 
     self.Castbar.PostCastStart = function(cb, unit)
         castColor(cb)
-        castColorUpdateStart(cb)
+        core.PostCastStart(cb, unit)
+        local r, g, b = cb:GetStatusBarColor()
+        cb.bg:SetColorTexture(r, g, b, 0.2)
     end
-    self.Castbar.PostCastInterruptible = castColorUpdateInterruptible
+    self.Castbar.PostCastInterruptible = function(cb)
+        core.PostCastInterruptible(cb)
+        local r, g, b = cb:GetStatusBarColor()
+        cb.bg:SetColorTexture(r, g, b, 0.2)
+    end
 
     -- Create Cast Time Text
     self.Castbar.Time = self.Castbar:CreateFontString(nil, "ARTWORK")
