@@ -351,7 +351,7 @@ function MyContainer:OnCreate(name, settings)
     background:SetFrameLevel(1)
     background:SetPoint("TOPLEFT", -4, 4)
     background:SetPoint("BOTTOMRIGHT", 4, -4)
-    E:ApplyBackdrop(background, false)
+    E:StyleFrame(background, { border = "thin" })
 
     -- Caption
     local caption = background:CreateFontString(nil, "OVERLAY", nil)
@@ -380,9 +380,9 @@ function MyContainer:OnCreate(name, settings)
         end)
     end
 
-    if tBag or tBank then
-        local tS = tBag and "backpack+bags" or "bank"
-        local tI = tBag and 5 or 7
+    if tBag then
+        local tS = "backpack+bags"
+        local tI = 5
 
         local bagButtons = self:SpawnPlugin("BagBar", tS)
         bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))
@@ -390,11 +390,11 @@ function MyContainer:OnCreate(name, settings)
             button:SetAlpha(match and 1 or 0.1)
         end
         bagButtons.isGlobal = true
-        bagButtons:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, tBag and 32 or 20)
+        bagButtons:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
         bagButtons:Hide()
         self.BagBar = bagButtons
 
-        self.bagToggle = createIconButton("Bags", self, Textures.BagToggle, "BOTTOMRIGHT", L.BAG_HINT_TOGGLE, tBag)
+        self.bagToggle = createIconButton("Bags", self, Textures.BagToggle, "BOTTOMRIGHT", L.BAG_HINT_TOGGLE, true)
         self.bagToggle:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
         self.bagToggle:SetScript("OnClick", function()
             if self.BagBar:IsShown() then
@@ -405,8 +405,8 @@ function MyContainer:OnCreate(name, settings)
             self:UpdateDimensions()
         end)
 
-        if tBag and module.opts.NewItems then
-            self.resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, "BOTTOMRIGHT", L.BAG_HINT_RESET_NEW, tBag)
+        if module.opts.NewItems then
+            self.resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, "BOTTOMRIGHT", L.BAG_HINT_RESET_NEW, true)
             self.resetBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
             self.resetBtn:SetScript("OnClick", function()
                 resetNewItems()
@@ -414,7 +414,7 @@ function MyContainer:OnCreate(name, settings)
         end
 
         if module.opts.Restack then
-            self.restackBtn = createIconButton("Restack", self, Textures.Restack, "BOTTOMRIGHT", L.BAG_HINT_RESTACK, tBag)
+            self.restackBtn = createIconButton("Restack", self, Textures.Restack, "BOTTOMRIGHT", L.BAG_HINT_RESTACK, true)
             if self.resetBtn then
                 self.restackBtn:SetPoint("BOTTOMRIGHT", self.resetBtn, "BOTTOMLEFT", 0, 0)
             else
@@ -425,32 +425,66 @@ function MyContainer:OnCreate(name, settings)
             end)
         end
 
-        if tBank then
-            self.reagentBtn = createIconButton("Deposit", self, Textures.Deposit, "BOTTOMRIGHT", REAGENTBANK_DEPOSIT, tBag)
-            if self.restackBtn then
-                self.reagentBtn:SetPoint("BOTTOMRIGHT", self.restackBtn, "BOTTOMLEFT", 0, 0)
+        local btnTable = { self.bagToggle }
+        if self.restackBtn then
+            tinsert(btnTable, self.restackBtn)
+        end
+        if self.resetBtn then
+            tinsert(btnTable, self.resetBtn)
+        end
+        local ttPos = -(#btnTable * 24 + 16)
+        for _, v in pairs(btnTable) do
+            v.tooltip:ClearAllPoints()
+            v.tooltip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", ttPos, 5.5)
+        end
+    end
+
+    if tBank then
+        local bankTab = self:SpawnPlugin("BagTab", "bank", false)
+        bankTab:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
+        bankTab:SetSize(bankTab:LayoutButtons("grid", 6))
+        bankTab.highlightFunction = function(button, match)
+            button:SetAlpha(match and 1 or 0.1)
+        end
+        bankTab.isGlobal = true
+        bankTab:Hide()
+        self.BagBar = bankTab
+
+        self.bagToggle = createIconButton("Bags", self, Textures.BagToggle, "BOTTOMRIGHT", L.BAG_HINT_TOGGLE, false)
+        self.bagToggle:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
+        self.bagToggle:SetScript("OnClick", function()
+            if self.BagBar:IsShown() then
+                self.BagBar:Hide()
             else
-                self.reagentBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
+                self.BagBar:Show()
             end
-            self.reagentBtn:SetScript("OnClick", function()
-                C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE)
+            self:UpdateDimensions()
+        end)
+
+        if module.opts.Restack then
+            self.restackBtn = createIconButton("Restack", self, Textures.Restack, "BOTTOMRIGHT", L.BAG_HINT_RESTACK, false)
+            self.restackBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
+            self.restackBtn:SetScript("OnClick", function()
+                restackItems(self)
             end)
         end
+
+        self.reagentBtn = createIconButton("Deposit", self, Textures.Deposit, "BOTTOMRIGHT", REAGENTBANK_DEPOSIT, false)
+        if self.restackBtn then
+            self.reagentBtn:SetPoint("BOTTOMRIGHT", self.restackBtn, "BOTTOMLEFT", 0, 0)
+        else
+            self.reagentBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
+        end
+        self.reagentBtn:SetScript("OnClick", function()
+            C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE)
+        end)
 
         local btnTable = { self.bagToggle }
         if self.restackBtn then
             tinsert(btnTable, self.restackBtn)
         end
-        if tBag and self.resetBtn then
-            tinsert(btnTable, self.resetBtn)
-        end
-        if tBank and self.reagentBtn then
-            tinsert(btnTable, self.reagentBtn)
-        end
-        local ttPos = -(#btnTable * 24 + 16)
-        if tBank then
-            ttPos = ttPos + 3
-        end
+        tinsert(btnTable, self.reagentBtn)
+        local ttPos = -(#btnTable * 24 + 16) + 3
         for _, v in pairs(btnTable) do
             v.tooltip:ClearAllPoints()
             v.tooltip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", ttPos, 5.5)
@@ -458,33 +492,40 @@ function MyContainer:OnCreate(name, settings)
     end
 
     if tAccount then
-        local bagWarband = self:SpawnPlugin("BagWarband", "accountbank")
-        bagWarband:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 2)
-        bagWarband:SetSize(bagWarband:LayoutButtons("grid", 5))
-        bagWarband.highlightFunction = function(button, match)
+        local accountTab = self:SpawnPlugin("BagTab", "accountbank", "Account")
+        accountTab:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
+        accountTab:SetSize(accountTab:LayoutButtons("grid", 5))
+        accountTab.highlightFunction = function(button, match)
             button:SetAlpha(match and 1 or 0.1)
         end
-        self.BagBar = bagWarband
+        accountTab.isGlobal = true
+        accountTab:Hide()
+        self.BagBar = accountTab
+
+        self.bagToggle = createIconButton("Bags", self, Textures.BagToggle, "BOTTOMRIGHT", L.BAG_HINT_TOGGLE, false)
+        self.bagToggle:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
+        self.bagToggle:SetScript("OnClick", function()
+            if self.BagBar:IsShown() then
+                self.BagBar:Hide()
+            else
+                self.BagBar:Show()
+            end
+            self:UpdateDimensions()
+        end)
 
         self.depositBtn = createIconButton("SendAccount", self, Textures.Deposit, "BOTTOMRIGHT", ACCOUNT_BANK_DEPOSIT_BUTTON_LABEL, false)
-        self.depositBtn:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
+        self.depositBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
         self.depositBtn:SetScript("OnClick", function()
             PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
             C_Bank.AutoDepositItemsIntoBank(ACCOUNT_BANK_TYPE)
         end)
-        self.depositBtn.tooltip:ClearAllPoints()
-        self.depositBtn.tooltip:SetPoint("RIGHT", self.depositBtn, "LEFT", -5, 0)
 
-        local checkbox = CreateFrame("CheckButton", nil, self, "InterfaceOptionsCheckButtonTemplate")
-        checkbox:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 2, 2)
-        checkbox:SetChecked(GetCVarBool("bankAutoDepositReagents"))
-        checkbox:SetScript("OnClick", function(cb)
-            SetCVar("bankAutoDepositReagents", cb:GetChecked())
-        end)
-        E:ReskinCheckBox(checkbox)
-
-        checkbox.fs = checkbox:CreateFontText(14, "", false, "LEFT", 30, 0)
-        checkbox.fs:SetText(L.BAG_HINT_ACOUNT_DEPOSIT_INCLUDE_REAGENTS)
+        local btnTable = { self.bagToggle, self.depositBtn }
+        local ttPos = -(#btnTable * 24 + 16) + 3
+        for _, v in pairs(btnTable) do
+            v.tooltip:ClearAllPoints()
+            v.tooltip:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", ttPos, 5.5)
+        end
     end
 
     -- Drop target
@@ -577,7 +618,7 @@ function BagButton:OnCreate()
     self:GetHighlightTexture():SetInside()
 
     self:SetSize(itemSlotSize, itemSlotSize)
-    self:CreateBackdrop()
+    self:CreateBackdrop("default", 0)
     self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
@@ -586,7 +627,7 @@ end
 function BagButton:OnUpdateButton()
     self.__backdrop:SetBackdropBorderColor(0, 0, 0)
 
-    local id = GetInventoryItemID("player", (self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
+    local id = GetInventoryItemID("player", self.invID)
     if not id then
         return
     end
@@ -628,10 +669,8 @@ function MyButton:OnCreate()
     self:SetHighlightTexture("Interface\\ChatFrame\\ChatFrameBackground")
     self:GetHighlightTexture():SetVertexColor(1, 1, 1, 0.25)
     self:GetHighlightTexture():SetInside()
-    self:SetSize(itemSlotSize - 4, itemSlotSize - 4)
-    self:CreateBackdrop()
-
-    self.__backdrop:SetOutside()
+    self:SetSize(itemSlotSize, itemSlotSize)
+    self:CreateBackdrop("default", 0)
     self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
     self.Icon:SetInside()

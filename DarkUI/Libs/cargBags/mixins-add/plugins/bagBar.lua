@@ -69,7 +69,6 @@ function BagButton:Create(bagID)
     button.isBankBag = isBankBag
     if isBankBag then
         button.isBag = 1
-        button.GetInventorySlot = ButtonInventorySlot
     end
 
     button:RegisterForDrag("LeftButton", "RightButton")
@@ -79,13 +78,15 @@ function BagButton:Create(bagID)
 
     cargBags.SetScriptHandlers(button, "OnClick", "OnReceiveDrag", "OnEnter", "OnLeave", "OnDragStart")
 
-    if button.OnCreate then button:OnCreate(bagID) end
+    if button.OnCreate then
+        button:OnCreate(bagID)
+    end
 
     return button
 end
 
 function BagButton:UpdateButton()
-    local icon = GetInventoryItemTexture("player", self.GetInventorySlot and self:GetInventorySlot() or self.invID)
+    local icon = GetInventoryItemTexture("player", self.invID)
     self.Icon:SetTexture(icon or self.bgTex)
     self.Icon:SetDesaturated(IsInventoryItemLocked(self.invID))
 
@@ -100,7 +101,9 @@ function BagButton:UpdateButton()
         end
     end
 
-    if self.OnUpdateButton then self:OnUpdateButton() end
+    if self.OnUpdateButton then
+        self:OnUpdateButton()
+    end
 end
 
 local function highlight(button, func, bagID)
@@ -121,7 +124,7 @@ function BagButton:OnEnter()
     end
 
     if self.isBankBag then
-        UpdateTooltip(self, self:GetInventorySlot())
+        UpdateTooltip(self, self.invID)
     else
         UpdateTooltip(self, self:GetID())
     end
@@ -144,7 +147,10 @@ function BagButton:OnLeave()
 end
 
 function BagButton:OnClick(btn)
-    if InCombatLockdown() then UIErrorsFrame:AddMessage("|cff99ccff" .. ERR_NOT_IN_COMBAT) return end
+    if InCombatLockdown() then
+        UIErrorsFrame:AddMessage("|cff99ccff" .. ERR_NOT_IN_COMBAT)
+        return
+    end
 
     if self.notBought then
         local numSlots = GetNumBankSlots and GetNumBankSlots() or 0
@@ -152,14 +158,20 @@ function BagButton:OnClick(btn)
         return StaticPopup_Show("CONFIRM_BUY_BANK_SLOT")
     end
 
-    if PutItemInBag((self.GetInventorySlot and self:GetInventorySlot()) or self.invID) then return end
+    if PutItemInBag(self.invID) then
+        return
+    end
 
-    if btn ~= "RightButton" then return end
+    if btn ~= "RightButton" then
+        return
+    end
     local container = self.bar.container
     if container and container.SetFilter then
         if not self.filter then
             local bagID = self.bagId
-            self.filter = function(i) return i.bagId ~= bagID end
+            self.filter = function(i)
+                return i.bagId ~= bagID
+            end
         end
         self.hidden = not self.hidden
 
@@ -176,7 +188,7 @@ end
 BagButton.OnReceiveDrag = BagButton.OnClick
 
 function BagButton:OnDragStart()
-    PickupBagFromSlot((self.GetInventorySlot and self:GetInventorySlot()) or self.invID)
+    PickupBagFromSlot(self.invID)
 end
 
 -- Updating the icons
@@ -187,7 +199,9 @@ local function updater(self)
 end
 
 local function onLock(self, _, bagID, slotID)
-    if slotID then return end
+    if slotID then
+        return
+    end
 
     for _, button in pairs(self.buttons) do
         if button.invID == bagID then

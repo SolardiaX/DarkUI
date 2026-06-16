@@ -20,20 +20,23 @@ local optDefaults = {
     scale = 1,
     NewItems = true,
     Restack = true,
-    TradeGoods = true,
-    Armor = true,
-    Gem = true,
-    Junk = true,
-    ItemSets = true,
+    Equipment = true,
     Consumables = true,
+    TradeGoods = true,
     Quest = true,
+    Collection = true,
+    Junk = true,
+    ItemSets = false,
+    AOE = true,
+    Decor = true,
+    Legacy = false,
     FilterBank = true,
     CompressEmpty = true,
     Unlocked = true,
     SortBags = true,
     SortBank = true,
     BankCustomBags = true,
-    BagPos = { "BOTTOMRIGHT", -99, 26 },
+    BagPos = { "RIGHT", -160, -160 },
     BankPos = { "TOPLEFT", 20, -20 },
 }
 
@@ -48,17 +51,53 @@ function module:OnInit()
 
     self:LoadDefaults()
 
-    self.filterEnabled.Armor = self.opts.Armor
-    self.filterEnabled.Gem = self.opts.Gem
+    self.filterEnabled.Equipment = self.opts.Equipment
+    self.filterEnabled.Consumables = self.opts.Consumables
     self.filterEnabled.TradeGoods = self.opts.TradeGoods
+    self.filterEnabled.Quest = self.opts.Quest
+    self.filterEnabled.Collection = self.opts.Collection
     self.filterEnabled.Junk = self.opts.Junk
     self.filterEnabled.ItemSets = self.opts.ItemSets
-    self.filterEnabled.Consumables = self.opts.Consumables
-    self.filterEnabled.Quest = self.opts.Quest
+    self.filterEnabled.AOE = self.opts.AOE
+    self.filterEnabled.Decor = self.opts.Decor
+    self.filterEnabled.Legacy = self.opts.Legacy
 
     self:CreateContainers(cbNivaya)
     cbNivaya:CreateAnchors()
     cbNivaya:Init()
+
+    -- Pre-populate knownItems so fNewItems doesn't catch everything on first open
+    if not next(self.knownItems) then
+        for bag = 0, 5 do
+            local numSlots = GetContainerNumSlots(bag)
+            for slot = 1, numSlots do
+                local item = cbNivaya:GetItemInfo(bag, slot)
+                if item.id then
+                    self.knownItems[item.id] = (self.knownItems[item.id] or 0) + (item.count or 1)
+                end
+            end
+        end
+    end
+
+    -- Delayed re-classify when item data arrives
+    local updater = CreateFrame("Frame")
+    updater:Hide()
+    updater:SetScript("OnUpdate", function(self, elapsed)
+        self.delay = self.delay - elapsed
+        if self.delay < 0 then
+            module:ResetItemClass()
+            self:Hide()
+        end
+    end)
+
+    local f = CreateFrame("Frame")
+    f:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    f:SetScript("OnEvent", function()
+        if cbNivaya:IsShown() then
+            updater.delay = 1
+            updater:Show()
+        end
+    end)
 end
 
 function module:LoadDefaults()
@@ -99,25 +138,23 @@ function module:CreateContainers(cbNivaya)
     self.bags = bags
 
     -- Bank containers
+    bags.bankEquipment = CC:New("cBniv_BankEquipment")
     bags.bankSets = CC:New("cBniv_BankSets")
-    bags.bankArmor = CC:New("cBniv_BankArmor")
-    bags.bankGem = CC:New("cBniv_BankGem")
     bags.bankConsumables = CC:New("cBniv_BankCons")
-    bags.bankBattlePet = CC:New("cBniv_BankPet")
     bags.bankQuest = CC:New("cBniv_BankQuest")
     bags.bankTrade = CC:New("cBniv_BankTrade")
+    bags.bankCollection = CC:New("cBniv_BankCollection")
     bags.bankJunk = CC:New("cBniv_BankJunk")
     bags.bankAccount = CC:New("cBniv_BankAccount")
     bags.bankReagent = CC:New("cBniv_BankReagent")
     bags.bank = CC:New("cBniv_Bank")
 
+    bags.bankEquipment:SetExtendedFilter(filters.fItemClass, "BankEquipment")
     bags.bankSets:SetMultipleFilters(true, filters.fBank, filters.fBankFilter, filters.fItemSets)
-    bags.bankArmor:SetExtendedFilter(filters.fItemClass, "BankArmor")
-    bags.bankGem:SetExtendedFilter(filters.fItemClass, "BankGem")
     bags.bankConsumables:SetExtendedFilter(filters.fItemClass, "BankConsumables")
-    bags.bankBattlePet:SetExtendedFilter(filters.fItemClass, "BankBattlePet")
     bags.bankQuest:SetExtendedFilter(filters.fItemClass, "BankQuest")
     bags.bankTrade:SetExtendedFilter(filters.fItemClass, "BankTradeGoods")
+    bags.bankCollection:SetExtendedFilter(filters.fItemClass, "BankCollection")
     bags.bankJunk:SetExtendedFilter(filters.fItemClass, "BankJunk")
     bags.bankReagent:SetMultipleFilters(true, filters.fBankReagent, filters.fHideEmpty)
     bags.bankAccount:SetMultipleFilters(true, filters.fBankAccount, filters.fHideEmpty)
@@ -125,27 +162,29 @@ function module:CreateContainers(cbNivaya)
 
     -- Inventory containers
     bags.bagItemSets = CC:New("cBniv_ItemSets")
-    bags.bagStuff = CC:New("cBniv_Stuff")
     bags.bagJunk = CC:New("cBniv_Junk")
     bags.bagNew = CC:New("cBniv_NewItems")
-    bags.armor = CC:New("cBniv_Armor")
-    bags.gem = CC:New("cBniv_Gem")
+    bags.equipment = CC:New("cBniv_Equipment")
     bags.quest = CC:New("cBniv_Quest")
     bags.consumables = CC:New("cBniv_Consumables")
-    bags.battlepet = CC:New("cBniv_BattlePet")
+    bags.collection = CC:New("cBniv_Collection")
     bags.tradegoods = CC:New("cBniv_TradeGoods")
+    bags.aoe = CC:New("cBniv_AOE")
+    bags.decor = CC:New("cBniv_Decor")
+    bags.legacy = CC:New("cBniv_Legacy")
     bags.main = CC:New("cBniv_Bag")
 
     bags.bagItemSets:SetFilter(filters.fItemSets, true)
-    bags.bagStuff:SetExtendedFilter(filters.fItemClass, "Stuff")
     bags.bagJunk:SetExtendedFilter(filters.fItemClass, "Junk")
     bags.bagNew:SetFilter(filters.fNewItems, true)
-    bags.armor:SetExtendedFilter(filters.fItemClass, "Armor")
-    bags.gem:SetExtendedFilter(filters.fItemClass, "Gem")
+    bags.equipment:SetExtendedFilter(filters.fItemClass, "Equipment")
     bags.quest:SetExtendedFilter(filters.fItemClass, "Quest")
     bags.consumables:SetExtendedFilter(filters.fItemClass, "Consumables")
-    bags.battlepet:SetExtendedFilter(filters.fItemClass, "BattlePet")
+    bags.collection:SetExtendedFilter(filters.fItemClass, "Collection")
     bags.tradegoods:SetExtendedFilter(filters.fItemClass, "TradeGoods")
+    bags.aoe:SetExtendedFilter(filters.fItemClass, "AOE")
+    bags.decor:SetExtendedFilter(filters.fItemClass, "Decor")
+    bags.legacy:SetExtendedFilter(filters.fItemClass, "Legacy")
     bags.main:SetMultipleFilters(true, filters.fBags, filters.fHideEmpty)
 
     bags.main:SetPoint(unpack(self.charOpts.BagPos or self.opts.BagPos))
@@ -188,25 +227,29 @@ function cbNivaya:CreateAnchors()
     CreateAnchorInfo(nil, bags.main, "Bottom")
     CreateAnchorInfo(nil, bags.bank, "Bottom")
 
-    -- Bank anchors
-    CreateAnchorInfo(bags.bank, bags.bankArmor, "Right")
-    CreateAnchorInfo(bags.bankArmor, bags.bankSets, "Bottom")
-    CreateAnchorInfo(bags.bankSets, bags.bankGem, "Bottom")
-    CreateAnchorInfo(bags.bankGem, bags.bankTrade, "Bottom")
-    CreateAnchorInfo(bags.bankTrade, bags.bankAccount, "Bottom")
-
+    -- Bank left column
     CreateAnchorInfo(bags.bank, bags.bankReagent, "Bottom")
     CreateAnchorInfo(bags.bankReagent, bags.bankConsumables, "Bottom")
-    CreateAnchorInfo(bags.bankConsumables, bags.bankQuest, "Bottom")
-    CreateAnchorInfo(bags.bankQuest, bags.bankBattlePet, "Bottom")
-    CreateAnchorInfo(bags.bankBattlePet, bags.bankJunk, "Bottom")
+    CreateAnchorInfo(bags.bankConsumables, bags.bankTrade, "Bottom")
+    CreateAnchorInfo(bags.bankTrade, bags.bankQuest, "Bottom")
+
+    -- Bank middle column
+    CreateAnchorInfo(bags.bank, bags.bankEquipment, "Right")
+    CreateAnchorInfo(bags.bankEquipment, bags.bankSets, "Bottom")
+    CreateAnchorInfo(bags.bankSets, bags.bankCollection, "Bottom")
+    CreateAnchorInfo(bags.bankCollection, bags.bankJunk, "Bottom")
+
+    -- Bank right (Account independent)
+    CreateAnchorInfo(bags.bankEquipment, bags.bankAccount, "Right")
 
     -- Bag anchors
     CreateAnchorInfo(bags.main, bags.bagItemSets, "Left")
-    CreateAnchorInfo(bags.bagItemSets, bags.armor, "Top")
-    CreateAnchorInfo(bags.armor, bags.gem, "Top")
-    CreateAnchorInfo(bags.gem, bags.battlepet, "Top")
-    CreateAnchorInfo(bags.battlepet, bags.bagStuff, "Top")
+    CreateAnchorInfo(bags.bagItemSets, bags.equipment, "Top")
+    CreateAnchorInfo(bags.equipment, bags.collection, "Top")
+    CreateAnchorInfo(bags.collection, bags.aoe, "Top")
+    CreateAnchorInfo(bags.aoe, bags.decor, "Top")
+    CreateAnchorInfo(bags.decor, bags.legacy, "Top")
+
     CreateAnchorInfo(bags.main, bags.tradegoods, "Top")
     CreateAnchorInfo(bags.tradegoods, bags.consumables, "Top")
     CreateAnchorInfo(bags.consumables, bags.quest, "Top")
@@ -231,17 +274,17 @@ function cbNivaya:UpdateAnchors(src)
             v:ClearAllPoints()
 
             if not h and u == "Top" then
-                v:SetPoint("BOTTOM", t, "TOP", 0, 12)
+                v:SetPoint("BOTTOM", t, "TOP", 0, 18)
             elseif h and u == "Top" then
                 v:SetPoint("BOTTOM", t, "BOTTOM")
             elseif not h and u == "Bottom" then
-                v:SetPoint("TOP", t, "BOTTOM", 0, -14)
+                v:SetPoint("TOP", t, "BOTTOM", 0, -18)
             elseif h and u == "Bottom" then
                 v:SetPoint("TOP", t, "TOP")
             elseif u == "Left" then
-                v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -12, 0)
+                v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -18, 0)
             elseif u == "Right" then
-                v:SetPoint("TOPLEFT", t, "TOPRIGHT", 12, 0)
+                v:SetPoint("TOPLEFT", t, "TOPRIGHT", 18, 0)
             end
         end
     end
@@ -271,15 +314,16 @@ function cbNivaya:OnOpen()
     bags.main:Show()
     showBags(
         self,
-        bags.armor,
+        bags.equipment,
         bags.bagNew,
         bags.bagItemSets,
-        bags.gem,
+        bags.collection,
         bags.quest,
         bags.consumables,
-        bags.battlepet,
         bags.tradegoods,
-        bags.bagStuff,
+        bags.aoe,
+        bags.decor,
+        bags.legacy,
         bags.bagJunk
     )
 end
@@ -288,15 +332,16 @@ function cbNivaya:OnClose()
     local bags = module.bags
     hideBags(
         bags.main,
-        bags.armor,
+        bags.equipment,
         bags.bagNew,
         bags.bagItemSets,
-        bags.gem,
+        bags.collection,
         bags.quest,
         bags.consumables,
-        bags.battlepet,
         bags.tradegoods,
-        bags.bagStuff,
+        bags.aoe,
+        bags.decor,
+        bags.legacy,
         bags.bagJunk
     )
 end
@@ -311,15 +356,18 @@ function cbNivaya:OnBankOpened()
         self,
         bags.bankSets,
         bags.bankReagent,
-        bags.bankArmor,
-        bags.bankGem,
+        bags.bankEquipment,
         bags.bankQuest,
         bags.bankTrade,
         bags.bankConsumables,
-        bags.bankBattlePet,
+        bags.bankCollection,
         bags.bankJunk,
         bags.bankAccount
     )
+
+    for id = 5, 16 do
+        self:UpdateBag(id)
+    end
 end
 
 function cbNivaya:OnBankClosed()
@@ -328,12 +376,11 @@ function cbNivaya:OnBankClosed()
         bags.bank,
         bags.bankSets,
         bags.bankReagent,
-        bags.bankArmor,
-        bags.bankGem,
+        bags.bankEquipment,
         bags.bankQuest,
         bags.bankTrade,
         bags.bankConsumables,
-        bags.bankBattlePet,
+        bags.bankCollection,
         bags.bankJunk,
         bags.bankAccount
     )
