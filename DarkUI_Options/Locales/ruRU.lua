@@ -169,7 +169,7 @@ L_OPT_TOOLTIP_MYTHIC_SCORE = "Показывать рейтинг М+"
 
 -- Chat
 L_OPT_CHAT_ENABLE = "Включить модуль чата"
-L_OPT_CHAT_BACKGROUND = "Включить фон чата"
+L_OPT_CHAT_EDITBOX_COLOR = "Цвет рамки поля ввода по каналу"
 L_OPT_CHAT_FILTER = "Фильтровать неиспользуемые системные сообщения"
 L_OPT_CHAT_SPAM = "Включить фильтр спама"
 L_OPT_CHAT_CHAT_BAR = "Включить кнопки переключения каналов"

@@ -167,7 +167,7 @@ L_OPT_TOOLTIP_MYTHIC_SCORE = "Show mythic+ score"
 
 -- Chat
 L_OPT_CHAT_ENABLE = "Enable chat module"
-L_OPT_CHAT_BACKGROUND = "Enable background for chat"
+L_OPT_CHAT_EDITBOX_COLOR = "Editbox border color by channel"
 L_OPT_CHAT_FILTER = "Filter unused system info"
 L_OPT_CHAT_SPAM = "Enable spam filter"
 L_OPT_CHAT_CHAT_BAR = "Enable channel switch buttons"

@@ -169,7 +169,7 @@ L_OPT_TOOLTIP_MYTHIC_SCORE = "顯示大秘境評分"
 
 -- Chat
 L_OPT_CHAT_ENABLE = "啟用聊天框模塊"
-L_OPT_CHAT_BACKGROUND = "聊天框顯示背景"
+L_OPT_CHAT_EDITBOX_COLOR = "輸入框按頻道顯示顏色"
 L_OPT_CHAT_FILTER = "屏蔽無用系統信息"
 L_OPT_CHAT_SPAM = "屏蔽玩家發送垃圾信息"
 L_OPT_CHAT_CHAT_BAR = "啟用快捷頻道切換按鈕"

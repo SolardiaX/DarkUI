@@ -5,7 +5,7 @@ addon:RegisterTab("chat", L_CATEGORIES_CHAT)
 
 addon.OptionList["chat"] = {
     { CHECK, "chat.enable", L_OPT_CHAT_ENABLE },
-    { CHECK, "chat.background", L_OPT_CHAT_BACKGROUND },
+    { CHECK, "chat.editbox_color", L_OPT_CHAT_EDITBOX_COLOR },
     { CHECK, "chat.filter", L_OPT_CHAT_FILTER },
     { CHECK, "chat.spam", L_OPT_CHAT_SPAM },
     { CHECK, "chat.chat_bar", L_OPT_CHAT_CHAT_BAR },
