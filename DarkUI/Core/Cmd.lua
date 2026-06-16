@@ -135,7 +135,7 @@ SlashCmdList["FRAME"] = function(arg)
             local targetName = relativeTo and relativeTo:GetName() or "UIParent"
 
             if targetName then
-                ChatFrame1:AddMessage("Point-" .. i .. ": |cffFFD100" .. point .. "|r anchored to " .. relativeTo:GetName() .. "'s |cffFFD100" .. relativePoint)
+                ChatFrame1:AddMessage("Point-" .. i .. ": |cffFFD100" .. point .. "|r anchored to " .. targetName .. "'s |cffFFD100" .. relativePoint)
             end
             if xOfs then
                 ChatFrame1:AddMessage("X: |cffFFD100" .. format("%.2f", xOfs))

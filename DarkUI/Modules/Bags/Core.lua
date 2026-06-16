@@ -8,16 +8,34 @@ local cargBags = select(2, ...).cargBags
 local module = E:Module("Bags")
 local cfg = C.bags
 
-local ipairs = ipairs
 local GetContainerNumSlots = C_Container.GetContainerNumSlots
 
+local cbNivaya = cargBags:GetImplementation("Nivaya")
+
 ------------------------------------------------------------------------
--- State
+-- Options Defaults
 ------------------------------------------------------------------------
 
-module.ContainerGroups = { Bag = {}, Bank = {}, Account = {} }
-module.customItems = nil
-module.customNames = nil
+local optDefaults = {
+    scale = 1,
+    NewItems = true,
+    Restack = true,
+    TradeGoods = true,
+    Armor = true,
+    Gem = true,
+    Junk = true,
+    ItemSets = true,
+    Consumables = true,
+    Quest = true,
+    FilterBank = true,
+    CompressEmpty = true,
+    Unlocked = true,
+    SortBags = true,
+    SortBank = true,
+    BankCustomBags = true,
+    BagPos = { "BOTTOMRIGHT", -99, 26 },
+    BankPos = { "TOPLEFT", 20, -20 },
+}
 
 ------------------------------------------------------------------------
 -- Lifecycle
@@ -30,311 +48,323 @@ function module:OnInit()
 
     self:LoadDefaults()
 
-    -- Create Implementation
-    local Backpack = cargBags:NewImplementation("Nivaya")
-    Backpack:RegisterBlizzard()
-    Backpack:HookScript("OnShow", function()
-        PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
-    end)
-    Backpack:HookScript("OnHide", function()
-        PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
-    end)
+    self.filterEnabled.Armor = self.opts.Armor
+    self.filterEnabled.Gem = self.opts.Gem
+    self.filterEnabled.TradeGoods = self.opts.TradeGoods
+    self.filterEnabled.Junk = self.opts.Junk
+    self.filterEnabled.ItemSets = self.opts.ItemSets
+    self.filterEnabled.Consumables = self.opts.Consumables
+    self.filterEnabled.Quest = self.opts.Quest
 
-    self.Bags = Backpack
-
-    -- Get classes and set them up
-    local MyContainer, MyButton = self:GetClasses(Backpack)
-    self:SetupContainerClass(MyContainer, Backpack)
-    self:SetupItemButtonClass(MyButton)
-    self:SetupBagButtonClass(Backpack)
-
-    -- Get filters
-    local filters = self:GetFilters()
-    local f = {}
-    self.frames = f
-
-    -- Helper to create sub-containers
-    local function addNewContainer(bagType, index, name, filter)
-        local container = MyContainer:New(name, { BagType = bagType, Index = index })
-        container:SetFilter(filter, true)
-        self.ContainerGroups[bagType][index] = container
-    end
-
-    function Backpack:OnInit()
-        -- Bag sub-containers
-        for i = 1, 5 do
-            addNewContainer("Bag", i, "BagCustom" .. i, filters["bagCustom" .. i])
-        end
-        addNewContainer("Bag", 6, "BagReagent", filters.onlyBagReagent)
-        addNewContainer("Bag", 7, "AzeriteItem", filters.bagAzeriteItem)
-        addNewContainer("Bag", 8, "Equipment", filters.bagEquipment)
-        addNewContainer("Bag", 9, "EquipSet", filters.bagEquipSet)
-        addNewContainer("Bag", 10, "BagAOE", filters.bagAOE)
-        addNewContainer("Bag", 11, "BagCollection", filters.bagCollection)
-        addNewContainer("Bag", 12, "BagDecor", filters.bagDecor)
-        addNewContainer("Bag", 13, "BagGoods", filters.bagGoods)
-        addNewContainer("Bag", 14, "BagAnima", filters.bagAnima)
-        addNewContainer("Bag", 15, "BagStone", filters.bagStone)
-        addNewContainer("Bag", 16, "Consumable", filters.bagConsumable)
-        addNewContainer("Bag", 17, "BagQuest", filters.bagQuest)
-        addNewContainer("Bag", 18, "BagLegacy", filters.bagLegacy)
-        addNewContainer("Bag", 19, "BagLower", filters.bagLower)
-        addNewContainer("Bag", 20, "Junk", filters.bagsJunk)
-
-        -- Main bag panel
-        f.main = MyContainer:New("Bag", { Bags = "bags", BagType = "Bag" })
-        f.main:SetFilter(filters.onlyBags, true)
-        f.main:SetPoint(unpack(module:GetSavedPosition("Bag", { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -50, 100 })))
-
-        -- Bank sub-containers
-        for i = 1, 5 do
-            addNewContainer("Bank", i, "BankCustom" .. i, filters["bankCustom" .. i])
-        end
-        addNewContainer("Bank", 6, "BankAzeriteItem", filters.bankAzeriteItem)
-        addNewContainer("Bank", 7, "BankEquipment", filters.bankEquipment)
-        addNewContainer("Bank", 8, "BankEquipSet", filters.bankEquipSet)
-        addNewContainer("Bank", 9, "BankAOE", filters.bankAOE)
-        addNewContainer("Bank", 10, "BankCollection", filters.bankCollection)
-        addNewContainer("Bank", 11, "BankDecor", filters.bankDecor)
-        addNewContainer("Bank", 12, "BankGoods", filters.bankGoods)
-        addNewContainer("Bank", 13, "BankAnima", filters.bankAnima)
-        addNewContainer("Bank", 14, "BankConsumable", filters.bankConsumable)
-        addNewContainer("Bank", 15, "BankQuest", filters.bankQuest)
-        addNewContainer("Bank", 16, "BankLegacy", filters.bankLegacy)
-        addNewContainer("Bank", 17, "BankLower", filters.bankLower)
-        addNewContainer("Bank", 18, "BankJunk", filters.bankJunk)
-
-        -- Main bank panel
-        f.bank = MyContainer:New("Bank", { Bags = "bank", BagType = "Bank" })
-        f.bank:SetFilter(filters.onlyBank, true)
-        f.bank:SetPoint(unpack(module:GetSavedPosition("Bank", { "BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 25, 50 })))
-        f.bank:Hide()
-
-        -- Account bank sub-containers
-        for i = 1, 5 do
-            addNewContainer("Account", i, "AccountCustom" .. i, filters["accountCustom" .. i])
-        end
-        addNewContainer("Account", 6, "AccountEquipment", filters.accountEquipment)
-        addNewContainer("Account", 7, "AccountAOE", filters.accountAOE)
-        addNewContainer("Account", 8, "AccountGoods", filters.accountGoods)
-        addNewContainer("Account", 9, "AccountConsumable", filters.accountConsumable)
-        addNewContainer("Account", 10, "AccountLegacy", filters.accountLegacy)
-
-        -- Main account bank panel
-        f.accountbank = MyContainer:New("Account", { Bags = "accountbank", BagType = "Account" })
-        f.accountbank:SetFilter(filters.accountBank, true)
-        f.accountbank:SetPoint(unpack(module:GetSavedPosition("Bank", { "BOTTOMLEFT", "UIParent", "BOTTOMLEFT", 25, 50 })))
-        f.accountbank:Hide()
-
-        -- Parent sub-containers to their main panel
-        for bagType, groups in pairs(module.ContainerGroups) do
-            for _, container in ipairs(groups) do
-                local parent = Backpack.contByName[bagType]
-                if parent then
-                    container:SetParent(parent)
-                end
-            end
-        end
-    end
-
-    function Backpack:OnOpen()
-        f.main:Show()
-    end
-
-    function Backpack:OnClose()
-        f.main:Hide()
-    end
-
-    function Backpack:OnBankOpened()
-        BankFrame:Show()
-        BankFrame.BankPanel:Show()
-        f.bank:Show()
-
-        -- Force update bank bags (bankType may not be set yet during first open)
-        for id = 6, 11 do
-            Backpack:UpdateBag(id)
-        end
-        for id = 12, 16 do
-            Backpack:UpdateBag(id)
-        end
-    end
-
-    function Backpack:OnBankClosed()
-        BankFrame.BankPanel:Hide()
-        f.bank:Hide()
-        f.accountbank:Hide()
-    end
+    self:CreateContainers(cbNivaya)
+    cbNivaya:CreateAnchors()
+    cbNivaya:Init()
 end
-
-------------------------------------------------------------------------
--- DB Helpers
-------------------------------------------------------------------------
 
 function module:LoadDefaults()
-    if not DB:GetStats("cBniv_CustomItems") then
-        DB:SetStats("cBniv_CustomItems", {})
+    if not DB:GetStats("cBnivCfg") then
+        DB:SetStats("cBnivCfg", {})
     end
-    if not DB:GetStats("cBniv_CustomNames") then
-        DB:SetStats("cBniv_CustomNames", {})
+    if not DB:GetStats("cBniv_CatInfo") then
+        DB:SetStats("cBniv_CatInfo", {})
     end
-    if not DB:GetStats("cBniv_Positions", true) then
-        DB:SetStats("cBniv_Positions", {}, true)
+    if not DB:GetStats("cB_KnownItems", true) then
+        DB:SetStats("cB_KnownItems", {}, true)
+    end
+    if not DB:GetStats("cBniv", true) then
+        DB:SetStats("cBniv", { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }, true)
     end
 
-    self.customItems = DB:GetStats("cBniv_CustomItems")
-    self.customNames = DB:GetStats("cBniv_CustomNames")
-    self.positions = DB:GetStats("cBniv_Positions", true)
-end
+    local opts = DB:GetStats("cBnivCfg")
+    for k, v in pairs(optDefaults) do
+        if type(opts[k]) == "nil" then
+            opts[k] = v
+        end
+    end
 
-function module:GetSavedPosition(name, default)
-    local saved = self.positions and self.positions[name]
-    return saved or default
+    self.opts = opts
+    self.knownItems = DB:GetStats("cB_KnownItems", true)
+    self.charOpts = DB:GetStats("cBniv", true)
+    self.catInfo = DB:GetStats("cBniv_CatInfo") or {}
 end
 
 ------------------------------------------------------------------------
--- Anchor Layout
+-- Container Creation
 ------------------------------------------------------------------------
 
-local anchorCache = {}
+function module:CreateContainers(cbNivaya)
+    local CC = cbNivaya:GetContainerClass()
+    local filters = self.filters
+    local bags = {}
+    self.bags = bags
 
-local function checkReagentBag(name)
-    return not (name == "BagReagent" and GetContainerNumSlots(5) == 0)
+    -- Bank containers
+    bags.bankSets = CC:New("cBniv_BankSets")
+    bags.bankArmor = CC:New("cBniv_BankArmor")
+    bags.bankGem = CC:New("cBniv_BankGem")
+    bags.bankConsumables = CC:New("cBniv_BankCons")
+    bags.bankBattlePet = CC:New("cBniv_BankPet")
+    bags.bankQuest = CC:New("cBniv_BankQuest")
+    bags.bankTrade = CC:New("cBniv_BankTrade")
+    bags.bankJunk = CC:New("cBniv_BankJunk")
+    bags.bankAccount = CC:New("cBniv_BankAccount")
+    bags.bankReagent = CC:New("cBniv_BankReagent")
+    bags.bank = CC:New("cBniv_Bank")
+
+    bags.bankSets:SetMultipleFilters(true, filters.fBank, filters.fBankFilter, filters.fItemSets)
+    bags.bankArmor:SetExtendedFilter(filters.fItemClass, "BankArmor")
+    bags.bankGem:SetExtendedFilter(filters.fItemClass, "BankGem")
+    bags.bankConsumables:SetExtendedFilter(filters.fItemClass, "BankConsumables")
+    bags.bankBattlePet:SetExtendedFilter(filters.fItemClass, "BankBattlePet")
+    bags.bankQuest:SetExtendedFilter(filters.fItemClass, "BankQuest")
+    bags.bankTrade:SetExtendedFilter(filters.fItemClass, "BankTradeGoods")
+    bags.bankJunk:SetExtendedFilter(filters.fItemClass, "BankJunk")
+    bags.bankReagent:SetMultipleFilters(true, filters.fBankReagent, filters.fHideEmpty)
+    bags.bankAccount:SetMultipleFilters(true, filters.fBankAccount, filters.fHideEmpty)
+    bags.bank:SetMultipleFilters(true, filters.fBank, filters.fHideEmpty)
+
+    -- Inventory containers
+    bags.bagItemSets = CC:New("cBniv_ItemSets")
+    bags.bagStuff = CC:New("cBniv_Stuff")
+    bags.bagJunk = CC:New("cBniv_Junk")
+    bags.bagNew = CC:New("cBniv_NewItems")
+    bags.armor = CC:New("cBniv_Armor")
+    bags.gem = CC:New("cBniv_Gem")
+    bags.quest = CC:New("cBniv_Quest")
+    bags.consumables = CC:New("cBniv_Consumables")
+    bags.battlepet = CC:New("cBniv_BattlePet")
+    bags.tradegoods = CC:New("cBniv_TradeGoods")
+    bags.main = CC:New("cBniv_Bag")
+
+    bags.bagItemSets:SetFilter(filters.fItemSets, true)
+    bags.bagStuff:SetExtendedFilter(filters.fItemClass, "Stuff")
+    bags.bagJunk:SetExtendedFilter(filters.fItemClass, "Junk")
+    bags.bagNew:SetFilter(filters.fNewItems, true)
+    bags.armor:SetExtendedFilter(filters.fItemClass, "Armor")
+    bags.gem:SetExtendedFilter(filters.fItemClass, "Gem")
+    bags.quest:SetExtendedFilter(filters.fItemClass, "Quest")
+    bags.consumables:SetExtendedFilter(filters.fItemClass, "Consumables")
+    bags.battlepet:SetExtendedFilter(filters.fItemClass, "BattlePet")
+    bags.tradegoods:SetExtendedFilter(filters.fItemClass, "TradeGoods")
+    bags.main:SetMultipleFilters(true, filters.fBags, filters.fHideEmpty)
+
+    bags.main:SetPoint(unpack(self.charOpts.BagPos or self.opts.BagPos))
+    bags.bank:SetPoint(unpack(self.charOpts.BankPos or self.opts.BankPos))
+
+    -- All containers default hidden (shown by OnOpen / OnBankOpened)
+    for _, bag in pairs(bags) do
+        bag:Hide()
+    end
 end
 
-function module:UpdateBagsAnchor(parent, bags)
-    wipe(anchorCache)
+------------------------------------------------------------------------
+-- Anchors
+------------------------------------------------------------------------
 
-    local index = 1
-    local perRow = cfg.bagsPerRow or 10
-    anchorCache[index] = parent
-    local topmost = nil
+function cbNivaya:CreateAnchors()
+    local bags = module.bags
 
-    for i = 1, #bags do
-        local bag = bags[i]
-        if bag and bag:GetHeight() > 45 and checkReagentBag(bag.name) then
-            bag:Show()
-            index = index + 1
-
-            bag:ClearAllPoints()
-            if (index - 1) % perRow == 0 then
-                bag:SetPoint("BOTTOMRIGHT", anchorCache[index - perRow], "BOTTOMLEFT", -5, 0)
-            else
-                bag:SetPoint("BOTTOMLEFT", anchorCache[index - 1], "TOPLEFT", 0, 5)
+    local function CreateAnchorInfo(src, tar, dir)
+        tar.AnchorTo = src
+        tar.AnchorDir = dir
+        if src then
+            if not src.AnchorTargets then
+                src.AnchorTargets = {}
             end
-            anchorCache[index] = bag
-            topmost = bag
-        elseif bag then
-            bag:Hide()
+            src.AnchorTargets[tar] = true
         end
     end
 
-    -- Update unified background to cover topmost sub-container
-    if parent.bgFrame then
-        parent.bgFrame:ClearAllPoints()
-        parent.bgFrame:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -4, -4)
-        parent.bgFrame:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", 4, -4)
-        if topmost then
-            parent.bgFrame:SetPoint("TOPLEFT", topmost, "TOPLEFT", -4, 4)
-            parent.bgFrame:SetPoint("TOPRIGHT", topmost, "TOPRIGHT", 4, 4)
-        else
-            parent.bgFrame:SetPoint("TOPLEFT", parent, "TOPLEFT", -4, 4)
-            parent.bgFrame:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 4, 4)
+    for _, v in pairs(bags) do
+        if v.name ~= "cBniv_Bag" and v.name ~= "cBniv_Bank" then
+            v:ClearAllPoints()
         end
-    end
-end
-
-function module:UpdateBankAnchor(parent, bags)
-    wipe(anchorCache)
-
-    local index = 1
-    local perRow = cfg.bankPerRow or 10
-    anchorCache[index] = parent
-    local topmost = nil
-
-    for i = 1, #bags do
-        local bag = bags[i]
-        if bag and bag:GetHeight() > 45 then
-            bag:Show()
-            index = index + 1
-
-            bag:ClearAllPoints()
-            if index <= perRow then
-                bag:SetPoint("BOTTOMLEFT", anchorCache[index - 1], "TOPLEFT", 0, 5)
-            elseif index == perRow + 1 then
-                bag:SetPoint("TOPLEFT", anchorCache[index - 1], "TOPRIGHT", 5, 0)
-            elseif (index - 1) % perRow == 0 then
-                bag:SetPoint("TOPLEFT", anchorCache[index - perRow], "TOPRIGHT", 5, 0)
-            else
-                bag:SetPoint("TOPLEFT", anchorCache[index - 1], "BOTTOMLEFT", 0, -5)
-            end
-            anchorCache[index] = bag
-            topmost = bag
-        elseif bag then
-            bag:Hide()
-        end
+        v.AnchorTo = nil
+        v.AnchorDir = nil
+        v.AnchorTargets = nil
     end
 
-    -- Update unified background
-    if parent.bgFrame then
-        parent.bgFrame:ClearAllPoints()
-        parent.bgFrame:SetPoint("BOTTOMLEFT", parent, "BOTTOMLEFT", -4, -4)
-        parent.bgFrame:SetPoint("BOTTOMRIGHT", parent, "BOTTOMRIGHT", 4, -4)
-        if topmost then
-            parent.bgFrame:SetPoint("TOPLEFT", topmost, "TOPLEFT", -4, 4)
-            parent.bgFrame:SetPoint("TOPRIGHT", topmost, "TOPRIGHT", 4, 4)
-        else
-            parent.bgFrame:SetPoint("TOPLEFT", parent, "TOPLEFT", -4, 4)
-            parent.bgFrame:SetPoint("TOPRIGHT", parent, "TOPRIGHT", 4, 4)
-        end
+    -- Main anchors
+    CreateAnchorInfo(nil, bags.main, "Bottom")
+    CreateAnchorInfo(nil, bags.bank, "Bottom")
+
+    -- Bank anchors
+    CreateAnchorInfo(bags.bank, bags.bankArmor, "Right")
+    CreateAnchorInfo(bags.bankArmor, bags.bankSets, "Bottom")
+    CreateAnchorInfo(bags.bankSets, bags.bankGem, "Bottom")
+    CreateAnchorInfo(bags.bankGem, bags.bankTrade, "Bottom")
+    CreateAnchorInfo(bags.bankTrade, bags.bankAccount, "Bottom")
+
+    CreateAnchorInfo(bags.bank, bags.bankReagent, "Bottom")
+    CreateAnchorInfo(bags.bankReagent, bags.bankConsumables, "Bottom")
+    CreateAnchorInfo(bags.bankConsumables, bags.bankQuest, "Bottom")
+    CreateAnchorInfo(bags.bankQuest, bags.bankBattlePet, "Bottom")
+    CreateAnchorInfo(bags.bankBattlePet, bags.bankJunk, "Bottom")
+
+    -- Bag anchors
+    CreateAnchorInfo(bags.main, bags.bagItemSets, "Left")
+    CreateAnchorInfo(bags.bagItemSets, bags.armor, "Top")
+    CreateAnchorInfo(bags.armor, bags.gem, "Top")
+    CreateAnchorInfo(bags.gem, bags.battlepet, "Top")
+    CreateAnchorInfo(bags.battlepet, bags.bagStuff, "Top")
+    CreateAnchorInfo(bags.main, bags.tradegoods, "Top")
+    CreateAnchorInfo(bags.tradegoods, bags.consumables, "Top")
+    CreateAnchorInfo(bags.consumables, bags.quest, "Top")
+    CreateAnchorInfo(bags.quest, bags.bagJunk, "Top")
+    CreateAnchorInfo(bags.bagJunk, bags.bagNew, "Top")
+
+    for _, v in pairs(bags) do
+        cbNivaya:UpdateAnchors(v)
     end
 end
 
-function module:UpdateAllAnchors()
-    local f = self.frames
-    if not f then
+module.bagHidden = {}
+
+function cbNivaya:UpdateAnchors(src)
+    if not src.AnchorTargets then
         return
     end
-    if f.main and f.main:IsShown() then
-        self:UpdateBagsAnchor(f.main, self.ContainerGroups["Bag"])
-    end
-    if f.bank and f.bank:IsShown() then
-        self:UpdateBankAnchor(f.bank, self.ContainerGroups["Bank"])
-    end
-    if f.accountbank and f.accountbank:IsShown() then
-        self:UpdateBankAnchor(f.accountbank, self.ContainerGroups["Account"])
+    for v in pairs(src.AnchorTargets) do
+        local t, u = v.AnchorTo, v.AnchorDir
+        if t then
+            local h = module.bagHidden[t.name]
+            v:ClearAllPoints()
+
+            if not h and u == "Top" then
+                v:SetPoint("BOTTOM", t, "TOP", 0, 12)
+            elseif h and u == "Top" then
+                v:SetPoint("BOTTOM", t, "BOTTOM")
+            elseif not h and u == "Bottom" then
+                v:SetPoint("TOP", t, "BOTTOM", 0, -14)
+            elseif h and u == "Bottom" then
+                v:SetPoint("TOP", t, "TOP")
+            elseif u == "Left" then
+                v:SetPoint("BOTTOMRIGHT", t, "BOTTOMLEFT", -12, 0)
+            elseif u == "Right" then
+                v:SetPoint("TOPLEFT", t, "TOPRIGHT", 12, 0)
+            end
+        end
     end
 end
 
-function module:GetContainerColumns(bagType)
-    if bagType == "Bag" then
-        return cfg.bagsWidth
-    elseif bagType == "Bank" then
-        return cfg.bankWidth
-    elseif bagType == "Account" then
-        return cfg.accountWidth
+------------------------------------------------------------------------
+-- Show / Hide
+------------------------------------------------------------------------
+
+local function showBags(impl, ...)
+    for i = 1, select("#", ...) do
+        local bag = select(i, ...)
+        if not module.bagHidden[bag.name] then
+            bag:Show()
+        end
     end
-    return cfg.bagsWidth
+end
+
+local function hideBags(...)
+    for i = 1, select("#", ...) do
+        select(i, ...):Hide()
+    end
+end
+
+function cbNivaya:OnOpen()
+    local bags = module.bags
+    bags.main:Show()
+    showBags(
+        self,
+        bags.armor,
+        bags.bagNew,
+        bags.bagItemSets,
+        bags.gem,
+        bags.quest,
+        bags.consumables,
+        bags.battlepet,
+        bags.tradegoods,
+        bags.bagStuff,
+        bags.bagJunk
+    )
+end
+
+function cbNivaya:OnClose()
+    local bags = module.bags
+    hideBags(
+        bags.main,
+        bags.armor,
+        bags.bagNew,
+        bags.bagItemSets,
+        bags.gem,
+        bags.quest,
+        bags.consumables,
+        bags.battlepet,
+        bags.tradegoods,
+        bags.bagStuff,
+        bags.bagJunk
+    )
+end
+
+function cbNivaya:OnBankOpened()
+    BankFrame:Show()
+    BankFrame.BankPanel:Show()
+
+    local bags = module.bags
+    bags.bank:Show()
+    showBags(
+        self,
+        bags.bankSets,
+        bags.bankReagent,
+        bags.bankArmor,
+        bags.bankGem,
+        bags.bankQuest,
+        bags.bankTrade,
+        bags.bankConsumables,
+        bags.bankBattlePet,
+        bags.bankJunk,
+        bags.bankAccount
+    )
+end
+
+function cbNivaya:OnBankClosed()
+    local bags = module.bags
+    hideBags(
+        bags.bank,
+        bags.bankSets,
+        bags.bankReagent,
+        bags.bankArmor,
+        bags.bankGem,
+        bags.bankQuest,
+        bags.bankTrade,
+        bags.bankConsumables,
+        bags.bankBattlePet,
+        bags.bankJunk,
+        bags.bankAccount
+    )
+    BankFrame.BankPanel:Hide()
 end
 
 ------------------------------------------------------------------------
 -- Utilities
 ------------------------------------------------------------------------
 
-function module:UpdateAllBags()
-    if self.Bags and self.Bags:IsShown() then
-        for i = 0, 16 do
-            self.Bags:UpdateBag(i)
-        end
-    end
-end
-
 function module:ResetNewItems()
-    -- Trigger C_NewItems clear
-    for bag = 0, 4 do
+    local knownItems = self.knownItems
+    wipe(knownItems)
+
+    for bag = 0, 5 do
         local numSlots = GetContainerNumSlots(bag)
         for slot = 1, numSlots do
-            C_NewItems.RemoveNewItem(bag, slot)
+            local item = cbNivaya:GetItemInfo(bag, slot)
+            if item.id then
+                knownItems[item.id] = (knownItems[item.id] or 0) + (item.count or 1)
+            end
         end
     end
-    self:UpdateAllBags()
+    cbNivaya:UpdateBags()
+end
+
+function module:ResetItemClass()
+    for k, v in pairs(self.itemClass) do
+        if v == "NoClass" then
+            self.itemClass[k] = nil
+        end
+    end
+    cbNivaya:UpdateBags()
 end
