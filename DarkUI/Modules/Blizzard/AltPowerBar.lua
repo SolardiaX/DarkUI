@@ -27,6 +27,7 @@ function module:OnInit()
     bar:EnableMouse(true)
     bar:SetMovable(true)
     bar:SetUserPlaced(true)
+    bar:CreateBorder()
 
     bar:SetScript("OnMouseDown", function(_, button)
         if IsAltKeyDown() or IsShiftKeyDown() then
