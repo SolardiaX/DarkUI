@@ -12,6 +12,7 @@ local function createButton(f, b, l, r, m)
     b:SetSize(16, 16)
 
     E:StyleButton(b)
+    b:CreateShadow()
 
     b.texture = b:CreateTexture(nil, "ARTWORK")
     b.texture:SetTexture(C.media.texture.status)
