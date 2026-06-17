@@ -13,6 +13,8 @@ local function createTimerBar(parent, duration, event)
     local frame = CreateFrame("Frame", nil, parent)
     frame:SetPoint("TOP", parent, "BOTTOM", 0, -10)
     frame:SetSize(280, 10)
+    frame:SetTemplate("transparent")
+    frame:CreateBorder("thin")
 
     frame.bar = CreateFrame("StatusBar", nil, frame)
     frame.bar:SetStatusBarTexture(C.media.texture.status)
