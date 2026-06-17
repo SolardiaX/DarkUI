@@ -607,9 +607,11 @@ local function style(self, unit)
     self.Health.PostUpdate = healthPostUpdate
 
     -- Absorb
-    local ahpb = self.Health:CreateTexture(nil, "ARTWORK")
-    ahpb:SetTexture(C.media.path .. "uf_bartex_normal")
-    ahpb:SetVertexColor(1, 1, 0, 1)
+    local ahpb = CreateFrame("StatusBar", nil, self.Health)
+    ahpb:SetAllPoints()
+    ahpb:SetStatusBarTexture(C.media.path .. "uf_bartex_normal")
+    ahpb:SetStatusBarColor(1, 1, 0, 0.3)
+    ahpb:SetFrameLevel(self.Health:GetFrameLevel())
     self.HealthPrediction = {
         damageAbsorb = ahpb,
     }
