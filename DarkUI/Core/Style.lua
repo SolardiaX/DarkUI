@@ -113,10 +113,18 @@ end
 ------------------------------------------------------------------------
 
 function E:StyleButton(button, margin)
+	local margin = margin or 2
+	
 	local overlay = button:CreateTexture(nil, "OVERLAY")
 	overlay:SetOutside(button, margin, margin)
 	overlay:SetTexture(C.media.texture.overlay)
 	button.__overlay = overlay
+
+	local icon = button.Icon or button.icon
+	if icon then
+		icon:SetTexCoord(unpack(C.media.texCoord))
+		icon:SetInside(button, margin, margin)
+	end
 
 	if button.NormalTexture then
 		button.NormalTexture:SetAlpha(0)

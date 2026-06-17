@@ -63,6 +63,11 @@ function module:OnInit()
 
     RegisterStateDriver(zoneBar, "visibility", "[petbattle] hide; show")
 
+    ExtraAbilityContainer:SetScript("OnShow", nil)
+    ExtraAbilityContainer:SetScript("OnUpdate", nil)
+    ExtraAbilityContainer.OnUpdate = nil
+    ExtraAbilityContainer.IsLayoutFrame = nil
+
     ZoneAbilityFrame.ignoreInLayout = true
     ZoneAbilityFrame:SetParent(zoneBar)
     ZoneAbilityFrame:ClearAllPoints()
@@ -71,6 +76,12 @@ function module:OnInit()
     ZoneAbilityFrame.SpellButtonContainer:SetSize(cfg.button.size, cfg.button.size)
     ZoneAbilityFrame.SpellButtonContainer.spacing = 3
     ZoneAbilityFrame.Style:SetAlpha(0)
+
+    hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
+        if parent == ExtraAbilityContainer then
+            self:SetParent(zoneBar)
+        end
+    end)
 
     hooksecurefunc("ExtraActionBar_Update", function()
         if HasExtraActionBar() then
@@ -81,21 +92,22 @@ function module:OnInit()
     end)
 
     hooksecurefunc(ZoneAbilityFrame, "UpdateDisplayedZoneAbilities", function(self)
-        local previous = nil
+        local previous
         for spellButton in self.SpellButtonContainer:EnumerateActive() do
             if spellButton and not spellButton.__styled then
                 spellButton:SetSize(cfg.button.size, cfg.button.size)
                 E:StyleButton(spellButton)
-
-                spellButton:ClearAllPoints()
-                if previous == nil then
-                    spellButton:SetPoint("CENTER", zoneBar, "CENTER")
-                else
-                    spellButton:SetPoint("BOTTOM", previous, "TOP", 0, 5)
-                end
-
+                -- spellButton:CreateShadow()
                 spellButton.__styled = true
             end
+
+            spellButton:ClearAllPoints()
+            if not previous then
+                spellButton:SetPoint("CENTER", zoneBar, "CENTER")
+            else
+                spellButton:SetPoint("BOTTOM", previous, "TOP", 0, 5)
+            end
+            previous = spellButton
         end
     end)
 end
