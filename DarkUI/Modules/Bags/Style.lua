@@ -676,8 +676,11 @@ function MyButton:OnCreate()
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
 
+    local font, fontSize, fontFlags = unpack(C.media.standard_font)
+    local smallFontSize = fontSize - 2
+
     self.Count:SetPoint("BOTTOMRIGHT", -1, 1)
-    self.Count:SetFont(unpack(C.media.standard_font))
+    self.Count:SetFont(font, smallFontSize, fontFlags)
 
     self.Cooldown:SetInside()
     self.IconOverlay:SetInside()
@@ -696,12 +699,12 @@ function MyButton:OnCreate()
     self.iLvl = self:CreateFontString(nil, "OVERLAY")
     self.iLvl:SetJustifyH("RIGHT")
     self.iLvl:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -1, 1)
-    self.iLvl:SetFont(unpack(C.media.standard_font))
+    self.iLvl:SetFont(font, smallFontSize, fontFlags)
 
     self.durability = self:CreateFontString(nil, "OVERLAY")
     self.durability:SetJustifyH("LEFT")
-    self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", -1, 1)
-    self.durability:SetFont(unpack(C.media.standard_font))
+    self.durability:SetPoint("TOPLEFT", self, "TOPLEFT", 1, -1)
+    self.durability:SetFont(font, smallFontSize, fontFlags)
 
     if C_AddOns.IsAddOnLoaded("CanIMogIt") then
         self.canIMogIt = parentFrame:CreateTexture(nil, "OVERLAY")
@@ -730,7 +733,7 @@ local function isItemHasLevel(item)
 end
 
 local function isItemNeedsLevel(item)
-    return item.link and item.quality and item.quality > 1 and isItemHasLevel(item)
+    return item.link and item.quality > 1 and item.ilvl
 end
 
 local function getIconOverlayAtlas(item)
@@ -779,7 +782,10 @@ function MyButton:OnUpdateButton(item)
     -- iLvl
     self.iLvl:SetText("")
     local level = item.level
-    if level and isItemNeedsLevel(item) then
+    if not level and isItemNeedsLevel(item) then
+        level = item.ilvl
+    end
+    if level then
         local color = C.media.qualityColors[item.quality]
         self.iLvl:SetText(level)
         self.iLvl:SetTextColor(color.r, color.g, color.b)
