@@ -151,8 +151,8 @@ oUF.Tags.Methods['dd:realname'] = function(u, r)
         name = name .. '-*'
     end
 
-    if UnitIsAFK(r or u) then name = L.UNITFRAME_AFK .. name end
-    if UnitIsDND(r or u) then name = L.UNITFRAME_DND .. name end
+    if not issecretvalue(UnitIsAFK(r or u)) and UnitIsAFK(r or u) then name = L.UNITFRAME_AFK .. name end
+    if not issecretvalue(UnitIsDND(r or u)) and UnitIsDND(r or u) then name = L.UNITFRAME_DND .. name end
 
     return name
 end

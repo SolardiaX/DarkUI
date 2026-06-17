@@ -102,10 +102,13 @@ local function playShine(cooldown)
         return
     end
 
+    local level = cooldown:GetFrameLevel()
+    if issecretvalue(level) then level = 5 end
+
     local shine = tremove(shinePool) or createShineFrame()
     shine:SetParent(parent)
     shine:SetAllPoints(parent)
-    shine:SetFrameLevel(cooldown:GetFrameLevel() + 5)
+    shine:SetFrameLevel(level + 5)
     shine:Show()
     shine.animGroup:Play()
 end
