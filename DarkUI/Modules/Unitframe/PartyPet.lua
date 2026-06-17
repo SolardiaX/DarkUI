@@ -40,7 +40,6 @@ local function createBar(self)
     self.Health.bg:SetAllPoints(self.Health)
     self.Health.bg.multiplier = 0.3
 
-    self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorClass = true

@@ -58,7 +58,6 @@ local function createBar(self)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
-    self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.target.colorHealth
     self.Health.colorClassNPC = cfg.target.colorHealth
@@ -288,8 +287,8 @@ local function createAuraIcon(self)
     f.initialAnchor = "TOPLEFT"
     f.onlyShowPlayer = cfg.target.aura.player_aura_only
     f.showStealableBuffs = cfg.target.aura.show_stealable_buffs
-    f["growth-x"] = "RIGHT"
-    f["growth-y"] = "DOWN"
+    f.growthX = "RIGHT"
+    f.growthY = "DOWN"
 
     local h = (f.size + f.spacing) * 6
     local w = (f.size + f.spacing) * 4

@@ -60,7 +60,6 @@ local function createBar(self)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
-    self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.player.colorHealth
     self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut

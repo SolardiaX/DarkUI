@@ -62,7 +62,6 @@ local function createBar(self)
     self.Health.bg:SetAllPoints(self.Health)
     self.Health.bg.multiplier = 0.3
 
-    self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorClass = true
@@ -229,8 +228,8 @@ local function createAuraIcon(self)
     f.gap = true
     f.initialAnchor = "LEFT"
     f.onlyShowPlayer = cfg.party.aura.player_aura_only
-    f["growth-x"] = "RIGHT"
-    f["growth-y"] = "DOWN"
+    f.growthX = "RIGHT"
+    f.growthY = "DOWN"
 
     local w = (f.size + f.spacing) * 4
     local h = (f.size + f.spacing) * 4
@@ -268,11 +267,9 @@ local function createStyle(self)
     createThreatType(self)
     createAuraIcon(self)
 
-    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "BOTTOM", 0, 18)
-    self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
+    self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 20, 1, self, "CENTER", "BOTTOM", 0, 18)
 
-    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 10)
-    self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
+    self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 20, -1, self, "BOTTOMRIGHT", "BOTTOMRIGHT", 4, 10)
 
     self.LeaderIndicator = core:CreateIcon(self.FrameBG, "BACKGROUND", 24, -1, self, "BOTTOM", "TOP", 0, 10)
     self.LeaderIndicator:SetTexture(media.leader_Tex)

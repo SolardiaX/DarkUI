@@ -99,7 +99,6 @@ local function createBar(self)
     self.Health.bg:SetAllPoints(self.Health)
     self.Health.bg:SetAlpha(0.3)
 
-    self.Health.frequentUpdates = true
     self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorSmooth = true
     self.Health.colorClass = cfg.raid.colorHealth

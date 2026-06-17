@@ -396,7 +396,6 @@ local function style(self, unit)
     self.Health = CreateFrame("StatusBar", nil, self)
     self.Health:SetAllPoints(self)
     self.Health:SetStatusBarTexture(C.media.texture.status)
-    self.Health.frequentUpdates = true
     self.Health.colorTapping = true
     self.Health.colorDisconnected = true
     self.Health.colorClass = true
@@ -577,11 +576,11 @@ local function style(self, unit)
         self.Auras = CreateFrame("Frame", nil, self)
         self.Auras:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT", 2, 20)
         self.Auras.initialAnchor = "BOTTOMRIGHT"
-        self.Auras["growth-y"] = "UP"
-        self.Auras["growth-x"] = "LEFT"
+        self.Auras.growthY = "UP"
+        self.Auras.growthX = "LEFT"
         self.Auras.numDebuffs = cfg.track_debuffs and 6 or 0
         self.Auras.numBuffs = cfg.track_buffs and 4 or 0
-        self.Auras.maxAuras = 5
+        self.Auras.numTotal = 5
         self.Auras:SetSize(20 + cfg.width, cfg.auras_size)
         self.Auras.spacing = cfg.icon_spacing
         self.Auras.size = cfg.auras_size
@@ -612,7 +611,7 @@ local function style(self, unit)
     ahpb:SetTexture(C.media.path .. "uf_bartex_normal")
     ahpb:SetVertexColor(1, 1, 0, 1)
     self.HealthPrediction = {
-        absorbBar = ahpb,
+        damageAbsorb = ahpb,
     }
 
     -- Every event should be register with this

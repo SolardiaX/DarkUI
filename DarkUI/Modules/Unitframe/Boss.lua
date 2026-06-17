@@ -45,7 +45,6 @@ local function createBar(self)
     self.Health:SetStatusBarTexture(media.hpTex)
     self.Health:SetStatusBarColor(0.2, 0.2, 0.2)
 
-    self.Health.frequentUpdates = true
     self.Health.colorSmooth = true
     self.Health.smoothing = Enum.StatusBarInterpolation.ExponentialEaseOut
     self.Health.colorClass = true
@@ -146,8 +145,8 @@ local function createAuraIcon(self)
     buffs.size = 22
     buffs.spacing = 4
     buffs.initialAnchor = "BOTTOMLEFT"
-    buffs["growth-x"] = "RIGHT"
-    buffs["growth-y"] = "UP"
+    buffs.growthX = "RIGHT"
+    buffs.growthY = "UP"
     buffs.num = 6
     buffs.showStealableBuffs = cfg.boss.aura.show_Stealable_buffs
     buffs:SetSize((buffs.size + buffs.spacing) * buffs.num, buffs.size)
@@ -164,8 +163,8 @@ local function createAuraIcon(self)
     debuffs.size = 22
     debuffs.spacing = 4
     debuffs.initialAnchor = "TOPLEFT"
-    debuffs["growth-x"] = "RIGHT"
-    debuffs["growth-y"] = "DOWN"
+    debuffs.growthX = "RIGHT"
+    debuffs.growthY = "DOWN"
     debuffs.num = 6
     debuffs.onlyShowPlayer = cfg.boss.aura.player_aura_only
     debuffs:SetSize((debuffs.size + debuffs.spacing) * debuffs.num, debuffs.size)
@@ -183,7 +182,7 @@ local function createCastbar(self)
     cb:SetFrameLevel(5)
     cb:SetStatusBarTexture(C.media.texture.status)
     cb:SetStatusBarColor(1, 0.8, 0)
-    cb:SetPoint("LEFT", self, "RIGHT", 8, 0)
+    cb:SetPoint("LEFT", self, "RIGHT", 20, 0)
     cb:SetSize(100, 10)
 
     cb.bg = cb:CreateTexture(nil, "BACKGROUND")
