@@ -127,7 +127,7 @@ function module:OnInit()
 
     local pos = cfg.position
     local panelWidth = 170
-    local panelHeight = 130
+    local panelHeight = 150
     local btnWidth = panelWidth * 0.8
     local btnHeight = 18
 
@@ -135,7 +135,8 @@ function module:OnInit()
     panel = CreateFrame("Frame", "DarkUI_RaidUtilityPanel", E.PetBattleFrameHider, "BackdropTemplate")
     panel:SetSize(panelWidth, panelHeight)
     panel:SetPoint(unpack(pos))
-    panel:SetTemplate("Default")
+    panel:SetTemplate("default")
+    panel:CreateBorder("thin")
     panel:SetFrameStrata("HIGH")
     panel:SetFrameLevel(9)
     panel:Hide()
