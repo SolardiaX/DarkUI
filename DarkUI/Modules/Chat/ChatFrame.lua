@@ -39,21 +39,20 @@ _G.ERR_FRIEND_ONLINE_SS = "|Hplayer:%s|h[%s]|h " .. L.CHAT_COME_ONLINE
 _G.ERR_FRIEND_OFFLINE_S = "[%s] " .. L.CHAT_GONE_OFFLINE
 
 ------------------------------------------------------------------------
--- AddMessage Hook
+-- AddMessage Filter (channel number strip + realm name strip)
 ------------------------------------------------------------------------
-
-local origs = {}
 
 local function strip(info, name)
     return format("|Hplayer:%s|h[%s]|h", info, name:gsub("%-[^|]+", ""))
 end
 
-local function addMessage(self, text, ...)
-    if type(text) == "string" and canaccessvalue(text) then
-        text = text:gsub("|h%[(%d+)%. .-%]|h", "|h[%1]|h")
-        text = text:gsub("|Hplayer:(.-)|h%[(.-)%]|h", strip)
+local function formatMessageFilter(_, _, text, ...)
+    if type(text) ~= "string" or not canaccessvalue(text) then return end
+    local modified = text:gsub("|h%[(%d+)%. .-%]|h", "|h[%1]|h")
+    modified = modified:gsub("|Hplayer:(.-)|h%[(.-)%]|h", strip)
+    if modified ~= text then
+        return false, modified, ...
     end
-    return origs[self](self, text, ...)
 end
 
 ------------------------------------------------------------------------
@@ -187,8 +186,6 @@ local function setChatStyle(frame)
     end
 
     if _G[chat] ~= _G["ChatFrame2"] then
-        origs[_G[chat]] = _G[chat].AddMessage
-        _G[chat].AddMessage = addMessage
         _G.TIMESTAMP_FORMAT_HHMM = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M]|r "
         _G.TIMESTAMP_FORMAT_HHMMSS = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M:%S]|r "
         _G.TIMESTAMP_FORMAT_HHMMSS_24HR = E:RGBToHex(unpack(cfg.time_color)) .. "[%H:%M:%S]|r "
@@ -283,6 +280,7 @@ end
 ------------------------------------------------------------------------
 
 local function addLootIcons(_, _, message, ...)
+    if issecretvalue(message) then return end
     local function icon(link)
         local texture = C_Item.GetItemIconByID(link)
         return "\124T" .. texture .. ":12:12:0:0:64:64:5:59:5:59\124t" .. link
@@ -296,6 +294,7 @@ end
 ------------------------------------------------------------------------
 
 local function removeRealmName(_, _, msg, author, ...)
+    if issecretvalue(msg) then return end
     local realm = gsub(E.realm, " ", "")
     if msg:find("-" .. realm) then
         return false, gsub(msg, "%-" .. realm, ""), author, ...
@@ -380,6 +379,17 @@ function module:OnInit()
     end
 
     ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", removeRealmName)
+
+    local formatEvents = {
+        "CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER",
+        "CHAT_MSG_PARTY", "CHAT_MSG_PARTY_LEADER", "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER",
+        "CHAT_MSG_INSTANCE_CHAT", "CHAT_MSG_INSTANCE_CHAT_LEADER",
+        "CHAT_MSG_CHANNEL", "CHAT_MSG_WHISPER", "CHAT_MSG_WHISPER_INFORM",
+        "CHAT_MSG_BN_WHISPER", "CHAT_MSG_BN_WHISPER_INFORM",
+    }
+    for _, event in ipairs(formatEvents) do
+        ChatFrame_AddMessageEventFilter(event, formatMessageFilter)
+    end
 
     for i = 1, NUM_CHAT_WINDOWS do
         if i ~= 2 then

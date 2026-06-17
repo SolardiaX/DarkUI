@@ -65,6 +65,7 @@ function module:OnInit()
         ERR_SPELL_UNLEARNED_S = ""
 
         local function systemFilter(_, _, text)
+            if issecretvalue(text) then return end
             if text and text == "" then
                 return true
             end
@@ -74,6 +75,7 @@ function module:OnInit()
 
     if cfg.spam then
         local function repeatMessageFilter(self, _, text, sender)
+            if issecretvalue(text) or issecretvalue(sender) then return end
             sender = Ambiguate(sender, "guild")
             if sender == E.myName or UnitIsInMyGuild(sender) then
                 return
@@ -100,6 +102,7 @@ function module:OnInit()
         local SpamList = cfg.spamlist or {}
 
         local function tradeFilter(_, _, text, sender)
+            if issecretvalue(text) or issecretvalue(sender) then return end
             sender = Ambiguate(sender, "guild")
             if sender == E.myName or UnitIsInMyGuild(sender) then
                 return

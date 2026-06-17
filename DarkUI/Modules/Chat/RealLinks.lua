@@ -66,6 +66,7 @@ local function getLinkColor(data)
 end
 
 local function messageFilter(self, event, message, ...)
+    if issecretvalue(message) then return end
     for link, data in gmatch(message, "(|H(.-)|h.-|h)") do
         local color, queue = getLinkColor(data)
         if queue then

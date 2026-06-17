@@ -27,7 +27,7 @@ local function onTooltipSetUnit(self)
     end
 
     local raidIndex = GetRaidTargetIndex(unit)
-    if raidIndex then
+    if raidIndex and not issecretvalue(raidIndex) then
         ricon:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_" .. raidIndex)
     else
         ricon:SetTexture(nil)

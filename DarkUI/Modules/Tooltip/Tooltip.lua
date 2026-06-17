@@ -176,13 +176,17 @@ local function onTooltipSetUnit(self)
     local name, realm = UnitName(unit)
     local race, englishRace = UnitRace(unit)
     local level = UnitLevel(unit)
-    local levelColor = GetCreatureDifficultyColor(level)
+    local levelIsSecret = issecretvalue(level)
+    local levelColor = not levelIsSecret and GetCreatureDifficultyColor(level) or nil
     local classification = UnitClassification(unit)
     local creatureType = UnitCreatureType(unit)
     local _, faction = UnitFactionGroup(unit)
     local _, playerFaction = UnitFactionGroup("player")
     local titleName = UnitPVPName(unit)
     local isPlayer = UnitIsPlayer(unit)
+
+    if levelIsSecret then level = nil end
+    if issecretvalue(creatureType) then creatureType = nil end
 
     if level and level == -1 then
         if classification == "worldboss" then
@@ -234,24 +238,28 @@ local function onTooltipSetUnit(self)
             end
         end
 
-        local levelLine = getLevelLine(self)
-        if levelLine then
-            if GetCVar("colorblindMode") == "1" then
-                local class = UnitClass(unit)
-                levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN, class or "")
-            else
-                levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN)
+        if levelColor then
+            local levelLine = getLevelLine(self)
+            if levelLine then
+                if GetCVar("colorblindMode") == "1" then
+                    local class = UnitClass(unit)
+                    levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN, class or "")
+                else
+                    levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN)
+                end
             end
         end
     else
-        for i = 2, lines do
-            local line = _G["GameTooltipTextLeft" .. i]
-            if not line or not line:GetText() or UnitIsBattlePetCompanion(unit) then return end
-            local text = line:GetText()
-            if not canaccessvalue(text) then break end
-            if (level and text:find("^" .. LEVEL)) or (creatureType and text:find("^" .. creatureType)) then
-                line:SetFormattedText("|cff%02x%02x%02x%s%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, classification, creatureType or "")
-                break
+        if levelColor then
+            for i = 2, lines do
+                local line = _G["GameTooltipTextLeft" .. i]
+                if not line or not line:GetText() or UnitIsBattlePetCompanion(unit) then break end
+                local text = line:GetText()
+                if not canaccessvalue(text) then break end
+                if (level and text:find("^" .. LEVEL)) or (creatureType and text:find("^" .. creatureType)) then
+                    line:SetFormattedText("|cff%02x%02x%02x%s%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, classification, creatureType or "")
+                    break
+                end
             end
         end
     end
