@@ -23,7 +23,13 @@ function module:OnInit()
 
     hooksecurefunc(ExtraActionBarFrame, "SetParent", function(self, parent)
         if parent == ExtraAbilityContainer then
-            self:SetParent(extraBar)
+            if InCombatLockdown() then
+                E.Event:RegisterOnce("PLAYER_REGEN_ENABLED", function()
+                    self:SetParent(extraBar)
+                end)
+            else
+                self:SetParent(extraBar)
+            end
         end
     end)
 
