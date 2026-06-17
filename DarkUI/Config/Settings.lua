@@ -337,6 +337,10 @@ C.chat = {
     tabs_mouseover = true,
     sticky = true,
     loot_icons = true,
+    bubble_font_size = 12,
+    bubble_scale = 0.9,
+    bubble_hide_instance = true,
+    bubble_hide_raid = true,
 }
 
 ----------------------------------------------------------------------------------------

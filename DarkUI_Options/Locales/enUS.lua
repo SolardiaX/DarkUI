@@ -177,6 +177,11 @@ L_OPT_CHAT_CHAT_COMBATLOG = "Show Combat Log Toggle"
 L_OPT_CHAT_CHAT_TABS_MOUSEOVER = "Hovering to show chat tabs"
 L_OPT_CHAT_CHAT_STICKY = "Remember the last channel used"
 L_OPT_CHAT_LOOT_ICONS = "Show loot icons in chat frame"
+L_OPT_CHAT_BUBBLE_HEADER = "Chat Bubbles"
+L_OPT_CHAT_BUBBLE_FONT_SIZE = "Bubble font size"
+L_OPT_CHAT_BUBBLE_SCALE = "Bubble scale"
+L_OPT_CHAT_BUBBLE_HIDE_INSTANCE = "Hide bubbles in instances"
+L_OPT_CHAT_BUBBLE_HIDE_RAID = "Hide bubbles in raids"
 
 -- Automation & Announcement
 L_OPT_MISC_AUTOMATION_ACCEPT_INVITE = "Auto accept invitations from friends/guild"

@@ -179,6 +179,11 @@ L_OPT_CHAT_CHAT_COMBATLOG = "显示战斗记录切换标签"
 L_OPT_CHAT_CHAT_TABS_MOUSEOVER = "鼠标悬停显示频道标签"
 L_OPT_CHAT_CHAT_STICKY = "记住上一次使用的频道"
 L_OPT_CHAT_LOOT_ICONS = "聊天框显示拾取物品图标"
+L_OPT_CHAT_BUBBLE_HEADER = "聊天气泡"
+L_OPT_CHAT_BUBBLE_FONT_SIZE = "气泡字体大小"
+L_OPT_CHAT_BUBBLE_SCALE = "气泡缩放"
+L_OPT_CHAT_BUBBLE_HIDE_INSTANCE = "副本中隐藏气泡"
+L_OPT_CHAT_BUBBLE_HIDE_RAID = "团本中隐藏气泡"
 
 -- Automation & Announcement
 L_OPT_MISC_AUTOMATION_ACCEPT_INVITE = "自动接收来自好友/工会的组队邀请"

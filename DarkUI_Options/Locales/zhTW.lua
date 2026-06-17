@@ -179,6 +179,11 @@ L_OPT_CHAT_CHAT_COMBATLOG = "顯示戰鬥記錄切換標籤"
 L_OPT_CHAT_CHAT_TABS_MOUSEOVER = "鼠標懸停顯示頻道標籤"
 L_OPT_CHAT_CHAT_STICKY = "記住上一次使用的頻道"
 L_OPT_CHAT_LOOT_ICONS = "聊天框顯示拾取物品圖標"
+L_OPT_CHAT_BUBBLE_HEADER = "聊天氣泡"
+L_OPT_CHAT_BUBBLE_FONT_SIZE = "氣泡字體大小"
+L_OPT_CHAT_BUBBLE_SCALE = "氣泡縮放"
+L_OPT_CHAT_BUBBLE_HIDE_INSTANCE = "副本中隱藏氣泡"
+L_OPT_CHAT_BUBBLE_HIDE_RAID = "團本中隱藏氣泡"
 
 -- Automation & Announcement
 L_OPT_MISC_AUTOMATION_ACCEPT_INVITE = "自動接收來自好友/工會的組隊邀請"

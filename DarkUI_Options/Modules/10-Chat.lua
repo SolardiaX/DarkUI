@@ -1,5 +1,5 @@
 local addon = DarkUI_Options
-local CHECK = addon.CHECK
+local CHECK, SLIDER, HEADER = addon.CHECK, addon.SLIDER, addon.HEADER
 
 addon:RegisterTab("chat", L_CATEGORIES_CHAT)
 
@@ -15,6 +15,11 @@ addon.OptionList["chat"] = {
     { CHECK, "chat.tabs_mouseover", L_OPT_CHAT_CHAT_TABS_MOUSEOVER },
     { CHECK, "chat.sticky", L_OPT_CHAT_CHAT_STICKY },
     { CHECK, "chat.loot_icons", L_OPT_CHAT_LOOT_ICONS },
+    { HEADER, "", L_OPT_CHAT_BUBBLE_HEADER },
+    { SLIDER, "chat.bubble_font_size", L_OPT_CHAT_BUBBLE_FONT_SIZE, { 8, 18, 1 } },
+    { SLIDER, "chat.bubble_scale", L_OPT_CHAT_BUBBLE_SCALE, { 0.5, 1.5, 0.05 } },
+    { CHECK, "chat.bubble_hide_instance", L_OPT_CHAT_BUBBLE_HIDE_INSTANCE },
+    { CHECK, "chat.bubble_hide_raid", L_OPT_CHAT_BUBBLE_HIDE_RAID },
 }
 
 addon.Hooks["chat"] = function(a)
