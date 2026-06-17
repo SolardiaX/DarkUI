@@ -192,21 +192,12 @@ local function skinProgressBar(tracker, key)
     local icon = bar and bar.Icon
 
     if not progressBar.styled then
-        if bar.BarFrame then bar.BarFrame:Hide() end
-        if bar.BarFrame2 then bar.BarFrame2:Hide() end
-        if bar.BarFrame3 then bar.BarFrame3:Hide() end
-        if bar.BarGlow then bar.BarGlow:Hide() end
-        if bar.Sheen then bar.Sheen:Hide() end
-        if bar.IconBG then bar.IconBG:SetAlpha(0) end
-        if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
-        if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
-        if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
-        if progressBar.PlayFlareAnim then progressBar.PlayFlareAnim = E.Dummy end
-
+        bar:StripTextures()
         bar:SetSize(200, 16)
         bar:SetStatusBarTexture(C.media.texture.status)
-        bar:CreateBackdrop("Transparent")
-        bar:CreateBorder()
+        bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+        bar:CreateBackdrop("transparent")
+        bar:CreateBorder("thin")
 
         label:ClearAllPoints()
         label:SetPoint("CENTER", 0, -1)
@@ -250,8 +241,9 @@ local function skinTimerBar(tracker, key)
         if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
 
         bar:SetStatusBarTexture(C.media.texture.status)
-        bar:CreateBackdrop("Transparent")
-        bar:CreateBorder()
+        bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+        bar:CreateBackdrop("transparent")
+        bar:CreateBorder("thin")
 
         timerBar.styled = true
     end
@@ -277,10 +269,8 @@ end
 
 local function skinStageBlock(block)
     if not block.backdrop then
-        block:CreateBackdrop("fill")
+        block:CreateBackdrop("transparent")
         block.__backdrop:SetBackdropEdge("thin")
-        block.__backdrop:SetPoint("TOPLEFT", block.NormalBG, 3, -3)
-        block.__backdrop:SetPoint("BOTTOMRIGHT", block.NormalBG, -6, 3)
 
         block.NormalBG:SetAlpha(0)
         block.FinalBG:SetAlpha(0)
@@ -297,9 +287,9 @@ local function skinStageWidgets(self)
             local bar = widgetFrame.TimerBar
             if bar and not bar.styled then
                 bar:SetStatusBarTexture(C.media.texture.status)
-                bar:CreateBackdrop("fill")
-                bar:CreateBorder()
-                bar:SetStatusBarColor(0, 0.6, 1)
+                bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+                bar:CreateBackdrop("transparent")
+                bar:CreateBorder("thin")
                 bar:SetFrameLevel(bar:GetFrameLevel() + 3)
                 bar.styled = true
             end
@@ -323,7 +313,7 @@ end
 
 local function skinChallengeBlock(block)
     if not block.__styled then
-        block:CreateBackdrop("default")
+        block:CreateBackdrop("transparent")
         block.__backdrop:SetBackdropEdge("thin")
         block.__backdrop:SetPoint("TOPLEFT", block, 3, -3)
         block.__backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
@@ -336,7 +326,8 @@ local function skinChallengeBlock(block)
         block.TimerBG:SetAlpha(0)
 
         block.StatusBar:SetStatusBarTexture(C.media.texture.status)
-        block.StatusBar:CreateBackdrop("default")
+        block.StatusBar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
+        block.StatusBar:CreateBackdrop("transparent")
         block.StatusBar.__backdrop:SetBackdropEdge("thin")
         block.StatusBar.__backdrop:SetFrameLevel(block.__backdrop:GetFrameLevel() + 1)
         block.StatusBar:SetStatusBarColor(0, 0.6, 1)
