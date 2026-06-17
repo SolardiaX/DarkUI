@@ -60,7 +60,7 @@ local BACKDROP = {
 local EDGE = {
 	pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
 	blur = { edgeFile = C.media.texture.shadow, edgeSize = Mult, insets = Mult },
-	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 8, insets = 4 },
+	thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, insets = 2 },
 	regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, insets = 2 },
 	bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, insets = 8, borderColor = { 1, 1, 1, 1 } },
 	bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, insets = { left = 8, right = 8, top = 16, bottom = 16 }, borderColor = { 1, 1, 1, 1 } }
@@ -293,7 +293,7 @@ local function setBackdropEdge(f, t, size)
 	if f.__bgColor then
 		f:SetBackdropColor(unpack(f.__bgColor))
 	else
-		f:SetBackdropColor(0, 0, 0, 0)
+		f:SetBackdropColor(unpack(E.media.backdrop_color))
 	end
 
 	if cfg.borderColor then
@@ -301,7 +301,7 @@ local function setBackdropEdge(f, t, size)
 	elseif f.__borderColor then
 		f:SetBackdropBorderColor(unpack(f.__borderColor))
 	else
-		f:SetBackdropBorderColor(0, 0, 0, 0)
+		f:SetBackdropBorderColor(unpack(E.media.backdrop_color))
 	end
 end
 
