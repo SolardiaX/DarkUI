@@ -10,8 +10,7 @@ local cfg = C.combattext
 local floor = math.floor
 local GetMoney = GetMoney
 
-local previousMoney = GetMoney()
-
+local previousMoney
 local dataEvent = {}
 
 local function onPlayerMoney()
@@ -20,6 +19,11 @@ local function onPlayerMoney()
     end
 
     local currentMoney = GetMoney()
+    if not previousMoney then
+        previousMoney = currentMoney
+        return
+    end
+
     local moneyChange = currentMoney - previousMoney
 
     if moneyChange > 0 then

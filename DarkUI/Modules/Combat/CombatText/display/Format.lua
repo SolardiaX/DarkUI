@@ -284,13 +284,13 @@ local function formatEvent(dataEvent)
                     local c = dataEvent.copper or 0
                     local parts = ""
                     if g > 0 then
-                        parts = parts .. "|cFFFFD700" .. g .. "|r" .. GOLD_ICON
+                        parts = parts .. "|cFFFFD700" .. format("%d", g) .. "|r" .. GOLD_ICON
                     end
                     if s > 0 then
-                        parts = parts .. "|cFFC0C0C0" .. s .. "|r" .. SILVER_ICON
+                        parts = parts .. " |cFFC0C0C0" .. format("%d", s) .. "|r" .. SILVER_ICON
                     end
                     if c > 0 or (g == 0 and s == 0) then
-                        parts = parts .. "|cFFB87333" .. c .. "|r" .. COPPER_ICON
+                        parts = parts .. " |cFFB87333" .. format("%d", c) .. "|r" .. COPPER_ICON
                     end
                     text = parts
                 end
