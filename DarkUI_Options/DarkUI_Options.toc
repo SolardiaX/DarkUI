@@ -25,7 +25,7 @@ Modules\08-DataText.lua
 Modules\09-Tooltip.lua
 Modules\10-Chat.lua
 Modules\11-Quest.lua
-Modules\12-Automation.lua
-Modules\13-Misc.lua
-Modules\14-Commands.lua
-Modules\15-CombatText.lua
+Modules\12-CombatText.lua
+Modules\13-Automation.lua
+Modules\14-Misc.lua
+Modules\15-Commands.lua
