@@ -7,9 +7,37 @@ Current game version: **12.0** (Interface `120001`).
 ## Critical API Rules for WoW 12.0
 
 ### Secret Values
-- Always check `issecretvalue(value)` before arithmetic on UnitHealth/UnitPower returns
-- Use `UnitHealthPercent()` / `UnitPowerPercent()` as safe alternatives
-- `ColorCurve` and `Curve` APIs for secret-aware visual calculations
+Secret values are conditionally restricted based on **secret predicates** (e.g., in combat, unit identity restricted, PvP, restricted maps). When execution is untainted (Blizzard secure code), secrets behave as normal values.
+
+**Detection:**
+- `issecretvalue(value)` — check before any restricted operation
+- `issecrettable(table)` / `canaccesstable(table)` — for table-level checks
+
+**Forbidden** (immediate Lua error in tainted/addon code):
+- Arithmetic (`+`, `-`, `*`, `/`, `%`)
+- Comparisons (`>`, `<`, `==`, `~=` against numbers/strings)
+- Length (`#secret`)
+- As table keys, indexed access/assignment, or calling as function
+
+**Allowed:**
+- Store in variables/tables, pass to functions
+- `type(secret)` returns real type; non-boolean secrets evaluate as truthy in `if`
+- String concat (`..`), `string.format`, `string.join`
+- Pass to widget APIs that accept secrets (`FontString:SetText`, `StatusBar:SetValue`, etc.)
+
+**APIs that may return secrets:**
+- `UnitHealth`, `UnitPower`, `UnitHealthMax`, `UnitPowerMax`
+- `UnitName` (non-player/pet units in combat)
+- Aura data, spell cast info on restricted units
+- `C_DamageMeter` returns (pass through to display, never do delta math)
+
+**Safe alternatives & tools:**
+- `UnitHealthPercent()` / `UnitPowerPercent()` — non-secret percentage values
+- `C_CurveUtil.CreateColorCurve()` / `CreateCurve()` — map secret numerics to visual output
+- `C_DurationUtil.CreateDuration()` — time calculations on secret values
+- `StatusBar:SetTimerDuration()` — display secret durations
+
+**Widget secret aspects:** Passing a secret to a setter (e.g., `SetText`) marks the widget aspect; subsequent getters (e.g., `GetText`) return secrets. Clear via `FrameScriptObject:SetToDefaults()`.
 
 ### Removed Globals → C_ActionBar
 All bare action functions (`GetVehicleBarIndex`, `HasAction`, `IsActionInRange`, `GetActionCooldown`, etc.) moved to `C_ActionBar.*`
