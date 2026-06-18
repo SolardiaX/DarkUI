@@ -210,7 +210,7 @@ local function createThreatType(self)
         end
 
         local status = UnitCanAttack(self.unit, "target") and UnitThreatSituation(self.unit, "target") or (UnitThreatSituation(self.unit))
-        -- if issecretvalue(status) then status = nil end
+        if issecretvalue(status) then status = nil end
         local file = (status ~= nil) and fg_files[status] or fg_files[0]
 
         if threat_status_file ~= file then
