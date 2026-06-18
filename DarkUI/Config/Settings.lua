@@ -109,14 +109,14 @@ C.actionbar = {
             pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 34 },
             button = { size = 24, space = 2 },
             scale = 1,
-            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.4 } },
+            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.1 } },
         },
         bags = {
             enable = true,
             pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 64 },
             scale = 0.98,
             button = { size = 24, space = 4 },
-            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.1 } },
+            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.01 } },
         },
         exp = {
             enable = true,
