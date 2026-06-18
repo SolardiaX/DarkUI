@@ -641,6 +641,8 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
+    C_CVar.SetCVar("minimapTrackingShowAll", 1)
+
     media = {
         map_gloss = C.media.path .. "map_gloss",
         map_overlay = C.media.path .. C.general.style .. "\\" .. "map_overlay",

@@ -49,6 +49,9 @@ function module:OnInit()
         return
     end
 
+    C_Container.SetSortBagsRightToLeft(true)
+    C_Container.SetInsertItemsLeftToRight(false)
+
     self:LoadDefaults()
 
     self.filterEnabled.Equipment = self.opts.Equipment

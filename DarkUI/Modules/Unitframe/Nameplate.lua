@@ -36,7 +36,6 @@ local cfg = C.nameplate
 local bar_border
 local arrow
 
-
 local function createBorderFrame(frame, point)
     if point == nil then
         point = frame
@@ -281,12 +280,10 @@ end
 
 -- Auras functions
 local function aurasFilter(element, unit, data)
-    if element.alwaysShowStealable and (not data.isHarmfulAura)
-        and type(data.dispelName) ~= "nil" and (not UnitIsPlayer(unit)) then
+    if element.alwaysShowStealable and not data.isHarmfulAura and type(data.dispelName) ~= "nil" and (not UnitIsPlayer(unit)) then
         return true
     end
-    return (data.isPlayerAura and data.isNameplateOnlyAura)
-        and not (data.isHarmfulAura and data.isCrowdControlAura)
+    return (data.isPlayerAura and data.isNameplateOnlyAura) and not (data.isHarmfulAura and data.isCrowdControlAura)
 end
 
 local function ccFilter(element, unit, data)
@@ -667,6 +664,11 @@ function module:PLAYER_ENTERING_WORLD()
 end
 
 function module:PLAYER_LOGIN()
+    SetCVar("ShowClassColorInNameplate", 1)
+    SetCVar("nameplateShowSelf", 0)
+    SetCVar("nameplateResourceOnTarget", 0)
+    SetCVar("nameplateMotion", 1)
+
     if cfg.enhance_threat == true then
         SetCVar("threatWarning", 3)
     end

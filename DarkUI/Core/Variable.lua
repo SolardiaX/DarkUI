@@ -8,7 +8,6 @@ local module = E:Module("Variable")
 
 local SetCVar = C_CVar.SetCVar
 local SetCVarBitfield = SetCVarBitfield
-local InCombatLockdown = InCombatLockdown
 local ToggleChatColorNamesByClassGroup = ToggleChatColorNamesByClassGroup
 local hooksecurefunc = hooksecurefunc
 
@@ -42,34 +41,13 @@ end
 -- Conditional CVars (applied every login)
 ------------------------------------------------------------------------
 
-local function applyCVars()
-    if C.chat.enable then
-        SetCVar("chatStyle", "classic")
-    end
-
-    if C.unitframe.enable then
-        SetCVar("showPartyBackground", 0)
-    end
-
-    if C.actionbar.bars.enable then
-        if not InCombatLockdown() then
-            SetCVar("multiBarRightVerticalLayout", 0)
-        end
-    end
-
-    if C.nameplate.enable then
-        SetCVar("ShowClassColorInNameplate", 1)
-    end
-
-    if C.map.minimap.enable then
-        SetCVar("minimapTrackingShowAll", 1)
-    end
-
-    if C.actionbar.bars.enable and C.actionbar.bars.bags.enable then
-        C_Container.SetSortBagsRightToLeft(true)
-        C_Container.SetInsertItemsLeftToRight(false)
-    end
-end
+-- Moved to respective modules:
+-- chatStyle → Chat/ChatFrame.lua
+-- showPartyBackground → Unitframe/Player.lua
+-- multiBarRightVerticalLayout → Actionbar/Actionbar.lua
+-- ShowClassColorInNameplate → Unitframe/Nameplate.lua
+-- minimapTrackingShowAll → Map/Minimap.lua
+-- C_Container sort → Bags/Core.lua
 
 ------------------------------------------------------------------------
 -- First-time initialization (once per version per character)
@@ -80,32 +58,16 @@ local function firstTimeSetup()
     SetCVar("cameraDistanceMaxZoomFactor", 2.6)
     SetCVar("showTutorials", 0)
     SetCVar("UberTooltips", 1)
-    SetCVar("chatMouseScroll", 1)
     SetCVar("removeChatDelay", 1)
-    SetCVar("lootUnderMouse", 1)
-    SetCVar("autoLootDefault", 1)
     SetCVar("RotateMinimap", 0)
     SetCVar("autoQuestProgress", 1)
     SetCVar("scriptErrors", 1)
     SetCVar("taintLog", 0)
     SetCVar("buffDurations", 1)
-    SetCVar("autoOpenLootHistory", 0)
     SetCVar("lossOfControl", 0)
     SetCVar("alwaysCompareItems", 1)
     SetCVar("autoSelfCast", 1)
-    SetCVar("ShowClassColorInNameplate", 1)
-    SetCVar("threatWarning", 3)
-    SetCVar("lockActionBars", 1)
-    SetCVar("countdownForCooldowns", 0)
-    SetCVar("alwaysShowActionBars", 1)
     SetCVar("fstack_preferParentKeys", 0)
-
-    SetCVar("nameplateShowSelf", 0)
-    SetCVar("nameplateResourceOnTarget", 0)
-    SetCVar("nameplateMotion", 1)
-    SetCVar("nameplateShowAll", 1)
-    SetCVar("nameplateShowEnemies", 1)
-    SetCVar("multiBarRightVerticalLayout", 0)
 
     SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_WORLD_MAP_FRAME, true)
     SetCVarBitfield("closedInfoFrames", LE_FRAME_TUTORIAL_PET_JOURNAL, true)
@@ -147,7 +109,6 @@ function module:OnInit()
     end
 
     disableTutorials()
-    applyCVars()
 
     print("|cffffff00" .. L.WELCOME_LINE .. E.version .. " " .. E.locale .. ", " .. E.myName .. ".|r")
 end

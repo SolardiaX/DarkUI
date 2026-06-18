@@ -97,6 +97,10 @@ local function disableDefaultBarEvents()
 end
 
 function module:OnInit()
+    C_CVar.SetCVar("multiBarRightVerticalLayout", 0)
+    C_CVar.SetCVar("lockActionBars", 1)
+    C_CVar.SetCVar("alwaysShowActionBars", 1)
+
     for _, frame in next, framesToHide do
         frame:SetParent(E.FrameHider)
     end

@@ -371,6 +371,8 @@ local function createStyle(self)
 end
 
 function module:OnInit()
+    C_CVar.SetCVar("showPartyBackground", 0)
+
     local mediaPath = cfg.mediaPath
     media = {
         portrait_overlay = mediaPath .. "uf_portrait_overlay",

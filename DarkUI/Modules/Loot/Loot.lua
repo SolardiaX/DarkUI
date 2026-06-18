@@ -384,7 +384,13 @@ end
 -- Lifecycle
 ------------------------------------------------------------------------
 function module:OnInit()
-    if not cfg.enable then return end
+    if not cfg.enable then
+        return
+    end
+
+    C_CVar.SetCVar("lootUnderMouse", 1)
+    C_CVar.SetCVar("autoLootDefault", 1)
+    C_CVar.SetCVar("autoOpenLootHistory", 0)
 
     lootFrame = CreateFrame("Button", "DarkUILootFrame", UIParent)
     lootFrame:SetPoint(unpack(cfg.pos))
