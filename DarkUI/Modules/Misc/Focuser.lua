@@ -48,9 +48,13 @@ function module:OnInit()
 
     hooksecurefunc("CreateFrame", onCreateFrame)
 
-    for _, object in next, oUF.objects do
-        setupFocus(object)
-    end
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
+        for _, object in next, oUF.objects do
+            if not object.focuser then
+                setupFocus(object)
+            end
+        end
+    end)
 
     self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
         if next(pending) then
