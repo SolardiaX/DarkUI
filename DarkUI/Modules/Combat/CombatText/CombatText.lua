@@ -37,8 +37,9 @@ function module:OnInit()
 
     -- Hide Blizzard floating combat text
     if cfg.hide_blizzard then
-        pcall(SetCVar, "floatingCombatTextCombatDamage_v2", 0)
-        pcall(SetCVar, "floatingCombatTextCombatHealing_v2", 0)
+        C_CVar.SetCVar("enableFloatingCombatText", 0)
+        C_CVar.SetCVar("floatingCombatTextCombatHealing_v2", 0)
+        C_CVar.SetCVar("floatingCombatTextCombatDamage_v2", 0)
     end
 
     -- Restore CVars on logout
@@ -46,8 +47,9 @@ function module:OnInit()
     logoutFrame:RegisterEvent("PLAYER_LOGOUT")
     logoutFrame:SetScript("OnEvent", function()
         if cfg.hide_blizzard then
-            pcall(SetCVar, "floatingCombatTextCombatDamage_v2", 1)
-            pcall(SetCVar, "floatingCombatTextCombatHealing_v2", 1)
+            C_CVar.SetCVar("enableFloatingCombatText", 1)
+            C_CVar.SetCVar("floatingCombatTextCombatHealing_v2", 1)
+            C_CVar.SetCVar("floatingCombatTextCombatDamage_v2", 1)
         end
     end)
 
