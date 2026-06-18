@@ -233,6 +233,35 @@ local function createStyle(self)
     createTag(self)
     createRaidDebuffs(self)
 
+    -- SpellsIndicator (corner buff colored dots)
+    if cfg.raid.spellsIndicator then
+        local si = CreateFrame("Frame", nil, self.Health)
+        si:SetAllPoints()
+        si:SetFrameLevel(self.Health:GetFrameLevel() + 5)
+        si.size = 5
+        self.SpellsIndicator = si
+    end
+
+    -- BuffsIndicator (important buff icons, bottom-right)
+    if cfg.raid.buffsIndicator then
+        local bi = CreateFrame("Frame", nil, self.Health)
+        bi:SetAllPoints()
+        bi:SetFrameLevel(self.Health:GetFrameLevel() + 4)
+        bi.size = cfg.raid.indicatorSize
+        bi.enable = true
+        self.BuffsIndicator = bi
+    end
+
+    -- DebuffsIndicator (debuff icons with dispel border, bottom-left)
+    if cfg.raid.debuffsIndicator then
+        local di = CreateFrame("Frame", nil, self.Health)
+        di:SetAllPoints()
+        di:SetFrameLevel(self.Health:GetFrameLevel() + 4)
+        di.size = cfg.raid.indicatorSize
+        di.enable = true
+        self.DebuffsIndicator = di
+    end
+
     self.RaidTargetIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 18, 1, self, "CENTER", "CENTER", 0, 6)
     self.ReadyCheckIndicator = core:CreateIcon(self, "OVERLAY", 14, -1, self, "TOPRIGHT", "TOPRIGHT", -10, -12)
     self.LeaderIndicator = core:CreateIcon(self, "OVERLAY", 14, -1, self, "TOPLEFT", "TOPLEFT", 12, -12)

@@ -280,24 +280,24 @@ local function healthPostUpdate(self, unit)
 end
 
 -- Auras functions
-local function aurasCustomFilter(element, unit, data)
-    local spellId = data.spellId
-    if issecretvalue(spellId) then
-        return false
-    end
-    if cfg.blackList[spellId] then
-        return false
-    elseif cfg.whiteList[spellId] and data.isPlayerAura then
+local function aurasFilter(element, unit, data)
+    if element.alwaysShowStealable and (not data.isHarmfulAura)
+        and type(data.dispelName) ~= "nil" and (not UnitIsPlayer(unit)) then
         return true
-    else
-        return core.FilterAuras(element, unit, data)
     end
+    return (data.isPlayerAura and data.isNameplateOnlyAura)
+        and not (data.isHarmfulAura and data.isCrowdControlAura)
+end
+
+local function ccFilter(element, unit, data)
+    return data.isHarmfulAura and data.isCrowdControlAura
 end
 
 local function aurasPostCreateIcon(element, button)
     core.PostCreateButton(element, button)
 
-    button:SetSize(cfg.auras_size, cfg.auras_size)
+    local size = element.size or cfg.auras_size
+    button:SetSize(size, size)
     button:EnableMouse(false)
 
     button.Cooldown.noCooldownCount = not cfg.show_timers
@@ -323,7 +323,13 @@ end
 local function aurasPostUpdateIcon(element, button, unit, data)
     core.PostUpdateButton(element, button, unit, data)
 
-    if cfg.colorBorder and data.isHarmfulAura and element.dispelColorCurve then
+    if cfg.desaturate and data.isHarmfulAura and not data.isPlayerAura then
+        button.Icon:SetDesaturated(true)
+    else
+        button.Icon:SetDesaturated(false)
+    end
+
+    if data.isHarmfulAura and element.showDebuffType and element.dispelColorCurve then
         local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
         if color then
             button.Overlay:SetVertexColor(color:GetRGBA())
@@ -468,7 +474,7 @@ local function style(self, unit)
         self.arrow = self:CreateTexture("$parent_Arrow", "OVERLAY")
         self.arrow:SetSize(50, 50)
         self.arrow:SetTexture(arrow)
-        self.arrow:SetPoint("BOTTOM", self, "TOP", 0, ((cfg.track_auras or cfg.track_buffs) and cfg.auras_size or 0) + 14)
+        self.arrow:SetPoint("BOTTOM", self, "TOP", 0, (cfg.show_auras and cfg.auras_size or 0) + 14)
         self.arrow:Hide()
     end
 
@@ -572,26 +578,43 @@ local function style(self, unit)
     end
 
     -- Aura tracking
-    if cfg.track_debuffs == true or cfg.track_buffs == true then
+    if cfg.show_auras then
         self.Auras = CreateFrame("Frame", nil, self)
-        self.Auras:SetPoint("BOTTOMRIGHT", self.Health, "TOPRIGHT", 2, 20)
-        self.Auras.initialAnchor = "BOTTOMRIGHT"
+        self.Auras:SetPoint("BOTTOMLEFT", self.Health, "TOPLEFT", 2, 20)
+        self.Auras.initialAnchor = "BOTTOMLEFT"
         self.Auras.growthY = "UP"
-        self.Auras.growthX = "LEFT"
-        self.Auras.numDebuffs = cfg.track_debuffs and 6 or 0
-        self.Auras.numBuffs = cfg.track_buffs and 4 or 0
-        self.Auras.numTotal = 5
+        self.Auras.numTotal = cfg.max_auras
+        self.Auras.maxCols = cfg.auras_per_row
         self.Auras:SetSize(20 + cfg.width, cfg.auras_size)
         self.Auras.spacing = cfg.icon_spacing
         self.Auras.size = cfg.auras_size
-        self.Auras.onlyShowPlayer = cfg.player_aura_only
-        self.Auras.showStealableBuffs = cfg.show_stealable_buffs
+        self.Auras.showStealableBuffs = true
+        self.Auras.alwaysShowStealable = cfg.show_dispel
+        self.Auras.showDebuffType = true
         self.Auras.disableMouse = true
 
-        self.Auras.FilterAura = aurasCustomFilter
+        self.Auras.FilterAura = aurasFilter
         self.Auras.PostCreateButton = aurasPostCreateIcon
         self.Auras.PostUpdateButton = aurasPostUpdateIcon
-        self.Auras.dispelColorCurve = C_CurveUtil.CreateColorCurve()
+        self.Auras.PostProcessAuraData = core.PostProcessAuraData
+    end
+
+    -- CC Debuffs (right side of health bar)
+    if cfg.show_cc then
+        self.Debuffs = CreateFrame("Frame", nil, self)
+        self.Debuffs:SetPoint("LEFT", self.Health, "RIGHT", 5, 0)
+        self.Debuffs.initialAnchor = "LEFT"
+        self.Debuffs.numDebuffs = cfg.num_cc
+        self.Debuffs:SetSize(cfg.cc_size * cfg.num_cc + cfg.icon_spacing * (cfg.num_cc - 1), cfg.cc_size)
+        self.Debuffs.size = cfg.cc_size
+        self.Debuffs.spacing = cfg.icon_spacing
+        self.Debuffs.showDebuffType = true
+        self.Debuffs.disableMouse = true
+
+        self.Debuffs.FilterAura = ccFilter
+        self.Debuffs.PostCreateButton = aurasPostCreateIcon
+        self.Debuffs.PostUpdateButton = aurasPostUpdateIcon
+        self.Debuffs.PostProcessAuraData = core.PostProcessAuraData
     end
 
     -- Health color

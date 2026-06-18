@@ -1,5 +1,5 @@
 local addon = DarkUI_Options
-local CHECK, HEADER = addon.CHECK, addon.HEADER
+local CHECK, SLIDER, HEADER = addon.CHECK, addon.SLIDER, addon.HEADER
 
 addon:RegisterTab("nameplate", L_CATEGORIES_NAMEPLATE)
 
@@ -16,12 +16,17 @@ addon.OptionList["nameplate"] = {
     { CHECK, "nameplate.arrow", L_OPT_NAMEPLATE_ARROW },
     { CHECK, "nameplate.quest", L_OPT_NAMEPLATE_QUEST },
     { HEADER, nil, "Auras" },
-    { CHECK, "nameplate.track_debuffs", L_OPT_NAMEPLATE_TRACK_DEBUFFS },
-    { CHECK, "nameplate.track_buffs", L_OPT_NAMEPLATE_TRACK_BUFFS },
-    { CHECK, "nameplate.player_aura_only", L_OPT_NAMEPLATE_PLAYER_AURA_ONLY },
-    { CHECK, "nameplate.show_stealable_buffs", L_OPT_NAMEPLATE_SHOW_STEALABLE_BUFFS },
+    { CHECK, "nameplate.show_auras", L_OPT_NAMEPLATE_SHOW_AURAS },
+    { CHECK, "nameplate.show_dispel", L_OPT_NAMEPLATE_SHOW_DISPEL },
+    { CHECK, "nameplate.desaturate", L_OPT_NAMEPLATE_DESATURATE },
+    { SLIDER, "nameplate.max_auras", L_OPT_NAMEPLATE_MAX_AURAS, { 1, 10, 1 } },
+    { SLIDER, "nameplate.auras_size", L_OPT_NAMEPLATE_AURAS_SIZE, { 16, 32, 1 } },
     { CHECK, "nameplate.show_timers", L_OPT_NAMEPLATE_SHOW_TIMERS },
     { CHECK, "nameplate.show_spiral", L_OPT_NAMEPLATE_SHOW_SPIRAL },
+    { HEADER, nil, "CC" },
+    { CHECK, "nameplate.show_cc", L_OPT_NAMEPLATE_SHOW_CC },
+    { SLIDER, "nameplate.num_cc", L_OPT_NAMEPLATE_NUM_CC, { 1, 5, 1 } },
+    { SLIDER, "nameplate.cc_size", L_OPT_NAMEPLATE_CC_SIZE, { 16, 36, 1 } },
 }
 
 addon.Hooks["nameplate"] = function(a)

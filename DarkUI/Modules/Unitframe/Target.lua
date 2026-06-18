@@ -299,6 +299,7 @@ local function createAuraIcon(self)
     f.PostCreateButton = core.PostCreateButton
     f.PostUpdateButton = core.PostUpdateButton
     f.PostUpdateGapButton = core.PostUpdateGapButton
+    f.PostProcessAuraData = core.PostProcessAuraData
     f.FilterAura = core.FilterAuras
 
     self.Auras = f

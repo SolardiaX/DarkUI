@@ -153,6 +153,8 @@ local function createAuraIcon(self)
     buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 8)
     buffs.PostCreateButton = core.PostCreateButton
     buffs.PostUpdateButton = core.PostUpdateButton
+    buffs.PostUpdateGapButton = core.PostUpdateGapButton
+    buffs.PostProcessAuraData = core.PostProcessAuraData
     buffs.FilterAura = core.FilterAuras
     self.Buffs = buffs
 
@@ -171,6 +173,8 @@ local function createAuraIcon(self)
     debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -8)
     debuffs.PostCreateButton = core.PostCreateButton
     debuffs.PostUpdateButton = core.PostUpdateButton
+    debuffs.PostUpdateGapButton = core.PostUpdateGapButton
+    debuffs.PostProcessAuraData = core.PostProcessAuraData
     debuffs.FilterAura = core.FilterAuras
     self.Debuffs = debuffs
 end

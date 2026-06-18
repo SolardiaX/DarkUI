@@ -8,7 +8,6 @@ local module = E:Module("Unitframe")
 local UnitIsFriend, UnitIsPlayer, UnitIsUnit = UnitIsFriend, UnitIsPlayer, UnitIsUnit
 local UnitIsDeadOrGhost, UnitIsConnected = UnitIsDeadOrGhost, UnitIsConnected
 local IsPlayerSpell = IsPlayerSpell
-local IsInRaid = IsInRaid
 local select, pairs, ipairs, unpack, tinsert = select, pairs, ipairs, unpack, table.insert
 
 local CastbarCompleteColor = { 0.1, 0.8, 0 }
@@ -260,6 +259,22 @@ function module.PostUpdateButton(element, button, unit, data, position)
     end
 end
 
+local function isAuraPassed(unit, data, filter, suffix)
+    return not C_UnitAuras.IsAuraFilteredOutByInstanceID(unit, data.auraInstanceID, filter .. "|" .. suffix)
+end
+
+function module.PostProcessAuraData(element, unit, data, filter)
+    data.isImportantAura = isAuraPassed(unit, data, filter, "IMPORTANT")
+    data.isCrowdControlAura = isAuraPassed(unit, data, filter, "CROWD_CONTROL")
+    data.isRaidInCombatAura = isAuraPassed(unit, data, filter, "RAID_IN_COMBAT")
+    data.isBigDefensiveAura = isAuraPassed(unit, data, filter, "BIG_DEFENSIVE")
+    data.isExtDefensiveAura = isAuraPassed(unit, data, filter, "EXTERNAL_DEFENSIVE")
+    data.isPlayerCancelable = isAuraPassed(unit, data, filter, "CANCELABLE")
+    data.isPlayerDispellable = isAuraPassed(unit, data, filter, "RAID_PLAYER_DISPELLABLE")
+    data.isNameplateOnlyAura = isAuraPassed(unit, data, filter, "INCLUDE_NAME_PLATE_ONLY")
+    return data
+end
+
 function module.CreateAuraTimer(aura, elapsed)
     if aura.timeLeft then
         aura.elapsed = (aura.elapsed or 0) + elapsed
@@ -288,24 +303,22 @@ function module.CreateAuraTimer(aura, elapsed)
     end
 end
 
-function module:FilterAuras(unit, data)
-    local spellId = data.spellId
-    if issecretvalue(spellId) then return false end
-
-    if IsInRaid(LE_PARTY_CATEGORY_HOME) then
-        local auraList = C.aura.raidbuffs[E.myClass]
-        if (auraList and auraList[spellId] and data.isPlayerAura) or C.aura.raidbuffs["ALL"][spellId] then
+function module.FilterAuras(element, unit, data)
+    if data.isHarmfulAura then
+        if element.onlyShowPlayer then
+            return data.isPlayerAura
+        end
+        return true
+    else
+        if element.showStealableBuffs and type(data.dispelName) ~= "nil"
+            and not UnitIsPlayer(unit) then
             return true
         end
-    elseif self.showStealableBuffs and type(data.dispelName) ~= "nil" and not UnitIsPlayer(unit) then
-        return true
-    elseif self.onlyShowPlayer and data.isPlayerAura then
-        return true
-    elseif not self.onlyShowPlayer and data.name then
+        if element.onlyShowPlayer then
+            return data.isPlayerAura
+        end
         return true
     end
-
-    return false
 end
 
 ------------------------------------------------------------------
