@@ -1,0 +1,18 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+    <!-- Display layer -->
+    <Script file="display/MessageFrame.lua"/>
+    <Script file="display/MessageQueue.lua"/>
+    <Script file="display/Display.lua"/>
+    <Script file="display/Format.lua"/>
+    <!-- Event handlers -->
+    <Script file="events/OnDamageMeterCombatSessionUpdate.lua"/>
+    <Script file="events/OnUnitCombat.lua"/>
+    <Script file="events/OnCombatTextUpdate.lua"/>
+    <Script file="events/OnUnitAura.lua"/>
+    <Script file="events/OnPlayerInCombatChanged.lua"/>
+    <Script file="events/OnBagUpdateDelayed.lua"/>
+    <Script file="events/OnPlayerMoney.lua"/>
+    <Script file="events/OnCurrencyDisplayUpdate.lua"/>
+    <!-- Main module (last - orchestrates) -->
+    <Script file="CombatText.lua"/>
+</Ui>

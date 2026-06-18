@@ -1,0 +1,1284 @@
+local E, C, L = select(2, ...):unpack()
+
+------------------------------------------------------------------------
+-- Combat Text
+------------------------------------------------------------------------
+
+local module = E:Module("CombatText")
+module:SetConfigKey("combattext")
+
+local cfg = C.combattext
+
+local GetTime = GetTime
+local floor, format, abs, pcall, wipe, tinsert, tremove = math.floor, string.format, math.abs, pcall, wipe, tinsert, tremove
+local UnitGUID, UnitName, UnitHealth, UnitHealthMax = UnitGUID, UnitName, UnitHealth, UnitHealthMax
+local C_Spell_GetSpellTexture = C_Spell.GetSpellTexture
+local C_Spell_GetSpellName = C_Spell.GetSpellName
+local C_Spell_IsAutoAttackSpell = C_Spell.IsAutoAttackSpell
+local C_Spell_IsRangedAutoAttackSpell = C_Spell.IsRangedAutoAttackSpell
+local GetMoney = GetMoney
+
+------------------------------------------------------------------------
+-- Secret Value Safety
+------------------------------------------------------------------------
+
+local function isSafeNumber(v)
+    if type(v) ~= "number" then
+        return false
+    end
+    if issecretvalue then
+        return not issecretvalue(v)
+    end
+    local ok = pcall(function()
+        return v + 0
+    end)
+    return ok
+end
+
+local function isSafeString(v)
+    if type(v) ~= "string" then
+        return false
+    end
+    if issecretvalue then
+        return not issecretvalue(v)
+    end
+    local ok = pcall(function()
+        return v == ""
+    end)
+    return ok
+end
+
+------------------------------------------------------------------------
+-- Constants
+------------------------------------------------------------------------
+
+local BATCH_DELAY_INBOUND = 0.30
+local BATCH_DELAY_OUTBOUND = 0.15
+local MIN_VERTICAL_SPACING = 8
+local POOL_SIZE = 30
+local OUTBOUND_OVERFLOW_THRESHOLD = 5
+
+local SCHOOL_COLORS = {
+    [1] = "FFFFFF", -- Physical
+    [2] = "F9F1A1", -- Holy
+    [3] = "F7EBCB", -- Holystrike
+    [4] = "EE7D80", -- Fire
+    [5] = "F7C3BF", -- Flamestrike
+    [6] = "EFB065", -- Radiant
+    [8] = "A1DB65", -- Nature
+    [9] = "B2CACD", -- Stormstrike
+    [10] = "C0E88B", -- Holystorm
+    [12] = "EF8B48", -- Volcanic
+    [16] = "76CAED", -- Frost
+    [17] = "ADDBE3", -- Froststrike
+    [18] = "8BE8DF", -- Holyfrost
+    [20] = "4392AA", -- Frostfire
+    [24] = "5BB28E", -- Froststorm
+    [28] = "56DBAE", -- Elemental
+    [32] = "5B4A98", -- Shadow
+    [33] = "D3CCF2", -- Shadowstrike
+    [34] = "A159B2", -- Twilight
+    [36] = "BE5587", -- Shadowflame
+    [40] = "95CC54", -- Plague
+    [48] = "33519B", -- Shadowfrost
+    [64] = "F4A8E4", -- Arcane
+    [65] = "F0DEED", -- Spellstrike
+    [66] = "F4E492", -- Divine
+    [68] = "E55C80", -- Spellfire
+    [72] = "BC69F7", -- Astral
+    [80] = "5252CC", -- Spellfrost
+    [96] = "733799", -- Spellshadow
+    [106] = "5EA0CC", -- Cosmic
+    [124] = "92F919", -- Chromatic
+    [126] = "78EFFF", -- Magic
+    [127] = "3F2766", -- Chaos
+}
+
+local ITEM_QUALITY_COLORS = {
+    [0] = { 0.62, 0.62, 0.62 }, -- Poor
+    [1] = { 1, 1, 1 }, -- Common
+    [2] = { 0.12, 1, 0 }, -- Uncommon
+    [3] = { 0, 0.44, 0.87 }, -- Rare
+    [4] = { 0.64, 0.21, 0.93 }, -- Epic
+    [5] = { 1, 0.5, 0 }, -- Legendary
+    [6] = { 0.9, 0.8, 0.5 }, -- Artifact
+    [7] = { 0, 0.8, 1 }, -- Heirloom
+    [8] = { 0, 0.8, 1 }, -- Token
+}
+
+------------------------------------------------------------------------
+-- Data Event Pool
+------------------------------------------------------------------------
+
+local dataEventPool = {}
+
+local function getDataEvent()
+    local t = tremove(dataEventPool)
+    if t then
+        wipe(t)
+    else
+        t = {}
+    end
+    return t
+end
+
+local function releaseDataEvent(t)
+    wipe(t)
+    tinsert(dataEventPool, t)
+end
+
+------------------------------------------------------------------------
+-- MessageFrame: FontString + Animation + Multi-Icon
+------------------------------------------------------------------------
+
+local MessageFrame = {}
+MessageFrame.__index = MessageFrame
+
+function MessageFrame.new(parent)
+    local self = setmetatable({}, MessageFrame)
+
+    self.frame = CreateFrame("Frame", nil, parent)
+    self.frame:SetSize(250, 24)
+    self.frame:Hide()
+
+    self.fontString = self.frame:CreateFontString(nil, "OVERLAY")
+    self.fontString:SetFont(cfg.font, cfg.font_size, cfg.font_style)
+    self.fontString:SetShadowOffset(1, -1)
+    self.fontString:SetPoint("CENTER")
+
+    self.iconContainer = CreateFrame("Frame", nil, self.frame)
+    self.iconContainer:SetSize(1, 1)
+
+    self.iconTextures = {}
+    self.numActiveIcons = 0
+
+    self.countString = self.iconContainer:CreateFontString(nil, "OVERLAY")
+    self.countString:SetFont(cfg.font, cfg.font_size - 2, cfg.font_style)
+    self.countString:SetPoint("LEFT", self.iconContainer, "RIGHT", 2, 0)
+
+    self.ag = self.frame:CreateAnimationGroup()
+
+    self.verticalMove = self.ag:CreateAnimation("Translation")
+    self.verticalMove:SetSmoothing("NONE")
+
+    self.horizontalCurve = self.ag:CreateAnimation("Translation")
+    self.horizontalCurve:SetSmoothing("OUT")
+
+    self.horizontalReturn = self.ag:CreateAnimation("Translation")
+    self.horizontalReturn:SetSmoothing("IN")
+
+    self.fadeOut = self.ag:CreateAnimation("Alpha")
+    self.fadeOut:SetFromAlpha(1)
+    self.fadeOut:SetToAlpha(0)
+    self.fadeOut:SetSmoothing("IN")
+
+    return self
+end
+
+function MessageFrame:SetText(message)
+    self.fontString:SetText(message or "")
+end
+
+function MessageFrame:SetIcons(icons, size, alpha)
+    local iconSize = size or cfg.icon_size
+
+    for _, tex in ipairs(self.iconTextures) do
+        tex:Hide()
+    end
+    self.numActiveIcons = 0
+
+    if not icons then
+        self.iconContainer:Hide()
+        return
+    end
+
+    local iconList = type(icons) == "table" and icons or { icons }
+    local spacing = 2
+
+    for i, iconPath in ipairs(iconList) do
+        if not self.iconTextures[i] then
+            self.iconTextures[i] = self.iconContainer:CreateTexture(nil, "ARTWORK")
+            self.iconTextures[i]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+        end
+        local tex = self.iconTextures[i]
+        tex:ClearAllPoints()
+        if i == 1 then
+            tex:SetSize(iconSize, iconSize)
+            tex:SetPoint("LEFT", self.iconContainer, "LEFT", 0, 0)
+        else
+            local subSize = iconSize * 0.7
+            tex:SetSize(subSize, subSize)
+            tex:SetPoint("LEFT", self.iconTextures[i - 1], "RIGHT", spacing, 0)
+        end
+        tex:SetTexture(iconPath)
+        tex:SetAlpha(alpha or 1)
+        tex:Show()
+        self.numActiveIcons = i
+    end
+
+    local totalWidth = iconSize + (self.numActiveIcons > 1 and (self.numActiveIcons - 1) * (iconSize * 0.7 + spacing) or 0)
+    self.iconContainer:SetSize(totalWidth + 4, iconSize)
+    self.iconContainer:Show()
+end
+
+function MessageFrame:SetCount(text)
+    if text then
+        self.countString:SetText(text)
+        self.countString:Show()
+    else
+        self.countString:SetText("")
+        self.countString:Hide()
+    end
+end
+
+function MessageFrame:SetupAnimation(areaSettings)
+    local scrollHeight = areaSettings.scrollHeight or 200
+    local scrollSpeed = areaSettings.scrollSpeed or 90
+    local duration = areaSettings.duration
+    local scrollTime = duration or (abs(scrollHeight) ~= 0 and abs(scrollHeight) / scrollSpeed or 2)
+    local animStyle = areaSettings.animStyle or cfg.anim_style
+
+    self.verticalMove:SetOffset(0, scrollHeight)
+    self.verticalMove:SetDuration(scrollTime)
+
+    if animStyle == "curve" and abs(scrollHeight) > 0 then
+        local curveOffset = areaSettings.horizontalCurveOffset or 0
+        local returnOffset = areaSettings.horizontalReturnOffset or 0
+
+        self.horizontalCurve:SetOffset(curveOffset, 0)
+        self.horizontalCurve:SetDuration(scrollTime * 0.6)
+        self.horizontalCurve:SetStartDelay(0)
+
+        self.horizontalReturn:SetOffset(returnOffset, 0)
+        self.horizontalReturn:SetStartDelay(scrollTime * 0.4)
+        self.horizontalReturn:SetDuration(scrollTime * 0.6)
+
+        self.fadeOut:SetStartDelay(scrollTime * 0.6)
+        self.fadeOut:SetDuration(scrollTime * 0.4)
+    else
+        self.horizontalCurve:SetOffset(0, 0)
+        self.horizontalCurve:SetDuration(0.01)
+        self.horizontalReturn:SetOffset(0, 0)
+        self.horizontalReturn:SetDuration(0.01)
+
+        self.fadeOut:SetStartDelay(scrollTime * 0.6)
+        self.fadeOut:SetDuration(scrollTime * 0.4)
+    end
+
+    self._scrollTime = scrollTime
+    self._scrollHeight = abs(scrollHeight)
+end
+
+function MessageFrame:SetPosition(area, justify, iconPosition)
+    local f = self.frame
+    f:ClearAllPoints()
+    f:SetPoint("TOP", area.anchor, "TOP", 0, 0)
+    f:SetWidth(area.width or 250)
+
+    self.fontString:ClearAllPoints()
+    if justify == "LEFT" then
+        self.fontString:SetPoint("LEFT", f, "LEFT", 0, 0)
+        self.fontString:SetJustifyH("LEFT")
+    elseif justify == "RIGHT" then
+        self.fontString:SetPoint("RIGHT", f, "RIGHT", 0, 0)
+        self.fontString:SetJustifyH("RIGHT")
+    else
+        self.fontString:SetPoint("CENTER", f, "CENTER", 0, 0)
+        self.fontString:SetJustifyH("CENTER")
+    end
+
+    self.iconContainer:ClearAllPoints()
+    local iconPos = iconPosition or "RIGHT"
+    if iconPos == "LEFT" then
+        self.iconContainer:SetPoint("RIGHT", self.fontString, "LEFT", -2, 0)
+    else
+        self.iconContainer:SetPoint("LEFT", self.fontString, "RIGHT", 2, 0)
+    end
+end
+
+function MessageFrame:Play()
+    self.frame:Show()
+    self.ag:Play()
+end
+
+function MessageFrame:Stop()
+    self.ag:Stop()
+    self.frame:Hide()
+end
+
+function MessageFrame:Reset()
+    self.ag:Stop()
+    self.frame:Hide()
+    self.frame:ClearAllPoints()
+    self.fontString:SetText("")
+    for _, tex in ipairs(self.iconTextures) do
+        tex:Hide()
+    end
+    self.numActiveIcons = 0
+    self.iconContainer:Hide()
+    self.countString:SetText("")
+    self.countString:Hide()
+end
+
+------------------------------------------------------------------------
+-- MessageFrame Pool
+------------------------------------------------------------------------
+
+local framePool = {}
+local activeFrames = {}
+
+local function initPool(parent)
+    for _ = 1, POOL_SIZE do
+        tinsert(framePool, MessageFrame.new(parent))
+    end
+end
+
+local function acquireFrame()
+    local mf = tremove(framePool)
+    if not mf then
+        mf = MessageFrame.new(UIParent)
+    end
+    tinsert(activeFrames, mf)
+    return mf
+end
+
+local function returnFrame(mf)
+    mf:Reset()
+    for i = #activeFrames, 1, -1 do
+        if activeFrames[i] == mf then
+            tremove(activeFrames, i)
+            break
+        end
+    end
+    tinsert(framePool, mf)
+end
+
+------------------------------------------------------------------------
+-- Message Queue (per scroll area)
+------------------------------------------------------------------------
+
+local MessageQueue = {}
+MessageQueue.__index = MessageQueue
+
+function MessageQueue.new()
+    return setmetatable({
+        messages = {},
+        inProcess = {},
+        active = false,
+    }, MessageQueue)
+end
+
+function MessageQueue:AddMessage(msg)
+    tinsert(self.messages, msg)
+end
+
+function MessageQueue:HandleNext()
+    if #self.messages == 0 then
+        return nil
+    end
+    local msg = tremove(self.messages, 1)
+    tinsert(self.inProcess, msg)
+    return msg
+end
+
+function MessageQueue:StopProcessing(msg)
+    for i = #self.inProcess, 1, -1 do
+        if self.inProcess[i] == msg then
+            tremove(self.inProcess, i)
+            break
+        end
+    end
+    if #self.messages == 0 and #self.inProcess == 0 then
+        self.active = false
+    end
+end
+
+function MessageQueue:Start()
+    self.active = true
+    self:HandleNext()
+end
+
+function MessageQueue:Clear()
+    wipe(self.messages)
+end
+
+function MessageQueue:IsEmpty()
+    return #self.messages == 0
+end
+
+function MessageQueue:InProcessCount()
+    return #self.inProcess
+end
+
+------------------------------------------------------------------------
+-- Scroll Areas
+------------------------------------------------------------------------
+
+local scrollAreas = {}
+local scrollQueues = {}
+
+local function createScrollArea(name, config)
+    local anchor = CreateFrame("Frame", "xCT_" .. name, UIParent)
+    local h = abs(config.scrollHeight or 200)
+    anchor:SetSize(config.width or 250, h > 0 and h or 40)
+    anchor:SetPoint(unpack(config.pos))
+    anchor:SetClampedToScreen(true)
+
+    local area = {
+        name = name,
+        anchor = anchor,
+        width = config.width or 250,
+        scrollHeight = config.scrollHeight or 200,
+        scrollSpeed = config.scrollSpeed or 90,
+        duration = config.duration,
+        justify = config.justify or "CENTER",
+        iconPosition = config.iconPosition or "RIGHT",
+        animStyle = config.animStyle or cfg.anim_style,
+        horizontalCurveOffset = config.horizontalCurveOffset or 0,
+        horizontalReturnOffset = config.horizontalReturnOffset or 0,
+        collisionMode = config.collisionMode or "SCROLL",
+        minimumVerticalSpacing = config.minimumVerticalSpacing or MIN_VERTICAL_SPACING,
+    }
+    scrollAreas[name] = area
+    scrollQueues[name] = MessageQueue.new()
+    return area
+end
+
+------------------------------------------------------------------------
+-- Collision Handling & Animation Dispatch
+------------------------------------------------------------------------
+
+local function getCollisionThreshold(area)
+    local height = abs(area.scrollHeight or 200)
+    if height == 0 then
+        return 1
+    end
+    return (cfg.font_size + area.minimumVerticalSpacing) / height
+end
+
+local function animateEvent(areaName, displayEvent)
+    local area = scrollAreas[areaName]
+    local queue = scrollQueues[areaName]
+    if not area or not queue then
+        return
+    end
+
+    local mf = acquireFrame()
+    displayEvent._messageFrame = mf
+    displayEvent._area = area
+    displayEvent._startTime = GetTime()
+
+    mf:SetText(displayEvent.message)
+    mf:SetIcons(displayEvent.iconTexture, nil, displayEvent.iconAlpha)
+    mf:SetCount(displayEvent.countText)
+    mf:SetPosition(area, area.justify, area.iconPosition)
+    mf:SetupAnimation(area)
+
+    -- Collision handling
+    if area.collisionMode == "REPLACE" then
+        for i = #queue.inProcess, 1, -1 do
+            local old = queue.inProcess[i]
+            if old and old._messageFrame then
+                returnFrame(old._messageFrame)
+            end
+            tremove(queue.inProcess, i)
+        end
+        queue:Clear()
+    elseif area.collisionMode == "STACK" then
+        local offset = cfg.font_size + area.minimumVerticalSpacing
+        for _, proc in ipairs(queue.inProcess) do
+            if proc._messageFrame then
+                local f = proc._messageFrame.frame
+                local p, rel, rp, x, y = f:GetPoint(1)
+                if p then
+                    local dir = (area.scrollHeight or 0) >= 0 and 1 or -1
+                    f:SetPoint(p, rel, rp, x, y + (offset * dir))
+                end
+            end
+        end
+    end
+
+    mf.ag:SetScript("OnFinished", function()
+        returnFrame(mf)
+        queue:StopProcessing(displayEvent)
+        if not queue:IsEmpty() then
+            local next = queue:HandleNext()
+            if next and next._animate then
+                next._animate(next)
+            end
+        end
+    end)
+
+    -- Collision-aware next message trigger (SCROLL mode)
+    if area.collisionMode == "SCROLL" then
+        local threshold = getCollisionThreshold(area)
+        mf.verticalMove:SetScript("OnUpdate", function(self)
+            local progress = self:GetProgress()
+            if progress >= threshold then
+                self:SetScript("OnUpdate", nil)
+                if not queue:IsEmpty() then
+                    local next = queue:HandleNext()
+                    if next and next._animate then
+                        next._animate(next)
+                    end
+                end
+            end
+        end)
+    end
+
+    tinsert(queue.inProcess, displayEvent)
+    mf:Play()
+end
+
+local function rgbToHex(r, g, b)
+    return format("%02X%02X%02X", (r or 1) * 255, (g or 1) * 255, (b or 1) * 255)
+end
+
+local function queueEvent(areaName, displayEvent)
+    local area = scrollAreas[areaName]
+    local queue = scrollQueues[areaName]
+    if not area or not queue then
+        return
+    end
+
+    if not displayEvent.message and displayEvent.text then
+        local hex = rgbToHex(displayEvent.r, displayEvent.g, displayEvent.b)
+        displayEvent.message = "|cFF" .. hex .. displayEvent.text .. "|r"
+    end
+
+    displayEvent._animate = function(self)
+        animateEvent(areaName, self)
+    end
+
+    if area.collisionMode == "REPLACE" or area.collisionMode == "STACK" then
+        animateEvent(areaName, displayEvent)
+    else
+        if queue:InProcessCount() == 0 then
+            animateEvent(areaName, displayEvent)
+        else
+            queue:AddMessage(displayEvent)
+        end
+    end
+end
+
+------------------------------------------------------------------------
+-- Display: Formatting Utilities
+------------------------------------------------------------------------
+
+local function getSchoolColorHex(schoolMask)
+    if not schoolMask then
+        return nil
+    end
+    return SCHOOL_COLORS[schoolMask]
+end
+
+local function colorWrap(text, hex)
+    if hex then
+        return "|cFF" .. hex .. text .. "|r"
+    end
+    return text
+end
+
+local function getSpellIcon(spellId)
+    if not spellId or not cfg.icons then
+        return nil
+    end
+    return C_Spell_GetSpellTexture(spellId)
+end
+
+------------------------------------------------------------------------
+-- Inbound Batching
+------------------------------------------------------------------------
+
+local inboundBatches = {}
+
+local function sendInboundBatch(batch, eventType)
+    if not batch or #batch == 0 then
+        return
+    end
+
+    local firstEvent = batch[1]
+    local totalAmount = firstEvent.amount
+
+    if #batch > 1 then
+        for i = 2, #batch do
+            totalAmount = totalAmount + batch[i].amount
+        end
+    end
+
+    local count = #batch
+    local schoolMask = nil
+
+    for _, ev in ipairs(batch) do
+        schoolMask = schoolMask or ev.schoolMask
+    end
+
+    local colorHex
+    if eventType == "damage" then
+        colorHex = getSchoolColorHex(schoolMask) or "BF1A1A"
+    else
+        colorHex = "1AA61A"
+    end
+
+    local prefix = eventType == "damage" and "|cFFFF0000-|r" or "|cFF00FF00+|r"
+    local message = prefix .. colorWrap(totalAmount, colorHex)
+
+    local displayEvent = {}
+    displayEvent.message = message
+
+    if count > 1 then
+        displayEvent.countText = format("|cffffffff[%d]|r", count)
+    end
+
+    if eventType == "damage" then
+        queueEvent("incoming", displayEvent)
+    elseif eventType == "heal" then
+        queueEvent("healing", displayEvent)
+    end
+
+    for _, ev in ipairs(batch) do
+        releaseDataEvent(ev)
+    end
+end
+
+local function batchInbound(dataEvent, eventType)
+    if not inboundBatches[eventType] then
+        inboundBatches[eventType] = { dataEvent }
+        C_Timer.After(BATCH_DELAY_INBOUND, function()
+            local batch = inboundBatches[eventType]
+            inboundBatches[eventType] = nil
+            sendInboundBatch(batch, eventType)
+        end)
+    else
+        tinsert(inboundBatches[eventType], dataEvent)
+    end
+end
+
+------------------------------------------------------------------------
+-- UNIT_COMBAT Handler (Inbound)
+------------------------------------------------------------------------
+
+local function handleUnitCombat(unit, action, descriptor, amount, school)
+    if unit ~= "player" then
+        return
+    end
+
+    local ev = getDataEvent()
+    ev.amount = amount
+    ev.damageType = school
+    ev.flagText = descriptor
+    ev.eventType = "INBOUND_" .. (isSafeString(action) and action or "WOUND")
+
+    local actionStr = isSafeString(action) and action or nil
+
+    if actionStr == "WOUND" or not actionStr then
+        if not cfg.incoming then
+            return
+        end
+        ev.schoolMask = isSafeNumber(school) and school or nil
+        batchInbound(ev, "damage")
+    elseif actionStr == "HEAL" then
+        if not cfg.incoming_heal then
+            return
+        end
+        batchInbound(ev, "heal")
+    elseif
+        actionStr == "DODGE"
+        or actionStr == "PARRY"
+        or actionStr == "MISS"
+        or actionStr == "BLOCK"
+        or actionStr == "RESIST"
+        or actionStr == "ABSORB"
+        or actionStr == "IMMUNE"
+        or actionStr == "DEFLECT"
+        or actionStr == "EVADE"
+    then
+        releaseDataEvent(ev)
+        local missText = _G[actionStr] or actionStr
+        queueEvent("incoming", { text = missText, r = 0.5, g = 0.5, b = 0.5 })
+    else
+        releaseDataEvent(ev)
+    end
+end
+
+------------------------------------------------------------------------
+-- COMBAT_TEXT_UPDATE Handler
+------------------------------------------------------------------------
+
+local function handleCombatTextUpdate(subevent)
+    if not subevent then
+        return
+    end
+    if not isSafeString(subevent) then
+        return
+    end
+
+    local rawArg1
+    if C_CombatText and C_CombatText.GetCurrentEventInfo then
+        rawArg1 = C_CombatText.GetCurrentEventInfo()
+    elseif GetCurrentCombatTextEventInfo then
+        rawArg1 = GetCurrentCombatTextEventInfo()
+    end
+
+    -- Spell Active / Proc (MBT's only use of COMBAT_TEXT_UPDATE)
+    if subevent == "SPELL_ACTIVE" or subevent == "SPELL_CAST" then
+        if rawArg1 and isSafeString(rawArg1) then
+            queueEvent("notification", { text = rawArg1, r = 1, g = 0.82, b = 0 })
+        end
+        return
+    end
+end
+
+------------------------------------------------------------------------
+-- UNIT_AURA Handler (12.0 API)
+------------------------------------------------------------------------
+
+local activeAuras = {}
+
+local function handleUnitAura(unit, updateInfo)
+    if unit ~= "player" then
+        return
+    end
+    if not updateInfo then
+        return
+    end
+    if not cfg.notification then
+        return
+    end
+
+    if updateInfo.addedAuras then
+        for _, aura in ipairs(updateInfo.addedAuras) do
+            if aura and aura.name and isSafeString(aura.name) then
+                activeAuras[aura.auraInstanceID] = {
+                    name = aura.name,
+                    spellId = aura.spellId,
+                    icon = aura.icon,
+                    isHarmful = aura.isHarmful,
+                }
+                local r, g, b = 1, 0.9, 0.5
+                if aura.isHarmful then
+                    r, g, b = 1, 0.1, 0.1
+                end
+                local icon = cfg.icons and aura.icon or nil
+                queueEvent("notification", {
+                    text = "+" .. aura.name,
+                    r = r,
+                    g = g,
+                    b = b,
+                    iconTexture = icon,
+                })
+            end
+        end
+    end
+
+    if updateInfo.removedAuraInstanceIDs then
+        for _, instanceID in ipairs(updateInfo.removedAuraInstanceIDs) do
+            local info = activeAuras[instanceID]
+            if info then
+                local r, g, b = 0.5, 0.5, 0.5
+                if info.isHarmful then
+                    r, g, b = 0.1, 1, 0.1
+                end
+                local icon = cfg.icons and info.icon or nil
+                queueEvent("notification", {
+                    text = "-" .. info.name,
+                    r = r,
+                    g = g,
+                    b = b,
+                    iconTexture = icon,
+                })
+                activeAuras[instanceID] = nil
+            end
+        end
+    end
+end
+
+------------------------------------------------------------------------
+-- C_DamageMeter: Outbound (Damage + Healing + Pet)
+------------------------------------------------------------------------
+
+local playerGUID
+local petGUID
+local lastDamageMeterResetAt = 0
+
+local function processDamageMeter()
+    if not C_DamageMeter then
+        return
+    end
+
+    local t = GetTime()
+    if (t - lastDamageMeterResetAt) < BATCH_DELAY_OUTBOUND then
+        return
+    end
+
+    if not playerGUID then
+        playerGUID = UnitGUID("player")
+    end
+    petGUID = UnitGUID("pet")
+
+    local playerDamageSource = C_DamageMeter.GetCombatSessionSourceFromType(0, Enum.DamageMeterType.DamageDone, playerGUID)
+    local spellCount = playerDamageSource and playerDamageSource.combatSpells and #playerDamageSource.combatSpells or 0
+
+    if spellCount == 0 then
+        C_DamageMeter.ResetAllCombatSessions()
+        lastDamageMeterResetAt = t
+        return
+    end
+
+    local spells = playerDamageSource.combatSpells
+
+    if cfg.group_unlike_spells and spellCount > 1 then
+        local icons = {}
+        for _, spell in ipairs(spells) do
+            local icon = C_Spell_GetSpellTexture(spell.spellID)
+            if icon then
+                tinsert(icons, icon)
+            end
+        end
+
+        local displayIcons
+        if cfg.group_appearance == "FIRST_ICON_PLUS_N" and #icons > 1 then
+            displayIcons = icons[1]
+        elseif #icons > 0 then
+            displayIcons = icons
+        end
+
+        local countText
+        if cfg.group_appearance == "FIRST_ICON_PLUS_N" and spellCount > 1 then
+            countText = format("|cffffffff[+%d]|r", spellCount - 1)
+        end
+
+        local targetArea = "outgoing"
+        local queue = scrollQueues["outgoing"]
+        if queue and queue:InProcessCount() > OUTBOUND_OVERFLOW_THRESHOLD and scrollAreas["outgoing_secondary"] then
+            targetArea = "outgoing_secondary"
+        end
+
+        queueEvent(targetArea, {
+            message = colorWrap(playerDamageSource.totalAmount, "FFFF00"),
+            iconTexture = displayIcons,
+            countText = countText,
+        })
+    else
+        for _, spell in ipairs(spells) do
+            local spellId = spell.spellID
+            local totalAmount = spell.totalAmount
+
+            local isAuto = false
+            local autoResult = C_Spell_IsAutoAttackSpell(spellId)
+            if not issecretvalue(autoResult) and autoResult then
+                isAuto = true
+            end
+            if not isAuto then
+                local rangedResult = C_Spell_IsRangedAutoAttackSpell(spellId)
+                if not issecretvalue(rangedResult) and rangedResult then
+                    isAuto = true
+                end
+            end
+            local icon = cfg.icons and C_Spell_GetSpellTexture(spellId) or nil
+            local iconAlpha = isAuto and 0.5 or 1
+            local colorHex = isAuto and "FFFFFF" or "FFFF00"
+
+            if petGUID and spell.creatureName then
+                local isPet = false
+                if not issecretvalue(spell.creatureName) then
+                    isPet = spell.creatureName ~= ""
+                else
+                    isPet = true
+                end
+                if isPet then
+                    queueEvent("outgoing", {
+                        message = colorWrap(totalAmount, "99CC99"),
+                        iconTexture = icon,
+                        iconAlpha = 0.8,
+                    })
+                else
+                    local targetArea = "outgoing"
+                    local queue = scrollQueues["outgoing"]
+                    if queue and queue:InProcessCount() > OUTBOUND_OVERFLOW_THRESHOLD and scrollAreas["outgoing_secondary"] then
+                        targetArea = "outgoing_secondary"
+                    end
+
+                    queueEvent(targetArea, {
+                        message = colorWrap(totalAmount, colorHex),
+                        iconTexture = icon,
+                        iconAlpha = iconAlpha,
+                    })
+                end
+            else
+                local targetArea = "outgoing"
+                local queue = scrollQueues["outgoing"]
+                if queue and queue:InProcessCount() > OUTBOUND_OVERFLOW_THRESHOLD and scrollAreas["outgoing_secondary"] then
+                    targetArea = "outgoing_secondary"
+                end
+
+                queueEvent(targetArea, {
+                    message = colorWrap(totalAmount, colorHex),
+                    iconTexture = icon,
+                    iconAlpha = iconAlpha,
+                })
+            end
+        end
+    end
+
+    -- Outgoing Healing
+    if cfg.outgoing_heal then
+        local healSource = C_DamageMeter.GetCombatSessionSourceFromType(0, Enum.DamageMeterType.HealingDone, playerGUID)
+        if healSource and healSource.combatSpells then
+            for _, spell in ipairs(healSource.combatSpells) do
+                local icon = cfg.icons and C_Spell_GetSpellTexture(spell.spellID) or nil
+                queueEvent("outgoing", {
+                    message = colorWrap(spell.totalAmount, "1AE64D"),
+                    iconTexture = icon,
+                })
+            end
+        end
+    end
+
+    C_DamageMeter.ResetAllCombatSessions()
+    lastDamageMeterResetAt = t
+end
+
+------------------------------------------------------------------------
+-- Loot / Gold / Currency Notifications
+------------------------------------------------------------------------
+
+local inventoryCache = {}
+local lastMoney = 0
+
+local function initInventoryCache()
+    wipe(inventoryCache)
+    for bag = 0, 4 do
+        local numSlots = C_Container.GetContainerNumSlots(bag)
+        for slot = 1, numSlots do
+            local itemInfo = C_Container.GetContainerItemInfo(bag, slot)
+            if itemInfo and itemInfo.itemID then
+                if not inventoryCache[itemInfo.itemID] then
+                    inventoryCache[itemInfo.itemID] = { count = 0 }
+                end
+                inventoryCache[itemInfo.itemID].count = inventoryCache[itemInfo.itemID].count + itemInfo.stackCount
+            end
+        end
+    end
+    lastMoney = GetMoney()
+end
+
+local function handleBagUpdateDelayed()
+    if not cfg.loot then
+        return
+    end
+
+    local currentInventory = {}
+    for bag = 0, 4 do
+        local numSlots = C_Container.GetContainerNumSlots(bag)
+        for slot = 1, numSlots do
+            local itemInfo = C_Container.GetContainerItemInfo(bag, slot)
+            if itemInfo and itemInfo.itemID then
+                if not currentInventory[itemInfo.itemID] then
+                    currentInventory[itemInfo.itemID] = {
+                        count = 0,
+                        name = itemInfo.itemName,
+                        quality = itemInfo.quality,
+                        iconFileID = itemInfo.iconFileID,
+                    }
+                end
+                currentInventory[itemInfo.itemID].count = currentInventory[itemInfo.itemID].count + itemInfo.stackCount
+            end
+        end
+    end
+
+    for itemID, info in pairs(currentInventory) do
+        local prevCount = inventoryCache[itemID] and inventoryCache[itemID].count or 0
+        if info.count > prevCount then
+            local gained = info.count - prevCount
+            local quality = info.quality or 1
+            local colors = ITEM_QUALITY_COLORS[quality] or ITEM_QUALITY_COLORS[1]
+            local icon = info.iconFileID
+
+            local text = format("+%d %s", gained, info.name or "")
+            queueEvent("static", {
+                text = text,
+                r = colors[1],
+                g = colors[2],
+                b = colors[3],
+                iconTexture = icon,
+            })
+        end
+    end
+
+    inventoryCache = currentInventory
+end
+
+local function handlePlayerMoney()
+    if not cfg.loot then
+        return
+    end
+
+    local currentMoney = GetMoney()
+    local change = currentMoney - lastMoney
+    lastMoney = currentMoney
+
+    if change <= 0 then
+        return
+    end
+
+    local gold = floor(change / 1e4)
+    local silver = floor(change / 100 % 100)
+    local copper = change % 100
+
+    local text = "+"
+    if gold > 0 then
+        text = text .. gold .. "|cffFFD700g|r "
+    end
+    if silver > 0 then
+        text = text .. silver .. "|cffc0c0c0s|r "
+    end
+    if copper > 0 then
+        text = text .. copper .. "|cffeda55fc|r"
+    end
+
+    queueEvent("static", {
+        text = text,
+        r = 1,
+        g = 0.84,
+        b = 0,
+    })
+end
+
+local function handleCurrencyDisplay(currencyType, quantity, quantityChange)
+    if not cfg.loot then
+        return
+    end
+    if not quantityChange or quantityChange <= 0 then
+        return
+    end
+    if not currencyType then
+        return
+    end
+
+    local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
+    if not info then
+        return
+    end
+
+    local text = format("+%d %s", quantityChange, info.name or "")
+    local icon = info.iconFileID
+
+    queueEvent("static", {
+        text = text,
+        r = 0.8,
+        g = 0.8,
+        b = 1,
+        iconTexture = icon,
+    })
+end
+
+------------------------------------------------------------------------
+-- Combat State
+------------------------------------------------------------------------
+
+local inCombat = false
+
+local function onCombatStart()
+    inCombat = true
+    if cfg.notification then
+        queueEvent("static", { text = "+" .. ENTERING_COMBAT, r = 1, g = 0.1, b = 0.1 })
+    end
+end
+
+local function onCombatEnd()
+    inCombat = false
+
+    if cfg.clear_on_combat_exit then
+        for _, name in ipairs({ "outgoing", "outgoing_secondary", "incoming", "healing" }) do
+            local q = scrollQueues[name]
+            if q then
+                q:Clear()
+            end
+        end
+    end
+
+    if cfg.notification then
+        queueEvent("static", { text = "-" .. LEAVING_COMBAT, r = 0.1, g = 1, b = 0.1 })
+    end
+end
+
+------------------------------------------------------------------------
+-- Lifecycle
+------------------------------------------------------------------------
+
+function module:OnInit()
+    if not cfg or not cfg.enable then
+        return
+    end
+
+    playerGUID = UnitGUID("player")
+
+    -- Create scroll areas
+    local playerFrame = _G["DarkUIPlayerFrame"]
+    local targetFrame = _G["DarkUITargetFrame"]
+
+    createScrollArea("incoming", {
+        pos = playerFrame and { "BOTTOMLEFT", playerFrame, "TOPLEFT", -5, 60 } or { "CENTER", UIParent, "CENTER", -200, 100 },
+        width = 160,
+        scrollHeight = 200,
+        scrollSpeed = 90,
+        justify = "RIGHT",
+        iconPosition = "LEFT",
+        horizontalCurveOffset = -35,
+        horizontalReturnOffset = 35,
+    })
+
+    createScrollArea("healing", {
+        pos = playerFrame and { "BOTTOMRIGHT", playerFrame, "TOPRIGHT", 5, 60 } or { "CENTER", UIParent, "CENTER", 200, 100 },
+        width = 160,
+        scrollHeight = 200,
+        scrollSpeed = 90,
+        justify = "LEFT",
+        iconPosition = "RIGHT",
+        horizontalCurveOffset = 35,
+        horizontalReturnOffset = -35,
+    })
+
+    createScrollArea("outgoing", {
+        pos = targetFrame and { "BOTTOMLEFT", targetFrame, "TOPLEFT", -5, 60 } or { "CENTER", UIParent, "CENTER", 200, 100 },
+        width = 180,
+        scrollHeight = 220,
+        scrollSpeed = 90,
+        justify = "LEFT",
+        iconPosition = "RIGHT",
+        horizontalCurveOffset = 35,
+        horizontalReturnOffset = -35,
+    })
+
+    createScrollArea("outgoing_secondary", {
+        pos = targetFrame and { "BOTTOMLEFT", targetFrame, "TOPLEFT", 70, 60 } or { "CENTER", UIParent, "CENTER", 275, 100 },
+        width = 140,
+        scrollHeight = 220,
+        scrollSpeed = 150,
+        justify = "LEFT",
+        iconPosition = "RIGHT",
+        horizontalCurveOffset = 35,
+        horizontalReturnOffset = -35,
+    })
+
+    createScrollArea("notification", {
+        pos = { "CENTER", UIParent, "CENTER", 0, 100 },
+        width = 300,
+        scrollHeight = -180,
+        scrollSpeed = 90,
+        justify = "CENTER",
+        iconPosition = "LEFT",
+        horizontalCurveOffset = 0,
+        horizontalReturnOffset = 0,
+    })
+
+    createScrollArea("static", {
+        pos = { "CENTER", UIParent, "CENTER", 0, -200 },
+        width = 300,
+        scrollHeight = 0,
+        duration = 2,
+        scrollSpeed = 0,
+        justify = "CENTER",
+        iconPosition = "LEFT",
+        collisionMode = "STACK",
+        horizontalCurveOffset = 0,
+        horizontalReturnOffset = 0,
+    })
+
+    -- Init pool
+    initPool(UIParent)
+
+    -- Event handler (register BEFORE suppressing Blizzard FCT)
+    local handler = CreateFrame("Frame")
+    handler:RegisterEvent("UNIT_COMBAT")
+    handler:RegisterEvent("COMBAT_TEXT_UPDATE")
+    handler:RegisterEvent("UNIT_AURA")
+    handler:RegisterEvent("PLAYER_REGEN_ENABLED")
+    handler:RegisterEvent("PLAYER_REGEN_DISABLED")
+    handler:RegisterEvent("UNIT_ENTERED_VEHICLE")
+    handler:RegisterEvent("UNIT_EXITING_VEHICLE")
+    handler:RegisterEvent("PLAYER_ENTERING_WORLD")
+
+    handler:RegisterEvent("DAMAGE_METER_COMBAT_SESSION_UPDATED")
+
+    if cfg.loot then
+        handler:RegisterEvent("BAG_UPDATE_DELAYED")
+        handler:RegisterEvent("PLAYER_MONEY")
+        handler:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+    end
+
+    handler:SetScript("OnEvent", function(_, event, arg1, arg2, arg3, arg4, arg5)
+        if event == "UNIT_COMBAT" then
+            handleUnitCombat(arg1, arg2, arg3, arg4, arg5)
+        elseif event == "COMBAT_TEXT_UPDATE" then
+            handleCombatTextUpdate(arg1)
+        elseif event == "UNIT_AURA" then
+            handleUnitAura(arg1, arg2)
+        elseif event == "DAMAGE_METER_COMBAT_SESSION_UPDATED" then
+            if cfg.outgoing then
+                processDamageMeter()
+            end
+        elseif event == "PLAYER_REGEN_DISABLED" then
+            onCombatStart()
+        elseif event == "PLAYER_REGEN_ENABLED" then
+            onCombatEnd()
+        elseif event == "UNIT_ENTERED_VEHICLE" or event == "UNIT_EXITING_VEHICLE" then
+            if arg1 == "player" then
+                playerGUID = UnitGUID("player")
+                if CombatTextSetActiveUnit then
+                    CombatTextSetActiveUnit(UnitHasVehicleUI("player") and "vehicle" or "player")
+                end
+            end
+        elseif event == "PLAYER_ENTERING_WORLD" then
+            initInventoryCache()
+        elseif event == "BAG_UPDATE_DELAYED" then
+            handleBagUpdateDelayed()
+        elseif event == "PLAYER_MONEY" then
+            handlePlayerMoney()
+        elseif event == "CURRENCY_DISPLAY_UPDATE" then
+            handleCurrencyDisplay(arg1, arg2, arg3)
+        end
+    end)
+
+    -- Suppress Blizzard FCT
+    if cfg.hide_blizzard then
+        pcall(SetCVar, "floatingCombatTextCombatDamage_v2", 0)
+        pcall(SetCVar, "floatingCombatTextCombatHealing_v2", 0)
+        if CombatText then
+            CombatText:UnregisterAllEvents()
+            CombatText:SetScript("OnLoad", nil)
+            CombatText:SetScript("OnEvent", nil)
+            CombatText:SetScript("OnUpdate", nil)
+        end
+    end
+
+    -- Restore on logout
+    local logoutFrame = CreateFrame("Frame")
+    logoutFrame:RegisterEvent("PLAYER_LOGOUT")
+    logoutFrame:SetScript("OnEvent", function()
+        if cfg.hide_blizzard then
+            pcall(SetCVar, "floatingCombatTextCombatDamage_v2", 1)
+            pcall(SetCVar, "floatingCombatTextCombatHealing_v2", 1)
+        end
+    end)
+
+    -- Slash Command
+    SlashCmdList.XCT = function(input)
+        input = (input or ""):lower()
+        if input == "test" then
+            for i = 1, 8 do
+                C_Timer.After(i * 0.25, function()
+                    queueEvent("incoming", { text = "-" .. math.random(10000, 99999), r = 0.75, g = 0.1, b = 0.1, iconTexture = 136116 })
+                    queueEvent("healing", { text = "+" .. math.random(5000, 50000), r = 0.1, g = 0.75, b = 0.1, iconTexture = 135936 })
+                    queueEvent("outgoing", { text = tostring(math.random(20000, 120000)), r = 1, g = 1, b = 0, iconTexture = 132350 })
+                end)
+            end
+            queueEvent("notification", { text = "Test Mode", r = 1, g = 0.82, b = 0 })
+            queueEvent("static", { text = "+15 Shadowflame Essence", r = 0.64, g = 0.21, b = 0.93, iconTexture = 463524 })
+        else
+            print("|cffffff00/xct test|r — fire test messages")
+        end
+    end
+    SLASH_XCT1 = "/xct"
+end

@@ -28,3 +28,4 @@ Modules\11-Quest.lua
 Modules\12-Automation.lua
 Modules\13-Misc.lua
 Modules\14-Commands.lua
+Modules\15-CombatText.lua

@@ -116,7 +116,7 @@ C.actionbar = {
             pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 64 },
             scale = 0.98,
             button = { size = 24, space = 4 },
-            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.4 } },
+            fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.1 } },
         },
         exp = {
             enable = true,
@@ -456,14 +456,18 @@ C.nameplate = {
     bad_color = { 1, 0, 0 },
     offtank_color = { 0, 0.5, 1 },
     custom_color = { 0, 0.8, 0.3 },
-    track_debuffs = true,
-    track_buffs = true,
-    player_aura_only = true,
-    show_stealable_buffs = true,
+    show_auras = true,
+    max_auras = 5,
+    auras_per_row = 5,
     auras_size = 22,
+    show_dispel = true,
+    desaturate = true,
     show_spiral = true,
     show_timers = true,
     icon_spacing = 4,
+    show_cc = true,
+    num_cc = 2,
+    cc_size = 26,
     arrow = true,
     quest = true,
     visibility = {
@@ -483,6 +487,27 @@ C.nameplate = {
             pets = false,
         },
     },
+}
+
+----------------------------------------------------------------------------------------
+-- Combat Text
+----------------------------------------------------------------------------------------
+C.combattext = {
+    enable = true,
+    incoming = true,
+    incoming_heal = true,
+    notification = true,
+    outgoing = true,
+    loot = true,
+    icons = true,
+    icon_size = 18,
+    font = STANDARD_TEXT_FONT,
+    font_size = 14,
+    font_style = "OUTLINE",
+    group_unlike_spells = false,
+    group_appearance = "ALL_ICONS", -- "ALL_ICONS" or "FIRST_ICON_PLUS_N"
+    hide_blizzard = true,
+    clear_on_combat_exit = true,
 }
 
 ----------------------------------------------------------------------------------------
@@ -637,6 +662,10 @@ C.unitframe = {
             showDebuffBorder = true,
             filterDispellableDebuff = false,
         },
+        spellsIndicator = true,
+        buffsIndicator = true,
+        debuffsIndicator = true,
+        indicatorSize = 16,
         fader = { Range = { insideAlpha = 1, outsideAlpha = 0.3 } },
     },
     classModule = {
