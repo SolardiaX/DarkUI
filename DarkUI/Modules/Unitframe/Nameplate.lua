@@ -15,7 +15,7 @@ local LCG = LibStub("LibCustomGlow-1.0", true)
 local oUF = select(2, ...).oUF
 
 local issecretvalue = issecretvalue
-local SetCVar = SetCVar
+local SetCVar = C_CVar.SetCVar
 local InCombatLockdown = InCombatLockdown
 local UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation = UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation
 local UnitIsTapDenied = UnitIsTapDenied

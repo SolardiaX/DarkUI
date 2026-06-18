@@ -212,5 +212,5 @@ function module:OnEnable()
         hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", updateCooldown)
     end
 
-    SetCVar("countdownForCooldowns", 1)
+    C_CVar.SetCVar("countdownForCooldowns", 1)
 end

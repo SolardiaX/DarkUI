@@ -6,7 +6,7 @@ local E, C, L, DB = select(2, ...):unpack()
 
 local module = E:Module("Variable")
 
-local SetCVar = SetCVar
+local SetCVar = C_CVar.SetCVar
 local SetCVarBitfield = SetCVarBitfield
 local InCombatLockdown = InCombatLockdown
 local ToggleChatColorNamesByClassGroup = ToggleChatColorNamesByClassGroup

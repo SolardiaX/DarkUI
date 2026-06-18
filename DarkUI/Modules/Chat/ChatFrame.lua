@@ -320,8 +320,8 @@ function module:OnInit()
         return
     end
 
-    SetCVar("chatStyle", "classic")
-    SetCVar("chatMouseScroll", 1)
+    C_CVar.SetCVar("chatStyle", "classic")
+    C_CVar.SetCVar("chatMouseScroll", 1)
 
     GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
     hooksecurefunc(GeneralDockManagerScrollFrame, "SetPoint", function(self, point, anchor, attachTo, x, y)

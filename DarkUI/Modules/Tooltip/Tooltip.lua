@@ -22,7 +22,7 @@ local UnitIsBattlePetCompanion = UnitIsBattlePetCompanion
 local UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel = UnitIsPlayer, UnitName, UnitPVPName, UnitClass, UnitRace, UnitLevel
 local UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction = UnitIsUnit, UnitIsTapDenied, UnitIsDead, UnitReaction
 local UnitIsInMyGuild, UnitExists = UnitIsInMyGuild, UnitExists
-local GetCVar = GetCVar
+local GetCVar = C_CVar.GetCVar
 
 local C_PetBattles_GetNumAuras = C_PetBattles.GetNumAuras
 local C_PetBattles_GetAuraInfo = C_PetBattles.GetAuraInfo

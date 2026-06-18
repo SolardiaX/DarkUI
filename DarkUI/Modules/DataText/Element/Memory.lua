@@ -8,7 +8,7 @@ local module = E:Module("DataText")
 
 local GetAddOnCPUUsage, GetAddOnMemoryUsage = GetAddOnCPUUsage, GetAddOnMemoryUsage
 local GetAvailableBandwidth = GetAvailableBandwidth
-local GetCVar = GetCVar
+local GetCVar = C_CVar.GetCVar
 local GetDownloadedPercentage = GetDownloadedPercentage
 local UpdateAddOnCPUUsage, UpdateAddOnMemoryUsage = UpdateAddOnCPUUsage, UpdateAddOnMemoryUsage
 local PlaySound = PlaySound

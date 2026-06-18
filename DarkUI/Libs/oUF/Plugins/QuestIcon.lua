@@ -162,7 +162,7 @@ local function Enable(self)
         self:RegisterEvent("UNIT_NAME_UPDATE", Path, true)
         self:RegisterEvent("PLAYER_ENTERING_WORLD", Path, true)
 
-        SetCVar("showQuestTrackingTooltips", 1)
+        C_CVar.SetCVar("showQuestTrackingTooltips", 1)
 
         return true
     end

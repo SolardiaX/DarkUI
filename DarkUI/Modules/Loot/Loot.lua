@@ -268,7 +268,7 @@ local function onLootOpened(_, _, autoLoot)
         lootFrame.title:SetText(LOOT)
     end
 
-    if GetCVar("lootUnderMouse") == "1" then
+    if C_CVar.GetCVar("lootUnderMouse") == "1" then
         local x, y = GetCursorPosition()
         x = x / lootFrame:GetEffectiveScale()
         y = y / lootFrame:GetEffectiveScale()
