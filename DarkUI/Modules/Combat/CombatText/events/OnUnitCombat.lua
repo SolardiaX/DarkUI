@@ -75,6 +75,7 @@ local function onUnitCombat(...)
     dataEvent.amount = amount
     dataEvent.damageType = schoolMask
     dataEvent.flagText = flagText
+    dataEvent.isCrit = (flagText == "CRITICAL")
 
     unitCombatBatcher(dataEvent)
 end

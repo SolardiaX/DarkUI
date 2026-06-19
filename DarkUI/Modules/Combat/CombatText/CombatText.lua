@@ -22,6 +22,11 @@ function module:OnInit()
     -- Initialize display layer
     module.Display.Init()
 
+    -- Start CLEU + UNIT_COMBAT outgoing damage detection
+    if module.CombatLog then
+        module.CombatLog:Enable()
+    end
+
     -- Register all events
     local eventFrame = CreateFrame("Frame")
     for event, _ in pairs(module.handlers) do

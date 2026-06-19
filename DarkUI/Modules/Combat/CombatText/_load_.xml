@@ -5,7 +5,7 @@
     <Script file="display/Display.lua"/>
     <Script file="display/Format.lua"/>
     <!-- Event handlers -->
-    <Script file="events/OnDamageMeterCombatSessionUpdate.lua"/>
+    <Script file="events/OnCombatLog.lua"/>
     <Script file="events/OnUnitCombat.lua"/>
     <Script file="events/OnCombatTextUpdate.lua"/>
     <Script file="events/OnUnitAura.lua"/>

@@ -52,6 +52,19 @@ local SCHOOL_COLORS = {
     [127] = "3F2766",
 }
 
+local MISS_TYPE_TEXT = {
+    MISS = L.COMBAT_CT_MISS,
+    DODGE = L.COMBAT_CT_DODGE,
+    PARRY = L.COMBAT_CT_PARRY,
+    BLOCK = L.COMBAT_CT_BLOCK,
+    ABSORB = L.COMBAT_CT_ABSORB,
+    RESIST = L.COMBAT_CT_RESIST,
+    IMMUNE = L.COMBAT_CT_IMMUNE,
+    DEFLECT = L.COMBAT_CT_DEFLECT,
+    REFLECT = L.COMBAT_CT_REFLECT,
+    EVADE = L.COMBAT_CT_EVADE,
+}
+
 local EVENT_TYPE_FORMATS = {
     OUTBOUND_DAMAGE = {
         variables = { "amount", "skillName" },
@@ -101,6 +114,23 @@ local EVENT_TYPE_FORMATS = {
             },
             { type = "text", value = L.COMBAT_CT_PET, color = "0000FF" },
             { type = "variable", value = "amount", color = "FFFFFF", useSchoolColor = false },
+        },
+        eligibleQueues = { "OUTBOUND" },
+    },
+    OUTBOUND_HEAL = {
+        variables = { "amount", "skillName" },
+        components = {
+            { type = "icon", value = "skillIcons" },
+            { type = "text", value = "+", color = "00FF00" },
+            { type = "variable", value = "amount", color = "00FF00", useSchoolColor = false },
+        },
+        eligibleQueues = { "OUTBOUND" },
+    },
+    OUTBOUND_MISS = {
+        variables = { "missType" },
+        components = {
+            { type = "icon", value = "skillIcons" },
+            { type = "variable", value = "missType", color = "CCCCCC", useSchoolColor = false },
         },
         eligibleQueues = { "OUTBOUND" },
     },
@@ -278,6 +308,9 @@ local function formatEvent(dataEvent)
                     text = component.value
                 elseif component.type == "variable" then
                     text = dataEvent[component.value]
+                    if component.value == "missType" and text then
+                        text = MISS_TYPE_TEXT[text] or text
+                    end
                 elseif component.type == "money" then
                     local g = dataEvent.gold or 0
                     local s = dataEvent.silver or 0
@@ -351,6 +384,7 @@ local function formatEvent(dataEvent)
     displayEvent.eventType = dataEvent.eventType
     displayEvent.skillID = dataEvent.skillID
     displayEvent.skillName = dataEvent.skillName
+    displayEvent.isCrit = dataEvent.isCrit
 
     module.Display.AnimateEvent(displayEvent)
 end

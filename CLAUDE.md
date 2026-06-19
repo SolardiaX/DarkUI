@@ -43,7 +43,12 @@ Secret values are conditionally restricted based on **secret predicates** (e.g.,
 All bare action functions (`GetVehicleBarIndex`, `HasAction`, `IsActionInRange`, `GetActionCooldown`, etc.) moved to `C_ActionBar.*`
 
 ### CLEU Removed
-`CombatLogGetCurrentEventInfo()` is gone. Use unit-based events (`UNIT_SPELLCAST_*`, `UNIT_HEALTH`, etc.)
+`CombatLogGetCurrentEventInfo()` global is gone. The functionality moved to `C_CombatLog.GetCurrentEventInfo()` — same return values, but may fail in restricted content (boss encounters, PvP). Wrap with `pcall`:
+```lua
+local GetCombatLogInfo = C_CombatLog and C_CombatLog.GetCurrentEventInfo
+-- Usage: local ok, ... = pcall(GetCombatLogInfo)
+```
+Use `bit.band(sourceFlags, COMBATLOG_OBJECT_AFFILIATION_MINE)` for ownership checks (GUIDs are secret strings in combat, cannot `==` compare). `UNIT_COMBAT` remains a reliable fallback when CLEU is restricted.
 
 ### C_Spell.GetSpellInfo Returns Table
 ```lua

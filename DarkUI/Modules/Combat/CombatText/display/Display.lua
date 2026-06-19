@@ -264,7 +264,7 @@ local function animateEvent(displayEvent)
             fontString:SetJustifyH("CENTER")
         end
 
-        fontString:SetFont(cfg.font, cfg.font_size, cfg.font_style)
+        fontString:SetFont(cfg.font, displayEvent.isCrit and cfg.font_size_crit or cfg.font_size, cfg.font_style)
         fontString:SetText(displayEvent.message or "")
 
         local countString = messageFrame:GetCountString()

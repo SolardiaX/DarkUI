@@ -9,6 +9,8 @@ addon.OptionList["combattext"] = {
     { CHECK, "combattext.incoming", L_OPT_COMBATTEXT_INCOMING },
     { CHECK, "combattext.incoming_heal", L_OPT_COMBATTEXT_INCOMING_HEAL },
     { CHECK, "combattext.outgoing", L_OPT_COMBATTEXT_OUTGOING },
+    { CHECK, "combattext.outgoing_heal", L_OPT_COMBATTEXT_OUTGOING_HEAL },
+    { CHECK, "combattext.outgoing_miss", L_OPT_COMBATTEXT_OUTGOING_MISS },
     { CHECK, "combattext.notification", L_OPT_COMBATTEXT_NOTIFICATION },
     { CHECK, "combattext.loot", L_OPT_COMBATTEXT_LOOT },
     { HEADER, "", L_OPT_COMBATTEXT_HEADER_FORMAT or "Format" },
