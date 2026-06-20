@@ -10,4 +10,5 @@
     <Script file="Element\Durability.lua" />
     <Script file="Element\Bags.lua" />
     <Script file="Element\Currencies.lua" />
+    <Script file="Element\Time.lua" />
 </Ui>

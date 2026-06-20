@@ -15,6 +15,7 @@ addon.OptionList["datatext"] = {
     { CHECK, "datatext.durability.enable", L_OPT_DATATEXT_DURABILITY_ENABLE },
     { CHECK, "datatext.bags.enable", L_OPT_DATATEXT_BAGS_ENABLE },
     { CHECK, "datatext.currencies.enable", L_OPT_DATATEXT_GOLD_ENABLE },
+    { CHECK, "datatext.time.enable", L_OPT_DATATEXT_TIME_ENABLE },
 }
 
 addon.Hooks["datatext"] = function(a)

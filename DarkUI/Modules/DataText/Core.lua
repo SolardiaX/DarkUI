@@ -360,6 +360,18 @@ local function buildConfig()
             tip_x = -21,
             tip_y = 20,
         },
+        Time = {
+            enable = stats.time.enable,
+            anchor_frame = "Minimap",
+            anchor_to = "bottom",
+            anchor_from = "bottom",
+            x_off = 1,
+            y_off = 1,
+            tip_frame = "UIParent",
+            tip_anchor = "CURSOR",
+            tip_x = 0,
+            tip_y = 0,
+        },
     }
 
     module.config = config

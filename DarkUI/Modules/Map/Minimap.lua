@@ -20,8 +20,6 @@ local ICON_POS = {
     garrison = { "CENTER", "Minimap", "CENTER", 90, 130 },
     queue = { "TOPLEFT", "Minimap", "TOPRIGHT", -56, 12 },
     instance = { "TOPRIGHT", "Minimap", "TOPRIGHT", 20, 20 },
-    time = { "BOTTOM", "Minimap", "BOTTOM", 1, 1 },
-    clock = { "TOP", "Minimap", "BOTTOM", -2, -10 },
 }
 
 local media
@@ -165,27 +163,13 @@ local function resetIcons()
         end)
     end
 
-    -- GameTime
+    -- GameTime & Clock (handled by DataText Time module)
     if GameTimeFrame then
-        GameTimeFrame:SetSize(26, 26)
-        GameTimeFrame:ClearAllPoints()
-        GameTimeFrame:SetPoint(unpack(ICON_POS.time))
-        GameTimeFrame:SetHitRectInsets(0, 0, 0, 0)
+        GameTimeFrame:Hide()
     end
 
-    -- Clock
     if TimeManagerClockButton then
-        TimeManagerClockButton:ClearAllPoints()
-        TimeManagerClockButton:SetPoint(unpack(ICON_POS.clock))
-        if TimeManagerClockTicker then
-            TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
-            TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
-        end
-        if TimeManagerAlarmFiredTexture and TimeManagerClockTicker then
-            TimeManagerAlarmFiredTexture:ClearAllPoints()
-            TimeManagerAlarmFiredTexture:SetPoint("TOPLEFT", TimeManagerClockTicker, "TOPLEFT", -18, 10)
-            TimeManagerAlarmFiredTexture:SetPoint("BOTTOMRIGHT", TimeManagerClockTicker, "BOTTOMRIGHT", 15, -13)
-        end
+        TimeManagerClockButton:Hide()
     end
 
     -- Mail

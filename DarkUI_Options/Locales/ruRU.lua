@@ -142,6 +142,7 @@ L_OPT_DATATEXT_COORDS_ENABLE = "Включить координаты"
 L_OPT_DATATEXT_DURABILITY_ENABLE = "Включить прочность"
 L_OPT_DATATEXT_BAGS_ENABLE = "Включить сумки"
 L_OPT_DATATEXT_GOLD_ENABLE = "Включить валюту"
+L_OPT_DATATEXT_TIME_ENABLE = "Включить время"
 
 -- Quest
 L_OPT_QUEST_ENABLE = "Включить модуль заданий"

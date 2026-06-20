@@ -140,6 +140,7 @@ L_OPT_DATATEXT_COORDS_ENABLE = "Enable coords"
 L_OPT_DATATEXT_DURABILITY_ENABLE = "Enable durability"
 L_OPT_DATATEXT_BAGS_ENABLE = "Enable bags"
 L_OPT_DATATEXT_GOLD_ENABLE = "Enable currencies"
+L_OPT_DATATEXT_TIME_ENABLE = "Enable time"
 
 -- Quest
 L_OPT_QUEST_ENABLE = "Enable quest module"
