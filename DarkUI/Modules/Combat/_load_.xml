@@ -1,3 +1,4 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">
     <Include file="CombatText/_load_.xml"/>
+    <Include file="DamageMeter/_load_.xml"/>
 </Ui>

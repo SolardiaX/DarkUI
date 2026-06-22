@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="Texture.lua"/>
+	<Script file="Hover.lua"/>
+	<Script file="Snap.lua"/>
+	<Script file="Reset.lua"/>
+	<Script file="DamageMeter.lua"/>
+</Ui>
