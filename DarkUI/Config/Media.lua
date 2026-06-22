@@ -52,6 +52,7 @@ local config = {
         empty = path .. "tex_empty",
         gray = path .. "tex_gray",
         gradient = path .. "tex_gradient",
+        gradient_rev = path .. "tex_gradient_rev",
         shadow = path .. "tex_shadow",
     },
 }
