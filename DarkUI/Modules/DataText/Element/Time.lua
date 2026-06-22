@@ -162,6 +162,9 @@ module:Inject("Time", {
             local info = C_CurrencyInfo.GetCurrencyInfo(3028)
             keyName = info and info.name or "Restored Coffer Key"
         end
+        if TimeManagerClockButton then
+            TimeManagerClockButton:Hide()
+        end
     end,
     OnEvent = function(self, event)
         if event == "PLAYER_ENTERING_WORLD" then
