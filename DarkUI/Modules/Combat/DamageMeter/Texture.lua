@@ -282,6 +282,13 @@ local function scanWindow(window)
         skinSourceWindow(sourceWin)
     end
 
+    local background = window.MinimizeContainer and window.MinimizeContainer.Background or nil
+    if background then
+        C_Timer_After(0, function()
+            background:SetAlpha(0)
+        end)
+    end
+
     if module.cfg.hideLocalPlayer then
         hookLocalPlayer(window)
     end
