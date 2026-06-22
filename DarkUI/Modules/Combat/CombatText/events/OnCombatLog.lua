@@ -6,7 +6,7 @@ local E, C, L = select(2, ...):unpack()
 ------------------------------------------------------------------------
 
 local module = E:Module("CombatText")
-local cfg = C.combattext
+local cfg = C.combat.combatText
 
 local GetTime = GetTime
 local band = bit.band

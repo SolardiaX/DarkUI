@@ -106,14 +106,14 @@ C.actionbar = {
         },
         micromenu = {
             enable = true,
-            pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 34 },
+            pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -40, 34 },
             button = { size = 24, space = 2 },
             scale = 1,
             fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.1 } },
         },
         bags = {
             enable = true,
-            pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -4, 64 },
+            pos = { "BOTTOMRIGHT", "UIParent", "BOTTOMRIGHT", -360, 10 },
             scale = 0.98,
             button = { size = 24, space = 4 },
             fader_mouseover = { fadeIn = { time = 0.4, alpha = 1 }, fadeOut = { time = 0.3, alpha = 0.01 } },
@@ -491,27 +491,47 @@ C.nameplate = {
 }
 
 ----------------------------------------------------------------------------------------
--- Combat Text
+-- Combat
 ----------------------------------------------------------------------------------------
-C.combattext = {
-    enable = true,
-    incoming = true,
-    incoming_heal = true,
-    notification = true,
-    outgoing = true,
-    outgoing_heal = true,
-    outgoing_miss = true,
-    loot = true,
-    icons = true,
-    icon_size = 18,
-    font = STANDARD_TEXT_FONT,
-    font_size = 14,
-    font_size_crit = 20,
-    font_style = "OUTLINE",
-    group_unlike_spells = false,
-    group_appearance = "ALL_ICONS", -- "ALL_ICONS" or "FIRST_ICON_PLUS_N"
-    hide_blizzard = true,
-    clear_on_combat_exit = true,
+C.combat = {
+    combatText = {
+        enable = true,
+        incoming = true,
+        incoming_heal = true,
+        notification = true,
+        outgoing = true,
+        outgoing_heal = true,
+        outgoing_miss = true,
+        loot = true,
+        icons = true,
+        icon_size = 18,
+        font = STANDARD_TEXT_FONT,
+        font_size = 14,
+        font_size_crit = 20,
+        font_style = "OUTLINE",
+        group_unlike_spells = false,
+        group_appearance = "ALL_ICONS", -- "ALL_ICONS" or "FIRST_ICON_PLUS_N"
+        hide_blizzard = true,
+        clear_on_combat_exit = true,
+    },
+    damageMeter = {
+        enable = true,
+        hideLocalPlayer = true,
+        enableHover = true,
+        headerBgMode = 2,
+        headerBtnMode = 3,
+        enableSnap = true,
+        win2Position = "TOP",
+        win2CustomSize = false,
+        win2SizeVal = 150,
+        win3Target = 2,
+        win3Position = "TOP",
+        win3CustomSize = false,
+        win3SizeVal = 150,
+        resetMode = "smart",
+        resetNotice = true,
+        quickReset = true,
+    },
 }
 
 ----------------------------------------------------------------------------------------

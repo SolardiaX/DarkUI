@@ -7,7 +7,7 @@ local E, C, L = select(2, ...):unpack()
 local module = E:Module("CombatText")
 module:SetConfigKey("combattext")
 
-local cfg = C.combattext
+local cfg = C.combat.combatText
 module.cfg = cfg
 
 ------------------------------------------------------------------------
