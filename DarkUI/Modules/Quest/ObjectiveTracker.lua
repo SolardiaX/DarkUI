@@ -365,11 +365,11 @@ function module:OnInit()
     -- Anchor
     local anchor = CreateFrame("Frame", "DarkUI_ObjectiveTrackerAnchor", UIParent)
     anchor:SetPoint(unpack(getTrackerPos()))
-    anchor:SetSize(224, 150)
+    anchor:SetSize(1, 1)
 
     ObjectiveTrackerFrame:SetClampedToScreen(true)
     ObjectiveTrackerFrame:ClearAllPoints()
-    ObjectiveTrackerFrame:SetPoint("TOP", anchor, "TOP")
+    ObjectiveTrackerFrame:SetPoint("TOPRIGHT", anchor, "TOPRIGHT")
     ObjectiveTrackerFrame.IsUserPlaced = function() return true end
     ObjectiveTrackerFrame.ignoreFramePositionManager = true
     ObjectiveTrackerFrame.ignoreFrameLayout = true
@@ -377,7 +377,7 @@ function module:OnInit()
     hooksecurefunc(ObjectiveTrackerFrame, "SetPoint", function(_, _, parent)
         if parent ~= anchor then
             ObjectiveTrackerFrame:ClearAllPoints()
-            ObjectiveTrackerFrame:SetPoint("TOP", anchor, "TOP")
+            ObjectiveTrackerFrame:SetPoint("TOPRIGHT", anchor, "TOPRIGHT")
         end
     end)
 
@@ -467,35 +467,4 @@ function module:OnInit()
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "Activate", skinChallengeBlock)
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "SetUpAffixes", skinAffixes)
 
-    -- Combat auto-collapse
-    if cfg.auto_collapse and cfg.auto_collapse ~= "NONE" then
-        local collapseMode = cfg.auto_collapse
-        local wasCollapsed = false
-
-        self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
-            local inInstance, instanceType = IsInInstance()
-            local shouldCollapse = false
-
-            if collapseMode == true or collapseMode == "RAID" then
-                shouldCollapse = inInstance and (instanceType == "raid" or instanceType == "party")
-            elseif collapseMode == "SCENARIO" then
-                shouldCollapse = inInstance
-            elseif collapseMode == "RELOAD" then
-                shouldCollapse = true
-            end
-
-            if shouldCollapse and not ObjectiveTrackerFrame:IsCollapsed() then
-                wasCollapsed = false
-                ObjectiveTrackerFrame:SetCollapsed(true)
-            else
-                wasCollapsed = ObjectiveTrackerFrame:IsCollapsed()
-            end
-        end)
-
-        self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-            if not wasCollapsed and ObjectiveTrackerFrame:IsCollapsed() then
-                ObjectiveTrackerFrame:SetCollapsed(false)
-            end
-        end)
-    end
 end

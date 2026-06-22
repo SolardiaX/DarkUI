@@ -29,8 +29,10 @@ function module:OnInit()
     if not cfg or not cfg.enable then return end
     if not cfg.auto_collapse or cfg.auto_collapse == "NONE" then return end
 
+    local mode = cfg.auto_collapse
+    local wasCollapsed = false
+
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
-        local mode = cfg.auto_collapse
         local inInstance, instanceType = IsInInstance()
 
         if mode == "RAID" or mode == true then
@@ -72,6 +74,32 @@ function module:OnInit()
             C_Timer.After(0.1, function()
                 ObjectiveTrackerFrame:SetCollapsed(true)
             end)
+        end
+    end)
+
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
+        local inInstance, instanceType = IsInInstance()
+        local shouldCollapse = false
+
+        if mode == true or mode == "RAID" then
+            shouldCollapse = inInstance and (instanceType == "raid" or instanceType == "party")
+        elseif mode == "SCENARIO" then
+            shouldCollapse = inInstance
+        elseif mode == "RELOAD" then
+            shouldCollapse = true
+        end
+
+        if shouldCollapse and not ObjectiveTrackerFrame:IsCollapsed() then
+            wasCollapsed = false
+            ObjectiveTrackerFrame:SetCollapsed(true)
+        else
+            wasCollapsed = ObjectiveTrackerFrame:IsCollapsed()
+        end
+    end)
+
+    self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+        if not wasCollapsed and ObjectiveTrackerFrame:IsCollapsed() then
+            ObjectiveTrackerFrame:SetCollapsed(false)
         end
     end)
 end
