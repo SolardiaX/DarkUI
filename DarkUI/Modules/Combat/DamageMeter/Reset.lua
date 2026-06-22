@@ -13,18 +13,18 @@ local StaticPopup_Show = StaticPopup_Show
 local StaticPopup_Hide = StaticPopup_Hide
 local IsControlKeyDown = IsControlKeyDown
 
-local POPUP_TEXT = L.DMETER_POPUP_TEXT or "|cffff6060[DarkUI]|r\n\nYou have entered a new instance. Reset data?"
-local POPUP_BTN_YES = L.DMETER_POPUP_BTN_YES or "Reset"
-local POPUP_BTN_NO = L.DMETER_POPUP_BTN_NO or "Keep"
-local MSG_PREFIX = L.DMETER_MSG_PREFIX or "|cffff6060[DarkUI]|r "
-local MSG_RESET = L.DMETER_MSG_RESET or "Data has been reset (%s)"
-local SRC_UNKNOWN = L.DMETER_SRC_UNKNOWN or "Unknown"
-local SRC_AUTO = L.DMETER_SRC_AUTO or "Auto"
-local SRC_ENTER_INST = L.DMETER_SRC_ENTER_INST or "Instance Entry"
-local SRC_QUICK = L.DMETER_SRC_QUICK or "Quick Reset"
-local SRC_MPLUS = L.DMETER_SRC_MPLUS or "M+ Started"
-local SRC_BOSS = L.DMETER_SRC_BOSS or "Boss Encounter"
-local SRC_COMBAT = L.DMETER_SRC_COMBAT or "Combat Started"
+local POPUP_TEXT = L.COMBAT_DMETER_POPUP_TEXT
+local POPUP_BTN_YES = L.COMBAT_DMETER_POPUP_BTN_YES
+local POPUP_BTN_NO = L.COMBAT_DMETER_POPUP_BTN_NO
+local MSG_PREFIX = L.COMBAT_DMETER_MSG_PREFIX
+local MSG_RESET = L.COMBAT_DMETER_MSG_RESET
+local SRC_UNKNOWN = L.COMBAT_DMETER_SRC_UNKNOWN
+local SRC_AUTO = L.COMBAT_DMETER_SRC_AUTO
+local SRC_ENTER_INST = L.COMBAT_DMETER_SRC_ENTER_INST
+local SRC_QUICK = L.COMBAT_DMETER_SRC_QUICK
+local SRC_MPLUS = L.COMBAT_DMETER_SRC_MPLUS
+local SRC_BOSS = L.COMBAT_DMETER_SRC_BOSS
+local SRC_COMBAT = L.COMBAT_DMETER_SRC_COMBAT
 
 local cfg
 

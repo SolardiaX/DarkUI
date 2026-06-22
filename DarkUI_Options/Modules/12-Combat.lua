@@ -25,7 +25,7 @@ addon.OptionList["combat"] = {
     { CHECK, "combat.combatText.hide_blizzard", L_OPT_COMBATTEXT_HIDE_BLIZZARD },
     { CHECK, "combat.combatText.clear_on_combat_exit", L_OPT_COMBATTEXT_CLEAR_ON_EXIT },
     -- Damage Meter
-    { HEADER, "", L_CATEGORIES_DMETER or "Damage Meter" },
+    { HEADER, "", L_OPT_COMBAT_HEADER_DMETER or "Damage Meter" },
     { CHECK, "combat.damageMeter.enable", L_OPT_DMETER_ENABLE or "Enable Damage Meter skin" },
     { HEADER, "", L_OPT_DMETER_HEADER_DISPLAY or "Display" },
     { CHECK, "combat.damageMeter.hideLocalPlayer", L_OPT_DMETER_HIDE_LOCALPLAYER or "Hide local player sticky bar" },

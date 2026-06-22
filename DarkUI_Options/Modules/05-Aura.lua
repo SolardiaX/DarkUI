@@ -15,7 +15,7 @@ addon.OptionList["aura"] = {
         end)
     end},
     { CHECK, "aura.show_caster", L_OPT_AURA_SHOW_CASTER },
-    { CHECK, "aura.show_timers", L_OPT_NAMEPLATE_SHOW_TIMERS },
+    { CHECK, "aura.show_timers", L_OPT_AURA_SHOW_TIMERS },
     { CHECK, "aura.enable_flash", L_OPT_AURA_ENABLE_FLASH },
     { CHECK, "aura.enable_animation", L_OPT_AURA_ENABLE_ANIMATION },
     { SLIDER, "aura.buff_size", L_OPT_AURA_BUFF_SIZE or "Buff Size", { 20, 48, 1 } },

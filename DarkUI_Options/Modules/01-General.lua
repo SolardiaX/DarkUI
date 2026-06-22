@@ -25,6 +25,6 @@ addon.OptionList["general"] = {
     { HEADER, nil, "Blizzard" },
     { CHECK, "blizzard.style", L_OPT_GENERAL_BLIZZARD_STYLE },
     { CHECK, "blizzard.custom_position", L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION },
-    { CHECK, "blizzard.slot_durability", L_OPT_MISC_BLIZZARD_SLOT_DURABILITY },
-    { CHECK, "blizzard.shift_mark", L_OPT_MISC_BLIZZARD_SHIFT_MARK },
+    { CHECK, "blizzard.slot_durability", L_OPT_GENERAL_SLOT_DURABILITY },
+    { CHECK, "blizzard.shift_mark", L_OPT_GENERAL_SHIFT_MARK },
 }
