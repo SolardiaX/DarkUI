@@ -8,7 +8,7 @@ local module = E:Module("Chat")
 module:SetConfigKey("chat")
 
 local gsub, strfind, format = gsub, strfind, string.format
-local SetCVar = C_CVar.SetCVar
+local strlower, BetterDate, time = strlower, BetterDate, time
 
 local cfg = C.chat
 local isScaling = false
@@ -48,7 +48,9 @@ local function strip(info, name)
 end
 
 local function formatMessageFilter(_, _, text, ...)
-    if type(text) ~= "string" or not canaccessvalue(text) then return end
+    if type(text) ~= "string" or not canaccessvalue(text) then
+        return
+    end
     local modified = text:gsub("|h%[(%d+)%. .-%]|h", "|h[%1]|h")
     modified = modified:gsub("|Hplayer:(.-)|h%[(.-)%]|h", strip)
     if modified ~= text then
@@ -88,17 +90,25 @@ local function setChatStyle(frame)
     tab.HighlightRight:Kill()
 
     local bf = frame.buttonFrame
-    if bf then bf:SetGhost() end
+    if bf then
+        bf:SetGhost()
+    end
 
     _G[format("ChatFrame%sTabGlow", id)]:Kill()
     frame.ScrollBar:Kill()
 
     local editLeft = _G[format("ChatFrame%sEditBoxLeft", id)]
-    if editLeft then editLeft:Kill() end
+    if editLeft then
+        editLeft:Kill()
+    end
     local editMid = _G[format("ChatFrame%sEditBoxMid", id)]
-    if editMid then editMid:Kill() end
+    if editMid then
+        editMid:Kill()
+    end
     local editRight = _G[format("ChatFrame%sEditBoxRight", id)]
-    if editRight then editRight:Kill() end
+    if editRight then
+        editRight:Kill()
+    end
 
     _G[chat .. "EditBox"]:StripTextures(2)
 
@@ -115,7 +125,9 @@ local function setChatStyle(frame)
     end
 
     local tab_convo = _G[chat .. "Tab"].conversationIcon
-    if tab_convo then tab_convo:Kill() end
+    if tab_convo then
+        tab_convo:Kill()
+    end
 
     local eb = _G[chat .. "EditBox"]
     eb:SetAltArrowKeyMode(false)
@@ -184,11 +196,6 @@ local function setChatStyle(frame)
 
             CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)
         end
-    end
-
-    if _G[chat] ~= _G["ChatFrame2"] then
-        -- Disable Blizzard timestamps (we add our own via AddMessage hook)
-        SetCVar("showTimestamps", "none")
     end
 
     frame.skinned = true
@@ -277,7 +284,9 @@ end
 ------------------------------------------------------------------------
 
 local function addLootIcons(_, _, message, ...)
-    if issecretvalue(message) then return end
+    if issecretvalue(message) then
+        return
+    end
     local function icon(link)
         local texture = C_Item.GetItemIconByID(link)
         return "\124T" .. texture .. ":12:12:0:0:64:64:5:59:5:59\124t" .. link
@@ -291,7 +300,9 @@ end
 ------------------------------------------------------------------------
 
 local function removeRealmName(_, _, msg, author, ...)
-    if issecretvalue(msg) then return end
+    if issecretvalue(msg) then
+        return
+    end
     local realm = gsub(E.realm, " ", "")
     if msg:find("-" .. realm) then
         return false, gsub(msg, "%-" .. realm, ""), author, ...
@@ -305,6 +316,80 @@ end
 local function typoHistoryPosthook(chat, text)
     if text and canaccessvalue(text) and strfind(text, HELP_TEXT_SIMPLE) then
         ChatEdit_AddHistory(chat.editBox)
+    end
+end
+
+------------------------------------------------------------------------
+-- Timestamp
+--
+-- Prepend a unified timestamp to every line. This is done by replacing
+-- ChatFrame.AddMessage (the only place that sees the final rendered text
+-- for all message types, including addon prints), mirroring ElvUI.
+------------------------------------------------------------------------
+
+local function addMessageTimestamp(frame, msg, ...)
+    if type(msg) == "string" and msg ~= "" and canaccessvalue(msg) then
+        msg = format("%s[%s]|r %s", E:RGBToHex(cfg.time_color), BetterDate(cfg.time_format or "%H:%M", time()), msg)
+    end
+    return frame.OldAddMessage(frame, msg, ...)
+end
+
+------------------------------------------------------------------------
+-- Chat History Override
+--
+-- Replacing AddMessage write-taints the frame, so Blizzard's
+-- MessageEventHandler runs tainted and crashes when it indexes the
+-- protected ChatHistory accessID tables (HistoryKeeper.lua). Mirror ElvUI:
+-- reimplement the ChatHistory_* globals with addon-owned tables (freely
+-- indexable while tainted) and bail on secret tokens -- chat targets and
+-- senders are secret in combat and cannot be used as table keys.
+------------------------------------------------------------------------
+
+local function setupChatHistory()
+    local accessIDs = {}
+    local accessIDToType = {}
+    local accessIDToTarget = {}
+    local accessIDToChanSender = {}
+    local nextAccessID = 1
+
+    local function getToken(chatType, chatTarget, chanSender)
+        return format("%s;;%s;;%s", strlower(chatType), chatTarget or "", chanSender or "")
+    end
+
+    function ChatHistory_GetToken(chatType, chatTarget, chanSender)
+        return getToken(chatType, chatTarget, chanSender)
+    end
+
+    function ChatHistory_GetAccessID(chatType, chatTarget, chanSender)
+        local token = getToken(chatType, chatTarget, chanSender)
+        if issecretvalue(token) then
+            return
+        end
+        if not accessIDs[token] then
+            accessIDs[token] = nextAccessID
+            accessIDToType[nextAccessID] = chatType
+            accessIDToTarget[nextAccessID] = chatTarget
+            accessIDToChanSender[nextAccessID] = chanSender
+            nextAccessID = nextAccessID + 1
+        end
+        return accessIDs[token]
+    end
+
+    function ChatHistory_GetChatType(accessID)
+        return accessIDToType[accessID], accessIDToTarget[accessID], accessIDToChanSender[accessID]
+    end
+
+    function ChatHistory_GetAllAccessIDsByChanSender(chanSender)
+        local results = {}
+        if issecretvalue(chanSender) then
+            return results
+        end
+        for accessID, sender in pairs(accessIDToChanSender) do
+            if strlower(sender) == strlower(chanSender) then
+                results[#results + 1] = accessID
+            end
+        end
+        return results
     end
 end
 
@@ -367,6 +452,10 @@ function module:OnInit()
         if not frame.skinned then
             setChatStyle(frame)
         end
+        if frame ~= _G["ChatFrame2"] and not frame.OldAddMessage then
+            frame.OldAddMessage = frame.AddMessage
+            frame.AddMessage = addMessageTimestamp
+        end
     end)
 
     hooksecurefunc("ChatEdit_CustomTabPressed", updateTabChannelSwitch)
@@ -378,11 +467,21 @@ function module:OnInit()
     ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", removeRealmName)
 
     local formatEvents = {
-        "CHAT_MSG_SAY", "CHAT_MSG_YELL", "CHAT_MSG_GUILD", "CHAT_MSG_OFFICER",
-        "CHAT_MSG_PARTY", "CHAT_MSG_PARTY_LEADER", "CHAT_MSG_RAID", "CHAT_MSG_RAID_LEADER",
-        "CHAT_MSG_INSTANCE_CHAT", "CHAT_MSG_INSTANCE_CHAT_LEADER",
-        "CHAT_MSG_CHANNEL", "CHAT_MSG_WHISPER", "CHAT_MSG_WHISPER_INFORM",
-        "CHAT_MSG_BN_WHISPER", "CHAT_MSG_BN_WHISPER_INFORM",
+        "CHAT_MSG_SAY",
+        "CHAT_MSG_YELL",
+        "CHAT_MSG_GUILD",
+        "CHAT_MSG_OFFICER",
+        "CHAT_MSG_PARTY",
+        "CHAT_MSG_PARTY_LEADER",
+        "CHAT_MSG_RAID",
+        "CHAT_MSG_RAID_LEADER",
+        "CHAT_MSG_INSTANCE_CHAT",
+        "CHAT_MSG_INSTANCE_CHAT_LEADER",
+        "CHAT_MSG_CHANNEL",
+        "CHAT_MSG_WHISPER",
+        "CHAT_MSG_WHISPER_INFORM",
+        "CHAT_MSG_BN_WHISPER",
+        "CHAT_MSG_BN_WHISPER_INFORM",
     }
     for _, event in ipairs(formatEvents) do
         ChatFrame_AddMessageEventFilter(event, formatMessageFilter)
@@ -394,19 +493,18 @@ function module:OnInit()
         end
     end
 
-    -- Hook AddMessage to prepend unified timestamp (like ElvUI/NDui)
-    local TS_COLOR = "|cff999999"
-    local TS_FORMAT = cfg.time_format or "%H:%M"
+    -- Disable Blizzard's native timestamps; addMessageTimestamp prepends ours.
+    C_CVar.SetCVar("showTimestamps", "none")
+
+    -- Make Blizzard's chat history taint-safe before tainting the frames below.
+    setupChatHistory()
+
     for i = 1, NUM_CHAT_WINDOWS do
         if i ~= 2 then
             local cf = _G["ChatFrame" .. i]
-            local oldAddMessage = cf.AddMessage
-            cf.AddMessage = function(self, msg, r, g, b, ...)
-                if msg and canaccessvalue(msg) and type(msg) == "string" and msg ~= "" then
-                    local ts = BetterDate(TS_FORMAT, time())
-                    msg = format("%s[%s]|r %s", TS_COLOR, ts, msg)
-                end
-                oldAddMessage(self, msg, r, g, b, ...)
+            if not cf.OldAddMessage then
+                cf.OldAddMessage = cf.AddMessage
+                cf.AddMessage = addMessageTimestamp
             end
         end
     end
@@ -414,7 +512,9 @@ end
 
 function module:OnEnable()
     local function updateChatSize()
-        if isScaling then return end
+        if isScaling then
+            return
+        end
         isScaling = true
 
         ChatFrame1:ClearAllPoints()
@@ -462,7 +562,9 @@ function module:OnEnable()
     self:RegisterEvent("UI_SCALE_CHANGED", updateChatSize)
 
     hooksecurefunc(ChatFrame1, "SetPoint", function(_, _, _, _, x)
-        if isScaling then return end
+        if isScaling then
+            return
+        end
         if x ~= cfg.pos[4] then
             updateChatSize()
         end
