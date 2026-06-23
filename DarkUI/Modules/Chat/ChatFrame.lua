@@ -8,6 +8,7 @@ local module = E:Module("Chat")
 module:SetConfigKey("chat")
 
 local gsub, strfind, format = gsub, strfind, string.format
+local SetCVar = C_CVar.SetCVar
 
 local cfg = C.chat
 local isScaling = false
@@ -103,7 +104,7 @@ local function setChatStyle(frame)
 
     if frame.ScrollToBottomButton then
         frame.ScrollToBottomButton:ClearAllPoints()
-        frame.ScrollToBottomButton:SetPoint("BOTTOMRIGHT", frame, 0, -4)
+        frame.ScrollToBottomButton:SetPoint("BOTTOMRIGHT", frame, -2, 22)
         frame:HookScript("OnUpdate", function(self)
             if not self:AtBottom() then
                 frame.ScrollToBottomButton:Show()
@@ -186,12 +187,8 @@ local function setChatStyle(frame)
     end
 
     if _G[chat] ~= _G["ChatFrame2"] then
-        _G.TIMESTAMP_FORMAT_HHMM = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M]|r "
-        _G.TIMESTAMP_FORMAT_HHMMSS = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M:%S]|r "
-        _G.TIMESTAMP_FORMAT_HHMMSS_24HR = E:RGBToHex(unpack(cfg.time_color)) .. "[%H:%M:%S]|r "
-        _G.TIMESTAMP_FORMAT_HHMMSS_AMPM = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M:%S %p]|r "
-        _G.TIMESTAMP_FORMAT_HHMM_24HR = E:RGBToHex(unpack(cfg.time_color)) .. "[%H:%M]|r "
-        _G.TIMESTAMP_FORMAT_HHMM_AMPM = E:RGBToHex(unpack(cfg.time_color)) .. "[%I:%M %p]|r "
+        -- Disable Blizzard timestamps (we add our own via AddMessage hook)
+        SetCVar("showTimestamps", "none")
     end
 
     frame.skinned = true
@@ -394,6 +391,23 @@ function module:OnInit()
     for i = 1, NUM_CHAT_WINDOWS do
         if i ~= 2 then
             hooksecurefunc(_G["ChatFrame" .. i], "AddMessage", typoHistoryPosthook)
+        end
+    end
+
+    -- Hook AddMessage to prepend unified timestamp (like ElvUI/NDui)
+    local TS_COLOR = "|cff999999"
+    local TS_FORMAT = cfg.time_format or "%H:%M"
+    for i = 1, NUM_CHAT_WINDOWS do
+        if i ~= 2 then
+            local cf = _G["ChatFrame" .. i]
+            local oldAddMessage = cf.AddMessage
+            cf.AddMessage = function(self, msg, r, g, b, ...)
+                if msg and canaccessvalue(msg) and type(msg) == "string" and msg ~= "" then
+                    local ts = BetterDate(TS_FORMAT, time())
+                    msg = format("%s[%s]|r %s", TS_COLOR, ts, msg)
+                end
+                oldAddMessage(self, msg, r, g, b, ...)
+            end
         end
     end
 end

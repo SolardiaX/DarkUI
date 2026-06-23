@@ -333,6 +333,7 @@ C.chat = {
     chat_bar_mouseover = false,
     chat_copy = true,
     time_color = { 1, 1, 0 },
+    time_format = "%H:%M",
     alt_invite = true,
     combatlog = true,
     tabs_mouseover = true,
