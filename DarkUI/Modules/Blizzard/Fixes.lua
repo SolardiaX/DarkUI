@@ -23,8 +23,17 @@ fixTooltip:SetScript("OnEvent", onActionBarEvent)
 GameTooltip:HookScript("OnTooltipCleared", function(self)
     if self:IsForbidden() then return end
     if bug and self:NumLines() == 0 then
-        self:Hide()
         bug = false
+        -- Defer the Hide: TooltipDataHandlerMixin:InternalProcessInfo calls
+        -- self:ClearLines() mid-rebuild, which fires OnTooltipCleared. Calling
+        -- Hide() synchronously here re-enters GameTooltip_OnHide -> ClearHandlerInfo,
+        -- nils self.infoList, and crashes the pending table.insert(self.infoList, info).
+        -- Hiding next frame skips the case where the rebuild repopulated the tooltip.
+        C_Timer.After(0, function()
+            if not self:IsForbidden() and self:IsShown() and self:NumLines() == 0 then
+                self:Hide()
+            end
+        end)
     end
 end)
 
@@ -44,12 +53,13 @@ _G.SettingsPanel.TransitionBackOpeningPanel = _G.HideUIPanel
 -- Fix BackdropTemplate secret value error
 ------------------------------------------------------------------------
 
-local old_SetupTextureCoordinates = BackdropTemplateMixin.SetupTextureCoordinates
-function BackdropTemplateMixin:SetupTextureCoordinates()
-    local width = self:GetWidth()
-    if issecretvalue and issecretvalue(width) then return end
-    old_SetupTextureCoordinates(self)
-end
+-- TODO: test if disabling this fixes UIWidgetTemplateTextWithState taint error
+-- local old_SetupTextureCoordinates = BackdropTemplateMixin.SetupTextureCoordinates
+-- function BackdropTemplateMixin:SetupTextureCoordinates()
+--     local width = self:GetWidth()
+--     if issecretvalue and issecretvalue(width) then return end
+--     old_SetupTextureCoordinates(self)
+-- end
 
 ------------------------------------------------------------------------
 -- Fix money tooltip
