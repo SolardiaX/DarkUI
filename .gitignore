@@ -1,6 +1,7 @@
 /*
 
 !/.gitignore
+!/.git-blame-ignore-revs
 !/.stylua.toml
 !/.styluaignore
 !/.pkgmeta

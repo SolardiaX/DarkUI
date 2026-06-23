@@ -1,0 +1,5 @@
+# Revisions listed here are skipped by `git blame` (bulk reformat / mechanical changes).
+# Enable locally with:  git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# style: [Core] apply stylua to entire codebase
+97e50e169a1fda5e169cea5459dae9d18ec1e4fc
