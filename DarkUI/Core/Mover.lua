@@ -14,30 +14,20 @@ E.LEMO = LibStub("LibEditModeOverride-1.0")
 local lemoReady = false
 
 local function initLEMO()
-    if lemoReady then
-        return
-    end
-    if not E.LEMO:IsReady() then
-        return
-    end
+    if lemoReady then return end
+    if not E.LEMO:IsReady() then return end
     lemoReady = true
     E.LEMO:LoadLayouts()
 end
 
 function E:IsLEMOReady()
-    if not lemoReady then
-        initLEMO()
-    end
+    if not lemoReady then initLEMO() end
     return lemoReady
 end
 
 function E:ApplyEditModeChanges()
-    if InCombatLockdown() then
-        return
-    end
-    if not self:IsLEMOReady() then
-        return
-    end
+    if InCombatLockdown() then return end
+    if not self:IsLEMOReady() then return end
     self.LEMO:LoadLayouts()
     self.LEMO:ApplyChanges()
 end
@@ -56,9 +46,7 @@ local Colors = {
 local function getVariable(t, vkey)
     for k in gmatch(vkey, "([^.%s]+)") do
         t = t[k]
-        if t == nil then
-            return
-        end
+        if t == nil then return end
     end
 
     return t
@@ -131,9 +119,7 @@ Anchor.Create = function(self, frame, name, vkey)
     local anchor = CreateFrame("Button", nil, UIParent)
 
     for method, func in next, Anchor do
-        if method ~= "Create" then
-            anchor[method] = func
-        end
+        if method ~= "Create" then anchor[method] = func end
     end
 
     anchor:Hide()
@@ -189,21 +175,13 @@ Anchor.Create = function(self, frame, name, vkey)
     return anchor
 end
 
-Anchor.Enable = function(self)
-    self.enabled = true
-end
+Anchor.Enable = function(self) self.enabled = true end
 
-Anchor.Disable = function(self)
-    self.enabled = false
-end
+Anchor.Disable = function(self) self.enabled = false end
 
-Anchor.IsEnabled = function(self)
-    return self.enabled
-end
+Anchor.IsEnabled = function(self) return self.enabled end
 
-Anchor.SetEnabled = function(self, enable)
-    self.enabled = enable and true or false
-end
+Anchor.SetEnabled = function(self, enable) self.enabled = enable and true or false end
 
 Anchor.UpdateHint = function(self)
     local msg = string_format(E:RGBToHex(Colors.highlight) .. "%s, %.0f, %.0f|r", unpack(self.position))
@@ -258,9 +236,7 @@ end
 
 Anchor.OnUpdate = function(self, elapsed)
     self.elapsed = self.elapsed + elapsed
-    if self.elapsed < 0.02 then
-        return
-    end
+    if self.elapsed < 0.02 then return end
     self.elapsed = 0
 
     self.position = { getPosition(self) }

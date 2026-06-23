@@ -21,9 +21,7 @@ function module:OnInit()
     button.icon:SetTexCoord(0.216, 0.784, 0.216, 0.784)
     button.icon:SetDrawLayer("ARTWORK")
     button.icon.__lockdown = true
-    if button.Arrow then
-        button.Arrow:SetAlpha(0)
-    end
+    if button.Arrow then button.Arrow:SetAlpha(0) end
 
     E:Module("Actionbar").StyleActionButton(button, true)
 
@@ -37,9 +35,7 @@ function module:OnInit()
         end
         GameTooltip:Show()
     end)
-    button:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
+    button:SetScript("OnLeave", function() GameTooltip:Hide() end)
     button:SetScript("OnClick", function(self)
         if UnitOnTaxi("player") then
             TaxiRequestEarlyLanding()
@@ -48,24 +44,16 @@ function module:OnInit()
         end
         self:SetChecked(true)
     end)
-    button:SetScript("OnShow", function(self)
-        self:SetChecked(false)
-    end)
+    button:SetScript("OnShow", function(self) self:SetChecked(false) end)
 
     frame.buttons = { button }
     frame.frameVisibility = "[canexitvehicle]c;[mounted]m;n"
     RegisterStateDriver(frame, "exit", frame.frameVisibility)
     frame:SetAttribute("_onstate-exit", [[ if CanExitVehicle() then self:Show() else self:Hide() end ]])
 
-    if not CanExitVehicle() then
-        frame:Hide()
-    end
+    if not CanExitVehicle() then frame:Hide() end
 
-    if cfg.fader_mouseover then
-        E:ButtonBarFader(frame, frame.buttons, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-    end
+    if cfg.fader_mouseover then E:ButtonBarFader(frame, frame.buttons, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
 
-    if cfg.fader_combat then
-        E:CombatFrameFader(frame, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-    end
+    if cfg.fader_combat then E:CombatFrameFader(frame, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut) end
 end

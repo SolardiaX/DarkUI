@@ -170,33 +170,23 @@ local IconHookCache = setmetatable({}, { __mode = "k" })
 
 local function getPlayerSpecID()
     local index = C_SpecializationInfo.GetSpecialization()
-    if not index then
-        return
-    end
+    if not index then return end
     return (GetSpecializationInfo(index))
 end
 
 local function applySpecIcon(entry, data)
-    if not entry or entry.spellID then
-        return
-    end
+    if not entry or entry.spellID then return end
 
     local iconTex = entry.Icon and entry.Icon.Icon or entry.Icon
-    if not iconTex or not iconTex.SetTexture then
-        return
-    end
+    if not iconTex or not iconTex.SetTexture then return end
 
     local specID
     local fileID = (data and data.specIconID) or entry.specIconID
-    if fileID then
-        specID = FILEID_TO_SPECID[tonumber(fileID) or fileID]
-    end
+    if fileID then specID = FILEID_TO_SPECID[tonumber(fileID) or fileID] end
 
     if not specID then
         local isPlayer = entry == (_G.DamageMeter and _G.DamageMeter.LocalPlayerEntry) or (data and data.isLocalPlayer)
-        if isPlayer then
-            specID = getPlayerSpecID()
-        end
+        if isPlayer then specID = getPlayerSpecID() end
     end
 
     local coords = specID and SPECID_TO_COORDS[specID]
@@ -216,12 +206,8 @@ end
 ------------------------------------------------------------------------
 
 local function styleEntry(entry)
-    if not entry or not entry.StatusBar then
-        return
-    end
-    if StyledCache[entry] then
-        return
-    end
+    if not entry or not entry.StatusBar then return end
+    if StyledCache[entry] then return end
 
     local bar = entry.StatusBar
 
@@ -242,9 +228,7 @@ local function styleEntry(entry)
         bar.Background:SetAllPoints(bar)
         bar.Background:SetColorTexture(0, 0, 0, 0)
     end
-    if bar.BackgroundEdge then
-        bar.BackgroundEdge:SetAlpha(0)
-    end
+    if bar.BackgroundEdge then bar.BackgroundEdge:SetAlpha(0) end
 
     if entry.UpdateIcon and not IconHookCache[entry] then
         hooksecurefunc(entry, "UpdateIcon", applySpecIcon)
@@ -260,9 +244,7 @@ end
 ------------------------------------------------------------------------
 
 local function hideHeader(window)
-    if not window or not window.Header then
-        return
-    end
+    if not window or not window.Header then return end
     window.Header:SetTexture(nil)
     window.Header:SetAtlas(nil)
     window.Header:SetColorTexture(0, 0, 0, 0)
@@ -293,9 +275,7 @@ end
 ------------------------------------------------------------------------
 
 local function hideScrollBar(scrollBar)
-    if not scrollBar or ScrollBarCache[scrollBar] then
-        return
-    end
+    if not scrollBar or ScrollBarCache[scrollBar] then return end
     scrollBar:SetAlpha(0)
     scrollBar:EnableMouse(false)
     scrollBar:SetWidth(1)
@@ -326,14 +306,10 @@ end
 
 local function skinScrollArea(window)
     local scrollBar = window.ScrollBar or (window.GetScrollBar and window:GetScrollBar())
-    if scrollBar then
-        hideScrollBar(scrollBar)
-    end
+    if scrollBar then hideScrollBar(scrollBar) end
 
     local scrollBox = window.ScrollBox or (window.GetScrollBox and window:GetScrollBox())
-    if not scrollBox then
-        return
-    end
+    if not scrollBox then return end
 
     forceScrollBoxAnchors(scrollBox, window)
 
@@ -351,9 +327,7 @@ local function skinScrollArea(window)
 
         local updating = false
         hooksecurefunc(scrollBox, "SetPoint", function(self, point)
-            if updating then
-                return
-            end
+            if updating then return end
             if point == "TOPLEFT" or point == "BOTTOMRIGHT" then
                 updating = true
                 forceScrollBoxAnchors(self, window)
@@ -370,22 +344,16 @@ end
 ------------------------------------------------------------------------
 
 local function skinSourceWindow(sourceWindow)
-    if not sourceWindow or WindowCache[sourceWindow] then
-        return
-    end
+    if not sourceWindow or WindowCache[sourceWindow] then return end
 
     local scrollBar = sourceWindow.ScrollBar or (sourceWindow.GetScrollBar and sourceWindow:GetScrollBar())
-    if scrollBar then
-        hideScrollBar(scrollBar)
-    end
+    if scrollBar then hideScrollBar(scrollBar) end
 
     local scrollBox = sourceWindow.ScrollBox or (sourceWindow.GetScrollBox and sourceWindow:GetScrollBox())
     if scrollBox and not ScrollBoxHookCache[scrollBox] then
         hooksecurefunc(scrollBox, "Update", function(self)
             C_Timer_After(0, function()
-                if self.ForEachFrame then
-                    self:ForEachFrame(styleEntry)
-                end
+                if self.ForEachFrame then self:ForEachFrame(styleEntry) end
             end)
         end)
         ScrollBoxHookCache[scrollBox] = true
@@ -395,9 +363,7 @@ local function skinSourceWindow(sourceWindow)
         hooksecurefunc(sourceWindow, "Refresh", function(self)
             C_Timer_After(0, function()
                 local sb = self.ScrollBox or (self.GetScrollBox and self:GetScrollBox())
-                if sb and sb.ForEachFrame then
-                    sb:ForEachFrame(styleEntry)
-                end
+                if sb and sb.ForEachFrame then sb:ForEachFrame(styleEntry) end
             end)
         end)
         sourceWindow._dkHookedRefresh = true
@@ -412,27 +378,19 @@ end
 
 local function hideLocalPlayer(window)
     local entry = (window.MinimizeContainer and window.MinimizeContainer.LocalPlayerEntry) or window.LocalPlayerEntry
-    if not entry then
-        return
-    end
+    if not entry then return end
     entry:Hide()
     entry:SetAlpha(0)
     entry:EnableMouse(false)
 end
 
 local function hookLocalPlayer(window)
-    if LocalPlayerHookCache[window] then
-        return
-    end
+    if LocalPlayerHookCache[window] then return end
     LocalPlayerHookCache[window] = true
 
     hideLocalPlayer(window)
 
-    if window.ShowLocalPlayerEntry then
-        hooksecurefunc(window, "ShowLocalPlayerEntry", function(self)
-            hideLocalPlayer(self)
-        end)
-    end
+    if window.ShowLocalPlayerEntry then hooksecurefunc(window, "ShowLocalPlayerEntry", function(self) hideLocalPlayer(self) end) end
 end
 
 ------------------------------------------------------------------------
@@ -440,32 +398,20 @@ end
 ------------------------------------------------------------------------
 
 local function scanWindow(window)
-    if not window then
-        return
-    end
-    if WindowCache[window] then
-        return
-    end
+    if not window then return end
+    if WindowCache[window] then return end
 
     hideHeader(window)
     desaturateHeaderButtons(window)
     skinScrollArea(window)
 
     local sourceWin = (window.MinimizeContainer and window.MinimizeContainer.SourceWindow) or window.SourceWindow
-    if sourceWin then
-        skinSourceWindow(sourceWin)
-    end
+    if sourceWin then skinSourceWindow(sourceWin) end
 
     local background = window.MinimizeContainer and window.MinimizeContainer.Background or nil
-    if background then
-        C_Timer_After(0, function()
-            background:SetAlpha(0)
-        end)
-    end
+    if background then C_Timer_After(0, function() background:SetAlpha(0) end) end
 
-    if module.cfg.hideLocalPlayer then
-        hookLocalPlayer(window)
-    end
+    if module.cfg.hideLocalPlayer then hookLocalPlayer(window) end
 
     WindowCache[window] = true
 end
@@ -490,9 +436,7 @@ function module.Texture:Init()
         hooksecurefunc(_G.DamageMeter, "SetupSessionWindow", function(_, windowOrIndex)
             C_Timer_After(0, function()
                 local window = windowOrIndex
-                if type(windowOrIndex) == "number" then
-                    window = _G["DamageMeterSessionWindow" .. windowOrIndex]
-                end
+                if type(windowOrIndex) == "number" then window = _G["DamageMeterSessionWindow" .. windowOrIndex] end
                 scanWindow(window)
             end)
         end)

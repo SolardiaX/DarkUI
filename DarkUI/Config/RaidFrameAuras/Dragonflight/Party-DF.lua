@@ -4,7 +4,6 @@ local module = C.aura
 local TIER = 10
 local INSTANCE
 
-
 INSTANCE = 1196 -- 蕨皮山谷
 module:RegisterSeasonSpells(TIER, INSTANCE)
 

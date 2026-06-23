@@ -84,9 +84,7 @@ local function createTab(spellID, toyID, itemID)
         GameTooltip:SetText(name)
         GameTooltip:Show()
     end)
-    tab:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
+    tab:SetScript("OnLeave", function() GameTooltip:Hide() end)
 
     tinsert(tabList, tab)
 end
@@ -104,14 +102,10 @@ local function updateTabs()
 
         if itemID then
             local start, duration = C_Item.GetItemCooldown(itemID)
-            if start and duration and duration > 0 then
-                tab.CD:SetCooldown(start, duration)
-            end
+            if start and duration and duration > 0 then tab.CD:SetCooldown(start, duration) end
         elseif spellID then
             local cooldownInfo = C_Spell.GetSpellCooldown(spellID)
-            if cooldownInfo and cooldownInfo.isActive then
-                tab.CD:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration)
-            end
+            if cooldownInfo and cooldownInfo.isActive then tab.CD:SetCooldown(cooldownInfo.startTime, cooldownInfo.duration) end
         end
     end
 end
@@ -138,21 +132,15 @@ local function buildProfessions()
                     local slotID = i + spelloffset
                     if not C_SpellBook.IsSpellBookItemPassive(slotID, BOOKTYPE_PROFESSION) then
                         local info = C_SpellBook.GetSpellBookItemInfo(slotID, BOOKTYPE_PROFESSION)
-                        if info and info.spellID then
-                            createTab(info.spellID)
-                        end
+                        if info and info.spellID then createTab(info.spellID) end
                     end
                 end
             end
         end
     end
 
-    if isCook and PlayerHasToy(CHEF_HAT) and C_ToyBox.IsToyUsable(CHEF_HAT) then
-        createTab(nil, CHEF_HAT)
-    end
-    if C_Item.GetItemCount(THERMAL_ANVIL) > 0 then
-        createTab(nil, nil, THERMAL_ANVIL)
-    end
+    if isCook and PlayerHasToy(CHEF_HAT) and C_ToyBox.IsToyUsable(CHEF_HAT) then createTab(nil, CHEF_HAT) end
+    if C_Item.GetItemCount(THERMAL_ANVIL) > 0 then createTab(nil, nil, THERMAL_ANVIL) end
 end
 
 local initialized
@@ -187,9 +175,7 @@ function module:OnInit()
         ProfessionsFrame:HookScript("OnShow", loadTradeTabsDeferred)
     else
         self:RegisterEvent("ADDON_LOADED", function(_, _, addon)
-            if addon == "Blizzard_Professions" then
-                loadTradeTabsDeferred()
-            end
+            if addon == "Blizzard_Professions" then loadTradeTabsDeferred() end
         end)
     end
 end

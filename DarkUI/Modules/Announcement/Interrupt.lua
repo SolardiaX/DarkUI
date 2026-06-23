@@ -32,9 +32,7 @@ function module:OnInit()
         if instanceType == "arena" then
             local skirmish = IsArenaSkirmish()
             local _, isRegistered = IsActiveBattlefieldArena()
-            if skirmish or not isRegistered then
-                inPartyLFG = true
-            end
+            if skirmish or not isRegistered then inPartyLFG = true end
             inRaid = false
         end
 

@@ -22,10 +22,7 @@ function module:OnInit()
 
     WorldFrame:HookScript("OnMouseDown", function(_, button)
         if button == "LeftButton" and IsShiftKeyDown() and UnitExists("mouseover") then
-            if (GetNumGroupMembers() > 0 and not UnitInRaid("player"))
-                or UnitIsGroupLeader("player")
-                or UnitIsGroupAssistant("player") then
-
+            if (GetNumGroupMembers() > 0 and not UnitInRaid("player")) or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player") then
                 local current = GetRaidTargetIndex("mouseover") or 0
                 local next = (current % 8) + 1
                 SetRaidTarget("mouseover", next)

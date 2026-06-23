@@ -8,9 +8,9 @@ local oUF = ns.oUF or oUF
 
 local health = oUF:CreateColor(0.15, 0.15, 0.15)
 health:SetCurve({
-    [0]   = CreateColor(255 / 255, 42 / 255, 12 / 255, 1),
+    [0] = CreateColor(255 / 255, 42 / 255, 12 / 255, 1),
     [0.5] = CreateColor(231 / 255, 48 / 255, 78 / 255, 1),
-    [1]   = CreateColor(0.15, 0.15, 0.15, 1),
+    [1] = CreateColor(0.15, 0.15, 0.15, 1),
 })
 
 C.oUF_colors = setmetatable({

@@ -21,9 +21,7 @@ local format, len, gsub, floor = string.format, string.len, string.gsub, math.fl
 
 local function colorToRGB(color)
     if type(color) == "table" then
-        if color.GetRGB then
-            return color:GetRGB()
-        end
+        if color.GetRGB then return color:GetRGB() end
         return color[1] or 0, color[2] or 0, color[3] or 0
     end
     return 0, 0, 0
@@ -55,7 +53,7 @@ oUF.Tags.Events["dd:nameplateNameColor"] = "UNIT_POWER_UPDATE UNIT_FLAGS"
 oUF.Tags.Methods["dd:nameplateHealth"] = function(unit)
     local per = format("%d%%", UnitHealthPercent(unit, true, CurveConstants.ScaleTo100))
     local cur = E:AbbreviateNumber(UnitHealth(unit))
-    
+
     return cur .. " - " .. per
 end
 oUF.Tags.Events["dd:nameplateHealth"] = "UNIT_HEALTH UNIT_MAXHEALTH NAME_PLATE_UNIT_ADDED"
@@ -76,7 +74,7 @@ oUF.Tags.Methods["dd:nameLongAbbrev"] = function(unit)
 end
 oUF.Tags.Events["dd:nameLongAbbrev"] = "UNIT_NAME_UPDATE"
 
-oUF.Tags.Methods['dd:difficulty'] = function(u)
+oUF.Tags.Methods["dd:difficulty"] = function(u)
     local l = UnitLevel(u)
     local c = GetQuestDifficultyColor((l > 0) and l or 99)
     return format("|cff%02x%02x%02x", c.r * 255, c.g * 255, c.b * 255)
@@ -92,13 +90,13 @@ hpColorCurve:AddPoint(0, CreateColor(245 / 255, 68 / 255, 68 / 255, 1))
 hpColorCurve:AddPoint(0.5, CreateColor(245 / 255, 186 / 255, 69 / 255, 1))
 hpColorCurve:AddPoint(1, CreateColor(105 / 255, 201 / 255, 105 / 255, 1))
 
-oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
+oUF.Tags.Methods["dd:smarthp"] = function(u, _, arg1)
     if not UnitIsConnected(u) then
         return L.UNITFRAME_OFFLINE
     elseif UnitIsGhost(u) then
         return L.UNITFRAME_GHOST
     elseif UnitIsFeignDeath(u) then
-        return '|cffff3333FD|r'
+        return "|cffff3333FD|r"
     elseif UnitIsDead(u) then
         return L.UNITFRAME_DEAD
     end
@@ -123,33 +121,25 @@ oUF.Tags.Methods['dd:smarthp'] = function(u, _, arg1)
         text = cur .. " - " .. per
     end
 
-    if color then
-        return color:WrapTextInColorCode(text)
-    end
+    if color then return color:WrapTextInColorCode(text) end
 
     return text
 end
-oUF.Tags.Events['dd:smarthp'] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
+oUF.Tags.Events["dd:smarthp"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION PLAYER_FLAGS_CHANGED PARTY_MEMBER_ENABLE PARTY_MEMBER_DISABLE"
 
-oUF.Tags.Methods['dd:pp'] = function(u)
+oUF.Tags.Methods["dd:pp"] = function(u)
     local color = C.oUF_colors.power[select(2, UnitPowerType(u))]
-    if color == nil then
-        color = C.oUF_colors.power[select(1, UnitPowerType(u))]
-    end
+    if color == nil then color = C.oUF_colors.power[select(1, UnitPowerType(u))] end
 
     local text = E:AbbreviateNumber(UnitPower(u))
-    if color and color.WrapTextInColorCode then
-        return color:WrapTextInColorCode(text)
-    end
+    if color and color.WrapTextInColorCode then return color:WrapTextInColorCode(text) end
     return text
 end
-oUF.Tags.Events['dd:pp'] = 'UNIT_POWER_UPDATE'
+oUF.Tags.Events["dd:pp"] = "UNIT_POWER_UPDATE"
 
-oUF.Tags.Methods['dd:realname'] = function(u, r)
+oUF.Tags.Methods["dd:realname"] = function(u, r)
     local name, realm = UnitName(r or u)
-    if realm then
-        name = name .. '-*'
-    end
+    if realm then name = name .. "-*" end
 
     if not issecretvalue(UnitIsAFK(r or u)) and UnitIsAFK(r or u) then name = L.UNITFRAME_AFK .. name end
     if not issecretvalue(UnitIsDND(r or u)) and UnitIsDND(r or u) then name = L.UNITFRAME_DND .. name end
@@ -175,9 +165,7 @@ oUF.Tags.Events["dd:raidname"] = "UNIT_NAME_UPDATE UNIT_HEALTH UNIT_MAXHEALTH UN
 
 oUF.Tags.Methods["dd:misshp"] = function(unit)
     local color = { r = 1, g = 1, b = 1 }
-    if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
-        color = { r = 0.5, g = 0.5, b = 0.5 }
-    end
+    if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then color = { r = 0.5, g = 0.5, b = 0.5 } end
     local colorstr = color and E:RGBToHex(color.r, color.g, color.b, true) or "ffffff"
 
     local hpval
@@ -187,26 +175,20 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
         hpval = L.UNITFRAME_OFFLINE
     else
         local loss = TruncateWhenZero(UnitHealthMissing(unit))
-        if issecretvalue(loss) then
-            hpval = "-" .. loss
-        end
+        if issecretvalue(loss) then hpval = "-" .. loss end
     end
     return "|cff" .. colorstr .. (hpval or "100%") .. "|r"
 end
 oUF.Tags.Events["dd:misshp"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
 
-oUF.Tags.Methods['dd:pvptimer'] = function(unit)
-    if not IsPVPTimerRunning() and GetPVPTimer() >= 0 then
-        return ''
-    end
+oUF.Tags.Methods["dd:pvptimer"] = function(unit)
+    if not IsPVPTimerRunning() and GetPVPTimer() >= 0 then return "" end
     return E:FormatTime(floor(GetPVPTimer() / 1000))
 end
 
 oUF.Tags.Methods["dd:altpower"] = function(unit)
     local cur = TruncateWhenZero(UnitPower(unit, ALTERNATE_POWER_INDEX))
-    if cur ~= "0" and cur ~= "" then
-        return cur
-    end
+    if cur ~= "0" and cur ~= "" then return cur end
 end
 oUF.Tags.Events["dd:altpower"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER"
 
@@ -222,9 +204,7 @@ proxyfunc = function(self, ...)
 end
 
 proxy = setmetatable({
-    done = function()
-        return instance
-    end,
+    done = function() return instance end,
 }, {
     __index = function(self, key)
         func = instance[key]
@@ -233,7 +213,7 @@ proxy = setmetatable({
 })
 
 local function CreateTag(self, region, tagstr, frequentUpdates)
-    if type(region) == 'string' then
+    if type(region) == "string" then
         region, tagstr = self, region
     end
 
@@ -241,10 +221,10 @@ local function CreateTag(self, region, tagstr, frequentUpdates)
     fs:ClearAllPoints()
 
     if frequentUpdates then
-        if type(frequentUpdates) == 'number' then
+        if type(frequentUpdates) == "number" then
             fs.frequentUpdates = frequentUpdates
         else
-            fs.frequentUpdates = .5
+            fs.frequentUpdates = 0.5
         end
     end
 
@@ -255,4 +235,4 @@ local function CreateTag(self, region, tagstr, frequentUpdates)
     return proxy
 end
 
-oUF:RegisterMetaFunction('CreateTag', CreateTag)
+oUF:RegisterMetaFunction("CreateTag", CreateTag)

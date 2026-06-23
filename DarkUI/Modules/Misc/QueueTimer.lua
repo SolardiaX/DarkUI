@@ -50,11 +50,7 @@ function module:OnInit()
     local hasDBM = C_AddOns.IsAddOnLoaded("DBM-Core")
     local hasBW = C_AddOns.IsAddOnLoaded("BigWigs")
 
-    if cfg.lfg_queue_timer and not hasDBM and not hasBW then
-        createTimerBar(LFGDungeonReadyDialog, 40, "LFG_PROPOSAL_SHOW")
-    end
+    if cfg.lfg_queue_timer and not hasDBM and not hasBW then createTimerBar(LFGDungeonReadyDialog, 40, "LFG_PROPOSAL_SHOW") end
 
-    if cfg.pvp_queue_timer and not hasDBM then
-        createTimerBar(PVPReadyDialog, 90, "UPDATE_BATTLEFIELD_STATUS")
-    end
+    if cfg.pvp_queue_timer and not hasDBM then createTimerBar(PVPReadyDialog, 90, "UPDATE_BATTLEFIELD_STATUS") end
 end

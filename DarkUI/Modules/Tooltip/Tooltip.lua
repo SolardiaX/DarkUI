@@ -41,9 +41,7 @@ local function getLevelLine(tooltip)
         if not line then break end
         local text = line:GetText()
         if not text or not canaccessvalue(text) then break end
-        if strfind(strlower(text), LEVEL_PATTERN) then
-            return line, i
-        end
+        if strfind(strlower(text), LEVEL_PATTERN) then return line, i end
     end
 end
 
@@ -196,20 +194,21 @@ local function onTooltipSetUnit(self)
         end
     end
 
-    if classification == "rareelite" then classification = " R+"
-    elseif classification == "rare" then classification = " R"
-    elseif classification == "elite" then classification = "+"
-    else classification = "" end
-
-    if isPlayer and titleName and cfg.title then
-        name = titleName
+    if classification == "rareelite" then
+        classification = " R+"
+    elseif classification == "rare" then
+        classification = " R"
+    elseif classification == "elite" then
+        classification = "+"
+    else
+        classification = ""
     end
+
+    if isPlayer and titleName and cfg.title then name = titleName end
 
     local r, g, b = getUnitColor(unit)
     _G["GameTooltipTextLeft1"]:SetFormattedText("|cff%02x%02x%02x%s|r", r * 255, g * 255, b * 255, name or "")
-    if realm and canaccessvalue(realm) and realm ~= "" and cfg.realm then
-        self:AddLine(FRIENDS_LIST_REALM .. "|cffffffff" .. realm .. "|r")
-    end
+    if realm and canaccessvalue(realm) and realm ~= "" and cfg.realm then self:AddLine(FRIENDS_LIST_REALM .. "|cffffffff" .. realm .. "|r") end
 
     if isPlayer then
         -- AFK/DND status can be a secret boolean on restricted units; guard the test.
@@ -219,13 +218,16 @@ local function onTooltipSetUnit(self)
         elseif canaccessvalue(dnd) and dnd then
             self:AppendText((" %s"):format("|cffFF0000" .. L.CHAT_DND .. "|r"))
         end
-        if englishRace and canaccessvalue(englishRace) and faction and canaccessvalue(faction)
+        if
+            englishRace
+            and canaccessvalue(englishRace)
+            and faction
+            and canaccessvalue(faction)
             and (englishRace == "Pandaren" or englishRace == "Dracthyr" or englishRace == "EarthenDwarf" or englishRace == "Harronir")
-            and faction ~= playerFaction then
+            and faction ~= playerFaction
+        then
             local hex = "cffff3333"
-            if faction == "Alliance" then
-                hex = "cff69ccf0"
-            end
+            if faction == "Alliance" then hex = "cff69ccf0" end
             self:AppendText((" [|%s%s|r]"):format(hex, faction:sub(1, 2)))
         end
 
@@ -238,9 +240,7 @@ local function onTooltipSetUnit(self)
             else
                 _G["GameTooltipTextLeft2"]:SetTextColor(0, 1, 1)
             end
-            if cfg.rank then
-                self:AddLine(RANK .. ": |cffffffff" .. guildRank .. "|r")
-            end
+            if cfg.rank then self:AddLine(RANK .. ": |cffffffff" .. guildRank .. "|r") end
         end
 
         if levelColor then
@@ -248,7 +248,15 @@ local function onTooltipSetUnit(self)
             if levelLine then
                 if GetCVar("colorblindMode") == "1" then
                     local class = UnitClass(unit)
-                    levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN, class or "")
+                    levelLine:SetFormattedText(
+                        "|cff%02x%02x%02x%s|r %s %s",
+                        levelColor.r * 255,
+                        levelColor.g * 255,
+                        levelColor.b * 255,
+                        level,
+                        race or UNKNOWN,
+                        class or ""
+                    )
                 else
                     levelLine:SetFormattedText("|cff%02x%02x%02x%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, race or UNKNOWN)
                 end
@@ -264,7 +272,15 @@ local function onTooltipSetUnit(self)
                 local text = line:GetText()
                 if not canaccessvalue(text) then break end
                 if (level and text:find("^" .. LEVEL)) or (creatureType and text:find("^" .. creatureType)) then
-                    line:SetFormattedText("|cff%02x%02x%02x%s%s|r %s", levelColor.r * 255, levelColor.g * 255, levelColor.b * 255, level, classification, creatureType or "")
+                    line:SetFormattedText(
+                        "|cff%02x%02x%02x%s%s|r %s",
+                        levelColor.r * 255,
+                        levelColor.g * 255,
+                        levelColor.b * 255,
+                        level,
+                        classification,
+                        creatureType or ""
+                    )
                     break
                 end
             end
@@ -303,15 +319,11 @@ local function skinItemTooltips()
     itemBD:SetPoint("BOTTOMRIGHT", GameTooltip.ItemTooltip.Icon, "BOTTOMRIGHT", 2, -2)
 
     hooksecurefunc(GameTooltip.ItemTooltip.IconBorder, "SetVertexColor", function(self, r, g, b)
-        if r ~= BAG_ITEM_QUALITY_COLORS[1].r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then
-            itemBD:SetBackdropBorderColor(r, g, b)
-        end
+        if r ~= BAG_ITEM_QUALITY_COLORS[1].r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then itemBD:SetBackdropBorderColor(r, g, b) end
         self:SetTexture("")
     end)
 
-    hooksecurefunc(GameTooltip.ItemTooltip.IconBorder, "Hide", function()
-        itemBD:SetBackdropBorderColor(unpack(C.media.border_color))
-    end)
+    hooksecurefunc(GameTooltip.ItemTooltip.IconBorder, "Hide", function() itemBD:SetBackdropBorderColor(unpack(C.media.border_color)) end)
     GameTooltip.ItemTooltip.Count:ClearAllPoints()
     GameTooltip.ItemTooltip.Count:SetPoint("BOTTOMRIGHT", GameTooltip.ItemTooltip.Icon, "BOTTOMRIGHT", 1, 0)
 
@@ -328,14 +340,10 @@ local function skinItemTooltips()
         rewardBD:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", 2, -2)
 
         hooksecurefunc(reward.IconBorder, "SetVertexColor", function(self, r, g, b)
-            if r ~= BAG_ITEM_QUALITY_COLORS[1].r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then
-                rewardBD:SetBackdropBorderColor(r, g, b)
-            end
+            if r ~= BAG_ITEM_QUALITY_COLORS[1].r and g ~= BAG_ITEM_QUALITY_COLORS[1].g then rewardBD:SetBackdropBorderColor(r, g, b) end
             self:SetTexture("")
         end)
-        hooksecurefunc(reward.IconBorder, "Hide", function()
-            rewardBD:SetBackdropBorderColor(unpack(C.media.border_color))
-        end)
+        hooksecurefunc(reward.IconBorder, "Hide", function() rewardBD:SetBackdropBorderColor(unpack(C.media.border_color)) end)
     end
 
     hooksecurefunc("GameTooltip_ShowProgressBar", function(tt)
@@ -391,9 +399,7 @@ module.rTips[E.addonName] = function()
             local _, _, _, isBuff = C_PetBattles_GetAuraInfo(self.petOwner, self.petIndex, i)
             if isBuff and self.Buffs then
                 local frame = self.Buffs.frames[nextBuff]
-                if frame and frame.Icon then
-                    frame.Icon:SetTexCoord(unpack(C.media.texCoord))
-                end
+                if frame and frame.Icon then frame.Icon:SetTexCoord(unpack(C.media.texCoord)) end
                 nextBuff = nextBuff + 1
             elseif (not isBuff) and self.Debuffs then
                 local frame = self.Debuffs.frames[nextDebuff]
@@ -434,18 +440,12 @@ module.rTips["Blizzard_Collections"] = function()
 end
 
 module.rTips["Blizzard_PVPUI"] = function()
-    if ConquestTooltip then
-        styleTooltip(ConquestTooltip)
-    end
+    if ConquestTooltip then styleTooltip(ConquestTooltip) end
 end
 
 module.rTips["Blizzard_Calendar"] = function()
-    if CalendarContextMenu then
-        styleTooltip(CalendarContextMenu)
-    end
-    if CalendarInviteStatusContextMenu then
-        styleTooltip(CalendarInviteStatusContextMenu)
-    end
+    if CalendarContextMenu then styleTooltip(CalendarContextMenu) end
+    if CalendarInviteStatusContextMenu then styleTooltip(CalendarInviteStatusContextMenu) end
 end
 
 module.rTips["Blizzard_EncounterJournal"] = function()
@@ -490,9 +490,7 @@ function module:OnInit()
 
     -- Re-apply our backdrop after Blizzard sets Azerite/Corrupted item styles
     hooksecurefunc("SharedTooltip_SetBackdropStyle", function(tt)
-        if tt and not tt:IsForbidden() and tt.styled and tt.__backdrop then
-            tt.__backdrop:Show()
-        end
+        if tt and not tt:IsForbidden() and tt.styled and tt.__backdrop then tt.__backdrop:Show() end
     end)
 
     -- Anchor
@@ -522,9 +520,7 @@ function module:OnInit()
     -- Shift modifier
     if cfg.shift_modifer then
         GameTooltip:HookScript("OnShow", function(tt)
-            if not IsShiftKeyDown() and not (HoverBind and HoverBind.enabled) then
-                tt:Hide()
-            end
+            if not IsShiftKeyDown() and not (HoverBind and HoverBind.enabled) then tt:Hide() end
         end)
     end
 

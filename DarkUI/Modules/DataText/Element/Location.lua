@@ -36,9 +36,7 @@ module:Inject("Location", {
     end,
     OnEvent = function(self)
         self.subzone, self.zone, self.pvp = GetSubZoneText(), GetZoneText(), { GetZonePVPInfo() }
-        if not self.pvp[1] then
-            self.pvp[1] = "neutral"
-        end
+        if not self.pvp[1] then self.pvp[1] = "neutral" end
         local label = (self.subzone ~= "" and cfg.subzone) and self.subzone or self.zone
         local r, g, b = unpack(self.pvp[1] and (self[self.pvp[1]] and self[self.pvp[1]][2]) or self.neutral[2])
         self.text:SetText(cfg.truncate == 0 and label or strtrim(strsub(label, 1, cfg.truncate)))
@@ -52,9 +50,7 @@ module:Inject("Location", {
                 GameTooltip:AddLine(format("%s |cffffffff(%s)", self.zone, module:Coords()), module.tthead.r, module.tthead.g, module.tthead.b, 1, 1, 1)
                 if self.pvp[1] and not IsInInstance() then
                     local r, g, b = unpack(self[self.pvp[1]][2])
-                    if self.subzone and self.subzone ~= self.zone then
-                        GameTooltip:AddLine(self.subzone, r, g, b)
-                    end
+                    if self.subzone and self.subzone ~= self.zone then GameTooltip:AddLine(self.subzone, r, g, b) end
                     GameTooltip:AddLine(format(self[self.pvp[1]][1], self.pvp[3] or ""), r, g, b)
                 end
                 GameTooltip:Show()

@@ -25,9 +25,7 @@ E.myGuid = UnitGUID("player")
 E.myColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[E.myClass]
 E.myColorString = format("|cff%02x%02x%02x", E.myColor.r * 255, E.myColor.g * 255, E.myColor.b * 255)
 
-function ns:unpack()
-    return self[1], self[2], self[3], self[4]
-end
+function ns:unpack() return self[1], self[2], self[3], self[4] end
 
 _G[addonName] = ns
 

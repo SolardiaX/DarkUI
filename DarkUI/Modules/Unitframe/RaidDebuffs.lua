@@ -5,32 +5,32 @@ local E, C, L = select(2, ...):unpack()
 ------------------------------------------------------------------------
 local oUF = select(2, ...).oUF or oUF
 
-local class = select(2, UnitClass('player'))
+local class = select(2, UnitClass("player"))
 local RaidDebuffsIgnore, invalidPrio, bossDebuffPrio = {}, -1, 9999999
 
 local DispellColor = {
-    ["Magic"]   = { .2, .6, 1 },
-    ["Curse"]   = { .6, 0, 1 },
-    ["Disease"] = { .6, .4, 0 },
-    ["Poison"]  = { 0, .6, 0 },
-    ["none"]    = { 0, 0, 0 },
+    ["Magic"] = { 0.2, 0.6, 1 },
+    ["Curse"] = { 0.6, 0, 1 },
+    ["Disease"] = { 0.6, 0.4, 0 },
+    ["Poison"] = { 0, 0.6, 0 },
+    ["none"] = { 0, 0, 0 },
 }
 
 local DispellPriority = {
-    ["Magic"]   = 4,
-    ["Curse"]   = 3,
+    ["Magic"] = 4,
+    ["Curse"] = 3,
     ["Disease"] = 2,
-    ["Poison"]  = 1,
+    ["Poison"] = 1,
 }
 
 local CanDispel = {
-    DRUID = {Magic = false, Curse = true, Poison = true},
-    EVOKER = {Magic = false, Curse = true, Poison = true, Disease = true},
-    MAGE = {Curse = true},
-    MONK = {Magic = false, Poison = true, Disease = true},
-    PALADIN = {Magic = false, Poison = true, Disease = true},
-    PRIEST = {Magic = false, Disease = true},
-    SHAMAN = {Magic = false, Curse = true}
+    DRUID = { Magic = false, Curse = true, Poison = true },
+    EVOKER = { Magic = false, Curse = true, Poison = true, Disease = true },
+    MAGE = { Curse = true },
+    MONK = { Magic = false, Poison = true, Disease = true },
+    PALADIN = { Magic = false, Poison = true, Disease = true },
+    PRIEST = { Magic = false, Disease = true },
+    SHAMAN = { Magic = false, Curse = true },
 }
 
 local DispellFilter = CanDispel[class] or {}
@@ -128,9 +128,7 @@ local function updateDebuffFrame(rd, icon, count, debuffType, duration, expirati
         end
 
         local c = DispellColor[debuffType] or DispellColor.none
-    if rd.ShowDebuffBorder and rd.shadow then
-        rd.shadow:SetBackdropBorderColor(c[1], c[2], c[3])
-        end
+        if rd.ShowDebuffBorder and rd.shadow then rd.shadow:SetBackdropBorderColor(c[1], c[2], c[3]) end
 
         if rd.glowFrame then
             if rd.priority == 6 then
@@ -168,9 +166,10 @@ local function Update(self, _, unit)
     local prio
 
     local i = 0
-    while(true) do
+    while true do
         i = i + 1
-        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, i, 'HARMFUL'))
+        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff =
+            AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL"))
 
         if not name then break end
 
@@ -185,7 +184,7 @@ local function Update(self, _, unit)
             end
         end
 
-        if rd.ShowDispellableDebuff and debuffType and (not isCharmed) and (not canAttack) then
+        if rd.ShowDispellableDebuff and debuffType and not isCharmed and not canAttack then
             local disPrio = rd.DispellPriority or DispellPriority
             local disFilter = rd.DispellFilter or DispellFilter
 
@@ -211,9 +210,7 @@ local function Update(self, _, unit)
         end
 
         local instPrio
-        if instName and C.aura.raidDebuffs and C.aura.raidDebuffs[instName] then
-            instPrio = C.aura.raidDebuffs[instName][spellId]
-        end
+        if instName and C.aura.raidDebuffs and C.aura.raidDebuffs[instName] then instPrio = C.aura.raidDebuffs[instName][spellId] end
 
         if not RaidDebuffsIgnore[spellId] and instPrio and (instPrio == 6 or instPrio > rd.priority) then
             rd.priority = instPrio
@@ -223,23 +220,18 @@ local function Update(self, _, unit)
         end
     end
 
-    
-	if rd.priority == invalidPrio then
-		rd.index = nil
-		rd.filter = nil
-		rd.type = nil
-	end
+    if rd.priority == invalidPrio then
+        rd.index = nil
+        rd.filter = nil
+        rd.type = nil
+    end
 
-	return updateDebuffFrame(rd, _icon, _count, _debuffType, _duration, _expirationTime, _spellId)
+    return updateDebuffFrame(rd, _icon, _count, _debuffType, _duration, _expirationTime, _spellId)
 end
 
-local function Path(self, ...)
-    return (self.RaidDebuffs.Override or Update)(self, ...)
-end
+local function Path(self, ...) return (self.RaidDebuffs.Override or Update)(self, ...) end
 
-local function ForceUpdate(element)
-    return Path(element.__owner, "ForceUpdate", element.__owner.unit)
-end
+local function ForceUpdate(element) return Path(element.__owner, "ForceUpdate", element.__owner.unit) end
 
 local function Enable(self)
     local rd = self.RaidDebuffs

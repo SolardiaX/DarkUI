@@ -49,11 +49,12 @@ local function instanceLockCompare(frame, link)
                     end
                 end
             end
-            mylink = mylink or gsub(link, "(instancelock:)([^:]+)(:%d+:%d+:)(%d+)", function(a, g, b, k)
-                g = myguid
-                k = "0"
-                return a .. g .. b .. k
-            end)
+            mylink = mylink
+                or gsub(link, "(instancelock:)([^:]+)(:%d+:%d+:)(%d+)", function(a, g, b, k)
+                    g = myguid
+                    k = "0"
+                    return a .. g .. b .. k
+                end)
         else
             mylink = gsub(link, "(instancelock:)([^:]+)(:%d+:%d+:)(%d+)", function(a, g, b, k)
                 g = myguid
@@ -81,9 +82,7 @@ function module:OnInit()
     myTip = CreateFrame("GameTooltip", "InstanceLockTooltip", nil, "GameTooltipTemplate")
 
     ItemRefTooltip:HookScript("OnDragStop", function(self)
-        if myTip:IsVisible() and (myTip:GetParent():GetName() == self:GetName()) then
-            anchorToSide(myTip, self)
-        end
+        if myTip:IsVisible() and (myTip:GetParent():GetName() == self:GetName()) then anchorToSide(myTip, self) end
     end)
 
     hooksecurefunc(GameTooltip, "SetHyperlink", instanceLockCompare)

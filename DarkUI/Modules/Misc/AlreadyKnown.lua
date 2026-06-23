@@ -69,9 +69,7 @@ end
 local function hookLootFrame(self)
     local slotIndex = self:GetSlotIndex()
     local texture, _, _, _, _, locked = GetLootSlotInfo(slotIndex)
-    if texture and not locked and isKnown(GetLootSlotLink(slotIndex)) then
-        SetItemButtonTextureVertexColor(self.Item, color.r, color.g, color.b)
-    end
+    if texture and not locked and isKnown(GetLootSlotLink(slotIndex)) then SetItemButtonTextureVertexColor(self.Item, color.r, color.g, color.b) end
 end
 
 local function hookMerchant()
@@ -83,9 +81,7 @@ local function hookMerchant()
         local button = _G["MerchantItem" .. i .. "ItemButton"]
         if button and button:IsShown() then
             local info = C_MerchantFrame.GetItemInfo(index)
-            if info and info.isUsable and isKnown(GetMerchantItemLink(index)) then
-                SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
-            end
+            if info and info.isUsable and isKnown(GetMerchantItemLink(index)) then SetItemButtonTextureVertexColor(button, color.r, color.g, color.b) end
         end
     end
 end
@@ -97,9 +93,7 @@ local function hookBuyback()
         local button = _G["MerchantItem" .. i .. "ItemButton"]
         if button and button:IsShown() then
             local _, _, _, _, _, isUsable = GetBuybackItemInfo(i)
-            if isUsable and isKnown(GetBuybackItemLink(i)) then
-                SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
-            end
+            if isUsable and isKnown(GetBuybackItemLink(i)) then SetItemButtonTextureVertexColor(button, color.r, color.g, color.b) end
         end
     end
 end
@@ -128,9 +122,7 @@ local function hookQuestRewards()
                     _, _, _, _, isUsable = GetQuestItemInfo("choice", i)
                 end
                 local link = QuestInfoFrame.questLog and GetQuestLogItemLink("choice", i) or GetQuestItemLink("choice", i)
-                if isUsable and isKnown(link) then
-                    SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
-                end
+                if isUsable and isKnown(link) then SetItemButtonTextureVertexColor(button, color.r, color.g, color.b) end
             end
             rewardsCount = rewardsCount + 1
         end
@@ -147,9 +139,7 @@ local function hookQuestRewards()
                     _, _, _, _, isUsable = GetQuestItemInfo("reward", i)
                 end
                 local link = QuestInfoFrame.questLog and GetQuestLogItemLink("reward", i) or GetQuestItemLink("reward", i)
-                if isUsable and isKnown(link) then
-                    SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
-                end
+                if isUsable and isKnown(link) then SetItemButtonTextureVertexColor(button, color.r, color.g, color.b) end
             end
             rewardsCount = rewardsCount + 1
         end
@@ -174,16 +164,10 @@ local function hookAuctionHouse(self)
                     button.SelectedHighlight:SetVertexColor(color.r, color.g, color.b)
                     button.SelectedHighlight:SetAlpha(0.2)
                 end
-                if button.cells and button.cells[2] and button.cells[2].Icon then
-                    button.cells[2].Icon:SetVertexColor(color.r, color.g, color.b)
-                end
+                if button.cells and button.cells[2] and button.cells[2].Icon then button.cells[2].Icon:SetVertexColor(color.r, color.g, color.b) end
             else
-                if button.SelectedHighlight then
-                    button.SelectedHighlight:SetVertexColor(1, 1, 1)
-                end
-                if button.cells and button.cells[2] and button.cells[2].Icon then
-                    button.cells[2].Icon:SetVertexColor(1, 1, 1)
-                end
+                if button.SelectedHighlight then button.SelectedHighlight:SetVertexColor(1, 1, 1) end
+                if button.cells and button.cells[2] and button.cells[2].Icon then button.cells[2].Icon:SetVertexColor(1, 1, 1) end
             end
         end
     end
@@ -193,16 +177,12 @@ local function hookBlackMarketHotItem(self)
     local texture = self.HotDeal and self.HotDeal.Item and self.HotDeal.Item.IconTexture
     if not (texture and texture:IsShown()) then return end
     local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetHotItem()
-    if name and usable and isKnown(link) then
-        texture:SetVertexColor(color.r, color.g, color.b)
-    end
+    if name and usable and isKnown(link) then texture:SetVertexColor(color.r, color.g, color.b) end
 end
 
 local function hookBlackMarketItem(self, elementData)
     local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetItemInfoByIndex(elementData.index)
-    if name and usable and isKnown(link) then
-        self.Item.IconTexture:SetVertexColor(color.r, color.g, color.b)
-    end
+    if name and usable and isKnown(link) then self.Item.IconTexture:SetVertexColor(color.r, color.g, color.b) end
 end
 
 local function hookGuildBank()
@@ -212,7 +192,10 @@ local function hookGuildBank()
         local index = math.fmod(i, 14)
         if index == 0 then index = 14 end
         local column = math.ceil((i - 0.5) / 14)
-        local button = GuildBankFrame.Columns and GuildBankFrame.Columns[column] and GuildBankFrame.Columns[column].Buttons and GuildBankFrame.Columns[column].Buttons[index]
+        local button = GuildBankFrame.Columns
+            and GuildBankFrame.Columns[column]
+            and GuildBankFrame.Columns[column].Buttons
+            and GuildBankFrame.Columns[column].Buttons[index]
         if button and button:IsShown() then
             local texture, _, locked = GetGuildBankItemInfo(tab, i)
             if texture and not locked then

@@ -43,19 +43,13 @@ _G.ERR_FRIEND_OFFLINE_S = "[%s] " .. L.CHAT_GONE_OFFLINE
 -- AddMessage Filter (channel number strip + realm name strip)
 ------------------------------------------------------------------------
 
-local function strip(info, name)
-    return format("|Hplayer:%s|h[%s]|h", info, name:gsub("%-[^|]+", ""))
-end
+local function strip(info, name) return format("|Hplayer:%s|h[%s]|h", info, name:gsub("%-[^|]+", "")) end
 
 local function formatMessageFilter(_, _, text, ...)
-    if type(text) ~= "string" or not canaccessvalue(text) then
-        return
-    end
+    if type(text) ~= "string" or not canaccessvalue(text) then return end
     local modified = text:gsub("|h%[(%d+)%. .-%]|h", "|h[%1]|h")
     modified = modified:gsub("|Hplayer:(.-)|h%[(.-)%]|h", strip)
-    if modified ~= text then
-        return false, modified, ...
-    end
+    if modified ~= text then return false, modified, ... end
 end
 
 ------------------------------------------------------------------------
@@ -90,25 +84,17 @@ local function setChatStyle(frame)
     tab.HighlightRight:Kill()
 
     local bf = frame.buttonFrame
-    if bf then
-        bf:SetGhost()
-    end
+    if bf then bf:SetGhost() end
 
     _G[format("ChatFrame%sTabGlow", id)]:Kill()
     frame.ScrollBar:Kill()
 
     local editLeft = _G[format("ChatFrame%sEditBoxLeft", id)]
-    if editLeft then
-        editLeft:Kill()
-    end
+    if editLeft then editLeft:Kill() end
     local editMid = _G[format("ChatFrame%sEditBoxMid", id)]
-    if editMid then
-        editMid:Kill()
-    end
+    if editMid then editMid:Kill() end
     local editRight = _G[format("ChatFrame%sEditBoxRight", id)]
-    if editRight then
-        editRight:Kill()
-    end
+    if editRight then editRight:Kill() end
 
     _G[chat .. "EditBox"]:StripTextures(2)
 
@@ -125,9 +111,7 @@ local function setChatStyle(frame)
     end
 
     local tab_convo = _G[chat .. "Tab"].conversationIcon
-    if tab_convo then
-        tab_convo:Kill()
-    end
+    if tab_convo then tab_convo:Kill() end
 
     local eb = _G[chat .. "EditBox"]
     eb:SetAltArrowKeyMode(false)
@@ -150,18 +134,14 @@ local function setChatStyle(frame)
         editBoxBg:SetTemplate("default")
 
         local function colorize(r, g, b)
-            if editBoxBg then
-                editBoxBg:SetBackdropBorderColor(r, g, b)
-            end
+            if editBoxBg then editBoxBg:SetBackdropBorderColor(r, g, b) end
         end
 
         local eb = _G[chat .. "EditBox"]
         if eb.UpdateHeader then
             hooksecurefunc(eb, "UpdateHeader", function(self)
                 local chatType = self:GetAttribute("chatType")
-                if not chatType then
-                    return
-                end
+                if not chatType then return end
 
                 local chanTarget = self:GetAttribute("channelTarget")
                 local chanName = chanTarget and GetChannelName(chanTarget)
@@ -208,52 +188,36 @@ end
 local cycles = {
     {
         chatType = "SAY",
-        use = function()
-            return 1
-        end,
+        use = function() return 1 end,
     },
     {
         chatType = "PARTY",
-        use = function()
-            return not IsInRaid() and IsInGroup(LE_PARTY_CATEGORY_HOME)
-        end,
+        use = function() return not IsInRaid() and IsInGroup(LE_PARTY_CATEGORY_HOME) end,
     },
     {
         chatType = "RAID",
-        use = function()
-            return IsInRaid(LE_PARTY_CATEGORY_HOME)
-        end,
+        use = function() return IsInRaid(LE_PARTY_CATEGORY_HOME) end,
     },
     {
         chatType = "INSTANCE_CHAT",
-        use = function()
-            return IsPartyLFG()
-        end,
+        use = function() return IsPartyLFG() end,
     },
     {
         chatType = "GUILD",
-        use = function()
-            return IsInGuild()
-        end,
+        use = function() return IsInGuild() end,
     },
     {
         chatType = "OFFICER",
-        use = function()
-            return C_GuildInfo.IsGuildOfficer()
-        end,
+        use = function() return C_GuildInfo.IsGuildOfficer() end,
     },
     {
         chatType = "SAY",
-        use = function()
-            return 1
-        end,
+        use = function() return 1 end,
     },
 }
 
 local function updateTabChannelSwitch(self)
-    if strsub(tostring(self:GetText()), 1, 1) == "/" then
-        return
-    end
+    if strsub(tostring(self:GetText()), 1, 1) == "/" then return end
     local currChatType = self:GetAttribute("chatType")
 
     if IsShiftKeyDown() and (currChatType == "WHISPER" or currChatType == "BN_WHISPER") then
@@ -284,9 +248,7 @@ end
 ------------------------------------------------------------------------
 
 local function addLootIcons(_, _, message, ...)
-    if issecretvalue(message) then
-        return
-    end
+    if issecretvalue(message) then return end
     local function icon(link)
         local texture = C_Item.GetItemIconByID(link)
         return "\124T" .. texture .. ":12:12:0:0:64:64:5:59:5:59\124t" .. link
@@ -300,13 +262,9 @@ end
 ------------------------------------------------------------------------
 
 local function removeRealmName(_, _, msg, author, ...)
-    if issecretvalue(msg) then
-        return
-    end
+    if issecretvalue(msg) then return end
     local realm = gsub(E.realm, " ", "")
-    if msg:find("-" .. realm) then
-        return false, gsub(msg, "%-" .. realm, ""), author, ...
-    end
+    if msg:find("-" .. realm) then return false, gsub(msg, "%-" .. realm, ""), author, ... end
 end
 
 ------------------------------------------------------------------------
@@ -314,9 +272,7 @@ end
 ------------------------------------------------------------------------
 
 local function typoHistoryPosthook(chat, text)
-    if text and canaccessvalue(text) and strfind(text, HELP_TEXT_SIMPLE) then
-        ChatEdit_AddHistory(chat.editBox)
-    end
+    if text and canaccessvalue(text) and strfind(text, HELP_TEXT_SIMPLE) then ChatEdit_AddHistory(chat.editBox) end
 end
 
 ------------------------------------------------------------------------
@@ -352,19 +308,13 @@ local function setupChatHistory()
     local accessIDToChanSender = {}
     local nextAccessID = 1
 
-    local function getToken(chatType, chatTarget, chanSender)
-        return format("%s;;%s;;%s", strlower(chatType), chatTarget or "", chanSender or "")
-    end
+    local function getToken(chatType, chatTarget, chanSender) return format("%s;;%s;;%s", strlower(chatType), chatTarget or "", chanSender or "") end
 
-    function ChatHistory_GetToken(chatType, chatTarget, chanSender)
-        return getToken(chatType, chatTarget, chanSender)
-    end
+    function ChatHistory_GetToken(chatType, chatTarget, chanSender) return getToken(chatType, chatTarget, chanSender) end
 
     function ChatHistory_GetAccessID(chatType, chatTarget, chanSender)
         local token = getToken(chatType, chatTarget, chanSender)
-        if issecretvalue(token) then
-            return
-        end
+        if issecretvalue(token) then return end
         if not accessIDs[token] then
             accessIDs[token] = nextAccessID
             accessIDToType[nextAccessID] = chatType
@@ -375,19 +325,13 @@ local function setupChatHistory()
         return accessIDs[token]
     end
 
-    function ChatHistory_GetChatType(accessID)
-        return accessIDToType[accessID], accessIDToTarget[accessID], accessIDToChanSender[accessID]
-    end
+    function ChatHistory_GetChatType(accessID) return accessIDToType[accessID], accessIDToTarget[accessID], accessIDToChanSender[accessID] end
 
     function ChatHistory_GetAllAccessIDsByChanSender(chanSender)
         local results = {}
-        if issecretvalue(chanSender) then
-            return results
-        end
+        if issecretvalue(chanSender) then return results end
         for accessID, sender in pairs(accessIDToChanSender) do
-            if strlower(sender) == strlower(chanSender) then
-                results[#results + 1] = accessID
-            end
+            if strlower(sender) == strlower(chanSender) then results[#results + 1] = accessID end
         end
         return results
     end
@@ -398,26 +342,20 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     C_CVar.SetCVar("chatStyle", "classic")
     C_CVar.SetCVar("chatMouseScroll", 1)
 
     GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
     hooksecurefunc(GeneralDockManagerScrollFrame, "SetPoint", function(self, point, anchor, attachTo, x, y)
-        if anchor == GeneralDockManagerOverflowButton and x == 0 and y == 0 then
-            self:SetPoint(point, anchor, attachTo, 0, -4)
-        end
+        if anchor == GeneralDockManagerOverflowButton and x == 0 and y == 0 then self:SetPoint(point, anchor, attachTo, 0, -4) end
     end)
 
     local function setupChat()
         for i = 1, NUM_CHAT_WINDOWS do
             local frame = _G[format("ChatFrame%s", i)]
-            if not frame.skinned then
-                setChatStyle(frame)
-            end
+            if not frame.skinned then setChatStyle(frame) end
         end
 
         local var = cfg.sticky and 1 or 0
@@ -449,9 +387,7 @@ function module:OnInit()
 
     hooksecurefunc("FCF_OpenTemporaryWindow", function()
         local frame = FCF_GetCurrentChatFrame()
-        if not frame.skinned then
-            setChatStyle(frame)
-        end
+        if not frame.skinned then setChatStyle(frame) end
         if frame ~= _G["ChatFrame2"] and not frame.OldAddMessage then
             frame.OldAddMessage = frame.AddMessage
             frame.AddMessage = addMessageTimestamp
@@ -460,9 +396,7 @@ function module:OnInit()
 
     hooksecurefunc("ChatEdit_CustomTabPressed", updateTabChannelSwitch)
 
-    if cfg.loot_icons then
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", addLootIcons)
-    end
+    if cfg.loot_icons then ChatFrame_AddMessageEventFilter("CHAT_MSG_LOOT", addLootIcons) end
 
     ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", removeRealmName)
 
@@ -488,9 +422,7 @@ function module:OnInit()
     end
 
     for i = 1, NUM_CHAT_WINDOWS do
-        if i ~= 2 then
-            hooksecurefunc(_G["ChatFrame" .. i], "AddMessage", typoHistoryPosthook)
-        end
+        if i ~= 2 then hooksecurefunc(_G["ChatFrame" .. i], "AddMessage", typoHistoryPosthook) end
     end
 
     -- Disable Blizzard's native timestamps; addMessageTimestamp prepends ours.
@@ -512,9 +444,7 @@ end
 
 function module:OnEnable()
     local function updateChatSize()
-        if isScaling then
-            return
-        end
+        if isScaling then return end
         isScaling = true
 
         ChatFrame1:ClearAllPoints()
@@ -562,11 +492,7 @@ function module:OnEnable()
     self:RegisterEvent("UI_SCALE_CHANGED", updateChatSize)
 
     hooksecurefunc(ChatFrame1, "SetPoint", function(_, _, _, _, x)
-        if isScaling then
-            return
-        end
-        if x ~= cfg.pos[4] then
-            updateChatSize()
-        end
+        if isScaling then return end
+        if x ~= cfg.pos[4] then updateChatSize() end
     end)
 end

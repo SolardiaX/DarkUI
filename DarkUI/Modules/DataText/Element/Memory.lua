@@ -24,12 +24,8 @@ local GetNetStats, GetFramerate = GetNetStats, GetFramerate
 
 local cfg = module.config.Memory
 
-local function sortdesc(a, b)
-    return a[2] > b[2]
-end
-local function formatmem(val, dec)
-    return format(format("%%.%df %s", dec or 1, val > 1024 and "MB" or "KB"), val / (val > 1024 and 1024 or 1))
-end
+local function sortdesc(a, b) return a[2] > b[2] end
+local function formatmem(val, dec) return format(format("%%.%df %s", dec or 1, val > 1024 and "MB" or "KB"), val / (val > 1024 and 1024 or 1)) end
 
 local memoryt = {}
 local isCPU = GetCVar("scriptProfile") == "1"
@@ -44,9 +40,7 @@ module:Inject("Memory", {
             for i = 1, C_AddOns.GetNumAddOns() do
                 self.total = self.total + GetAddOnMemoryUsage(i)
             end
-            if parent.hovered then
-                parent:GetScript("OnEnter")(parent)
-            end
+            if parent.hovered then parent:GetScript("OnEnter")(parent) end
             return self.total >= 1024 and format(cfg.fmt_mb, self.total / 1024) or format(cfg.fmt_kb, self.total)
         end,
         update = 5,
@@ -70,9 +64,7 @@ module:Inject("Memory", {
         )
         GameTooltip:AddLine(" ")
         if cfg.max_addons ~= 0 or IsAltKeyDown() then
-            if isCPU and IsControlKeyDown() then
-                self.timer = 5
-            end
+            if isCPU and IsControlKeyDown() then self.timer = 5 end
             if not self.timer or self.timer + 5 < time() then
                 if isCPU and IsControlKeyDown() then
                     UpdateAddOnCPUUsage()
@@ -81,9 +73,7 @@ module:Inject("Memory", {
                     end
                     for i = 1, C_AddOns.GetNumAddOns() do
                         local addon, name = C_AddOns.GetAddOnInfo(i)
-                        if C_AddOns.IsAddOnLoaded(i) then
-                            tinsert(memoryt, { name or addon, GetAddOnCPUUsage(i) })
-                        end
+                        if C_AddOns.IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnCPUUsage(i) }) end
                     end
                     tsort(memoryt, sortdesc)
                 else
@@ -94,9 +84,7 @@ module:Inject("Memory", {
                     end
                     for i = 1, C_AddOns.GetNumAddOns() do
                         local addon, name = C_AddOns.GetAddOnInfo(i)
-                        if C_AddOns.IsAddOnLoaded(i) then
-                            tinsert(memoryt, { name or addon, GetAddOnMemoryUsage(i) })
-                        end
+                        if C_AddOns.IsAddOnLoaded(i) then tinsert(memoryt, { name or addon, GetAddOnMemoryUsage(i) }) end
                     end
                     tsort(memoryt, sortdesc)
                 end

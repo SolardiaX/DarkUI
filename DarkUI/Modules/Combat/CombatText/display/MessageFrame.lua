@@ -43,21 +43,13 @@ function MessageFrame.new(parent)
     return self
 end
 
-function MessageFrame:GetFontString()
-    return self.fontString
-end
+function MessageFrame:GetFontString() return self.fontString end
 
-function MessageFrame:GetFrame()
-    return self.frame
-end
+function MessageFrame:GetFrame() return self.frame end
 
-function MessageFrame:GetCountString()
-    return self.countString
-end
+function MessageFrame:GetCountString() return self.countString end
 
-function MessageFrame:SetCountText(text)
-    self.countString:SetText(text or "")
-end
+function MessageFrame:SetCountText(text) self.countString:SetText(text or "") end
 
 function MessageFrame:SetIcons(icons)
     for _, texture in ipairs(self.iconTextures) do
@@ -65,25 +57,19 @@ function MessageFrame:SetIcons(icons)
     end
     self.numActiveIcons = 0
 
-    if not icons then
-        return
-    end
+    if not icons then return end
 
     local iconList = type(icons) == "table" and icons or { icons }
 
     for i, iconPath in ipairs(iconList) do
-        if not self.iconTextures[i] then
-            self.iconTextures[i] = self.iconContainer:CreateTexture(nil, "ARTWORK")
-        end
+        if not self.iconTextures[i] then self.iconTextures[i] = self.iconContainer:CreateTexture(nil, "ARTWORK") end
         self.iconTextures[i]:SetTexture(iconPath)
         self.iconTextures[i]:Show()
         self.numActiveIcons = i
     end
 end
 
-function MessageFrame:SetIconAlpha(alpha)
-    self.iconContainer:SetAlpha(alpha)
-end
+function MessageFrame:SetIconAlpha(alpha) self.iconContainer:SetAlpha(alpha) end
 
 function MessageFrame:SetAnimationAttributes(attributes)
     local iconMountPoint = attributes.iconPosition == "RIGHT" and "LEFT" or "RIGHT"
@@ -94,9 +80,7 @@ function MessageFrame:SetAnimationAttributes(attributes)
     local numIcons = self.numActiveIcons or 0
     local countWidth = 0
 
-    if self.countString:GetText() and self.countString:GetText() ~= "" then
-        countWidth = 30
-    end
+    if self.countString:GetText() and self.countString:GetText() ~= "" then countWidth = 30 end
 
     if numIcons > 0 then
         local width = (numIcons * iconSize) + ((numIcons - 1) * spacing)
@@ -133,9 +117,7 @@ function MessageFrame:SetAnimationAttributes(attributes)
 
     if attributes.reverseDirection then
         local point, relativeTo, relativePoint, xOfs, yOfs = self.frame:GetPoint(1)
-        if point then
-            self.frame:SetPoint(point, relativeTo, relativePoint, xOfs or 0, (yOfs or 0) - (attributes.scrollHeight or 0))
-        end
+        if point then self.frame:SetPoint(point, relativeTo, relativePoint, xOfs or 0, (yOfs or 0) - (attributes.scrollHeight or 0)) end
     end
 
     local directionMultiplier = attributes.reverseDirection and 1 or -1

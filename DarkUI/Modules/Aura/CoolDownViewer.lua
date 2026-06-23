@@ -1,8 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.aura.coolDownViewer.enable then
-    return
-end
+if not C.aura.coolDownViewer.enable then return end
 
 ------------------------------------------------------------------------
 -- CoolDownViewer — Blizzard Cooldown Manager Restyling
@@ -29,9 +27,7 @@ local function styleIconFrame(frame)
     local iconTex, maskTex, overlayTex = regions[1], regions[2], regions[3]
 
     if maskTex and maskTex:IsObjectType("MaskTexture") then
-        if iconTex and iconTex.RemoveMaskTexture then
-            pcall(iconTex.RemoveMaskTexture, iconTex, maskTex)
-        end
+        if iconTex and iconTex.RemoveMaskTexture then pcall(iconTex.RemoveMaskTexture, iconTex, maskTex) end
         maskTex:Hide()
     end
 
@@ -59,9 +55,7 @@ local function styleIconFrame(frame)
 
         if frame.Cooldown.GetCountdownFontString then
             local fs = frame.Cooldown:GetCountdownFontString()
-            if fs then
-                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
-            end
+            if fs then fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE") end
         end
     end
 end
@@ -88,9 +82,7 @@ local function styleBarFrame(frame)
         local iconTex, maskTex, overlayTex = regions[1], regions[2], regions[3]
 
         if maskTex and maskTex:IsObjectType("MaskTexture") then
-            if iconTex and iconTex.RemoveMaskTexture then
-                pcall(iconTex.RemoveMaskTexture, iconTex, maskTex)
-            end
+            if iconTex and iconTex.RemoveMaskTexture then pcall(iconTex.RemoveMaskTexture, iconTex, maskTex) end
             maskTex:Hide()
         end
 
@@ -126,7 +118,7 @@ local function styleBarFrame(frame)
         bar.Spark = bar:CreateTexture(nil, "OVERLAY")
         bar.Spark:SetTexture("Interface\\CastingBar\\UI-CastingBar-Spark")
         bar.Spark:SetBlendMode("ADD")
-        bar.Spark:SetAlpha(.8)
+        bar.Spark:SetAlpha(0.8)
         bar.Spark:SetPoint("TOPLEFT", bar:GetStatusBarTexture(), "TOPRIGHT", -10, 10)
         bar.Spark:SetPoint("BOTTOMRIGHT", bar:GetStatusBarTexture(), "BOTTOMRIGHT", 10, -10)
 
@@ -163,35 +155,25 @@ local lastLayoutTime = 0
 local function collectIconFrames(viewer)
     local frames = {}
     for _, child in ipairs({ viewer:GetChildren() }) do
-        if child and child:IsShown() and child.Icon and child.layoutIndex then
-            frames[#frames + 1] = child
-        end
+        if child and child:IsShown() and child.Icon and child.layoutIndex then frames[#frames + 1] = child end
     end
-    table.sort(frames, function(a, b)
-        return (a.layoutIndex or 0) < (b.layoutIndex or 0)
-    end)
+    table.sort(frames, function(a, b) return (a.layoutIndex or 0) < (b.layoutIndex or 0) end)
     return frames
 end
 
 local function collectBarFrames(viewer)
     local frames = {}
     for _, child in ipairs({ viewer:GetChildren() }) do
-        if child and child:IsShown() and child:IsVisible() and (child.Bar or child.Icon) then
-            frames[#frames + 1] = child
-        end
+        if child and child:IsShown() and child:IsVisible() and (child.Bar or child.Icon) then frames[#frames + 1] = child end
     end
-    table.sort(frames, function(a, b)
-        return (a.layoutIndex or 0) < (b.layoutIndex or 0)
-    end)
+    table.sort(frames, function(a, b) return (a.layoutIndex or 0) < (b.layoutIndex or 0) end)
     return frames
 end
 
 local function layoutIconViewer(viewer)
     local frames = collectIconFrames(viewer)
     local count = #frames
-    if count == 0 then
-        return
-    end
+    if count == 0 then return end
 
     local isHorizontal = (viewer.isHorizontal ~= false)
     local spacing = cfg.spacing or 4
@@ -200,9 +182,7 @@ local function layoutIconViewer(viewer)
     local refFrame = frames[1]
     local iconW = refFrame:GetWidth()
     local iconH = refFrame:GetHeight()
-    if iconW == 0 or iconH == 0 then
-        return
-    end
+    if iconW == 0 or iconH == 0 then return end
 
     local iconsPerRow = iconLimit
     local rowCount = math.ceil(count / iconsPerRow)
@@ -234,9 +214,7 @@ end
 local function layoutBarViewer(viewer)
     local frames = collectBarFrames(viewer)
     local count = #frames
-    if count == 0 then
-        return
-    end
+    if count == 0 then return end
 
     local vcfg = cfg.viewers.BuffBarCooldownViewer or {}
     local iconSize = vcfg.iconSize or 18
@@ -258,9 +236,7 @@ local layoutFrame = CreateFrame("Frame")
 
 local function doLayout()
     local now = GetTime()
-    if now - lastLayoutTime < LAYOUT_THROTTLE then
-        return
-    end
+    if now - lastLayoutTime < LAYOUT_THROTTLE then return end
     lastLayoutTime = now
 
     for _, viewerName in ipairs(VIEWERS) do
@@ -283,15 +259,11 @@ layoutFrame:SetScript("OnUpdate", doLayout)
 
 local function refreshCooldownFonts(viewerName)
     local viewer = _G[viewerName]
-    if not viewer then
-        return
-    end
+    if not viewer then return end
     for _, child in ipairs({ viewer:GetChildren() }) do
         if child.Cooldown and child.Cooldown.GetCountdownFontString then
             local fs = child.Cooldown:GetCountdownFontString()
-            if fs then
-                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
-            end
+            if fs then fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE") end
         end
     end
 end
@@ -303,9 +275,7 @@ end
 
 local function hookViewer(viewerName)
     local viewer = _G[viewerName]
-    if not viewer then
-        return
-    end
+    if not viewer then return end
 
     if viewer.RefreshLayout then
         hooksecurefunc(viewer, "RefreshLayout", function()
@@ -327,30 +297,20 @@ local function setup()
 
     hooksecurefunc(getmetatable(CreateFrame("Cooldown", nil, nil, "CooldownFrameTemplate")).__index, "SetCooldown", function(cd)
         local parent = cd:GetParent()
-        if not parent then
-            return
-        end
+        if not parent then return end
         local viewer = parent:GetParent()
         local viewerName = viewer and viewer.GetName and viewer:GetName()
-        if not viewerName or not cfg.viewers[viewerName] then
-            return
-        end
+        if not viewerName or not cfg.viewers[viewerName] then return end
         if cd.GetCountdownFontString then
             local fs = cd:GetCountdownFontString()
-            if fs then
-                fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE")
-            end
+            if fs then fs:SetFont(STANDARD_TEXT_FONT, 13, "OUTLINE") end
         end
     end)
 
     if EditModeManagerFrame then
         hooksecurefunc(EditModeManagerFrame, "ExitEditMode", function()
-            if InCombatLockdown() then
-                return
-            end
-            if E:IsLEMOReady() then
-                E.LEMO:LoadLayouts()
-            end
+            if InCombatLockdown() then return end
+            if E:IsLEMOReady() then E.LEMO:LoadLayouts() end
             forceRefresh()
             C_Timer_After(0, forceRefresh)
         end)
@@ -358,18 +318,14 @@ local function setup()
 
     if CooldownViewerSettings and CooldownViewerSettings.RefreshLayout then
         hooksecurefunc(CooldownViewerSettings, "RefreshLayout", function()
-            if InCombatLockdown() then
-                return
-            end
+            if InCombatLockdown() then return end
             C_Timer_After(0, forceRefresh)
         end)
     end
 
     C_Timer_After(0.2, doLayout)
     C_Timer_After(1, function()
-        if not InCombatLockdown() then
-            E:ApplyEditModeChanges()
-        end
+        if not InCombatLockdown() then E:ApplyEditModeChanges() end
     end)
 end
 

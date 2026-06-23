@@ -18,9 +18,7 @@ local lastLootTime = 0
 -- Lifecycle
 ------------------------------------------------------------------------
 function module:OnInit()
-    if not cfg.faster_loot then
-        return
-    end
+    if not cfg.faster_loot then return end
 
     self:RegisterEvent("LOOT_READY", function()
         if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then

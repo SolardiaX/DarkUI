@@ -26,9 +26,7 @@ function module:OnInit()
         button:SetScript("OnUpdate", nil)
         button:SetScript("OnClick", nil)
         button2:SetScript("OnClick", nil)
-        if baseInboxFrame_OnClick then
-            InboxFrame_OnClick = baseInboxFrame_OnClick
-        end
+        if baseInboxFrame_OnClick then InboxFrame_OnClick = baseInboxFrame_OnClick end
         button:UnregisterEvent("UI_ERROR_MESSAGE")
         takingOnlyCash = false
 

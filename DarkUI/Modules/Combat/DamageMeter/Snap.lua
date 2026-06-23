@@ -18,47 +18,25 @@ local snappedStateCache = setmetatable({}, { __mode = "k" })
 -- Helpers
 ------------------------------------------------------------------------
 
-local function getSideInset()
-    return 5
-end
+local function getSideInset() return 5 end
 
 local function stripControl(window)
-    if not window then
-        return
-    end
-    if window.ResizeButton then
-        window.ResizeButton:Hide()
-    end
-    if window.ResizeGrip then
-        window.ResizeGrip:Hide()
-    end
+    if not window then return end
+    if window.ResizeButton then window.ResizeButton:Hide() end
+    if window.ResizeGrip then window.ResizeGrip:Hide() end
     if window.MinimizeContainer then
-        if window.MinimizeContainer.ResizeButton then
-            window.MinimizeContainer.ResizeButton:Hide()
-        end
-        if window.MinimizeContainer.ResizeGrip then
-            window.MinimizeContainer.ResizeGrip:Hide()
-        end
+        if window.MinimizeContainer.ResizeButton then window.MinimizeContainer.ResizeButton:Hide() end
+        if window.MinimizeContainer.ResizeGrip then window.MinimizeContainer.ResizeGrip:Hide() end
     end
 end
 
 local function restoreControl(window)
-    if not window then
-        return
-    end
-    if window.ResizeButton then
-        window.ResizeButton:Show()
-    end
-    if window.ResizeGrip then
-        window.ResizeGrip:Show()
-    end
+    if not window then return end
+    if window.ResizeButton then window.ResizeButton:Show() end
+    if window.ResizeGrip then window.ResizeGrip:Show() end
     if window.MinimizeContainer then
-        if window.MinimizeContainer.ResizeButton then
-            window.MinimizeContainer.ResizeButton:Show()
-        end
-        if window.MinimizeContainer.ResizeGrip then
-            window.MinimizeContainer.ResizeGrip:Show()
-        end
+        if window.MinimizeContainer.ResizeButton then window.MinimizeContainer.ResizeButton:Show() end
+        if window.MinimizeContainer.ResizeGrip then window.MinimizeContainer.ResizeGrip:Show() end
     end
 end
 
@@ -67,18 +45,14 @@ end
 ------------------------------------------------------------------------
 
 local function setupDragAndMemory(window, index)
-    if not window or dragHookCache[window] then
-        return
-    end
+    if not window or dragHookCache[window] then return end
 
     window:SetMovable(true)
     window:RegisterForDrag("LeftButton")
 
     local origDragStart = window:GetScript("OnDragStart")
     window:SetScript("OnDragStart", function(self, ...)
-        if snappedStateCache[self] then
-            return
-        end
+        if snappedStateCache[self] then return end
         if origDragStart then
             origDragStart(self, ...)
         else
@@ -88,9 +62,7 @@ local function setupDragAndMemory(window, index)
 
     local origDragStop = window:GetScript("OnDragStop")
     window:SetScript("OnDragStop", function(self, ...)
-        if snappedStateCache[self] then
-            return
-        end
+        if snappedStateCache[self] then return end
         if origDragStop then
             origDragStop(self, ...)
         else
@@ -99,9 +71,7 @@ local function setupDragAndMemory(window, index)
     end)
 
     hooksecurefunc(window, "StopMovingOrSizing", function(self)
-        if snappedStateCache[self] then
-            return
-        end
+        if snappedStateCache[self] then return end
         local p, _, rp, x, y = self:GetPoint()
         module.Snap.freePositions[index] = { point = p, relativePoint = rp, x = x, y = y }
     end)
@@ -126,12 +96,8 @@ local function restoreFreePositions()
 end
 
 local function rescueStuckWindow(window, index)
-    if not window then
-        return
-    end
-    if module.Snap.freePositions[index] then
-        return
-    end
+    if not window then return end
+    if module.Snap.freePositions[index] then return end
 
     local pt, rel, rp, x, y = window:GetPoint()
     local isRelUIParent = (not rel) or (rel == UIParent)
@@ -142,17 +108,13 @@ local function rescueStuckWindow(window, index)
         window:SetMovable(true)
         window:ClearAllPoints()
         window:SetPoint("CENTER", UIParent, "CENTER", (index - 1) * 50, -(index - 1) * 50)
-        if isSizeBugged then
-            window:SetSize(300, 200)
-        end
+        if isSizeBugged then window:SetSize(300, 200) end
         window:SetUserPlaced(true)
     end
 end
 
 local function detachWindow(window, index)
-    if not window then
-        return
-    end
+    if not window then return end
     restoreControl(window)
 
     window:SetMovable(true)
@@ -174,9 +136,7 @@ end
 ------------------------------------------------------------------------
 
 local function snapWindowTo(current, target, direction, useCustomSize, customVal)
-    if not current or not target or not target:IsShown() then
-        return
-    end
+    if not current or not target or not target:IsShown() then return end
 
     stripControl(current)
     current:SetMovable(true)
@@ -187,13 +147,9 @@ local function snapWindowTo(current, target, direction, useCustomSize, customVal
     local currentH = targetH
 
     if direction == "TOP" or direction == "BOTTOM" then
-        if useCustomSize and customVal then
-            currentH = customVal
-        end
+        if useCustomSize and customVal then currentH = customVal end
     elseif direction == "LEFT" or direction == "RIGHT" then
-        if useCustomSize and customVal then
-            currentW = customVal
-        end
+        if useCustomSize and customVal then currentW = customVal end
     end
 
     current:ClearAllPoints()
@@ -227,45 +183,27 @@ module.Snap = {}
 module.Snap.freePositions = {}
 
 function module.Snap:Refresh()
-    if InCombatLockdown() then
-        return
-    end
-    if EditModeManagerFrame and EditModeManagerFrame:IsShown() then
-        return
-    end
+    if InCombatLockdown() then return end
+    if EditModeManagerFrame and EditModeManagerFrame:IsShown() then return end
 
     local win1 = _G[BASE_FRAME_NAME .. "1"]
     local win2 = _G[BASE_FRAME_NAME .. "2"]
     local win3 = _G[BASE_FRAME_NAME .. "3"]
 
-    if win2 then
-        rescueStuckWindow(win2, 2)
-    end
-    if win3 then
-        rescueStuckWindow(win3, 3)
-    end
+    if win2 then rescueStuckWindow(win2, 2) end
+    if win3 then rescueStuckWindow(win3, 3) end
 
-    if win2 then
-        setupDragAndMemory(win2, 2)
-    end
-    if win3 then
-        setupDragAndMemory(win3, 3)
-    end
+    if win2 then setupDragAndMemory(win2, 2) end
+    if win3 then setupDragAndMemory(win3, 3) end
 
     if not cfg.enableSnap then
         restoreFreePositions()
-        if win2 and win2:IsShown() then
-            detachWindow(win2, 2)
-        end
-        if win3 and win3:IsShown() then
-            detachWindow(win3, 3)
-        end
+        if win2 and win2:IsShown() then detachWindow(win2, 2) end
+        if win3 and win3:IsShown() then detachWindow(win3, 3) end
         return
     end
 
-    if not win1 or not win1:IsShown() then
-        return
-    end
+    if not win1 or not win1:IsShown() then return end
 
     if win2 and win2:IsShown() then
         local pos = cfg.win2Position or "TOP"
@@ -281,9 +219,7 @@ function module.Snap:Refresh()
         local useCustom = cfg.win3CustomSize or false
         local customVal = cfg.win3SizeVal or 150
 
-        if targetIndex == 2 and (not win2 or not win2:IsShown()) then
-            targetWin = win1
-        end
+        if targetIndex == 2 and (not win2 or not win2:IsShown()) then targetWin = win1 end
         snapWindowTo(win3, targetWin, pos, useCustom, customVal)
     end
 end

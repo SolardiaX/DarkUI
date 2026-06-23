@@ -27,20 +27,14 @@ local function getPetActionButtonState(button)
 end
 
 local function getActionButtonState(button)
-    if button._state_type == "custom" then
-        return "normal"
-    end
+    if button._state_type == "custom" then return "normal" end
 
     local action = button._state_action
-    if not action then
-        return "normal"
-    end
+    if not action then return "normal" end
 
     local actionType, actionTypeId = GetActionInfo(action)
 
-    if not actionType then
-        return "normal"
-    end
+    if not actionType then return "normal" end
 
     if actionType == "macro" then
         local name = GetMacroInfo(actionTypeId)
@@ -50,14 +44,10 @@ local function getActionButtonState(button)
                 local costs = GetSpellPowerCost(spellId)
                 if costs then
                     for _, cost in ipairs(costs) do
-                        if UnitPower("player", cost.type) < cost.minCost then
-                            return "oom"
-                        end
+                        if UnitPower("player", cost.type) < cost.minCost then return "oom" end
                     end
                 end
-                if IsActionInRange(action) == false then
-                    return "oor"
-                end
+                if IsActionInRange(action) == false then return "oor" end
                 return "normal"
             end
         end
@@ -65,23 +55,17 @@ local function getActionButtonState(button)
 
     local isUsable, notEnoughMana = IsUsableAction(action)
     if not isUsable then
-        if notEnoughMana then
-            return "oom"
-        end
+        if notEnoughMana then return "oom" end
         return "unusable"
     end
 
-    if IsActionInRange(action) == false then
-        return "oor"
-    end
+    if IsActionInRange(action) == false then return "oor" end
     return "normal"
 end
 
 local function alphaOnFinished(self)
     local owner = self.owner
-    if owner.flashing ~= 1 then
-        module:StopButtonFlashing(owner)
-    end
+    if owner.flashing ~= 1 then module:StopButtonFlashing(owner) end
 end
 
 function module:StartButtonFlashing(button)
@@ -149,19 +133,11 @@ function module:OnEnable()
     self.flashAnimations = {}
 
     local function registerCallback(header)
-        if not header then
-            return
-        end
+        if not header then return end
 
-        LAB.RegisterCallback(header, "OnButtonUsable", function(_, button)
-            button.icon:SetVertexColor(unpack(cfg[getActionButtonState(button)]))
-        end)
+        LAB.RegisterCallback(header, "OnButtonUsable", function(_, button) button.icon:SetVertexColor(unpack(cfg[getActionButtonState(button)])) end)
 
-        if cfg.flashAnimations then
-            LAB.RegisterCallback(header, "OnButtonState", function(_, button)
-                module:UpdateButtonFlashing(button)
-            end)
-        end
+        if cfg.flashAnimations then LAB.RegisterCallback(header, "OnButtonState", function(_, button) module:UpdateButtonFlashing(button) end) end
     end
 
     for i = 1, 8 do
@@ -216,9 +192,7 @@ function module:OnEnable()
         end
 
         local PetActionBarFrame = PetActionBar
-        if PetActionBarFrame and type(PetActionBarFrame.Update) == "function" then
-            hooksecurefunc(PetActionBarFrame, "Update", petActionBar_Update)
-        end
+        if PetActionBarFrame and type(PetActionBarFrame.Update) == "function" then hooksecurefunc(PetActionBarFrame, "Update", petActionBar_Update) end
 
         if PetActionBarFrame then
             local buttons = PetActionBarFrame.actionButtons
@@ -226,9 +200,7 @@ function module:OnEnable()
                 for _, button in pairs(buttons) do
                     petButton_Setup(button)
                     hooksecurefunc(button, "StartFlash", function(btn)
-                        if btn:IsVisible() then
-                            self:StartButtonFlashing(btn)
-                        end
+                        if btn:IsVisible() then self:StartButtonFlashing(btn) end
                     end)
                 end
             end

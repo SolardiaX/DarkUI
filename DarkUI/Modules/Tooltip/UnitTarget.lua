@@ -29,9 +29,7 @@ local function getTargetColor(unitTarget)
     elseif UnitIsPlayer(unitTarget) then
         local _, class = UnitClass(unitTarget)
         local color = class and (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-        if color then
-            return color.r, color.g, color.b
-        end
+        if color then return color.r, color.g, color.b end
     else
         local reaction = UnitReaction(unitTarget, "player")
         if reaction and C.oUF_colors.reaction[reaction] then
@@ -58,7 +56,12 @@ local function onTooltipSetUnit(self)
     local tr, tg, tb = getTargetColor(unitTarget)
 
     local text
-    if C_Secrets and C_Secrets.ShouldUnitComparisonBeSecret and not C_Secrets.ShouldUnitComparisonBeSecret("player", unitTarget) and UnitIsUnit("player", unitTarget) then
+    if
+        C_Secrets
+        and C_Secrets.ShouldUnitComparisonBeSecret
+        and not C_Secrets.ShouldUnitComparisonBeSecret("player", unitTarget)
+        and UnitIsUnit("player", unitTarget)
+    then
         text = "|cfffed100" .. STATUS_TEXT_TARGET .. ":|r |cffff0000> " .. UNIT_YOU .. " <|r"
     else
         text = "|cfffed100" .. STATUS_TEXT_TARGET .. ":|r " .. (UnitName(unitTarget) or UNKNOWN)

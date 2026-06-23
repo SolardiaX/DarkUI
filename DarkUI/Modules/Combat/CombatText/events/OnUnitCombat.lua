@@ -14,9 +14,7 @@ local dataBatches = {}
 local dataEventPool = {}
 
 local function getDataEvent()
-    if #dataEventPool > 0 then
-        return table.remove(dataEventPool)
-    end
+    if #dataEventPool > 0 then return table.remove(dataEventPool) end
     return {}
 end
 
@@ -62,9 +60,7 @@ end
 local function onUnitCombat(...)
     local unitTarget, event, flagText, amount, schoolMask = ...
 
-    if unitTarget ~= "player" then
-        return
-    end
+    if unitTarget ~= "player" then return end
 
     local dataEvent = getDataEvent()
 

@@ -1,8 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.map.minimap.enable then
-    return
-end
+if not C.map.minimap.enable then return end
 
 ------------------------------------------------------------------------
 -- MiniMap Styles
@@ -32,17 +30,11 @@ local FRAMES_TO_ROTATE
 ------------------------------------------------------------------------
 
 local function hideObject(obj)
-    if not obj then
-        return
-    end
+    if not obj then return end
     obj:SetAlpha(0)
     obj:Hide()
-    if obj.UnregisterAllEvents then
-        obj:UnregisterAllEvents()
-    end
-    if obj.Show then
-        obj.Show = E.Dummy
-    end
+    if obj.UnregisterAllEvents then obj:UnregisterAllEvents() end
+    if obj.Show then obj.Show = E.Dummy end
 end
 
 local function disableBlizzard()
@@ -50,9 +42,7 @@ local function disableBlizzard()
 
     hideObject(MinimapCompassTexture)
 
-    if MinimapCluster.BorderTop then
-        MinimapCluster.BorderTop:Hide()
-    end
+    if MinimapCluster.BorderTop then MinimapCluster.BorderTop:Hide() end
 
     if Minimap.ZoomIn then
         Minimap.ZoomIn:SetAlpha(0)
@@ -66,9 +56,7 @@ local function disableBlizzard()
     Minimap:SetArchBlobRingScalar(0)
     Minimap:SetQuestBlobRingScalar(0)
 
-    if MinimapCluster.ZoneTextButton then
-        MinimapCluster.ZoneTextButton:Hide()
-    end
+    if MinimapCluster.ZoneTextButton then MinimapCluster.ZoneTextButton:Hide() end
 
     Minimap:SetSize(Minimap:GetWidth() * 0.88, Minimap:GetHeight() * 0.88)
     Minimap:ClearAllPoints()
@@ -99,9 +87,7 @@ local function resetIcons()
 
         local isSettingDiffPoint
         hooksecurefunc(instDiff, "SetPoint", function(self)
-            if isSettingDiffPoint then
-                return
-            end
+            if isSettingDiffPoint then return end
             isSettingDiffPoint = true
             self:ClearAllPoints()
             self:SetPoint(unpack(ICON_POS.instance))
@@ -109,9 +95,7 @@ local function resetIcons()
         end)
 
         if instDiff.Default then
-            if instDiff.Default.Border then
-                instDiff.Default.Border:Hide()
-            end
+            if instDiff.Default.Border then instDiff.Default.Border:Hide() end
             instDiff.Default.Background:SetSize(28, 36)
             instDiff.Default.Background:SetVertexColor(0.6, 0.3, 0)
             if instDiff.Default.HeroicTexture then
@@ -127,17 +111,13 @@ local function resetIcons()
         end
 
         if instDiff.Guild then
-            if instDiff.Guild.Border then
-                instDiff.Guild.Border:Hide()
-            end
+            if instDiff.Guild.Border then instDiff.Guild.Border:Hide() end
             instDiff.Guild.Background:SetSize(28, 36)
             instDiff.Guild.Background:SetVertexColor(0.6, 0.3, 0)
         end
 
         if instDiff.ChallengeMode then
-            if instDiff.ChallengeMode.Border then
-                instDiff.ChallengeMode.Border:Hide()
-            end
+            if instDiff.ChallengeMode.Border then instDiff.ChallengeMode.Border:Hide() end
             instDiff.ChallengeMode.Background:SetSize(28, 36)
             instDiff.ChallengeMode.Background:SetVertexColor(0.6, 0.3, 0)
         end
@@ -155,9 +135,7 @@ local function resetIcons()
 
         local isSettingQueuePoint
         hooksecurefunc(QueueStatusButton, "SetPoint", function(self)
-            if isSettingQueuePoint then
-                return
-            end
+            if isSettingQueuePoint then return end
             isSettingQueuePoint = true
             self:ClearAllPoints()
             self:SetPoint(unpack(ICON_POS.queue))
@@ -178,7 +156,7 @@ local function resetIcons()
         TimeManagerClockButton:SetPoint(unpack(ICON_POS.clock))
         if TimeManagerClockTicker then
             TimeManagerClockTicker:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
-            TimeManagerClockTicker:SetTextColor(195/255, 186/255, 140/255)
+            TimeManagerClockTicker:SetTextColor(195 / 255, 186 / 255, 140 / 255)
         end
         if TimeManagerAlarmFiredTexture and TimeManagerClockTicker then
             TimeManagerAlarmFiredTexture:ClearAllPoints()
@@ -197,9 +175,7 @@ local function resetIcons()
 
         local isSettingMailPoint
         hooksecurefunc(mailFrame, "SetPoint", function(self)
-            if isSettingMailPoint then
-                return
-            end
+            if isSettingMailPoint then return end
             isSettingMailPoint = true
             self:ClearAllPoints()
             self:SetPoint(unpack(ICON_POS.mail))
@@ -223,12 +199,8 @@ local function resetIcons()
 
         garrButton:HookScript("OnMouseDown", function(self, btn)
             if btn == "RightButton" then
-                if GarrisonLandingPage and GarrisonLandingPage:IsShown() then
-                    HideUIPanel(GarrisonLandingPage)
-                end
-                if ExpansionLandingPage and ExpansionLandingPage:IsShown() then
-                    HideUIPanel(ExpansionLandingPage)
-                end
+                if GarrisonLandingPage and GarrisonLandingPage:IsShown() then HideUIPanel(GarrisonLandingPage) end
+                if ExpansionLandingPage and ExpansionLandingPage:IsShown() then HideUIPanel(ExpansionLandingPage) end
                 showGarrisonMenu(self)
             end
         end)
@@ -249,12 +221,8 @@ local function resetIcons()
         tracking:SetSize(28, 28)
         tracking:ClearAllPoints()
         tracking:SetPoint("LEFT", Minimap, "RIGHT", -12, 2)
-        if tracking.Background then
-            tracking.Background:Hide()
-        end
-        if tracking.Button then
-            tracking.Button:SetSize(28, 28)
-        end
+        if tracking.Background then tracking.Background:Hide() end
+        if tracking.Button then tracking.Button:SetSize(28, 28) end
     end
 
     -- AddonCompartment
@@ -343,9 +311,7 @@ end
 ------------------------------------------------------------------------
 
 local function enableAutoZoomOut()
-    if not cfg.autoZoom then
-        return
-    end
+    if not cfg.autoZoom then return end
 
     local isResetting
     local function resetZoom()
@@ -386,9 +352,7 @@ local ignoredButtons = {
 
 local function isButtonIgnored(name)
     for pattern in pairs(ignoredButtons) do
-        if name:match(pattern) then
-            return true
-        end
+        if name:match(pattern) then return true end
     end
 end
 
@@ -466,23 +430,17 @@ local function setupRecycleBin()
     fadeIn.alpha:SetFromAlpha(0)
     fadeIn.alpha:SetToAlpha(1)
     fadeIn.alpha:SetDuration(0.3)
-    fadeIn:SetScript("OnPlay", function()
-        bin:Show()
-    end)
+    fadeIn:SetScript("OnPlay", function() bin:Show() end)
 
     local fadeOut = bin:CreateAnimationGroup()
     fadeOut.alpha = fadeOut:CreateAnimation("Alpha")
     fadeOut.alpha:SetFromAlpha(1)
     fadeOut.alpha:SetToAlpha(0)
     fadeOut.alpha:SetDuration(0.3)
-    fadeOut:SetScript("OnFinished", function()
-        bin:Hide()
-    end)
+    fadeOut:SetScript("OnFinished", function() bin:Hide() end)
 
     local function hideBin()
-        if bin:IsShown() then
-            fadeOut:Play()
-        end
+        if bin:IsShown() then fadeOut:Play() end
     end
 
     -- Reskin a collected button
@@ -520,15 +478,9 @@ local function setupRecycleBin()
             if not child.__binStyled then
                 child:SetParent(bin)
                 child:SetFrameLevel(binLevel + 5)
-                if child:HasScript("OnDragStop") then
-                    child:SetScript("OnDragStop", nil)
-                end
-                if child:HasScript("OnDragStart") then
-                    child:SetScript("OnDragStart", nil)
-                end
-                if child:HasScript("OnClick") then
-                    child:HookScript("OnClick", hideBin)
-                end
+                if child:HasScript("OnDragStop") then child:SetScript("OnDragStop", nil) end
+                if child:HasScript("OnDragStart") then child:SetScript("OnDragStart", nil) end
+                if child:HasScript("OnClick") then child:HookScript("OnClick", hideBin) end
 
                 if child:IsObjectType("Button") then
                     child:SetHighlightTexture(C.media.texture.blank)
@@ -542,21 +494,15 @@ local function setupRecycleBin()
 
     -- Arrange buttons in grid
     local function sortButtons()
-        if #buttons == 0 then
-            return
-        end
+        if #buttons == 0 then return end
 
         local shownButtons = {}
         for _, btn in ipairs(buttons) do
-            if btn:IsShown() then
-                shownButtons[#shownButtons + 1] = btn
-            end
+            if btn:IsShown() then shownButtons[#shownButtons + 1] = btn end
         end
 
         local numShown = #shownButtons
-        if numShown == 0 then
-            return
-        end
+        if numShown == 0 then return end
 
         local rows = math.ceil(numShown / ICONS_PER_ROW)
         local newHeight = rows * (BUTTON_SIZE + SPACING) + SPACING
@@ -579,9 +525,7 @@ local function setupRecycleBin()
                 local child = select(i, Minimap:GetChildren())
                 local name = child and child.GetName and child:GetName()
                 if name and not child.__binExamed and not blackList[name] then
-                    if (child:IsObjectType("Button") or name:upper():find("BUTTON")) and not isButtonIgnored(name) then
-                        reskinButton(child)
-                    end
+                    if (child:IsObjectType("Button") or name:upper():find("BUTTON")) and not isButtonIgnored(name) then reskinButton(child) end
                     child.__binExamed = true
                 end
             end
@@ -591,9 +535,7 @@ local function setupRecycleBin()
         setupButtons()
 
         scanCount = scanCount + 1
-        if scanCount < 12 then
-            C_Timer_After(5, collectButtons)
-        end
+        if scanCount < 12 then C_Timer_After(5, collectButtons) end
     end
 
     -- Toggle button click
@@ -630,9 +572,7 @@ end
 ------------------------------------------------------------------------
 
 local function setupHybridMinimap()
-    if HybridMinimap and HybridMinimap.CircleMask then
-        HybridMinimap.CircleMask:SetTexture("Interface\\BUTTONS\\WHITE8X8")
-    end
+    if HybridMinimap and HybridMinimap.CircleMask then HybridMinimap.CircleMask:SetTexture("Interface\\BUTTONS\\WHITE8X8") end
 end
 
 ------------------------------------------------------------------------
@@ -672,18 +612,14 @@ function module:OnInit()
         },
     }
 
-    if not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager") then
-        C_AddOns.LoadAddOn("Blizzard_TimeManager")
-    end
+    if not C_AddOns.IsAddOnLoaded("Blizzard_TimeManager") then C_AddOns.LoadAddOn("Blizzard_TimeManager") end
 
     disableBlizzard()
     resetIcons()
     addTextures()
     enableAutoZoomOut()
 
-    if cfg.recycleBin then
-        setupRecycleBin()
-    end
+    if cfg.recycleBin then setupRecycleBin() end
 
     -- Mouse wheel zoom
     Minimap:EnableMouseWheel(true)

@@ -1,6 +1,4 @@
-if GetLocale() ~= "ruRU" then
-    return
-end
+if GetLocale() ~= "ruRU" then return end
 
 L_DARKUI_CONSOLE = "Консоль DarkUI"
 
@@ -26,7 +24,8 @@ L_OPT_GENERAL_THEME_COLD = "Холодная"
 L_OPT_GENERAL_THEME_WARM = "Тёплая"
 L_OPT_GENERAL_THEME_LITEMODE = "Использовать облегчённый стиль"
 L_OPT_GENERAL_BLIZZARD_STYLE = "Украшать стандартные фреймы Blizzard"
-L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION = "Оптимизировать расположение стандартных фреймов (Достижения/Диалоги NPC/Полоса дыхания и т.д.)"
+L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION =
+    "Оптимизировать расположение стандартных фреймов (Достижения/Диалоги NPC/Полоса дыхания и т.д.)"
 L_OPT_GENERAL_AUTOSCALE = "Включить автомасштабирование"
 L_OPT_GENERAL_UISCALE = "Масштаб интерфейса"
 L_OPT_GENERAL_LOCALE_VALUEFORMAT = "Включить локализованные единицы (требуется языковой пакет)"

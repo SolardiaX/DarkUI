@@ -46,9 +46,7 @@ local MyContainer = cbNivaya:GetContainerClass()
 local quickSort
 do
     local func = function(v1, v2)
-        if v1 == nil or v2 == nil then
-            return v1 and true or false
-        end
+        if v1 == nil or v2 == nil then return v1 and true or false end
         if v1[1] == -1 or v2[1] == -1 then
             return v1[1] > v2[1]
         elseif v1[2] ~= v2[2] then
@@ -63,9 +61,7 @@ do
             return v1[4] > v2[4]
         end
     end
-    quickSort = function(tbl)
-        table.sort(tbl, func)
-    end
+    quickSort = function(tbl) table.sort(tbl, func) end
 end
 
 ------------------------------------------------------------------------
@@ -95,9 +91,7 @@ function MyContainer:OnContentsChanged()
     end
 
     local opts = module.opts
-    if (tBank or tReagent) and opts.SortBank or (not (tBank or tReagent) and opts.SortBags) then
-        quickSort(buttonIDs)
-    end
+    if (tBank or tReagent) and opts.SortBank or (not (tBank or tReagent) and opts.SortBags) then quickSort(buttonIDs) end
 
     for _, v in ipairs(buttonIDs) do
         local button = v[3]
@@ -135,16 +129,12 @@ function MyContainer:OnContentsChanged()
 
     self.ContainerHeight = (row + (col > 0 and 1 or 0)) * (itemSlotSize + 2)
 
-    if self.UpdateDimensions then
-        self:UpdateDimensions()
-    end
+    if self.UpdateDimensions then self:UpdateDimensions() end
     self:SetWidth((itemSlotSize + 2) * self.Columns + 2)
 
     local t = (tName == "cBniv_Bag") or (tName == "cBniv_Bank") or (tName == "cBniv_BankReagent") or (tName == "cBniv_BankAccount")
     local bags = module.bags
-    if not bags or not bags.bank or not bags.main then
-        return
-    end
+    if not bags or not bags.bank or not bags.main then return end
     local bankShown = bags.bank:IsShown()
 
     if (not tBankBags and bags.main:IsShown() and not t) or (tBankBags and bankShown) then
@@ -178,24 +168,14 @@ local function restackItems(self)
     end
 end
 
-local function resetNewItems()
-    module:ResetNewItems()
-end
+local function resetNewItems() module:ResetNewItems() end
 
 local function updateDimensions(self)
     local height = 0
-    if self.BagBar and self.BagBar:IsShown() then
-        height = height + 40
-    end
-    if self.Space then
-        height = height + 16
-    end
-    if self.bagToggle then
-        height = height + 24
-    end
-    if self.Caption then
-        height = height + self.Caption:GetStringHeight() + 16
-    end
+    if self.BagBar and self.BagBar:IsShown() then height = height + 40 end
+    if self.Space then height = height + 16 end
+    if self.bagToggle then height = height + 24 end
+    if self.Caption then height = height + self.Caption:GetStringHeight() + 16 end
     self:SetHeight(self.ContainerHeight + height)
 end
 
@@ -204,9 +184,7 @@ local function setFrameMovable(f, v)
     f:SetUserPlaced(true)
     f:RegisterForDrag("LeftButton")
     if v then
-        f:SetScript("OnDragStart", function()
-            f:StartMoving()
-        end)
+        f:SetScript("OnDragStart", function() f:StartMoving() end)
         f:SetScript("OnDragStop", function()
             f:StopMovingOrSizing()
             local orig, _, tar, x, y = f:GetPoint()
@@ -231,21 +209,15 @@ end
 local classColor
 local function iconButtonOnEnter(self)
     self.mouseover = true
-    if not classColor then
-        classColor = { GetClassColor(select(2, UnitClass("player"))) }
-    end
+    if not classColor then classColor = { GetClassColor(select(2, UnitClass("player"))) } end
     self.icon:SetVertexColor(classColor[1], classColor[2], classColor[3])
-    if self.tooltip then
-        self.tooltip:Show()
-    end
+    if self.tooltip then self.tooltip:Show() end
 end
 
 local function iconButtonOnLeave(self)
     self.mouseover = false
     self.icon:SetVertexColor(0.8, 0.8, 0.8)
-    if self.tooltip then
-        self.tooltip:Hide()
-    end
+    if self.tooltip then self.tooltip:Hide() end
 end
 
 local function createIconButton(name, parent, texture, point, hint, isBag)
@@ -274,12 +246,8 @@ local function createIconButton(name, parent, texture, point, hint, isBag)
     button.tooltip:Hide()
 
     button.tag = name
-    button:SetScript("OnEnter", function()
-        iconButtonOnEnter(button)
-    end)
-    button:SetScript("OnLeave", function()
-        iconButtonOnLeave(button)
-    end)
+    button:SetScript("OnEnter", function() iconButtonOnEnter(button) end)
+    button:SetScript("OnLeave", function() iconButtonOnLeave(button) end)
     button.mouseover = false
 
     return button
@@ -300,18 +268,14 @@ local function getFirstFreeSlot(bagtype)
     elseif bagtype == "bankAccount" then
         containerIDs = { 12, 13, 14, 15, 16 }
     end
-    if not containerIDs then
-        return false
-    end
+    if not containerIDs then return false end
 
     for _, i in next, containerIDs do
         local t = C_Container_GetContainerNumFreeSlots(i)
         if t > 0 then
             local numSlots = C_Container_GetContainerNumSlots(i)
             for j = 1, numSlots do
-                if not C_Container_GetContainerItemLink(i, j) then
-                    return i, j
-                end
+                if not C_Container_GetContainerItemLink(i, j) then return i, j end
             end
         end
     end
@@ -336,9 +300,7 @@ function MyContainer:OnCreate(name, settings)
     self.UpdateDimensions = updateDimensions
     self:SetFrameStrata("HIGH")
 
-    if tBag or tBank then
-        setFrameMovable(self, module.opts.Unlocked)
-    end
+    if tBag or tBank then setFrameMovable(self, module.opts.Unlocked) end
 
     self.Columns = (tBankBags and cfg.columns.bank) or cfg.columns.bag
     self.ContainerHeight = 0
@@ -357,9 +319,7 @@ function MyContainer:OnCreate(name, settings)
     local caption = background:CreateFontString(nil, "OVERLAY", nil)
     caption:SetFont(unpack(FONT_STANDARD))
     local t = L["BAG_CAPTIONS_" .. self.name:upper():sub(7)] or (tBankBags and self.name:sub(5))
-    if not t then
-        t = self.name
-    end
+    if not t then t = self.name end
     caption:SetText(t)
     caption:SetPoint("TOPLEFT", 7.5, -7.5)
     self.Caption = caption
@@ -386,9 +346,7 @@ function MyContainer:OnCreate(name, settings)
 
         local bagButtons = self:SpawnPlugin("BagBar", tS)
         bagButtons:SetSize(bagButtons:LayoutButtons("grid", tI))
-        bagButtons.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
-        end
+        bagButtons.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
         bagButtons.isGlobal = true
         bagButtons:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
         bagButtons:Hide()
@@ -408,9 +366,7 @@ function MyContainer:OnCreate(name, settings)
         if module.opts.NewItems then
             self.resetBtn = createIconButton("ResetNew", self, Textures.ResetNew, "BOTTOMRIGHT", L.BAG_HINT_RESET_NEW, true)
             self.resetBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
-            self.resetBtn:SetScript("OnClick", function()
-                resetNewItems()
-            end)
+            self.resetBtn:SetScript("OnClick", function() resetNewItems() end)
         end
 
         if module.opts.Restack then
@@ -420,18 +376,12 @@ function MyContainer:OnCreate(name, settings)
             else
                 self.restackBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
             end
-            self.restackBtn:SetScript("OnClick", function()
-                restackItems(self)
-            end)
+            self.restackBtn:SetScript("OnClick", function() restackItems(self) end)
         end
 
         local btnTable = { self.bagToggle }
-        if self.restackBtn then
-            tinsert(btnTable, self.restackBtn)
-        end
-        if self.resetBtn then
-            tinsert(btnTable, self.resetBtn)
-        end
+        if self.restackBtn then tinsert(btnTable, self.restackBtn) end
+        if self.resetBtn then tinsert(btnTable, self.resetBtn) end
         local ttPos = -(#btnTable * 24 + 16)
         for _, v in pairs(btnTable) do
             v.tooltip:ClearAllPoints()
@@ -443,9 +393,7 @@ function MyContainer:OnCreate(name, settings)
         local bankTab = self:SpawnPlugin("BagTab", "bank", false)
         bankTab:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
         bankTab:SetSize(bankTab:LayoutButtons("grid", 6))
-        bankTab.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
-        end
+        bankTab.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
         bankTab.isGlobal = true
         bankTab:Hide()
         self.BagBar = bankTab
@@ -464,9 +412,7 @@ function MyContainer:OnCreate(name, settings)
         if module.opts.Restack then
             self.restackBtn = createIconButton("Restack", self, Textures.Restack, "BOTTOMRIGHT", L.BAG_HINT_RESTACK, false)
             self.restackBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
-            self.restackBtn:SetScript("OnClick", function()
-                restackItems(self)
-            end)
+            self.restackBtn:SetScript("OnClick", function() restackItems(self) end)
         end
 
         self.reagentBtn = createIconButton("Deposit", self, Textures.Deposit, "BOTTOMRIGHT", REAGENTBANK_DEPOSIT, false)
@@ -475,14 +421,10 @@ function MyContainer:OnCreate(name, settings)
         else
             self.reagentBtn:SetPoint("BOTTOMRIGHT", self.bagToggle, "BOTTOMLEFT", 0, 0)
         end
-        self.reagentBtn:SetScript("OnClick", function()
-            C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE)
-        end)
+        self.reagentBtn:SetScript("OnClick", function() C_Bank.AutoDepositItemsIntoBank(CHAR_BANK_TYPE) end)
 
         local btnTable = { self.bagToggle }
-        if self.restackBtn then
-            tinsert(btnTable, self.restackBtn)
-        end
+        if self.restackBtn then tinsert(btnTable, self.restackBtn) end
         tinsert(btnTable, self.reagentBtn)
         local ttPos = -(#btnTable * 24 + 16) + 3
         for _, v in pairs(btnTable) do
@@ -495,9 +437,7 @@ function MyContainer:OnCreate(name, settings)
         local accountTab = self:SpawnPlugin("BagTab", "accountbank", "Account")
         accountTab:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", -2, 32)
         accountTab:SetSize(accountTab:LayoutButtons("grid", 5))
-        accountTab.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
-        end
+        accountTab.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
         accountTab.isGlobal = true
         accountTab:Hide()
         self.BagBar = accountTab
@@ -532,15 +472,11 @@ function MyContainer:OnCreate(name, settings)
     if tBag or tBank or tReagent or tAccount then
         self.DropTarget = CreateFrame("ItemButton", self.name .. "DropTarget", self)
         local dtNT = _G[self.DropTarget:GetName() .. "NormalTexture"]
-        if dtNT then
-            dtNT:SetTexture(nil)
-        end
+        if dtNT then dtNT:SetTexture(nil) end
 
         local function DropTargetProcessItem()
             local bID, sID = getFirstFreeSlot((tBag and "bag") or (tBank and "bank") or (tReagent and "bankReagent") or (tAccount and "bankAccount") or false)
-            if bID then
-                C_Container_PickupContainerItem(bID, sID)
-            end
+            if bID then C_Container_PickupContainerItem(bID, sID) end
         end
 
         self.DropTarget:SetScript("OnMouseUp", DropTargetProcessItem)
@@ -582,9 +518,7 @@ function MyContainer:OnCreate(name, settings)
 
         local search = self:SpawnPlugin("SearchBar", infoFrame)
         search.isGlobal = true
-        search.highlightFunction = function(button, match)
-            button:SetAlpha(match and 1 or 0.1)
-        end
+        search.highlightFunction = function(button, match) button:SetAlpha(match and 1 or 0.1) end
 
         local searchIcon = background:CreateTexture(nil, "ARTWORK")
         searchIcon:SetTexture(Textures.Search)
@@ -628,17 +562,11 @@ function BagButton:OnUpdateButton()
     self.__backdrop:SetBackdropBorderColor(0, 0, 0)
 
     local id = GetInventoryItemID("player", self.invID)
-    if not id then
-        return
-    end
+    if not id then return end
     local _, _, quality = C_Item.GetItemInfo(id)
-    if not quality or quality <= 1 then
-        return
-    end
+    if not quality or quality <= 1 then return end
     local color = C.media.qualityColors[quality]
-    if not self.hidden and not self.notBought and color then
-        self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
-    end
+    if not self.hidden and not self.notBought and color then self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b) end
 end
 
 ------------------------------------------------------------------------
@@ -653,12 +581,8 @@ function MyButton:OnAdd()
         if mouseButton == "RightButton" then
             local slotId, bagId = btn:GetSlotAndBagID()
             local tID = C_Container.GetContainerItemID(bagId, slotId)
-            if not tID then
-                return
-            end
-            if IsControlKeyDown() and cbNivaya:AtBank() then
-                C_Container.UseContainerItem(bagId, slotId, nil, true)
-            end
+            if not tID then return end
+            if IsControlKeyDown() and cbNivaya:AtBank() then C_Container.UseContainerItem(bagId, slotId, nil, true) end
         end
     end)
 end
@@ -732,14 +656,10 @@ local function isItemHasLevel(item)
     return index and (index == 0 or index == item.subClassID)
 end
 
-local function isItemNeedsLevel(item)
-    return item.link and item.quality > 1 and item.ilvl
-end
+local function isItemNeedsLevel(item) return item.link and item.quality > 1 and item.ilvl end
 
 local function getIconOverlayAtlas(item)
-    if not item.link then
-        return
-    end
+    if not item.link then return end
     if C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(item.link) then
         return "AzeriteIconFrame"
     elseif IsCosmeticItem(item.link) then
@@ -782,9 +702,7 @@ function MyButton:OnUpdateButton(item)
     -- iLvl
     self.iLvl:SetText("")
     local level = item.level
-    if not level and isItemNeedsLevel(item) then
-        level = item.ilvl
-    end
+    if not level and isItemNeedsLevel(item) then level = item.ilvl end
     if level then
         local color = C.media.qualityColors[item.quality]
         self.iLvl:SetText(level)
@@ -803,9 +721,7 @@ function MyButton:OnUpdateButton(item)
 
     self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
-    if not item.texture and GameTooltip:GetOwner() == self then
-        GameTooltip:Hide()
-    end
+    if not item.texture and GameTooltip:GetOwner() == self then GameTooltip:Hide() end
 
     -- CanIMogIt support
     if self.canIMogIt then

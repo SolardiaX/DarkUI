@@ -10,9 +10,7 @@ local cfg = C.combat.combatText
 local dataEvent = {}
 
 local function onPlayerInCombatChanged(inCombat)
-    if not inCombat and cfg.clear_on_combat_exit then
-        module.Display.ClearCombatQueues()
-    end
+    if not inCombat and cfg.clear_on_combat_exit then module.Display.ClearCombatQueues() end
 
     wipe(dataEvent)
 

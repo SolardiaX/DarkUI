@@ -14,8 +14,6 @@ local cfg = module.config.FPS
 
 module:Inject("FPS", {
     text = {
-        string = function()
-            return format(cfg.fmt, floor(GetFramerate()))
-        end,
+        string = function() return format(cfg.fmt, floor(GetFramerate())) end,
     },
 })

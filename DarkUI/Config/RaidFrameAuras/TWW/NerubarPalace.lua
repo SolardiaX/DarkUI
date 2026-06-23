@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
-
 local TIER = 11
 local INSTANCE = 1273 -- 尼鲁巴尔王宫
 

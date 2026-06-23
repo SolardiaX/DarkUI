@@ -15,17 +15,13 @@ module.cfg = cfg
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     -- Initialize display layer
     module.Display.Init()
 
     -- Start CLEU + UNIT_COMBAT outgoing damage detection
-    if module.CombatLog then
-        module.CombatLog:Enable()
-    end
+    if module.CombatLog then module.CombatLog:Enable() end
 
     -- Register all events
     local eventFrame = CreateFrame("Frame")
@@ -34,9 +30,7 @@ function module:OnInit()
     end
     eventFrame:SetScript("OnEvent", function(_, event, ...)
         local handler = module.handlers[event]
-        if handler then
-            handler(...)
-        end
+        if handler then handler(...) end
     end)
     module.eventFrame = eventFrame
 

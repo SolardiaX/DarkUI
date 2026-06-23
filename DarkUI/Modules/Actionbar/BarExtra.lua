@@ -24,9 +24,7 @@ function module:OnInit()
     hooksecurefunc(ExtraActionBarFrame, "SetParent", function(self, parent)
         if parent == ExtraAbilityContainer then
             if InCombatLockdown() then
-                E.Event:RegisterOnce("PLAYER_REGEN_ENABLED", function()
-                    self:SetParent(extraBar)
-                end)
+                E.Event:RegisterOnce("PLAYER_REGEN_ENABLED", function() self:SetParent(extraBar) end)
             else
                 self:SetParent(extraBar)
             end
@@ -40,21 +38,15 @@ function module:OnInit()
     if button.style then
         button.style:SetTexture(nil)
         hooksecurefunc(button.style, "SetTexture", function(style, texture)
-            if texture then
-                style:SetTexture(nil)
-            end
+            if texture then style:SetTexture(nil) end
         end)
     end
 
     tinsert(extraBar.buttonList, button)
 
-    if cfg.fader_mouseover then
-        E:ButtonBarFader(extraBar, extraBar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-    end
+    if cfg.fader_mouseover then E:ButtonBarFader(extraBar, extraBar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
 
-    if cfg.fader_combat then
-        E:CombatFrameFader(extraBar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-    end
+    if cfg.fader_combat then E:CombatFrameFader(extraBar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut) end
 
     -- Zone ability
     local zoneBar = CreateFrame("Frame", "DarkUI_ZoneAbilityBarHolder", UIParent)
@@ -78,9 +70,7 @@ function module:OnInit()
     ZoneAbilityFrame.Style:SetAlpha(0)
 
     hooksecurefunc(ZoneAbilityFrame, "SetParent", function(self, parent)
-        if parent == ExtraAbilityContainer then
-            self:SetParent(zoneBar)
-        end
+        if parent == ExtraAbilityContainer then self:SetParent(zoneBar) end
     end)
 
     hooksecurefunc("ExtraActionBar_Update", function()

@@ -205,9 +205,7 @@ local function createThreatType(self)
     local threat_status_file
 
     local event_handler = function(self, event, unit)
-        if unit and unit ~= self.unit then
-            return
-        end
+        if unit and unit ~= self.unit then return end
 
         local status = UnitCanAttack(self.unit, "target") and UnitThreatSituation(self.unit, "target") or (UnitThreatSituation(self.unit))
         if issecretvalue(status) then status = nil end

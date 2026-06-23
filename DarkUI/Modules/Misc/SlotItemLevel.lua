@@ -28,9 +28,7 @@ local function getRealItemLevel(slotId, unit)
         if text then
             if strfind(text, itemLevelPattern) then
                 local level = strmatch(text, "(%d+)%)?$")
-                if level and tonumber(level) > 0 then
-                    return level
-                end
+                if level and tonumber(level) > 0 then return level end
             end
         end
     end
@@ -46,25 +44,26 @@ local function updateItems(unit, frame)
                 if unit == "player" then equipped[i] = itemLink end
 
                 local realItemLevel = getRealItemLevel(i, unit) or ""
-                if realItemLevel ~= "" and tonumber(realItemLevel) == 1 then
-                    realItemLevel = ""
-                end
+                if realItemLevel ~= "" and tonumber(realItemLevel) == 1 then realItemLevel = "" end
 
                 local color = "|cffFFFF00"
                 if itemLink and realItemLevel ~= "" and tonumber(realItemLevel) > 0 then
                     local _, _, enchant = strsplit(":", itemLink)
-                    if i == INVSLOT_BACK or i == INVSLOT_CHEST or i == INVSLOT_MAINHAND
-                        or i == INVSLOT_FINGER1 or i == INVSLOT_FINGER2
-                        or i == INVSLOT_WRIST or i == INVSLOT_FEET or i == INVSLOT_LEGS then
-                        if enchant and enchant == "" then
-                            color = "|cffFF0000"
-                        end
+                    if
+                        i == INVSLOT_BACK
+                        or i == INVSLOT_CHEST
+                        or i == INVSLOT_MAINHAND
+                        or i == INVSLOT_FINGER1
+                        or i == INVSLOT_FINGER2
+                        or i == INVSLOT_WRIST
+                        or i == INVSLOT_FEET
+                        or i == INVSLOT_LEGS
+                    then
+                        if enchant and enchant == "" then color = "|cffFF0000" end
                     end
                 end
 
-                if frame[i] then
-                    frame[i]:SetText(color .. realItemLevel)
-                end
+                if frame[i] then frame[i]:SetText(color .. realItemLevel) end
             end
         end
     end
@@ -170,9 +169,7 @@ function module:OnInit()
         updateItems("player", playerFrame)
         playerFrame:Show()
     end)
-    PaperDollFrame:HookScript("OnHide", function()
-        playerFrame:Hide()
-    end)
+    PaperDollFrame:HookScript("OnHide", function() playerFrame:Hide() end)
 
     self:RegisterEvent("PLAYER_EQUIPMENT_CHANGED", function(_, _, slot)
         if not PaperDollFrame:IsShown() then return end
@@ -191,14 +188,10 @@ function module:OnInit()
             updateItems("target", inspectFrame)
             inspectFrame:Show()
         end)
-        InspectPaperDollFrame:HookScript("OnHide", function()
-            inspectFrame:Hide()
-        end)
+        InspectPaperDollFrame:HookScript("OnHide", function() inspectFrame:Hide() end)
 
         module:RegisterEvent("INSPECT_READY", function()
-            if InspectPaperDollFrame and InspectPaperDollFrame:IsShown() then
-                updateItems("target", inspectFrame)
-            end
+            if InspectPaperDollFrame and InspectPaperDollFrame:IsShown() then updateItems("target", inspectFrame) end
         end)
     end
 
@@ -206,9 +199,7 @@ function module:OnInit()
         setupInspect()
     else
         self:RegisterEvent("ADDON_LOADED", function(_, _, addon)
-            if addon == "Blizzard_InspectUI" then
-                setupInspect()
-            end
+            if addon == "Blizzard_InspectUI" then setupInspect() end
         end)
     end
 

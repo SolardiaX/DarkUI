@@ -44,26 +44,18 @@ local function buildFriendTable(total)
     for i = 1, total do
         local name, level, class, area, connected, status, note = C_FriendList_GetFriendInfo(i)
         for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-            if class == v then
-                class = k
-            end
+            if class == v then class = k end
         end
         if GetLocale() ~= "enUS" then
             for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-                if class == v then
-                    class = k
-                end
+                if class == v then class = k end
             end
         end
         friendTable[i] = { name, level, class, area, connected, status, note }
-        if connected then
-            totalFriendsOnline = totalFriendsOnline + 1
-        end
+        if connected then totalFriendsOnline = totalFriendsOnline + 1 end
     end
     table.sort(friendTable, function(a, b)
-        if a[1] and b[1] then
-            return a[1] < b[1]
-        end
+        if a[1] and b[1] then return a[1] < b[1] end
     end)
 end
 
@@ -74,15 +66,11 @@ local function buildBNTable(total)
         local accountInfo = C_BattleNet_GetFriendAccountInfo(i)
         local class = accountInfo.gameAccountInfo.className
         for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-            if class == v then
-                class = k
-            end
+            if class == v then class = k end
         end
         if GetLocale() ~= "enUS" then
             for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-                if class == v then
-                    class = k
-                end
+                if class == v then class = k end
             end
         end
         BNTable[i] = {
@@ -103,9 +91,7 @@ local function buildBNTable(total)
             accountInfo.gameAccountInfo.areaName,
             accountInfo.gameAccountInfo.characterLevel,
         }
-        if accountInfo.gameAccountInfo.isOnline then
-            totalBattleNetOnline = totalBattleNetOnline + 1
-        end
+        if accountInfo.gameAccountInfo.isOnline then totalBattleNetOnline = totalBattleNetOnline + 1 end
     end
 end
 
@@ -144,9 +130,7 @@ module:Inject("Friends", {
             local total = numTotal + numBNetTotal
             self.text:SetText(format(cfg.fmt, online, total))
         end
-        if self.hovered then
-            self:GetScript("OnEnter")(self)
-        end
+        if self.hovered then self:GetScript("OnEnter")(self) end
     end,
     OnClick = function(self, b)
         if b == "MiddleButton" then
@@ -171,9 +155,7 @@ module:Inject("Friends", {
                         grouped = (UnitInParty(friendTable[i][1]) or UnitInRaid(friendTable[i][1])) and " |cffaaaaaa*|r" or ""
                         classc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[friendTable[i][3]]
                         levelc = GetQuestDifficultyColor(friendTable[i][2])
-                        if not classc then
-                            classc = GetQuestDifficultyColor(friendTable[i][2])
-                        end
+                        if not classc then classc = GetQuestDifficultyColor(friendTable[i][2]) end
 
                         module.menuList[3].menuList[#module.menuList[3].menuList + 1] = {
                             text = format(
@@ -190,9 +172,7 @@ module:Inject("Friends", {
                             ),
                             arg1 = friendTable[i][1],
                             notCheckable = true,
-                            func = function(_, arg1)
-                                SetItemRef("player:" .. arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton")
-                            end,
+                            func = function(_, arg1) SetItemRef("player:" .. arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton") end,
                         }
 
                         if not (UnitInParty(friendTable[i][1]) or UnitInRaid(friendTable[i][1])) then
@@ -210,9 +190,7 @@ module:Inject("Friends", {
                                 ),
                                 arg1 = friendTable[i][1],
                                 notCheckable = true,
-                                func = function(_, arg1)
-                                    InviteUnit(arg1)
-                                end,
+                                func = function(_, arg1) InviteUnit(arg1) end,
                             }
                         end
                     end
@@ -228,18 +206,14 @@ module:Inject("Friends", {
                             text = BNTable[i][2] .. grouped,
                             arg1 = BNTable[i][2],
                             notCheckable = true,
-                            func = function(_, arg1)
-                                ChatFrame_SendBNetTell(arg1)
-                            end,
+                            func = function(_, arg1) ChatFrame_SendBNetTell(arg1) end,
                         }
 
                         if BNTable[i][6] == BNET_CLIENT_WOW and UnitFactionGroup("player") == BNTable[i][12] then
                             if not (UnitInParty(BNTable[i][4]) or UnitInRaid(BNTable[i][4])) then
                                 classc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[BNTable[i][14]]
                                 levelc = GetQuestDifficultyColor(BNTable[i][16])
-                                if not classc then
-                                    classc = GetQuestDifficultyColor(BNTable[i][16])
-                                end
+                                if not classc then classc = GetQuestDifficultyColor(BNTable[i][16]) end
                                 module.menuList[2].menuList[#module.menuList[2].menuList + 1] = {
                                     text = format(
                                         "|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r",
@@ -254,9 +228,7 @@ module:Inject("Friends", {
                                     ),
                                     arg1 = BNTable[i][5],
                                     notCheckable = true,
-                                    func = function(_, arg1)
-                                        BNInviteFriend(arg1)
-                                    end,
+                                    func = function(_, arg1) BNInviteFriend(arg1) end,
                                 }
                             end
                         end
@@ -278,9 +250,7 @@ module:Inject("Friends", {
             for i = 1, BNtotal do
                 local accountInfo = C_BattleNet_GetFriendAccountInfo(i)
                 BNTableEnter[i] = { accountInfo, accountInfo.gameAccountInfo.clientProgram }
-                if accountInfo.gameAccountInfo.isOnline then
-                    BNonline = BNonline + 1
-                end
+                if accountInfo.gameAccountInfo.isOnline then BNonline = BNonline + 1 end
             end
         end
         local totalonline = online + BNonline
@@ -305,30 +275,22 @@ module:Inject("Friends", {
                 GameTooltip:AddLine(WOW_FRIEND)
                 for i = 1, total do
                     name, level, class, zone, connected, status, note = C_FriendList_GetFriendInfo(i)
-                    if not connected then
-                        break
-                    end
+                    if not connected then break end
                     if GetRealZoneText() == zone then
                         zone_r, zone_g, zone_b = 0.3, 1.0, 0.3
                     else
                         zone_r, zone_g, zone_b = 0.65, 0.65, 0.65
                     end
                     for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-                        if class == v then
-                            class = k
-                        end
+                        if class == v then class = k end
                     end
                     if GetLocale() ~= "enUS" then
                         for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-                            if class == v then
-                                class = k
-                            end
+                            if class == v then class = k end
                         end
                     end
                     classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class], GetQuestDifficultyColor(level)
-                    if not classc then
-                        classc = { r = 1, g = 1, b = 1 }
-                    end
+                    if not classc then classc = { r = 1, g = 1, b = 1 } end
                     grouped = (UnitInParty(name) or UnitInRaid(name)) and (GetRealZoneText() == zone and " |cff7fff00*|r" or " |cffff7f00*|r") or ""
                     GameTooltip:AddDoubleLine(
                         format("|cff%02x%02x%02x%d|r %s%s%s", levelc.r * 255, levelc.g * 255, levelc.b * 255, level, name, grouped, " " .. status),
@@ -340,9 +302,7 @@ module:Inject("Friends", {
                         zone_g,
                         zone_b
                     )
-                    if self.altdown and note then
-                        GameTooltip:AddLine("  " .. note, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1)
-                    end
+                    if self.altdown and note then GameTooltip:AddLine("  " .. note, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1) end
                 end
             end
             if BNonline > 0 then
@@ -367,29 +327,21 @@ module:Inject("Friends", {
                             class = accountInfo.gameAccountInfo.className
                             level = accountInfo.gameAccountInfo.characterLevel
                             for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
-                                if class == v then
-                                    class = k
-                                end
+                                if class == v then class = k end
                             end
                             if GetLocale() ~= "enUS" then
                                 for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
-                                    if class == v then
-                                        class = k
-                                    end
+                                    if class == v then class = k end
                                 end
                             end
                             classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class], GetQuestDifficultyColor(level)
-                            if not classc then
-                                classc = { r = 1, g = 1, b = 1 }
-                            end
+                            if not classc then classc = { r = 1, g = 1, b = 1 } end
                             if UnitInParty(characterName) or UnitInRaid(characterName) then
                                 grouped = " |cffaaaaaa*|r"
                             else
                                 grouped = ""
                             end
-                            if accountInfo.gameAccountInfo.factionName ~= UnitFactionGroup("player") then
-                                grouped = " |cffff0000*|r"
-                            end
+                            if accountInfo.gameAccountInfo.factionName ~= UnitFactionGroup("player") then grouped = " |cffff0000*|r" end
                             GameTooltip:AddDoubleLine(
                                 format(
                                     "%s (|cff%02x%02x%02x%d|r |cff%02x%02x%02x%s|r%s) |cff%02x%02x%02x%s|r",

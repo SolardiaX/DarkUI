@@ -21,9 +21,7 @@ addon.OptionList = {}
 addon.Hooks = {}
 addon.widgets = {}
 
-function addon:RegisterTab(key, label)
-    self.TabList[#self.TabList + 1] = { key = key, label = label }
-end
+function addon:RegisterTab(key, label) self.TabList[#self.TabList + 1] = { key = key, label = label } end
 
 ------------------------------------------------------------------------
 -- Deferred DarkUI namespace access
@@ -32,13 +30,9 @@ end
 local E, C, L, DB
 
 local function ensureNamespace()
-    if E then
-        return true
-    end
+    if E then return true end
     local ns = _G["DarkUI"]
-    if not ns then
-        return false
-    end
+    if not ns then return false end
     E, C, L, DB = ns:unpack()
     return true
 end
@@ -85,13 +79,9 @@ local WIDGET_OFFSET_BUTTON = 32
 -- Widget Factory (all use E/C/DB at runtime)
 ------------------------------------------------------------------------
 
-local function getFont()
-    return C.media.standard_font[1]
-end
+local function getFont() return C.media.standard_font[1] end
 
-local function getClassColor()
-    return E.myColor
-end
+local function getClassColor() return E.myColor end
 
 local function createHeader(parent, text, offset)
     local font = getFont()
@@ -137,9 +127,7 @@ local function createCheckBox(parent, dbPath, label, offset, horizon)
     text:SetTextColor(1, 1, 1)
     cb.label = text
 
-    if horizon then
-        return 0, cb
-    end
+    if horizon then return 0, cb end
     return WIDGET_OFFSET_CHECK, cb
 end
 
@@ -234,9 +222,7 @@ local function createDropDown(parent, dbPath, label, offset, options)
             end
         end
     end
-    if not currentIndex then
-        displayText:SetText(tostring(currentValue or ""))
-    end
+    if not currentIndex then displayText:SetText(tostring(currentValue or "")) end
 
     local list = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     list:SetPoint("TOP", frame, "BOTTOM", 0, -2)
@@ -274,12 +260,8 @@ local function createDropDown(parent, dbPath, label, offset, options)
             needReload = true
             if applyButton then applyButton:Show() end
         end)
-        btn:SetScript("OnEnter", function(self)
-            self:SetBackdropColor(1, 1, 1, 0.25)
-        end)
-        btn:SetScript("OnLeave", function(self)
-            self:SetBackdropColor(0, 0, 0, 0.3)
-        end)
+        btn:SetScript("OnEnter", function(self) self:SetBackdropColor(1, 1, 1, 0.25) end)
+        btn:SetScript("OnLeave", function(self) self:SetBackdropColor(0, 0, 0, 0.3) end)
     end
 
     list:SetHeight(#options * 30 + 8)
@@ -359,9 +341,7 @@ local function populateContent(key)
     clearContent()
 
     local options = addon.OptionList[key]
-    if not options then
-        return
-    end
+    if not options then return end
 
     local offset = 10
     for _, opt in ipairs(options) do
@@ -384,30 +364,20 @@ local function populateContent(key)
             h, widget = createActionButton(scrollChild, dbPath, label, offset)
         end
 
-        if h then
-            offset = offset + h
-        end
+        if h then offset = offset + h end
 
-        if widget and dbPath then
-            addon.widgets[dbPath] = widget
-        end
+        if widget and dbPath then addon.widgets[dbPath] = widget end
 
-        if initFn and widget then
-            initFn(widget, addon)
-        end
+        if initFn and widget then initFn(widget, addon) end
     end
 
-    if addon.Hooks[key] then
-        addon.Hooks[key](addon)
-    end
+    if addon.Hooks[key] then addon.Hooks[key](addon) end
 
     scrollChild:SetHeight(offset + 20)
 end
 
 local function selectTab(index)
-    if activeTab == index then
-        return
-    end
+    if activeTab == index then return end
     activeTab = index
 
     local cc = getClassColor()
@@ -424,9 +394,7 @@ local function selectTab(index)
     end
 
     local tabInfo = addon.TabList[index]
-    if tabInfo then
-        populateContent(tabInfo.key)
-    end
+    if tabInfo then populateContent(tabInfo.key) end
 end
 
 ------------------------------------------------------------------------
@@ -470,9 +438,7 @@ local function createPanel()
     -- Close (X) button
     local closeX = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
     E:StyleCloseButton(closeX, panel)
-    closeX:SetScript("OnClick", function()
-        addon:Hide()
-    end)
+    closeX:SetScript("OnClick", function() addon:Hide() end)
 
     -- Bottom buttons
     local closeButton = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
@@ -523,9 +489,7 @@ local function createPanel()
     scrollFrame:SetPoint("BOTTOMRIGHT", -28, 40)
 
     local scrollBar = scrollFrame.ScrollBar or _G[scrollFrame:GetName() .. "ScrollBar"]
-    if scrollBar then
-        E:ReskinScrollBar(scrollBar)
-    end
+    if scrollBar then E:ReskinScrollBar(scrollBar) end
 
     scrollChild = CreateFrame("Frame", nil, scrollFrame)
     scrollChild:SetWidth(scrollFrame:GetWidth())
@@ -546,18 +510,12 @@ local function createPanel()
         text:SetTextColor(0.8, 0.8, 0.8)
         tab.text = text
 
-        tab:SetScript("OnClick", function()
-            selectTab(i)
-        end)
+        tab:SetScript("OnClick", function() selectTab(i) end)
         tab:SetScript("OnEnter", function(self)
-            if activeTab ~= i then
-                self:SetBackdropColor(cc.r, cc.g, cc.b, 0.3)
-            end
+            if activeTab ~= i then self:SetBackdropColor(cc.r, cc.g, cc.b, 0.3) end
         end)
         tab:SetScript("OnLeave", function(self)
-            if activeTab ~= i then
-                self:SetBackdropColor(0, 0, 0, 0.3)
-            end
+            if activeTab ~= i then self:SetBackdropColor(0, 0, 0, 0.3) end
         end)
 
         tabs[i] = tab
@@ -574,37 +532,25 @@ function addon:Toggle()
         return
     end
 
-    if not panel then
-        createPanel()
-    end
+    if not panel then createPanel() end
 
     if panel:IsShown() then
         self:Hide()
     else
         panel:Show()
-        if not activeTab then
-            selectTab(1)
-        end
+        if not activeTab then selectTab(1) end
     end
 end
 
 function addon:Show()
-    if not ensureNamespace() then
-        return
-    end
-    if not panel then
-        createPanel()
-    end
+    if not ensureNamespace() then return end
+    if not panel then createPanel() end
     panel:Show()
-    if not activeTab then
-        selectTab(1)
-    end
+    if not activeTab then selectTab(1) end
 end
 
 function addon:Hide()
-    if panel then
-        panel:Hide()
-    end
+    if panel then panel:Hide() end
     if needReload then
         StaticPopup_Show("DARKUI_RELOAD_UI")
         needReload = false
@@ -637,23 +583,17 @@ local function addGameMenuButton()
                 others[#others + 1] = button
             end
         end
-        if not anchor then
-            return
-        end
+        if not anchor then return end
 
         local anchorTop = anchor:GetTop()
 
         local p, rel, rp, x, y = anchor:GetPoint()
-        if p and rel and y then
-            anchor:SetPoint(p, rel, rp, x, y - offset)
-        end
+        if p and rel and y then anchor:SetPoint(p, rel, rp, x, y - offset) end
 
         for _, button in ipairs(others) do
             if button:GetTop() < anchorTop then
                 local p2, rel2, rp2, x2, y2 = button:GetPoint()
-                if p2 and rel2 and y2 then
-                    button:SetPoint(p2, rel2, rp2, x2, y2 - offset)
-                end
+                if p2 and rel2 and y2 then button:SetPoint(p2, rel2, rp2, x2, y2 - offset) end
             end
         end
 
@@ -669,7 +609,5 @@ local menuFrame = CreateFrame("Frame")
 menuFrame:RegisterEvent("PLAYER_LOGIN")
 menuFrame:SetScript("OnEvent", function(self)
     self:UnregisterEvent("PLAYER_LOGIN")
-    if GameMenuFrame then
-        addGameMenuButton()
-    end
+    if GameMenuFrame then addGameMenuButton() end
 end)

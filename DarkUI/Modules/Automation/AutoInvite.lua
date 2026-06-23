@@ -40,22 +40,24 @@ function module:OnInit()
 
     self:RegisterEvent("CHAT_MSG_WHISPER", function(_, _, arg1, arg2)
         if not cfg.invite_keyword then return end
-        if (not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player"))
+        if
+            (not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player"))
             and arg1:lower():match(cfg.invite_keyword)
-            and not QueueStatusButton:IsShown() then
+            and not QueueStatusButton:IsShown()
+        then
             C_PartyInfo.InviteUnit(arg2)
         end
     end)
 
     self:RegisterEvent("CHAT_MSG_BN_WHISPER", function(_, _, arg1, _, _, _, _, _, _, _, _, _, _, bnetIDAccount)
         if not cfg.invite_keyword then return end
-        if (not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player"))
+        if
+            (not UnitExists("party1") or UnitIsGroupLeader("player") or UnitIsGroupAssistant("player"))
             and arg1:lower():match(cfg.invite_keyword)
-            and not QueueStatusButton:IsShown() then
+            and not QueueStatusButton:IsShown()
+        then
             local accountInfo = C_BattleNet.GetAccountInfoByID(bnetIDAccount)
-            if accountInfo and accountInfo.gameAccountInfo then
-                BNInviteFriend(accountInfo.gameAccountInfo.gameAccountID)
-            end
+            if accountInfo and accountInfo.gameAccountInfo then BNInviteFriend(accountInfo.gameAccountInfo.gameAccountID) end
         end
     end)
 end

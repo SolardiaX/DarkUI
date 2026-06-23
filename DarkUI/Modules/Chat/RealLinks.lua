@@ -92,18 +92,14 @@ function module:OnInit()
                     local frame = data[1]
                     if frame and frame.GetScript then
                         local onEvent = frame:GetScript("OnEvent")
-                        if type(onEvent) == "function" then
-                            onEvent(unpack(data))
-                        end
+                        if type(onEvent) == "function" then onEvent(unpack(data)) end
                     end
                     queuedMessages[i] = nil
                 end
             end
 
             for i = #queuedMessages, 1, -1 do
-                if queuedMessages[i] == nil then
-                    table.remove(queuedMessages, i)
-                end
+                if queuedMessages[i] == nil then table.remove(queuedMessages, i) end
             end
         end
     end)

@@ -32,9 +32,7 @@ function module:OnInit()
                         if numItem < 12 then
                             C_Container.UseContainerItem(bag, slot)
                         else
-                            C_Timer.After(numItem / 8, function()
-                                C_Container.UseContainerItem(bag, slot)
-                            end)
+                            C_Timer.After(numItem / 8, function() C_Container.UseContainerItem(bag, slot) end)
                         end
                     end
                 end
@@ -46,11 +44,17 @@ function module:OnInit()
             local s = floor((totalCost % 10000) / 100) or 0
             local c = totalCost % 100
             DEFAULT_CHAT_FRAME:AddMessage(
-                "|cffffff00" .. (L.AUTO_SELL_INFO or "Sold junk: ") .. "|r"
-                .. format(GOLD_AMOUNT_TEXTURE, g, 0, 0) .. " "
-                .. format(SILVER_AMOUNT_TEXTURE, s, 0, 0) .. " "
-                .. format(COPPER_AMOUNT_TEXTURE, c, 0, 0),
-                255, 255, 255
+                "|cffffff00"
+                    .. (L.AUTO_SELL_INFO or "Sold junk: ")
+                    .. "|r"
+                    .. format(GOLD_AMOUNT_TEXTURE, g, 0, 0)
+                    .. " "
+                    .. format(SILVER_AMOUNT_TEXTURE, s, 0, 0)
+                    .. " "
+                    .. format(COPPER_AMOUNT_TEXTURE, c, 0, 0),
+                255,
+                255,
+                255
             )
         end
     end)

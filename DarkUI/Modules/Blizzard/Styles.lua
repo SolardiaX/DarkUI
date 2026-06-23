@@ -116,9 +116,7 @@ local function darkenFrame(frame, recursive)
     if recursive and frame.GetChildren then
         for i = 1, select("#", frame:GetChildren()) do
             local child = select(i, frame:GetChildren())
-            if child then
-                darkenFrame(child, true)
-            end
+            if child then darkenFrame(child, true) end
         end
     end
 end
@@ -204,9 +202,7 @@ function module:OnInit()
     local function processBaseFrames()
         for _, name in ipairs(BASE_FRAMES) do
             local frame = _G[name]
-            if frame then
-                darkenFrame(frame, true)
-            end
+            if frame then darkenFrame(frame, true) end
         end
     end
 
@@ -239,34 +235,22 @@ function module:OnInit()
     end)
 
     -- Re-process on certain events where Blizzard resets colors
-    self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
-        C_Timer.After(0.5, processBaseFrames)
-    end)
+    self:RegisterEvent("PLAYER_ENTERING_WORLD", function() C_Timer.After(0.5, processBaseFrames) end)
 
     -- Dynamic content: GossipFrame / QuestFrame
     local function darkenScrollContent(frame)
         if not frame then return end
-        C_Timer.After(0.2, function()
-            darkenFrame(frame, true)
-        end)
+        C_Timer.After(0.2, function() darkenFrame(frame, true) end)
     end
 
     if GossipFrame then
-        GossipFrame:HookScript("OnShow", function()
-            darkenScrollContent(GossipFrame)
-        end)
+        GossipFrame:HookScript("OnShow", function() darkenScrollContent(GossipFrame) end)
         if GossipFrame.GreetingPanel and GossipFrame.GreetingPanel.ScrollBox then
-            hooksecurefunc(GossipFrame.GreetingPanel.ScrollBox, "FullUpdate", function()
-                darkenScrollContent(GossipFrame.GreetingPanel)
-            end)
+            hooksecurefunc(GossipFrame.GreetingPanel.ScrollBox, "FullUpdate", function() darkenScrollContent(GossipFrame.GreetingPanel) end)
         end
     end
 
-    if QuestFrame then
-        QuestFrame:HookScript("OnShow", function()
-            darkenScrollContent(QuestFrame)
-        end)
-    end
+    if QuestFrame then QuestFrame:HookScript("OnShow", function() darkenScrollContent(QuestFrame) end) end
 
     -- Vigor bar decorations
     local function darkenVigor()
@@ -285,17 +269,13 @@ function module:OnInit()
                     local grandchild = select(j, child:GetChildren())
                     if grandchild and grandchild.Frame and grandchild.Frame.GetAtlas then
                         local atlas = grandchild.Frame:GetAtlas()
-                        if atlas and atlas:find("vigor", 1, true) then
-                            darkenTexture(grandchild.Frame)
-                        end
+                        if atlas and atlas:find("vigor", 1, true) then darkenTexture(grandchild.Frame) end
                     end
                 end
             end
         end
     end
 
-    self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", function()
-        C_Timer.After(0.3, darkenVigor)
-    end)
+    self:RegisterEvent("PLAYER_MOUNT_DISPLAY_CHANGED", function() C_Timer.After(0.3, darkenVigor) end)
     C_Timer.After(1.5, darkenVigor)
 end

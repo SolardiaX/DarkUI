@@ -10,22 +10,16 @@ local format, pcall = format, pcall
 local function getSourceColor(srcUnit)
     if UnitIsPlayer(srcUnit) then
         local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[select(2, UnitClass(srcUnit))]
-        if color then
-            return format("|cff%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255)
-        end
+        if color then return format("|cff%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255) end
     else
         local color = FACTION_BAR_COLORS[UnitReaction(srcUnit, "player")]
-        if color then
-            return format("|cff%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255)
-        end
+        if color then return format("|cff%02x%02x%02x", color.r * 255, color.g * 255, color.b * 255) end
     end
     return "|cffffffff"
 end
 
 local function addCasterLine(tooltip, data)
-    if not data or not data.sourceUnit then
-        return
-    end
+    if not data or not data.sourceUnit then return end
 
     local caster = data.sourceUnit
     if issecretvalue(caster) then
@@ -45,38 +39,28 @@ local function addCasterLine(tooltip, data)
 end
 
 function module:OnInit()
-    if not C.aura or not C.aura.enable or not C.aura.show_caster then
-        return
-    end
+    if not C.aura or not C.aura.enable or not C.aura.show_caster then return end
 
     hooksecurefunc(GameTooltip, "SetUnitAura", function(self, ...)
-        if self:IsForbidden() then
-            return
-        end
+        if self:IsForbidden() then return end
         local data = C_UnitAuras.GetAuraDataByIndex(...)
         addCasterLine(self, data)
     end)
 
     hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", function(self, ...)
-        if self:IsForbidden() then
-            return
-        end
+        if self:IsForbidden() then return end
         local data = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
         addCasterLine(self, data)
     end)
 
     hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", function(self, ...)
-        if self:IsForbidden() then
-            return
-        end
+        if self:IsForbidden() then return end
         local data = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
         addCasterLine(self, data)
     end)
 
     hooksecurefunc(GameTooltip, "SetUnitAuraByAuraInstanceID", function(self, ...)
-        if self:IsForbidden() then
-            return
-        end
+        if self:IsForbidden() then return end
         local data = C_UnitAuras.GetAuraDataByAuraInstanceID(...)
         addCasterLine(self, data)
     end)

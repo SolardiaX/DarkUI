@@ -12,9 +12,7 @@ local dataEvent = {}
 local function onCurrencyDisplayUpdate(...)
     local currencyType, quantity, quantityChange = ...
 
-    if not cfg.loot then
-        return
-    end
+    if not cfg.loot then return end
 
     if quantityChange and quantityChange > 0 then
         wipe(dataEvent)

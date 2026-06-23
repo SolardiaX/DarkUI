@@ -1,8 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 
-if not C.nameplate.enable then
-    return
-end
+if not C.nameplate.enable then return end
 
 ------------------------------------------------------------------------
 -- Nameplates
@@ -37,12 +35,8 @@ local bar_border
 local arrow
 
 local function createBorderFrame(frame, point)
-    if point == nil then
-        point = frame
-    end
-    if point.backdrop then
-        return
-    end
+    if point == nil then point = frame end
+    if point.backdrop then return end
 
     frame.backdrop = frame:CreateTexture(nil, "BORDER")
     frame.backdrop:SetDrawLayer("BORDER", -8)
@@ -94,30 +88,22 @@ local function updateTarget(self)
         self:SetSize(cfg.width + cfg.ad_width, cfg.height + cfg.ad_height)
         self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - (cfg.height + cfg.ad_height))
         self.Castbar.Icon:SetSize((cfg.height + cfg.ad_height) * 2 + 8, (cfg.height + cfg.ad_height) * 2 + 8)
-        if cfg.class_icons == true then
-            self.Class.Icon:SetSize((cfg.height + cfg.ad_height) * 2 + 8, (cfg.height + cfg.ad_height) * 2 + 8)
-        end
+        if cfg.class_icons == true then self.Class.Icon:SetSize((cfg.height + cfg.ad_height) * 2 + 8, (cfg.height + cfg.ad_height) * 2 + 8) end
 
         self:SetAlpha(1)
-        if self.arrow then
-            self.arrow:Show()
-        end
+        if self.arrow then self.arrow:Show() end
     else
         self:SetSize(cfg.width, cfg.height)
         self.Castbar:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMLEFT", 0, -8 - cfg.height)
         self.Castbar.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
-        if cfg.class_icons == true then
-            self.Class.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
-        end
+        if cfg.class_icons == true then self.Class.Icon:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8) end
         if UnitExists("target") and not isMe then
             self:SetAlpha(0.5)
         else
             self:SetAlpha(1)
         end
 
-        if self.arrow then
-            self.arrow:Hide()
-        end
+        if self.arrow then self.arrow:Hide() end
     end
 
     self.Health.border:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
@@ -144,27 +130,19 @@ end
 local function castColor(self)
     local spellID = self.spellID
     if not issecretvalue(spellID) and cfg.majorSpells[spellID] then
-        if LCG then
-            LCG.ShowOverlayGlow(self.Icon.glowFrame)
-        end
+        if LCG then LCG.ShowOverlayGlow(self.Icon.glowFrame) end
     else
-        if LCG then
-            LCG.HideOverlayGlow(self.Icon.glowFrame)
-        end
+        if LCG then LCG.HideOverlayGlow(self.Icon.glowFrame) end
     end
 end
 
 -- Threat color
 local function threatColor(self, forced)
-    if UnitIsPlayer(self.unit) then
-        return
-    end
+    if UnitIsPlayer(self.unit) then return end
     local combat = UnitAffectingCombat("player")
     local threatStatus = UnitThreatSituation("player", self.unit)
 
-    if cfg.enhance_threat ~= true then
-        setColorBorder(self.Health, unpack(C.media.border_color))
-    end
+    if cfg.enhance_threat ~= true then setColorBorder(self.Health, unpack(C.media.border_color)) end
 
     if UnitIsTapDenied(self.unit) then
         self.Health:SetStatusBarColor(0.6, 0.6, 0.6)
@@ -207,9 +185,7 @@ local function threatColor(self, forced)
                         for i = 1, GetNumGroupMembers() do
                             if UnitExists("raid" .. i) and not UnitIsUnit("raid" .. i, "player") then
                                 local isTanking = UnitDetailedThreatSituation("raid" .. i, self.unit)
-                                if isTanking and UnitGroupRolesAssigned("raid" .. i) == "TANK" then
-                                    self.Health:SetStatusBarColor(unpack(cfg.offtank_color))
-                                end
+                                if isTanking and UnitGroupRolesAssigned("raid" .. i) == "TANK" then self.Health:SetStatusBarColor(unpack(cfg.offtank_color)) end
                             end
                         end
                     end
@@ -280,15 +256,11 @@ end
 
 -- Auras functions
 local function aurasFilter(element, unit, data)
-    if element.alwaysShowStealable and not data.isHarmfulAura and type(data.dispelName) ~= "nil" and (not UnitIsPlayer(unit)) then
-        return true
-    end
+    if element.alwaysShowStealable and not data.isHarmfulAura and type(data.dispelName) ~= "nil" and (not UnitIsPlayer(unit)) then return true end
     return (data.isPlayerAura and data.isNameplateOnlyAura) and not (data.isHarmfulAura and data.isCrowdControlAura)
 end
 
-local function ccFilter(element, unit, data)
-    return data.isHarmfulAura and data.isCrowdControlAura
-end
+local function ccFilter(element, unit, data) return data.isHarmfulAura and data.isCrowdControlAura end
 
 local function aurasPostCreateIcon(element, button)
     core.PostCreateButton(element, button)
@@ -298,9 +270,7 @@ local function aurasPostCreateIcon(element, button)
     button:EnableMouse(false)
 
     button.Cooldown.noCooldownCount = not cfg.show_timers
-    if button.Cooldown.SetHideCountdownNumbers then
-        button.Cooldown:SetHideCountdownNumbers(not cfg.show_timers)
-    end
+    if button.Cooldown.SetHideCountdownNumbers then button.Cooldown:SetHideCountdownNumbers(not cfg.show_timers) end
 
     button.Count:SetPoint("BOTTOM", button, "TOP", 0, -8)
     button.Count:SetJustifyH("CENTER")
@@ -339,9 +309,7 @@ local function aurasPostUpdateIcon(element, button, unit, data)
 end
 
 local function callback(self, event, unit)
-    if not self then
-        return
-    end
+    if not self then return end
     if unit then
         local unitGUID = UnitGUID(unit)
         if unitGUID and canaccessvalue(unitGUID) then
@@ -380,9 +348,7 @@ local function callback(self, event, unit)
 
             local blizzPlate = self:GetParent().UnitFrame
             self.widgetContainer = blizzPlate and blizzPlate.WidgetContainer
-            if self.widgetContainer then
-                self.widgetContainer:SetParent(self)
-            end
+            if self.widgetContainer then self.widgetContainer:SetParent(self) end
         end
     end
 end
@@ -444,9 +410,7 @@ local function style(self, unit)
 
     -- Hide Blizzard Power Bar
     hooksecurefunc(_G.NamePlateDriverFrame, "SetupClassNameplateBars", function(frame)
-        if not frame or frame:IsForbidden() then
-            return
-        end
+        if not frame or frame:IsForbidden() then return end
         if frame.classNamePlatePowerBar then
             frame.classNamePlatePowerBar:Hide()
             frame.classNamePlatePowerBar:UnregisterAllEvents()
@@ -513,9 +477,7 @@ local function style(self, unit)
     self.Castbar.Time:SetPoint("RIGHT", self.Castbar, "RIGHT", 0, 0)
     self.Castbar.Time:SetFont(unpack(C.media.standard_font))
 
-    self.Castbar.CustomTimeText = function(self, duration)
-        self.Time:SetFormattedText("%.1f", duration:GetRemainingDuration())
-    end
+    self.Castbar.CustomTimeText = function(self, duration) self.Time:SetFormattedText("%.1f", duration:GetRemainingDuration()) end
 
     -- Create Cast Name Text
     if cfg.show_castbar_name == true then
@@ -620,9 +582,7 @@ local function style(self, unit)
     self.Health:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
     self.Health:RegisterEvent("UNIT_THREAT_LIST_UPDATE")
 
-    self.Health:SetScript("OnEvent", function()
-        threatColor(main)
-    end)
+    self.Health:SetScript("OnEvent", function() threatColor(main) end)
 
     self.Health.PostUpdate = healthPostUpdate
 
@@ -647,13 +607,9 @@ local function style(self, unit)
     self.disableMovement = true
 end
 
-function module:PLAYER_REGEN_ENABLED()
-    SetCVar("nameplateShowEnemies", 0)
-end
+function module:PLAYER_REGEN_ENABLED() SetCVar("nameplateShowEnemies", 0) end
 
-function module:PLAYER_REGEN_DISABLED()
-    SetCVar("nameplateShowEnemies", 1)
-end
+function module:PLAYER_REGEN_DISABLED() SetCVar("nameplateShowEnemies", 1) end
 
 function module:PLAYER_ENTERING_WORLD()
     if InCombatLockdown() then
@@ -669,9 +625,7 @@ function module:PLAYER_LOGIN()
     SetCVar("nameplateResourceOnTarget", 0)
     SetCVar("nameplateMotion", 1)
 
-    if cfg.enhance_threat == true then
-        SetCVar("threatWarning", 3)
-    end
+    if cfg.enhance_threat == true then SetCVar("threatWarning", 3) end
     SetCVar("nameplateGlobalScale", 1)
     SetCVar("namePlateMinScale", 1)
     SetCVar("namePlateMaxScale", 1)
@@ -686,9 +640,7 @@ function module:PLAYER_LOGIN()
     SetCVar("nameplateOtherTopInset", cfg.clamp and 0.08 or -1)
     SetCVar("nameplateOtherBottomInset", cfg.clamp and 0.1 or -1)
 
-    if cfg.only_name then
-        SetCVar("nameplateShowOnlyNames", 1)
-    end
+    if cfg.only_name then SetCVar("nameplateShowOnlyNames", 1) end
 
     local vis = cfg.visibility
     if vis then

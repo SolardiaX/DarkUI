@@ -35,21 +35,15 @@ local shownMapCache, exploredCache, fileDataIDs, storedTex = {}, {}, {}, {}
 ------------------------------------------------------------------------
 
 local function getPlayerMapPos(mapID)
-    if not mapID then
-        return
-    end
+    if not mapID then return end
     tempVec2D.x, tempVec2D.y = UnitPosition("player")
-    if not tempVec2D.x then
-        return
-    end
+    if not tempVec2D.x then return end
 
     local mapRect = mapRects[mapID]
     if not mapRect then
         local pos1 = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0)))
         local pos2 = select(2, C_Map_GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1)))
-        if not pos1 or not pos2 then
-            return
-        end
+        if not pos1 or not pos2 then return end
         mapRect = { pos1, pos2 }
         mapRect[2]:Subtract(mapRect[1])
         mapRects[mapID] = mapRect
@@ -60,13 +54,9 @@ local function getPlayerMapPos(mapID)
 end
 
 local function getCursorCoords()
-    if not WorldMapFrame.ScrollContainer:IsMouseOver() then
-        return
-    end
+    if not WorldMapFrame.ScrollContainer:IsMouseOver() then return end
     local cursorX, cursorY = WorldMapFrame.ScrollContainer:GetNormalizedCursorPosition()
-    if cursorX < 0 or cursorX > 1 or cursorY < 0 or cursorY > 1 then
-        return
-    end
+    if cursorX < 0 or cursorX > 1 or cursorY < 0 or cursorY > 1 then return end
     return cursorX, cursorY
 end
 
@@ -80,9 +70,7 @@ end
 
 local function updateCoords(self, elapsed)
     self.elapsed = (self.elapsed or 0) + elapsed
-    if self.elapsed < 0.1 then
-        return
-    end
+    if self.elapsed < 0.1 then return end
     self.elapsed = 0
 
     local cursorX, cursorY = getCursorCoords()
@@ -113,9 +101,7 @@ end
 -- Map Reveal (Fog Removal)
 ------------------------------------------------------------------------
 
-local function getStringFromInfo(info)
-    return format("W%dH%dX%dY%d", info.textureWidth, info.textureHeight, info.offsetX, info.offsetY)
-end
+local function getStringFromInfo(info) return format("W%dH%dX%dY%d", info.textureWidth, info.textureHeight, info.offsetX, info.offsetY) end
 
 local function getShapesFromString(str)
     local w, h, x, y = strmatch(str, "W(%d*)H(%d*)X(%d*)Y(%d*)")
@@ -138,16 +124,12 @@ local function mapDataRefreshOverlays(self, fullUpdate)
     wipe(storedTex)
 
     local mapID = WorldMapFrame.mapID
-    if not mapID then
-        return
-    end
+    if not mapID then return end
 
     local mapArtID = C_Map_GetMapArtID(mapID)
     local rawMapData = E:Module("Map").RawMapData
     local mapData = mapArtID and rawMapData[mapArtID]
-    if not mapData then
-        return
-    end
+    if not mapData then return end
 
     local exploredMapTextures = C_MapExplorationInfo_GetExploredMapTextures(mapID)
     if exploredMapTextures then
@@ -156,14 +138,10 @@ local function mapDataRefreshOverlays(self, fullUpdate)
         end
     end
 
-    if not self.layerIndex then
-        self.layerIndex = WorldMapFrame.ScrollContainer:GetCurrentLayerIndex()
-    end
+    if not self.layerIndex then self.layerIndex = WorldMapFrame.ScrollContainer:GetCurrentLayerIndex() end
     local layers = C_Map_GetMapArtLayers(mapID)
     local layerInfo = layers and layers[self.layerIndex]
-    if not layerInfo then
-        return
-    end
+    if not layerInfo then return end
 
     local TILE_SIZE_WIDTH = layerInfo.tileWidth
     local TILE_SIZE_HEIGHT = layerInfo.tileHeight
@@ -182,9 +160,7 @@ local function mapDataRefreshOverlays(self, fullUpdate)
                     textureFileHeight = TILE_SIZE_HEIGHT
                 else
                     texturePixelHeight = mod(height, TILE_SIZE_HEIGHT)
-                    if texturePixelHeight == 0 then
-                        texturePixelHeight = TILE_SIZE_HEIGHT
-                    end
+                    if texturePixelHeight == 0 then texturePixelHeight = TILE_SIZE_HEIGHT end
                     textureFileHeight = 16
                     while textureFileHeight < texturePixelHeight do
                         textureFileHeight = textureFileHeight * 2
@@ -198,9 +174,7 @@ local function mapDataRefreshOverlays(self, fullUpdate)
                         textureFileWidth = TILE_SIZE_WIDTH
                     else
                         texturePixelWidth = width % TILE_SIZE_WIDTH
-                        if texturePixelWidth == 0 then
-                            texturePixelWidth = TILE_SIZE_WIDTH
-                        end
+                        if texturePixelWidth == 0 then texturePixelWidth = TILE_SIZE_WIDTH end
                         textureFileWidth = 16
                         while textureFileWidth < texturePixelWidth do
                             textureFileWidth = textureFileWidth * 2
@@ -221,9 +195,7 @@ local function mapDataRefreshOverlays(self, fullUpdate)
 
                     texture:SetShown(cfg.revealMap)
 
-                    if fullUpdate then
-                        self.textureLoadGroup:AddTexture(texture)
-                    end
+                    if fullUpdate then self.textureLoadGroup:AddTexture(texture) end
                     tinsert(shownMapCache, texture)
                 end
             end
@@ -244,14 +216,10 @@ end
 -- WorldMapFrame is a protected frame: SetScale/SetPoint on it are blocked in
 -- combat lockdown, so bail out then to avoid an ADDON_ACTION_BLOCKED message.
 local function applyMapLayout(self)
-    if InCombatLockdown() then
-        return
-    end
+    if InCombatLockdown() then return end
 
     local scale = self.isMaximized and cfg.maxScale or cfg.scale
-    if self:GetScale() ~= scale then
-        self:SetScale(scale)
-    end
+    if self:GetScale() ~= scale then self:SetScale(scale) end
 
     self:ClearAllPoints()
     self:SetPoint(unpack(cfg.position))
@@ -326,9 +294,7 @@ local function setupRevealMap()
         local checked = self:GetChecked()
         cfg.revealMap = checked
         DB:Set("map.worldmap.revealMap", checked)
-        if explorationPin then
-            explorationPin:RefreshOverlays(true)
-        end
+        if explorationPin then explorationPin:RefreshOverlays(true) end
     end)
 end
 
@@ -337,12 +303,8 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
-    if C_AddOns.IsAddOnLoaded("Mapster") then
-        return
-    end
+    if not cfg or not cfg.enable then return end
+    if C_AddOns.IsAddOnLoaded("Mapster") then return end
 
     setupMapScale()
     setupCoords()

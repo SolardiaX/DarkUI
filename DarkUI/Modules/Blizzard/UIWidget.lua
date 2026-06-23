@@ -158,9 +158,7 @@ function module:OnInit()
             end
         end
         for _, widget in pairs(UIWidgetBelowMinimapContainerFrame.widgetFrames) do
-            if widget.widgetType == Enum.UIWidgetVisualizationType.CaptureBar then
-                skinCaptureBar(nil, widget)
-            end
+            if widget.widgetType == Enum.UIWidgetVisualizationType.CaptureBar then skinCaptureBar(nil, widget) end
         end
     end
 
@@ -170,9 +168,7 @@ function module:OnInit()
     skinFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
     skinFrame:SetScript("OnEvent", updateWidgets)
 
-    hooksecurefunc(UIWidgetTemplateStatusBarMixin, "Setup", function(widget)
-        skinStatusBar(widget)
-    end)
+    hooksecurefunc(UIWidgetTemplateStatusBarMixin, "Setup", function(widget) skinStatusBar(widget) end)
 
     hooksecurefunc(UIWidgetTemplateScenarioHeaderCurrenciesAndBackgroundMixin, "Setup", function(widgetInfo)
         widgetInfo.Frame:SetAlpha(0)

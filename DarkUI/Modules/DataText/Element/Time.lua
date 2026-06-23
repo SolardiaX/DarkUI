@@ -75,9 +75,7 @@ local function checkTimeWalker()
     C_Calendar_OpenCalendar()
 
     local numEvents = C_Calendar_GetNumDayEvents(0, today.monthDay)
-    if numEvents <= 0 then
-        return
-    end
+    if numEvents <= 0 then return end
 
     for i = 1, numEvents do
         local info = C_Calendar_GetDayEvent(0, today.monthDay, i)
@@ -90,12 +88,8 @@ local function checkTimeWalker()
 end
 
 local function checkTexture(texture)
-    if not walkerTexture then
-        return
-    end
-    if walkerTexture == texture or walkerTexture == texture - 1 then
-        return true
-    end
+    if not walkerTexture then return end
+    if walkerTexture == texture or walkerTexture == texture - 1 then return true end
 end
 
 ------------------------------------------------------------------------
@@ -162,9 +156,7 @@ module:Inject("Time", {
             local info = C_CurrencyInfo.GetCurrencyInfo(3028)
             keyName = info and info.name or "Restored Coffer Key"
         end
-        if TimeManagerClockButton then
-            TimeManagerClockButton:Hide()
-        end
+        if TimeManagerClockButton then TimeManagerClockButton:Hide() end
     end,
     OnEvent = function(self, event)
         if event == "PLAYER_ENTERING_WORLD" then
@@ -251,9 +243,7 @@ module:Inject("Time", {
         for _, v in pairs(questlist) do
             if IsQuestFlaggedCompleted(v.id) then
                 local showEntry = true
-                if v.name == "Timewarped" then
-                    showEntry = isTimeWalker and checkTexture(v.texture)
-                end
+                if v.name == "Timewarped" then showEntry = isTimeWalker and checkTexture(v.texture) end
                 if showEntry then
                     addTitle(QUESTS_LABEL)
                     local displayName = v.questName and QuestUtils_GetQuestName(v.id) or v.name
@@ -265,9 +255,7 @@ module:Inject("Time", {
         -- Delves Keys
         local currentKeys, maxKeys = 0, #delvesKeys
         for _, questID in pairs(delvesKeys) do
-            if IsQuestFlaggedCompleted(questID) then
-                currentKeys = currentKeys + 1
-            end
+            if IsQuestFlaggedCompleted(questID) then currentKeys = currentKeys + 1 end
         end
         if currentKeys > 0 then
             addTitle(QUESTS_LABEL)
@@ -313,9 +301,7 @@ module:Inject("Time", {
             end
             ToggleCalendar()
         elseif button == "MiddleButton" then
-            if not WeeklyRewardsFrame then
-                C_AddOns.LoadAddOn("Blizzard_WeeklyRewards")
-            end
+            if not WeeklyRewardsFrame then C_AddOns.LoadAddOn("Blizzard_WeeklyRewards") end
             if WeeklyRewardsFrame then
                 if InCombatLockdown() then
                     WeeklyRewardsFrame:SetShown(not WeeklyRewardsFrame:IsShown())

@@ -27,15 +27,11 @@ local rollTypes = { [1] = "need", [2] = "greed", [3] = "disenchant", [4] = "tran
 -- Roll button callbacks
 ------------------------------------------------------------------------
 local function clickRoll(frame)
-    if not frame.parent.rollID then
-        return
-    end
+    if not frame.parent.rollID then return end
     RollOnLoot(frame.parent.rollID, frame.rolltype)
 end
 
-local function hideTip()
-    GameTooltip:Hide()
-end
+local function hideTip() GameTooltip:Hide() end
 
 local function hideTipCursor()
     GameTooltip:Hide()
@@ -45,26 +41,18 @@ end
 local function setTip(frame)
     GameTooltip:SetOwner(frame, "ANCHOR_TOPLEFT")
     GameTooltip:SetText(frame.tiptext)
-    if not frame:IsEnabled() then
-        GameTooltip:AddLine(frame.errtext, 1, 0.2, 0.2, 1)
-    end
+    if not frame:IsEnabled() then GameTooltip:AddLine(frame.errtext, 1, 0.2, 0.2, 1) end
     for name, roll in pairs(frame.parent.rolls) do
-        if roll == rollTypes[frame.rolltype] then
-            GameTooltip:AddLine(name, 1, 1, 1)
-        end
+        if roll == rollTypes[frame.rolltype] then GameTooltip:AddLine(name, 1, 1, 1) end
     end
     GameTooltip:Show()
 end
 
 local function setItemTip(frame)
-    if not frame.link then
-        return
-    end
+    if not frame.link then return end
     GameTooltip:SetOwner(frame, "ANCHOR_TOPLEFT")
     GameTooltip:SetHyperlink(frame.link)
-    if IsShiftKeyDown() then
-        GameTooltip_ShowCompareItem()
-    end
+    if IsShiftKeyDown() then GameTooltip_ShowCompareItem() end
     if IsModifiedClick("DRESSUP") then
         ShowInspectCursor()
     else
@@ -112,9 +100,7 @@ local function onEvent(frame, event, rollID)
         frame:Hide()
     else
         cancelledRolls[rollID] = true
-        if frame.rollID ~= rollID then
-            return
-        end
+        if frame.rollID ~= rollID then return end
 
         frame.rollID = nil
         frame.time = nil
@@ -123,9 +109,7 @@ local function onEvent(frame, event, rollID)
 end
 
 local function statusUpdate(frame)
-    if not frame.parent.rollID then
-        return
-    end
+    if not frame.parent.rollID then return end
     local t = GetLootRollTimeLeft(frame.parent.rollID)
     local perc = t / frame.parent.time
     frame.spark:SetPoint("CENTER", frame, "LEFT", perc * frame:GetWidth(), 0)
@@ -140,9 +124,7 @@ local function createRollButton(parent, ntex, ptex, htex, rolltype, tiptext, ...
     f:SetPoint(...)
     f:SetSize(28, 28)
     f:SetNormalTexture(ntex)
-    if ptex then
-        f:SetPushedTexture(ptex)
-    end
+    if ptex then f:SetPushedTexture(ptex) end
     f:SetHighlightTexture(htex)
     f.rolltype = rolltype
     f.parent = parent
@@ -299,9 +281,7 @@ end
 ------------------------------------------------------------------------
 local function getFrame()
     for _, f in ipairs(frames) do
-        if not f.rollID then
-            return f
-        end
+        if not f.rollID then return f end
     end
 
     local f = createRollFrame()
@@ -326,9 +306,7 @@ end
 -- START_LOOT_ROLL handler
 ------------------------------------------------------------------------
 local function startLootRoll(rollID, time)
-    if cancelledRolls[rollID] then
-        return
-    end
+    if cancelledRolls[rollID] then return end
 
     local f = getFrame()
     f.rollID = rollID
@@ -393,9 +371,7 @@ local function startLootRoll(rollID, time)
     f.status:SetMinMaxValues(0, time)
     f.status:SetValue(time)
 
-    if f.button.__backdrop then
-        f.button.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7)
-    end
+    if f.button.__backdrop then f.button.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7) end
 
     f:SetPoint("CENTER", WorldFrame, "CENTER")
     f:Show()
@@ -419,9 +395,7 @@ function module:OnInit()
         UIParent:UnregisterEvent("START_LOOT_ROLL")
         UIParent:UnregisterEvent("CANCEL_LOOT_ROLL")
 
-        self:SetScript("OnEvent", function(_, _, ...)
-            startLootRoll(...)
-        end)
+        self:SetScript("OnEvent", function(_, _, ...) startLootRoll(...) end)
     end)
 
     SlashCmdList.TESTROLL = function()
@@ -433,9 +407,7 @@ function module:OnInit()
         else
             local item = items[math.random(1, #items)]
             local name, _, quality, _, _, _, _, _, _, texture = C_Item.GetItemInfo(item)
-            if not name then
-                return
-            end
+            if not name then return end
 
             local r, g, b = C_Item.GetItemQualityColor(quality or 1)
 
@@ -449,9 +421,7 @@ function module:OnInit()
             f.status:SetValue(math.random(50, 90))
             f.status:SetStatusBarColor(r, g, b, 0.7)
 
-            if f.button.__backdrop then
-                f.button.__backdrop:SetBackdropBorderColor(r, g, b, 0.7)
-            end
+            if f.button.__backdrop then f.button.__backdrop:SetBackdropBorderColor(r, g, b, 0.7) end
 
             f.button.link = "item:" .. item .. ":0:0:0:0:0:0:0"
             local greed = math.random(0, 1)

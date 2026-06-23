@@ -36,8 +36,6 @@ function module:OnInit()
         end
 
         local areaID = C_Map.GetBestMapForUnit("player") or 0
-        if BG_MAPS[areaID] or inBattlefield then
-            RepopMe()
-        end
+        if BG_MAPS[areaID] or inBattlefield then RepopMe() end
     end)
 end

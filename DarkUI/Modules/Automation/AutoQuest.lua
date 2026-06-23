@@ -67,36 +67,75 @@ local BLOCKLIST_ITEMS = {
 
 local BLOCKLIST_QUESTS = {
     -- 6.0 coins
-    [36054] = true, [37454] = true, [37455] = true,
-    [36055] = true, [37452] = true, [37453] = true,
-    [36056] = true, [37456] = true, [37457] = true,
+    [36054] = true,
+    [37454] = true,
+    [37455] = true,
+    [36055] = true,
+    [37452] = true,
+    [37453] = true,
+    [36056] = true,
+    [37456] = true,
+    [37457] = true,
     [36057] = true,
     -- 7.0 coins
-    [43892] = true, [43893] = true, [43894] = true,
-    [43895] = true, [43896] = true, [43897] = true,
-    [47851] = true, [47864] = true, [47865] = true,
+    [43892] = true,
+    [43893] = true,
+    [43894] = true,
+    [43895] = true,
+    [43896] = true,
+    [43897] = true,
+    [47851] = true,
+    [47864] = true,
+    [47865] = true,
     -- 8.0 coins
-    [52834] = true, [52838] = true, [52835] = true,
-    [52839] = true, [52837] = true, [52840] = true,
+    [52834] = true,
+    [52838] = true,
+    [52835] = true,
+    [52839] = true,
+    [52837] = true,
+    [52840] = true,
     -- 7.0 valuable resources
-    [48910] = true, [48634] = true, [48911] = true,
-    [48635] = true, [48799] = true,
+    [48910] = true,
+    [48634] = true,
+    [48911] = true,
+    [48635] = true,
+    [48799] = true,
     -- 8.0 emissaries
-    [54451] = true, [53982] = true, [54453] = true,
-    [54454] = true, [54455] = true, [54456] = true,
-    [54457] = true, [54458] = true, [54460] = true,
-    [54461] = true, [54462] = true, [55348] = true,
+    [54451] = true,
+    [53982] = true,
+    [54453] = true,
+    [54454] = true,
+    [54455] = true,
+    [54456] = true,
+    [54457] = true,
+    [54458] = true,
+    [54460] = true,
+    [54461] = true,
+    [54462] = true,
+    [55348] = true,
     [55976] = true,
     -- 9.0
     [64541] = true,
     -- 10.0
-    [70183] = true, [70184] = true, [70186] = true,
-    [70187] = true, [70190] = true, [70188] = true,
-    [70189] = true, [70191] = true, [70192] = true,
-    [70193] = true, [70194] = true,
-    [75164] = true, [75165] = true, [75166] = true, [75167] = true,
+    [70183] = true,
+    [70184] = true,
+    [70186] = true,
+    [70187] = true,
+    [70190] = true,
+    [70188] = true,
+    [70189] = true,
+    [70191] = true,
+    [70192] = true,
+    [70193] = true,
+    [70194] = true,
+    [75164] = true,
+    [75165] = true,
+    [75166] = true,
+    [75167] = true,
     -- 12.0 bonus rolls
-    [95279] = true, [95304] = true, [95290] = true,
+    [95279] = true,
+    [95304] = true,
+    [95290] = true,
 }
 
 local DARKMOON_GOSSIP = {
@@ -134,8 +173,12 @@ local IGNORE_GOSSIP = {
 local ITEM_CASH_REWARDS = {
     [45724] = 1e5, -- Champion's Purse
     [64491] = 2e6, -- Royal Reward
-    [138127] = 15, [138129] = 11, [138131] = 24,
-    [138123] = 15, [138125] = 16, [138133] = 27,
+    [138127] = 15,
+    [138129] = 11,
+    [138131] = 24,
+    [138123] = 15,
+    [138125] = 16,
+    [138133] = 27,
 }
 
 ------------------------------------------------------------------------
@@ -164,13 +207,9 @@ local function isQuestIgnored(questID, _, override)
 
     if override then return false end
 
-    if C_QuestLog.IsQuestTrivial(questID) and not C_Minimap.IsTrackingHiddenQuests() then
-        return true
-    end
+    if C_QuestLog.IsQuestTrivial(questID) and not C_Minimap.IsTrackingHiddenQuests() then return true end
 
-    if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) and not C_Minimap.IsTrackingAccountCompletedQuests() then
-        return true
-    end
+    if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) and not C_Minimap.IsTrackingAccountCompletedQuests() then return true end
 
     if BLOCKLIST_QUESTS[questID] then return true end
 
@@ -182,9 +221,7 @@ local function waitForQuestData(questID, callback)
     C_QuestLog.RequestLoadQuestByID(questID)
 end
 
-local function waitForItemData(itemID, callback)
-    Item:CreateFromItemID(itemID):ContinueOnItemLoad(callback)
-end
+local function waitForItemData(itemID, callback) Item:CreateFromItemID(itemID):ContinueOnItemLoad(callback) end
 
 ------------------------------------------------------------------------
 -- Lifecycle
@@ -206,9 +243,7 @@ function module:OnInit()
         if paused then return end
         if BLOCKLIST_NPCS[getNPCID()] then return end
 
-        if C_PlayerInteractionManager.IsInteractingWithNpcOfType(Enum.PlayerInteractionType.TaxiNode) then
-            return
-        end
+        if C_PlayerInteractionManager.IsInteractingWithNpcOfType(Enum.PlayerInteractionType.TaxiNode) then return end
 
         local gossipQuests = {}
         local gossipSkips = {}
@@ -235,9 +270,7 @@ function module:OnInit()
             return
         end
 
-        if (C_GossipInfo.GetNumActiveQuests() + C_GossipInfo.GetNumAvailableQuests()) > 0 then
-            return
-        end
+        if (C_GossipInfo.GetNumActiveQuests() + C_GossipInfo.GetNumAvailableQuests()) > 0 then return end
 
         if #gossip ~= 1 then return end
         if not gossip[1].gossipOptionID then return end
@@ -245,9 +278,7 @@ function module:OnInit()
 
         local _, instanceType = GetInstanceInfo()
         if instanceType == "raid" then
-            if GetNumGroupMembers() <= 1 then
-                C_GossipInfo.SelectOption(gossip[1].gossipOptionID)
-            end
+            if GetNumGroupMembers() <= 1 then C_GossipInfo.SelectOption(gossip[1].gossipOptionID) end
         else
             C_GossipInfo.SelectOption(gossip[1].gossipOptionID)
         end
@@ -290,9 +321,7 @@ function module:OnInit()
         for index = 1, GetNumActiveQuests() do
             local questID = GetActiveQuestID(index)
             local _, isComplete = GetActiveTitle(index)
-            if isComplete and not isQuestIgnored(questID) then
-                SelectActiveQuest(index)
-            end
+            if isComplete and not isQuestIgnored(questID) then SelectActiveQuest(index) end
         end
 
         for index = 1, GetNumAvailableQuests() do
@@ -333,9 +362,7 @@ function module:OnInit()
             AcceptQuest()
         end
 
-        if popups[questID] then
-            RemoveAutoQuestPopUp(questID)
-        end
+        if popups[questID] then RemoveAutoQuestPopUp(questID) end
     end
     self:RegisterEvent("QUEST_DETAIL", handleQuestDetail)
 
@@ -386,9 +413,7 @@ function module:OnInit()
 
             if highestValueIndex then
                 local rewardButtons = QuestInfoRewardsFrame and QuestInfoRewardsFrame.RewardButtons
-                if rewardButtons and rewardButtons[highestValueIndex] then
-                    QuestInfoItem_OnClick(rewardButtons[highestValueIndex])
-                end
+                if rewardButtons and rewardButtons[highestValueIndex] then QuestInfoItem_OnClick(rewardButtons[highestValueIndex]) end
             end
         end
         selectBest()
@@ -428,8 +453,6 @@ function module:OnInit()
 
     -- MODIFIER_STATE_CHANGED: pause key (SHIFT)
     self:RegisterEvent("MODIFIER_STATE_CHANGED", function(_, _, key, state)
-        if string.sub(key, 2) == "SHIFT" then
-            paused = state == 1
-        end
+        if string.sub(key, 2) == "SHIFT" then paused = state == 1 end
     end)
 end

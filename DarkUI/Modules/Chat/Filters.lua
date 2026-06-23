@@ -13,30 +13,16 @@ local cfg = C.chat
 function module:OnInit()
     if cfg.filter then
         ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", function()
-            if IsResting() then
-                return true
-            end
+            if IsResting() then return true end
         end)
         ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_YELL", function()
-            if IsResting() then
-                return true
-            end
+            if IsResting() then return true end
         end)
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_JOIN", function()
-            return true
-        end)
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_LEAVE", function()
-            return true
-        end)
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_NOTICE", function()
-            return true
-        end)
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_AFK", function()
-            return true
-        end)
-        ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", function()
-            return true
-        end)
+        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_JOIN", function() return true end)
+        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_LEAVE", function() return true end)
+        ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_NOTICE", function() return true end)
+        ChatFrame_AddMessageEventFilter("CHAT_MSG_AFK", function() return true end)
+        ChatFrame_AddMessageEventFilter("CHAT_MSG_DND", function() return true end)
 
         DUEL_WINNER_KNOCKOUT = ""
         DUEL_WINNER_RETREAT = ""
@@ -66,9 +52,7 @@ function module:OnInit()
 
         local function systemFilter(_, _, text)
             if issecretvalue(text) then return end
-            if text and text == "" then
-                return true
-            end
+            if text and text == "" then return true end
         end
         ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", systemFilter)
     end
@@ -77,18 +61,14 @@ function module:OnInit()
         local function repeatMessageFilter(self, _, text, sender)
             if issecretvalue(text) or issecretvalue(sender) then return end
             sender = Ambiguate(sender, "guild")
-            if sender == E.myName or UnitIsInMyGuild(sender) then
-                return
-            end
+            if sender == E.myName or UnitIsInMyGuild(sender) then return end
 
             if not self.repeatMessages or self.repeatCount > 100 then
                 self.repeatCount = 0
                 self.repeatMessages = {}
             end
             local lastMessage = self.repeatMessages[sender]
-            if lastMessage == text then
-                return true
-            end
+            if lastMessage == text then return true end
             self.repeatMessages[sender] = text
             self.repeatCount = self.repeatCount + 1
         end
@@ -104,14 +84,10 @@ function module:OnInit()
         local function tradeFilter(_, _, text, sender)
             if issecretvalue(text) or issecretvalue(sender) then return end
             sender = Ambiguate(sender, "guild")
-            if sender == E.myName or UnitIsInMyGuild(sender) then
-                return
-            end
+            if sender == E.myName or UnitIsInMyGuild(sender) then return end
 
             for _, value in pairs(SpamList) do
-                if text:lower():match(value) then
-                    return true
-                end
+                if text:lower():match(value) then return true end
             end
         end
 

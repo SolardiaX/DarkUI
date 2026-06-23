@@ -33,20 +33,12 @@ function module:OnInit()
         for i = 1, self:GetNumChildren() do
             local child = select(i, self:GetChildren())
             if child and child:IsObjectType("Button") and not child.__darkHooked then
-                child:HookScript("OnEnter", function()
-                    VehicleSeatIndicator:SetAlpha(1)
-                end)
-                child:HookScript("OnLeave", function()
-                    VehicleSeatIndicator:SetAlpha(0)
-                end)
+                child:HookScript("OnEnter", function() VehicleSeatIndicator:SetAlpha(1) end)
+                child:HookScript("OnLeave", function() VehicleSeatIndicator:SetAlpha(0) end)
                 child.__darkHooked = true
             end
         end
     end)
-    VehicleSeatIndicator:HookScript("OnEnter", function(self)
-        self:SetAlpha(1)
-    end)
-    VehicleSeatIndicator:HookScript("OnLeave", function(self)
-        self:SetAlpha(0)
-    end)
+    VehicleSeatIndicator:HookScript("OnEnter", function(self) self:SetAlpha(1) end)
+    VehicleSeatIndicator:HookScript("OnLeave", function(self) self:SetAlpha(0) end)
 end

@@ -36,16 +36,12 @@ local SENDER_OFFSET_Y = 2
 local messageQueue = {}
 local processedBubbles = {}
 
-local function queueMessage(sender, guid)
-    tinsert(messageQueue, { sender = sender, guid = guid, time = GetTime() })
-end
+local function queueMessage(sender, guid) tinsert(messageQueue, { sender = sender, guid = guid, time = GetTime() }) end
 
 local function cleanQueue()
     local now = GetTime()
     for i = #messageQueue, 1, -1 do
-        if now - messageQueue[i].time > 2 then
-            tremove(messageQueue, i)
-        end
+        if now - messageQueue[i].time > 2 then tremove(messageQueue, i) end
     end
 end
 
@@ -54,14 +50,10 @@ end
 ------------------------------------------------------------------------
 
 local function skinBubble(container)
-    if container.isSkinned then
-        return
-    end
+    if container.isSkinned then return end
 
     local frame = container:GetChildren()
-    if not frame then
-        return
-    end
+    if not frame then return end
 
     local text
     for i = 1, select("#", frame:GetRegions()) do
@@ -72,9 +64,7 @@ local function skinBubble(container)
         end
     end
 
-    if not text then
-        return
-    end
+    if not text then return end
 
     -- Hide all Blizzard textures
     for i = 1, select("#", frame:GetRegions()) do
@@ -85,9 +75,7 @@ local function skinBubble(container)
         end
     end
 
-    if frame.Tail then
-        frame.Tail:SetAlpha(0)
-    end
+    if frame.Tail then frame.Tail:SetAlpha(0) end
 
     -- Scale
     frame:SetScale(cfg.bubble_scale or 0.9)
@@ -141,9 +129,7 @@ local function skinBubble(container)
     frame:HookScript("OnHide", function()
         container.isSkinned = false
         processedBubbles[container] = nil
-        if container._sender then
-            container._sender:SetText("")
-        end
+        if container._sender then container._sender:SetText("") end
     end)
 
     container.isSkinned = true
@@ -154,9 +140,7 @@ end
 ------------------------------------------------------------------------
 
 local function updateBubble(container, guid, sender)
-    if not container._sender then
-        return
-    end
+    if not container._sender then return end
 
     -- Sender name with class color
     if sender then
@@ -164,9 +148,7 @@ local function updateBubble(container, guid, sender)
         local color
         if guid and guid ~= "" then
             local _, class = GetPlayerInfoByGUID(guid)
-            if class then
-                color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
-            end
+            if class then color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class] end
         end
         if color then
             container._sender:SetText(format("|cff%02x%02x%02x%s|r", color.r * 255, color.g * 255, color.b * 255, displayName))
@@ -183,23 +165,17 @@ end
 local function shouldHide()
     if cfg.bubble_hide_instance then
         local inInstance, instanceType = IsInInstance()
-        if inInstance and (instanceType == "party" or instanceType == "scenario") then
-            return true
-        end
+        if inInstance and (instanceType == "party" or instanceType == "scenario") then return true end
     end
     if cfg.bubble_hide_raid then
         local inInstance, instanceType = IsInInstance()
-        if inInstance and instanceType == "raid" then
-            return true
-        end
+        if inInstance and instanceType == "raid" then return true end
     end
     return false
 end
 
 local function processBubbles()
-    if shouldHide() then
-        return
-    end
+    if shouldHide() then return end
 
     for _, container in pairs(C_ChatBubbles_GetAllChatBubbles()) do
         if not processedBubbles[container] then
@@ -216,17 +192,13 @@ local function processBubbles()
                 end
             end
 
-            if not processedBubbles[container] then
-                processedBubbles[container] = true
-            end
+            if not processedBubbles[container] then processedBubbles[container] = true end
         end
     end
 
     -- Cleanup hidden bubbles
     for bubble in pairs(processedBubbles) do
-        if not bubble:IsShown() then
-            processedBubbles[bubble] = nil
-        end
+        if not bubble:IsShown() then processedBubbles[bubble] = nil end
     end
 end
 
@@ -252,9 +224,7 @@ function module:OnInit()
     end
 
     handler:SetScript("OnEvent", function(_, event, _, sender, _, _, _, _, _, _, _, _, _, guid)
-        if not GetCVarBool(events[event]) then
-            return
-        end
+        if not GetCVarBool(events[event]) then return end
 
         queueMessage(sender, guid)
         cleanQueue()

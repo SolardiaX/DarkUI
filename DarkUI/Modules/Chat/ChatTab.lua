@@ -15,9 +15,7 @@ local function updateFS(self, _, ...)
     local fstring = self:GetFontString()
     fstring:SetFont(STANDARD_TEXT_FONT, 14, "OUTLINE")
     fstring:SetShadowOffset(1, -1)
-    if ... then
-        fstring:SetTextColor(...)
-    end
+    if ... then fstring:SetTextColor(...) end
 end
 
 local function onEnter(self)
@@ -42,24 +40,18 @@ local function onLeave(self)
 end
 
 local function chatFrame2SetAlpha(_, alpha)
-    if CombatLogQuickButtonFrame_Custom then
-        CombatLogQuickButtonFrame_Custom:SetAlpha(alpha)
-    end
+    if CombatLogQuickButtonFrame_Custom then CombatLogQuickButtonFrame_Custom:SetAlpha(alpha) end
 end
 
 local function chatFrame2GetAlpha()
-    if CombatLogQuickButtonFrame_Custom then
-        return CombatLogQuickButtonFrame_Custom:GetAlpha()
-    end
+    if CombatLogQuickButtonFrame_Custom then return CombatLogQuickButtonFrame_Custom:GetAlpha() end
 end
 
 local function faneifyTab(frame, selected)
     local i = frame:GetID()
 
     if frame:GetParent() == _G.ChatConfigFrameChatTabManager then
-        if selected then
-            frame.Text:SetTextColor(1, 1, 1)
-        end
+        if selected then frame.Text:SetTextColor(1, 1, 1) end
         frame:SetAlpha(1)
     else
         if not frame.Fane then
@@ -72,9 +64,7 @@ local function faneifyTab(frame, selected)
                 else
                     frame.SetAlpha = chatFrame2SetAlpha
                     frame.GetAlpha = chatFrame2GetAlpha
-                    if CombatLogQuickButtonFrame_Custom then
-                        CombatLogQuickButtonFrame_Custom:SetAlpha(0.4)
-                    end
+                    if CombatLogQuickButtonFrame_Custom then CombatLogQuickButtonFrame_Custom:SetAlpha(0.4) end
                 end
             end
             frame.Fane = true
@@ -110,16 +100,12 @@ function module:OnInit()
     end
 
     if C_AddOns.IsAddOnLoaded("Blizzard_CombatLog") then
-        if CombatLogQuickButtonFrame_Custom then
-            CombatLogQuickButtonFrame_Custom:SetAlpha(0.4)
-        end
+        if CombatLogQuickButtonFrame_Custom then CombatLogQuickButtonFrame_Custom:SetAlpha(0.4) end
     else
         local function onAddonLoaded(_, _, addon)
             if addon == "Blizzard_CombatLog" then
                 self:UnregisterEvent("ADDON_LOADED", onAddonLoaded)
-                if CombatLogQuickButtonFrame_Custom then
-                    CombatLogQuickButtonFrame_Custom:SetAlpha(0.4)
-                end
+                if CombatLogQuickButtonFrame_Custom then CombatLogQuickButtonFrame_Custom:SetAlpha(0.4) end
             end
         end
         self:RegisterEvent("ADDON_LOADED", onAddonLoaded)

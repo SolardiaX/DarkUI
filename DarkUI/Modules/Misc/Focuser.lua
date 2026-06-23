@@ -32,9 +32,7 @@ local function setupFocus(frame)
 end
 
 local function onCreateFrame(_, name, _, template)
-    if name and template == "SecureUnitButtonTemplate" then
-        setupFocus(_G[name])
-    end
+    if name and template == "SecureUnitButtonTemplate" then setupFocus(_G[name]) end
 end
 
 function module:OnInit()
@@ -50,9 +48,7 @@ function module:OnInit()
 
     self:RegisterEvent("PLAYER_ENTERING_WORLD", function()
         for _, object in next, oUF.objects do
-            if not object.focuser then
-                setupFocus(object)
-            end
+            if not object.focuser then setupFocus(object) end
         end
     end)
 
@@ -66,9 +62,7 @@ function module:OnInit()
 
     self:RegisterEvent("GROUP_ROSTER_UPDATE", function()
         for _, object in next, oUF.objects do
-            if not object.focuser then
-                setupFocus(object)
-            end
+            if not object.focuser then setupFocus(object) end
         end
     end)
 end

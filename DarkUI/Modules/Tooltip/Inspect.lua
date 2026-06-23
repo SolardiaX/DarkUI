@@ -67,17 +67,13 @@ local function getSlotItemLevel(unit, slot)
         local lineData = data.lines[i]
         if not lineData then break end
         local text = lineData.leftText
-        if text and strfind(text, ITEM_LEVEL_PATTERN) then
-            return tonumber(strmatch(text, "(%d+)%)?$"))
-        end
+        if text and strfind(text, ITEM_LEVEL_PATTERN) then return tonumber(strmatch(text, "(%d+)%)?$")) end
     end
     return nil
 end
 
 local function calcAverageItemLevel(unit)
-    if UnitIsUnit(unit, "player") then
-        return select(2, GetAverageItemLevel())
-    end
+    if UnitIsUnit(unit, "player") then return select(2, GetAverageItemLevel()) end
 
     local total = 0
     local weapon = { 0, 0 }
@@ -96,9 +92,7 @@ local function calcAverageItemLevel(unit)
                     local _, _, _, equipLoc = C_Item.GetItemInfoInstant(link)
                     weapon[slot - 15] = ilvl
                     haveWeapon = haveWeapon + 1
-                    if equipLoc and TWO_HANDERS[equipLoc] then
-                        twohand = twohand + 1
-                    end
+                    if equipLoc and TWO_HANDERS[equipLoc] then twohand = twohand + 1 end
                 end
             end
         end
@@ -217,7 +211,10 @@ local function onInspectReady(_, _, guid)
     if guid ~= currentGUID then return end
 
     local db = cache[guid]
-    if not db then db = {}; cache[guid] = db end
+    if not db then
+        db = {}
+        cache[guid] = db
+    end
 
     if cfg.talents then
         local name, icon = getUnitSpec(currentUnit)
@@ -313,9 +310,7 @@ local function inspectUnit(unit)
         end
     end
 
-    if db and db.getTime and not IsShiftKeyDown() and (GetTime() - db.getTime < CACHE_TIMEOUT) then
-        return
-    end
+    if db and db.getTime and not IsShiftKeyDown() and (GetTime() - db.getTime < CACHE_TIMEOUT) then return end
 
     if not UnitIsVisible(unit) or UnitIsDeadOrGhost("player") or UnitOnTaxi("player") then return end
     if InspectFrame and InspectFrame:IsShown() then return end
@@ -343,7 +338,6 @@ local function onTooltipSetUnit(self)
     inspectUnit(unit)
 end
 
-
 ------------------------------------------------------------------------
 -- Lifecycle
 ------------------------------------------------------------------------
@@ -363,7 +357,5 @@ function module:OnInit()
         module:UnregisterEvent("INSPECT_READY")
     end)
 
-    if cfg.average_lvl then
-        self:RegisterEvent("UNIT_INVENTORY_CHANGED", onInventoryChanged)
-    end
+    if cfg.average_lvl then self:RegisterEvent("UNIT_INVENTORY_CHANGED", onInventoryChanged) end
 end

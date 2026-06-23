@@ -13,14 +13,24 @@ local SMOOTH = { 1, 0, 0, 1, 1, 0, 0, 1, 0 }
 local GUILD_INDEX_MAX = 12
 
 local BC = {}
-for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do BC[v] = k end
-for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do BC[v] = k end
+for k, v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+    BC[v] = k
+end
+for k, v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
+    BC[v] = k
+end
 
 local function hex(r, g, b)
     if type(r) == "table" then
-        if r.r then r, g, b = r.r, r.g, r.b else r, g, b = unpack(r) end
+        if r.r then
+            r, g, b = r.r, r.g, r.b
+        else
+            r, g, b = unpack(r)
+        end
     end
-    if not r or not g or not b then r, g, b = 1, 1, 1 end
+    if not r or not g or not b then
+        r, g, b = 1, 1, 1
+    end
     return format("|cff%02x%02x%02x", r * 255, g * 255, b * 255)
 end
 
@@ -75,12 +85,10 @@ local guildRankColor = setmetatable({}, {
     end,
 })
 
-if CUSTOM_CLASS_COLORS then
-    CUSTOM_CLASS_COLORS:RegisterCallback(function()
-        wipe(classColorRaw)
-        wipe(classColor)
-    end)
-end
+if CUSTOM_CLASS_COLORS then CUSTOM_CLASS_COLORS:RegisterCallback(function()
+    wipe(classColorRaw)
+    wipe(classColor)
+end) end
 
 ------------------------------------------------------------------------
 -- FriendsList
@@ -99,23 +107,34 @@ local function hookFriendsList(self)
             if button.buttonType == FRIENDS_BUTTON_TYPE_WOW then
                 local info = C_FriendList.GetFriendInfoByIndex(button.id)
                 if info and info.connected then
-                    nameText = classColor[info.className] .. info.name .. "|r, " .. format(FRIENDS_LEVEL_TEMPLATE, diffColor[info.level] .. info.level .. "|r", info.className)
-                    if info.area == playerArea then
-                        infoText = "|cff00ff00" .. info.area .. "|r"
-                    end
+                    nameText = classColor[info.className]
+                        .. info.name
+                        .. "|r, "
+                        .. format(FRIENDS_LEVEL_TEMPLATE, diffColor[info.level] .. info.level .. "|r", info.className)
+                    if info.area == playerArea then infoText = "|cff00ff00" .. info.area .. "|r" end
                 end
             elseif button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
                 local accountInfo = C_BattleNet.GetFriendAccountInfo(button.id)
-                if accountInfo and accountInfo.gameAccountInfo and accountInfo.gameAccountInfo.isOnline and accountInfo.gameAccountInfo.clientProgram == BNET_CLIENT_WOW then
+                if
+                    accountInfo
+                    and accountInfo.gameAccountInfo
+                    and accountInfo.gameAccountInfo.isOnline
+                    and accountInfo.gameAccountInfo.clientProgram == BNET_CLIENT_WOW
+                then
                     local accountName = accountInfo.accountName
                     local charName = accountInfo.gameAccountInfo.characterName
                     local class = accountInfo.gameAccountInfo.className
                     local areaName = accountInfo.gameAccountInfo.areaName
                     if accountName and charName and class then
-                        nameText = format(BATTLENET_NAME_FORMAT, accountName, "") .. " " .. FRIENDS_WOW_NAME_COLOR_CODE .. "(" .. classColor[class] .. charName .. FRIENDS_WOW_NAME_COLOR_CODE .. ")"
-                        if areaName and areaName == playerArea then
-                            infoText = "|cff00ff00" .. areaName .. "|r"
-                        end
+                        nameText = format(BATTLENET_NAME_FORMAT, accountName, "")
+                            .. " "
+                            .. FRIENDS_WOW_NAME_COLOR_CODE
+                            .. "("
+                            .. classColor[class]
+                            .. charName
+                            .. FRIENDS_WOW_NAME_COLOR_CODE
+                            .. ")"
+                        if areaName and areaName == playerArea then infoText = "|cff00ff00" .. areaName .. "|r" end
                     end
                 end
             end
@@ -136,17 +155,11 @@ local function hookCommunities(self)
     if not memberInfo then return end
     if memberInfo.presence == Enum.ClubMemberPresence.Offline then return end
 
-    if memberInfo.zone and memberInfo.zone == playerArea then
-        self.Zone:SetText("|cff4cff4c" .. memberInfo.zone)
-    end
+    if memberInfo.zone and memberInfo.zone == playerArea then self.Zone:SetText("|cff4cff4c" .. memberInfo.zone) end
 
-    if memberInfo.level then
-        self.Level:SetText(diffColor[memberInfo.level] .. memberInfo.level)
-    end
+    if memberInfo.level then self.Level:SetText(diffColor[memberInfo.level] .. memberInfo.level) end
 
-    if memberInfo.guildRankOrder and memberInfo.guildRank then
-        self.Rank:SetText(guildRankColor[memberInfo.guildRankOrder] .. memberInfo.guildRank)
-    end
+    if memberInfo.guildRankOrder and memberInfo.guildRank then self.Rank:SetText(guildRankColor[memberInfo.guildRankOrder] .. memberInfo.guildRank) end
 end
 
 ------------------------------------------------------------------------
@@ -160,9 +173,7 @@ local function hookPVPResults(self, rowData)
     local n, r = strsplit("-", name, 2)
     n = classColor[className] .. n .. "|r"
 
-    if name == UnitName("player") then
-        n = ">>> " .. n .. " <<<"
-    end
+    if name == UnitName("player") then n = ">>> " .. n .. " <<<" end
 
     if r then
         local faction = rowData.faction
@@ -182,13 +193,7 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if FriendsListFrame and FriendsListFrame.ScrollBox then
-        hooksecurefunc(FriendsListFrame.ScrollBox, "Update", hookFriendsList)
-    end
-    if CommunitiesMemberListEntryMixin then
-        hooksecurefunc(CommunitiesMemberListEntryMixin, "RefreshExpandedColumns", hookCommunities)
-    end
-    if PVPCellNameMixin then
-        hooksecurefunc(PVPCellNameMixin, "Populate", hookPVPResults)
-    end
+    if FriendsListFrame and FriendsListFrame.ScrollBox then hooksecurefunc(FriendsListFrame.ScrollBox, "Update", hookFriendsList) end
+    if CommunitiesMemberListEntryMixin then hooksecurefunc(CommunitiesMemberListEntryMixin, "RefreshExpandedColumns", hookCommunities) end
+    if PVPCellNameMixin then hooksecurefunc(PVPCellNameMixin, "Populate", hookPVPResults) end
 end

@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
-
 local TIER = 11
 local INSTANCE = 1296 -- Liberation of Undermine
 

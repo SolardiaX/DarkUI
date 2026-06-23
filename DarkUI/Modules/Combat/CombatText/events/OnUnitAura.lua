@@ -13,9 +13,7 @@ local dataEvent = {}
 local function onUnitAura(...)
     local unitTarget, updateInfo = ...
 
-    if unitTarget ~= "player" then
-        return
-    end
+    if unitTarget ~= "player" then return end
 
     if updateInfo.addedAuras and #updateInfo.addedAuras > 0 then
         for _, auraInfo in ipairs(updateInfo.addedAuras) do

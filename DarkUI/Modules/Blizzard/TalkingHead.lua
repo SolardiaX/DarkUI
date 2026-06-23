@@ -16,9 +16,7 @@ function module:OnInit()
     if not cfg.custom_position then return end
 
     self:RegisterEventOnce("PLAYER_ENTERING_WORLD", function()
-        if not _G.TalkingHeadFrame then
-            TalkingHead_LoadUI()
-        end
+        if not _G.TalkingHeadFrame then TalkingHead_LoadUI() end
 
         TalkingHeadFrame.ignoreFramePositionManager = true
         TalkingHeadFrame.ignoreFrameLayout = true

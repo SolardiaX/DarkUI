@@ -33,9 +33,7 @@ local initComplete
 -- Helpers
 ------------------------------------------------------------------------
 
-local function getQuestLinkOrName(questID)
-    return GetQuestLink(questID) or C_QuestLog_GetTitleForQuestID(questID) or ""
-end
+local function getQuestLinkOrName(questID) return GetQuestLink(questID) or C_QuestLog_GetTitleForQuestID(questID) or "" end
 
 local function sendQuestMsg(msg)
     if IsPartyLFG() or C_PartyInfo.IsPartyWalkIn() then
@@ -74,9 +72,7 @@ local function onQuestProgress(_, _, _, msg)
             local _, _, _, cur, max = strfind(msg, "(.*)[:：]%s*([-%d]+)%s*/%s*([-%d]+)%s*$")
             cur, max = tonumber(cur), tonumber(max)
             if cur and max and max >= 10 then
-                if mod(cur, floor(max / 5)) == 0 then
-                    sendQuestMsg(msg)
-                end
+                if mod(cur, floor(max / 5)) == 0 then sendQuestMsg(msg) end
             else
                 sendQuestMsg(msg)
             end

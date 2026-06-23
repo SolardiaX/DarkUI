@@ -45,9 +45,7 @@ local optDefaults = {
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     C_Container.SetSortBagsRightToLeft(true)
     C_Container.SetInsertItemsLeftToRight(false)
@@ -75,9 +73,7 @@ function module:OnInit()
             local numSlots = GetContainerNumSlots(bag)
             for slot = 1, numSlots do
                 local item = cbNivaya:GetItemInfo(bag, slot)
-                if item.id then
-                    self.knownItems[item.id] = (self.knownItems[item.id] or 0) + (item.count or 1)
-                end
+                if item.id then self.knownItems[item.id] = (self.knownItems[item.id] or 0) + (item.count or 1) end
             end
         end
     end
@@ -104,24 +100,14 @@ function module:OnInit()
 end
 
 function module:LoadDefaults()
-    if not DB:GetStats("cBnivCfg") then
-        DB:SetStats("cBnivCfg", {})
-    end
-    if not DB:GetStats("cBniv_CatInfo") then
-        DB:SetStats("cBniv_CatInfo", {})
-    end
-    if not DB:GetStats("cB_KnownItems", true) then
-        DB:SetStats("cB_KnownItems", {}, true)
-    end
-    if not DB:GetStats("cBniv", true) then
-        DB:SetStats("cBniv", { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }, true)
-    end
+    if not DB:GetStats("cBnivCfg") then DB:SetStats("cBnivCfg", {}) end
+    if not DB:GetStats("cBniv_CatInfo") then DB:SetStats("cBniv_CatInfo", {}) end
+    if not DB:GetStats("cB_KnownItems", true) then DB:SetStats("cB_KnownItems", {}, true) end
+    if not DB:GetStats("cBniv", true) then DB:SetStats("cBniv", { BagPos = optDefaults.BagPos, BankPos = optDefaults.BankPos }, true) end
 
     local opts = DB:GetStats("cBnivCfg")
     for k, v in pairs(optDefaults) do
-        if type(opts[k]) == "nil" then
-            opts[k] = v
-        end
+        if type(opts[k]) == "nil" then opts[k] = v end
     end
 
     self.opts = opts
@@ -210,17 +196,13 @@ function cbNivaya:CreateAnchors()
         tar.AnchorTo = src
         tar.AnchorDir = dir
         if src then
-            if not src.AnchorTargets then
-                src.AnchorTargets = {}
-            end
+            if not src.AnchorTargets then src.AnchorTargets = {} end
             src.AnchorTargets[tar] = true
         end
     end
 
     for _, v in pairs(bags) do
-        if v.name ~= "cBniv_Bag" and v.name ~= "cBniv_Bank" then
-            v:ClearAllPoints()
-        end
+        if v.name ~= "cBniv_Bag" and v.name ~= "cBniv_Bank" then v:ClearAllPoints() end
         v.AnchorTo = nil
         v.AnchorDir = nil
         v.AnchorTargets = nil
@@ -267,9 +249,7 @@ end
 module.bagHidden = {}
 
 function cbNivaya:UpdateAnchors(src)
-    if not src.AnchorTargets then
-        return
-    end
+    if not src.AnchorTargets then return end
     for v in pairs(src.AnchorTargets) do
         local t, u = v.AnchorTo, v.AnchorDir
         if t then
@@ -300,9 +280,7 @@ end
 local function showBags(impl, ...)
     for i = 1, select("#", ...) do
         local bag = select(i, ...)
-        if not module.bagHidden[bag.name] then
-            bag:Show()
-        end
+        if not module.bagHidden[bag.name] then bag:Show() end
     end
 end
 
@@ -402,9 +380,7 @@ function module:ResetNewItems()
         local numSlots = GetContainerNumSlots(bag)
         for slot = 1, numSlots do
             local item = cbNivaya:GetItemInfo(bag, slot)
-            if item.id then
-                knownItems[item.id] = (knownItems[item.id] or 0) + (item.count or 1)
-            end
+            if item.id then knownItems[item.id] = (knownItems[item.id] or 0) + (item.count or 1) end
         end
     end
     cbNivaya:UpdateBags()
@@ -412,9 +388,7 @@ end
 
 function module:ResetItemClass()
     for k, v in pairs(self.itemClass) do
-        if v == "NoClass" then
-            self.itemClass[k] = nil
-        end
+        if v == "NoClass" then self.itemClass[k] = nil end
     end
     cbNivaya:UpdateBags()
 end

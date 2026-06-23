@@ -16,9 +16,7 @@ local C_Timer_After = C_Timer.After
 function module:ForEachWindow(callback)
     for i = 1, 3 do
         local window = _G["DamageMeterSessionWindow" .. i]
-        if window then
-            callback(window)
-        end
+        if window then callback(window) end
     end
 end
 
@@ -31,13 +29,9 @@ function module:OnInit()
     if not cfg or not cfg.enable then return end
     module.cfg = cfg
 
-    if C_CVar.GetCVar("damageMeterEnabled") ~= "1" then
-        C_CVar.SetCVar("damageMeterEnabled", "1")
-    end
+    if C_CVar.GetCVar("damageMeterEnabled") ~= "1" then C_CVar.SetCVar("damageMeterEnabled", "1") end
 
-    if C_AddOns.IsAddOnLoaded("Blizzard_DamageMeter") then
-        self:Bootstrap()
-    end
+    if C_AddOns.IsAddOnLoaded("Blizzard_DamageMeter") then self:Bootstrap() end
 
     local eventFrame = CreateFrame("Frame")
     eventFrame:RegisterEvent("ADDON_LOADED")

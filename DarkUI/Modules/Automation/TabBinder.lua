@@ -28,13 +28,9 @@ function module:OnInit()
         local pvpType = C_PvP.GetZonePVPInfo()
         local _, zoneType = IsInInstance()
 
-        local targetKey = GetBindingKey("TARGETNEARESTENEMYPLAYER")
-            or GetBindingKey("TARGETNEARESTENEMY")
-            or "TAB"
+        local targetKey = GetBindingKey("TARGETNEARESTENEMYPLAYER") or GetBindingKey("TARGETNEARESTENEMY") or "TAB"
 
-        local lastTargetKey = GetBindingKey("TARGETPREVIOUSENEMYPLAYER")
-            or GetBindingKey("TARGETPREVIOUSENEMY")
-            or "SHIFT-TAB"
+        local lastTargetKey = GetBindingKey("TARGETPREVIOUSENEMYPLAYER") or GetBindingKey("TARGETPREVIOUSENEMY") or "SHIFT-TAB"
 
         local currentBind = GetBindingAction(targetKey)
         local isPvP = (zoneType == "arena" or zoneType == "pvp" or pvpType == "combat")
@@ -44,9 +40,7 @@ function module:OnInit()
 
         if currentBind ~= wantedTarget then
             local success = SetBinding(targetKey, wantedTarget)
-            if lastTargetKey then
-                SetBinding(lastTargetKey, wantedPrev)
-            end
+            if lastTargetKey then SetBinding(lastTargetKey, wantedPrev) end
             if success then
                 SaveBindings(bindSet)
                 RTB_Fail = false

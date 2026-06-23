@@ -127,9 +127,7 @@ local function createStyle(self)
 end
 
 function module:OnInit()
-    if not C.unitframe.partypet.enable then
-        return
-    end
+    if not C.unitframe.partypet.enable then return end
 
     local mediaPath = cfg.mediaPath
     media = {

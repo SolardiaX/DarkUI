@@ -14,9 +14,7 @@ C.aura.raidBuffs = {}
 
 function C.aura:AddClassSpells(list)
     for class, value in pairs(list) do
-        if class == "ALL" or class == E.myClass then
-            C.aura.raidBuffs[class] = value
-        end
+        if class == "ALL" or class == E.myClass then C.aura.raidBuffs[class] = value end
     end
 end
 

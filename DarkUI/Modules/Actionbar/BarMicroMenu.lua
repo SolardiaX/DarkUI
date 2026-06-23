@@ -25,9 +25,7 @@ local buttonList = {
 local num = #buttonList
 
 function module:OnInit()
-    if not cfg then
-        return
-    end
+    if not cfg then return end
 
     local bar = CreateFrame("Frame", "DarkUI_MicroMenuBarHolder", UIParent, "SecureHandlerStateTemplate")
     bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
@@ -68,20 +66,12 @@ function module:OnInit()
 
     RegisterStateDriver(bar, "visibility", "[petbattle] hide; show")
 
-    if cfg.fader_mouseover then
-        E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-    end
+    if cfg.fader_mouseover then E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
 
-    if HelpOpenWebTicketButton then
-        HelpOpenWebTicketButton:Kill()
-    end
+    if HelpOpenWebTicketButton then HelpOpenWebTicketButton:Kill() end
     if MainMenuMicroButton then
-        if MainMenuMicroButton.MainMenuBarPerformanceBar then
-            MainMenuMicroButton.MainMenuBarPerformanceBar:Kill()
-        end
+        if MainMenuMicroButton.MainMenuBarPerformanceBar then MainMenuMicroButton.MainMenuBarPerformanceBar:Kill() end
         MainMenuMicroButton:SetScript("OnUpdate", nil)
     end
-    if MicroMenu and MicroMenu.UpdateHelpTicketButtonAnchor then
-        MicroMenu.UpdateHelpTicketButtonAnchor = E.Dummy
-    end
+    if MicroMenu and MicroMenu.UpdateHelpTicketButtonAnchor then MicroMenu.UpdateHelpTicketButtonAnchor = E.Dummy end
 end

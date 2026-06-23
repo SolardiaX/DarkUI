@@ -15,9 +15,7 @@ local WorldMapFrame = WorldMapFrame
 
 module:Inject("Coords", {
     text = {
-        string = function()
-            return module:Coords()
-        end,
+        string = function() return module:Coords() end,
     },
     OnClick = function()
         if IsShiftKeyDown() then

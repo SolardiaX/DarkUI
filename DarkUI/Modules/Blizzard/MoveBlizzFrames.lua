@@ -16,13 +16,39 @@ function module:OnInit()
     if not cfg.custom_position then return end
 
     local frames = {
-        "CharacterFrame", "ChannelFrame", "TaxiFrame", "QuestFrame", "PVEFrame", "AddonList",
-        "QuestLogPopupDetailFrame", "MerchantFrame", "TradeFrame", "MailFrame", "LootFrame",
-        "FriendsFrame", "CinematicFrame", "TabardFrame", "PetStableFrame", "BankFrame",
-        "PetitionFrame", "HelpFrame", "GossipFrame", "DressUpFrame", "GuildRegistrarFrame",
-        "ChatConfigFrame", "RaidBrowserFrame", "WorldMapFrame", "GameMenuFrame",
-        "GuildInviteFrame", "ItemTextFrame", "OpenMailFrame", "StackSplitFrame",
-        "StaticPopup1", "StaticPopup2", "SettingsPanel", "ProfessionsFrame",
+        "CharacterFrame",
+        "ChannelFrame",
+        "TaxiFrame",
+        "QuestFrame",
+        "PVEFrame",
+        "AddonList",
+        "QuestLogPopupDetailFrame",
+        "MerchantFrame",
+        "TradeFrame",
+        "MailFrame",
+        "LootFrame",
+        "FriendsFrame",
+        "CinematicFrame",
+        "TabardFrame",
+        "PetStableFrame",
+        "BankFrame",
+        "PetitionFrame",
+        "HelpFrame",
+        "GossipFrame",
+        "DressUpFrame",
+        "GuildRegistrarFrame",
+        "ChatConfigFrame",
+        "RaidBrowserFrame",
+        "WorldMapFrame",
+        "GameMenuFrame",
+        "GuildInviteFrame",
+        "ItemTextFrame",
+        "OpenMailFrame",
+        "StackSplitFrame",
+        "StaticPopup1",
+        "StaticPopup2",
+        "SettingsPanel",
+        "ProfessionsFrame",
     }
 
     for _, name in pairs(frames) do
@@ -82,9 +108,7 @@ function module:OnInit()
             local ej = _G.EncounterJournal
             if ej and ej.suggestFrame then
                 local function fixRewardTooltip(rewardFrame)
-                    if rewardFrame.data then
-                        _G.EncounterJournalTooltip:ClearAllPoints()
-                    end
+                    if rewardFrame.data then _G.EncounterJournalTooltip:ClearAllPoints() end
                     AdventureJournal_Reward_OnEnter(rewardFrame)
                 end
                 ej.suggestFrame.Suggestion1.reward:HookScript("OnEnter", fixRewardTooltip)

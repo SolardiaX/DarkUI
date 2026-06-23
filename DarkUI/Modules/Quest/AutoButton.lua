@@ -75,15 +75,11 @@ function module:OnInit()
         button:SetAlpha(1)
         if not InCombatLockdown() then
             button:EnableMouse(true)
-            if item then
-                button:SetAttribute("item", item)
-            end
+            if item then button:SetAttribute("item", item) end
         else
             self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
                 button:EnableMouse(true)
-                if item then
-                    button:SetAttribute("item", item)
-                end
+                if item then button:SetAttribute("item", item) end
                 self:UnregisterEvent("PLAYER_REGEN_ENABLED")
             end)
         end

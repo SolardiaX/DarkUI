@@ -58,9 +58,7 @@ local ExtraButtons_Lite_Size = {
 }
 
 local function createExtraBar(cfg, index)
-    if not _G[cfg.parent] then
-        return
-    end
+    if not _G[cfg.parent] then return end
 
     local name = ExtraButtons_PREFIX .. cfg.name
     local bar = CreateFrame("Frame", name .. "Bar", _G[cfg.parent], "SecureHandlerStateTemplate")
@@ -84,9 +82,7 @@ local function createExtraBar(cfg, index)
     ]]
     )
 
-    LAB.RegisterCallback(bar, "OnButtonUpdate", function(_, btn)
-        btn:SetAlpha(1)
-    end)
+    LAB.RegisterCallback(bar, "OnButtonUpdate", function(_, btn) btn:SetAlpha(1) end)
 
     return bar
 end
@@ -121,19 +117,13 @@ function module:OnEnable()
     self:RegisterEvent("CVAR_UPDATE", function(_, _, var)
         if var == "lockActionBars" then
             if InCombatLockdown() then
-                self:RegisterEventOnce("PLAYER_REGEN_ENABLED", function()
-                    actionButton:UpdateBarConfig(self.bars)
-                end)
+                self:RegisterEventOnce("PLAYER_REGEN_ENABLED", function() actionButton:UpdateBarConfig(self.bars) end)
             else
                 actionButton:UpdateBarConfig(self.bars)
             end
         end
     end)
 
-    self:RegisterEvent("UPDATE_BINDINGS PET_BATTLE_CLOSE", function()
-        actionButton:ReassignBindings(self.bars)
-    end)
-    self:RegisterEvent("PET_BATTLE_OPENING_DONE", function()
-        actionButton:ClearBindings(self.bars)
-    end)
+    self:RegisterEvent("UPDATE_BINDINGS PET_BATTLE_CLOSE", function() actionButton:ReassignBindings(self.bars) end)
+    self:RegisterEvent("PET_BATTLE_OPENING_DONE", function() actionButton:ClearBindings(self.bars) end)
 end

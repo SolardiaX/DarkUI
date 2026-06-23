@@ -6,9 +6,7 @@ local E, C, L = select(2, ...):unpack()
 local MAJOR, MINOR = "DarkUI-ActionButton", 1
 local actionButton = LibStub:NewLibrary(MAJOR, MINOR)
 
-if not actionButton then
-    return
-end
+if not actionButton then return end
 
 local LAB = LibStub("LibActionButton-1.0")
 
@@ -45,24 +43,18 @@ end
 
 function actionButton:UpdateBarConfig(headers)
     for _, bar in next, headers do
-        if bar then
-            self:UpdateButtonConfig(bar)
-        end
+        if bar then self:UpdateButtonConfig(bar) end
     end
 end
 
 function actionButton:ReassignBindings(headers)
-    if InCombatLockdown() then
-        return
-    end
+    if InCombatLockdown() then return end
 
     for _, bar in next, headers do
         if bar and bar.buttons then
             for _, button in next, bar.buttons do
                 for _, key in next, { GetBindingKey(button.keyBoundTarget) } do
-                    if key and key ~= "" then
-                        SetOverrideBindingClick(bar, false, key, button:GetName(), "Keybind")
-                    end
+                    if key and key ~= "" then SetOverrideBindingClick(bar, false, key, button:GetName(), "Keybind") end
                 end
             end
         end
@@ -70,14 +62,10 @@ function actionButton:ReassignBindings(headers)
 end
 
 function actionButton:ClearBindings(headers)
-    if InCombatLockdown() then
-        return
-    end
+    if InCombatLockdown() then return end
 
     for _, bar in next, headers do
-        if bar then
-            ClearOverrideBindings(bar)
-        end
+        if bar then ClearOverrideBindings(bar) end
     end
 end
 

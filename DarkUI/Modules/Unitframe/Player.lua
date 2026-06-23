@@ -148,9 +148,7 @@ local function createBar(self)
     self.AdditionalPower.text:SetPoint("CENTER")
 
     self.AdditionalPower.PostUpdate = function(element, cur, max)
-        if not element.text then
-            return
-        end
+        if not element.text then return end
         if max == 0 then
             element.text:SetText("")
             return

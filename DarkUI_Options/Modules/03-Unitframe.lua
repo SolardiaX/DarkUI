@@ -44,9 +44,7 @@ addon.Hooks["unitframe"] = function(a)
     master:HookScript("OnClick", function(self)
         local checked = self:GetChecked()
         for path, w in pairs(a.widgets) do
-            if path:find("^unitframe%.") and path ~= "unitframe.enable" then
-                w:SetEnabled(checked)
-            end
+            if path:find("^unitframe%.") and path ~= "unitframe.enable" then w:SetEnabled(checked) end
         end
     end)
 
@@ -68,9 +66,7 @@ addon.Hooks["unitframe"] = function(a)
         raidEnable:HookScript("OnClick", function(self)
             local checked = self:GetChecked() and masterChecked
             for path, w in pairs(a.widgets) do
-                if path:find("^unitframe%.raid%.") and path ~= "unitframe.raid.enable" then
-                    w:SetEnabled(checked)
-                end
+                if path:find("^unitframe%.raid%.") and path ~= "unitframe.raid.enable" then w:SetEnabled(checked) end
             end
         end)
     end
@@ -80,18 +76,14 @@ addon.Hooks["unitframe"] = function(a)
         raidDebuffs:HookScript("OnClick", function(self)
             local checked = self:GetChecked() and masterChecked and raidEnable:GetChecked()
             for path, w in pairs(a.widgets) do
-                if path:find("^unitframe%.raid%.raidDebuffs%.") and path ~= "unitframe.raid.raidDebuffs.enable" then
-                    w:SetEnabled(checked)
-                end
+                if path:find("^unitframe%.raid%.raidDebuffs%.") and path ~= "unitframe.raid.raidDebuffs.enable" then w:SetEnabled(checked) end
             end
         end)
     end
 
     -- Apply initial state
     for path, w in pairs(a.widgets) do
-        if path:find("^unitframe%.") and path ~= "unitframe.enable" then
-            w:SetEnabled(masterChecked)
-        end
+        if path:find("^unitframe%.") and path ~= "unitframe.enable" then w:SetEnabled(masterChecked) end
     end
     if standalone and raidEnable then
         local partyChecked = masterChecked and standalone:GetChecked()
@@ -104,16 +96,12 @@ addon.Hooks["unitframe"] = function(a)
 
         local raidChecked = masterChecked and raidEnable:GetChecked()
         for path, w in pairs(a.widgets) do
-            if path:find("^unitframe%.raid%.") and path ~= "unitframe.raid.enable" then
-                w:SetEnabled(raidChecked)
-            end
+            if path:find("^unitframe%.raid%.") and path ~= "unitframe.raid.enable" then w:SetEnabled(raidChecked) end
         end
         if raidDebuffs then
             local debuffChecked = raidChecked and raidDebuffs:GetChecked()
             for path, w in pairs(a.widgets) do
-                if path:find("^unitframe%.raid%.raidDebuffs%.") and path ~= "unitframe.raid.raidDebuffs.enable" then
-                    w:SetEnabled(debuffChecked)
-                end
+                if path:find("^unitframe%.raid%.raidDebuffs%.") and path ~= "unitframe.raid.raidDebuffs.enable" then w:SetEnabled(debuffChecked) end
             end
         end
     end

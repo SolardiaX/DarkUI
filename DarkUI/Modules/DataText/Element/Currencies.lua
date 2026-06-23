@@ -32,16 +32,10 @@ local t_icon = C.datatext.icon_size or 20
 local cfg = module.config.Currencies
 
 local function hasAvailableChildren(list, withZero)
-    if not list or #list == 0 then
-        return false
-    end
-    if withZero then
-        return true
-    end
+    if not list or #list == 0 then return false end
+    if withZero then return true end
     for _, info in ipairs(list) do
-        if info.quantity > 0 then
-            return true
-        end
+        if info.quantity > 0 then return true end
     end
     return false
 end
@@ -143,14 +137,10 @@ module:Inject("Currencies", {
         local goldTable = {}
         wipe(goldTable)
         for char, sts in pairs(DB:GetStats(E.realm) or {}) do
-            if sts.Gold and sts.Gold > 99 then
-                goldTable[#goldTable + 1] = { char, module:FormatGold(5, sts.Gold), sts.Gold }
-            end
+            if sts.Gold and sts.Gold > 99 then goldTable[#goldTable + 1] = { char, module:FormatGold(5, sts.Gold), sts.Gold } end
         end
         tsort(goldTable, function(a, b)
-            if a and b then
-                return a[3] > b[3]
-            end
+            if a and b then return a[3] > b[3] end
         end)
         for _, v in ipairs(goldTable) do
             GameTooltip:AddDoubleLine(v[1], v[2], 1, 1, 1, 1, 1, 1)
@@ -174,9 +164,7 @@ module:Inject("Currencies", {
         while listSize >= i do
             local info = C_CurrencyInfo_GetCurrencyListInfo(i)
             if info.isShowInBackpack then
-                if not currencies[TRACKING] then
-                    currencies[TRACKING] = {}
-                end
+                if not currencies[TRACKING] then currencies[TRACKING] = {} end
                 table_insert(currencies[TRACKING], info)
             elseif info.isHeader then
                 header = info.name

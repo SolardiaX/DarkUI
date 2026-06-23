@@ -43,9 +43,7 @@ function module:OnInit()
 
     self:RegisterEvent("START_TIMER", function()
         for _, b in pairs(TimerTracker.timerList) do
-            if b.bar and not b.bar.skinned then
-                skinBar(b.bar)
-            end
+            if b.bar and not b.bar.skinned then skinBar(b.bar) end
         end
     end)
 end

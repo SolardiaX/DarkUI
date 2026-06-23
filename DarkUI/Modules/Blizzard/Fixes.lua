@@ -30,9 +30,7 @@ GameTooltip:HookScript("OnTooltipCleared", function(self)
         -- nils self.infoList, and crashes the pending table.insert(self.infoList, info).
         -- Hiding next frame skips the case where the rebuild repopulated the tooltip.
         C_Timer.After(0, function()
-            if not self:IsForbidden() and self:IsShown() and self:NumLines() == 0 then
-                self:Hide()
-            end
+            if not self:IsForbidden() and self:IsShown() and self:NumLines() == 0 then self:Hide() end
         end)
     end
 end)
@@ -117,9 +115,7 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
                 if not issecurevariable(frame, "which") then
                     if frame:IsShown() then
                         local info = StaticPopupDialogs[frame.which]
-                        if info and not issecurevariable(info, "OnCancel") then
-                            info.OnCancel()
-                        end
+                        if info and not issecurevariable(info, "OnCancel") then info.OnCancel() end
                         frame:Hide()
                     end
                     frame.which = nil
@@ -145,9 +141,7 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
 
         function NoTaint2_CleanGlobal()
             for k in pairs(global_obj_name) do
-                if not issecurevariable(k) then
-                    _G[k] = nil
-                end
+                if not issecurevariable(k) then _G[k] = nil end
             end
         end
 
@@ -159,14 +153,10 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
         end)
 
         hooksecurefunc(EditModeManagerFrame, "HideSystemSelections", function(self)
-            if self.editModeActive == false then
-                self.editModeActive = nil
-            end
+            if self.editModeActive == false then self.editModeActive = nil end
         end)
 
-        hooksecurefunc(EditModeManagerFrame, "IsEditModeLocked", function()
-            NoTaint2_CleanGlobal()
-        end)
+        hooksecurefunc(EditModeManagerFrame, "IsEditModeLocked", function() NoTaint2_CleanGlobal() end)
 
         local function cleanAll()
             NoTaint2_CleanDropDownList()
@@ -178,9 +168,7 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
         hooksecurefunc(EditModeManagerFrame, "IsShown", function(self)
             if Origin_IsShown(self) then return end
             local stack = debugstack(4)
-            if stack and stack:find('[string "=[C]"]: in function `ShowUIPanel\'\n', 1, true) then
-                cleanAll()
-            end
+            if stack and stack:find('[string "=[C]"]: in function `ShowUIPanel\'\n', 1, true) then cleanAll() end
         end)
     end
 
@@ -207,27 +195,29 @@ if not C_AddOns.IsAddOnLoaded("!!NoTaint2") then
     if not NoTaint2_Proc_CleanActionButtonFlyout then
         NoTaint2_Proc_CleanActionButtonFlyout = 1
         local barsToUpdate = {
-            MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight,
-            StanceBar, PetActionBar, PossessActionBar,
-            MultiBarRight, MultiBarLeft, MultiBar5, MultiBar6, MultiBar7,
+            MainMenuBar,
+            MultiBarBottomLeft,
+            MultiBarBottomRight,
+            StanceBar,
+            PetActionBar,
+            PossessActionBar,
+            MultiBarRight,
+            MultiBarLeft,
+            MultiBar5,
+            MultiBar6,
+            MultiBar7,
         }
         for _, bar in ipairs(barsToUpdate) do
             hooksecurefunc(bar, "UpdateSpellFlyoutDirection", function(self)
-                if not issecurevariable(self, "flyoutDirection") then
-                    self.flyoutDirection = nil
-                end
-                if not issecurevariable(self, "snappedToFrame") then
-                    self.snappedToFrame = nil
-                end
+                if not issecurevariable(self, "flyoutDirection") then self.flyoutDirection = nil end
+                if not issecurevariable(self, "snappedToFrame") then self.snappedToFrame = nil end
             end)
         end
 
         hooksecurefunc("SetClampedTextureRotation", function(texture)
             local parent = texture and texture:GetParent()
             if parent and parent.FlyoutArrowPushed and parent.FlyoutArrowHighlight then
-                if not issecurevariable(texture, "rotationDegrees") then
-                    texture.rotationDegrees = nil
-                end
+                if not issecurevariable(texture, "rotationDegrees") then texture.rotationDegrees = nil end
             end
         end)
     end
@@ -239,9 +229,7 @@ end
 
 if LFGListFrame and LFGListFrame.SearchPanel and LFGListFrame.SearchPanel.FilterButton then
     hooksecurefunc(LFGListFrame.SearchPanel.FilterButton, "SetWidth", function(self, width)
-        if width ~= 94 then
-            self:SetWidth(94)
-        end
+        if width ~= 94 then self:SetWidth(94) end
     end)
 end
 

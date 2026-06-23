@@ -4,16 +4,20 @@ local CHECK, SLIDER, DROP, HEADER = addon.CHECK, addon.SLIDER, addon.DROP, addon
 addon:RegisterTab("aura", L_CATEGORIES_AURA)
 
 addon.OptionList["aura"] = {
-    { CHECK, "aura.enable", L_OPT_AURA_ENABLE, nil, function(widget, a)
-        widget:HookScript("OnClick", function(self)
-            local checked = self:GetChecked()
-            for path, w in pairs(a.widgets) do
-                if path:find("^aura%.") and path ~= "aura.enable" then
-                    w:SetEnabled(checked)
+    {
+        CHECK,
+        "aura.enable",
+        L_OPT_AURA_ENABLE,
+        nil,
+        function(widget, a)
+            widget:HookScript("OnClick", function(self)
+                local checked = self:GetChecked()
+                for path, w in pairs(a.widgets) do
+                    if path:find("^aura%.") and path ~= "aura.enable" then w:SetEnabled(checked) end
                 end
-            end
-        end)
-    end},
+            end)
+        end,
+    },
     { CHECK, "aura.show_caster", L_OPT_AURA_SHOW_CASTER },
     { CHECK, "aura.show_timers", L_OPT_AURA_SHOW_TIMERS },
     { CHECK, "aura.enable_flash", L_OPT_AURA_ENABLE_FLASH },
@@ -28,8 +32,6 @@ addon.Hooks["aura"] = function(a)
     if not master then return end
     local checked = master:GetChecked()
     for path, w in pairs(a.widgets) do
-        if path:find("^aura%.") and path ~= "aura.enable" then
-            w:SetEnabled(checked)
-        end
+        if path:find("^aura%.") and path ~= "aura.enable" then w:SetEnabled(checked) end
     end
 end

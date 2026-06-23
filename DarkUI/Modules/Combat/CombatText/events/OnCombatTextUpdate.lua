@@ -14,13 +14,10 @@ C_CombatText.SetActiveUnit("player")
 local dataEvent = {}
 
 local function onCombatTextUpdate(event)
-  wipe(dataEvent)
-    if event ~= "SPELL_ACTIVE" then
-        return
-    end
+    wipe(dataEvent)
+    if event ~= "SPELL_ACTIVE" then return end
 
     local arg1, arg2 = C_CombatText.GetCurrentEventInfo()
-
 
     dataEvent.recipientUnit = "player"
     dataEvent.recipientGUID = PLAYER_GUID

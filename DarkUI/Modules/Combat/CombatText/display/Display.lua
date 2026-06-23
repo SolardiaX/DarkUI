@@ -117,16 +117,12 @@ local function createPool()
 end
 
 local function getAvailableFrame()
-    if #framePool > 0 then
-        return table.remove(framePool)
-    end
+    if #framePool > 0 then return table.remove(framePool) end
     return MessageFrame.new(animationFrame)
 end
 
 local function returnFrame(messageFrame)
-    if not messageFrame then
-        return
-    end
+    if not messageFrame then return end
     local fontString = messageFrame:GetFontString()
     messageFrame:GetFrame():Hide()
     messageFrame:GetFrame():ClearAllPoints()
@@ -158,14 +154,10 @@ local function onVerticalUpdate(self)
     local queue = displayEventQueues[displayEvent.queue]
     local attributes = wrapper.attributes
 
-    if queue:IsEmpty() then
-        return
-    end
+    if queue:IsEmpty() then return end
 
     if attributes.collisionMode == "STACK" then
-        if not queue:IsEmpty() then
-            queue:HandleNextMessage()
-        end
+        if not queue:IsEmpty() then queue:HandleNextMessage() end
         self:SetScript("OnUpdate", nil)
         return
     elseif attributes.scrollHeight == 0 or attributes.collisionMode == "REPLACE" then
@@ -187,9 +179,7 @@ end
 ------------------------------------------------------------------------
 
 local function animateNextEvent(displayEvent)
-    if not displayEvent then
-        return
-    end
+    if not displayEvent then return end
 
     local attributes = SCROLL_AREAS[displayEvent.queue]
     local messageFrame = displayEvent.messageFrame:GetFrame()
@@ -222,14 +212,10 @@ end
 ------------------------------------------------------------------------
 
 local function animateEvent(displayEvent)
-    if not displayEvent then
-        return
-    end
+    if not displayEvent then return end
 
     for _, scrollFrameName in ipairs(displayEvent.eligibleScrollFrames) do
-        if scrollFrameName == "OUTBOUND_SECONDARY" then
-            break
-        end
+        if scrollFrameName == "OUTBOUND_SECONDARY" then break end
 
         displayEvent.queue = scrollFrameName
 
@@ -268,9 +254,7 @@ local function animateEvent(displayEvent)
         fontString:SetText(displayEvent.message or "")
 
         local countString = messageFrame:GetCountString()
-        if countString then
-            countString:SetFont(cfg.font, cfg.font_size, cfg.font_style)
-        end
+        if countString then countString:SetFont(cfg.font, cfg.font_size, cfg.font_style) end
 
         messageFrame:SetCountText(displayEvent.countText)
 

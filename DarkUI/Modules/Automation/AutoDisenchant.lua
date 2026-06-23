@@ -18,9 +18,7 @@ function module:OnInit()
     local function confirmPopups()
         for i = 1, STATICPOPUP_NUMDIALOGS do
             local f = _G["StaticPopup" .. i]
-            if (f.which == "CONFIRM_LOOT_ROLL" or f.which == "LOOT_BIND") and f:IsVisible() then
-                StaticPopup_OnClick(f, 1)
-            end
+            if (f.which == "CONFIRM_LOOT_ROLL" or f.which == "LOOT_BIND") and f:IsVisible() then StaticPopup_OnClick(f, 1) end
         end
     end
 

@@ -41,9 +41,7 @@ function module:OnInit()
     ricon:SetSize(18, 18)
     ricon:SetPoint("CENTER", GameTooltip, "TOP", 0, 0)
 
-    GameTooltip:HookScript("OnHide", function()
-        ricon:SetTexture(nil)
-    end)
+    GameTooltip:HookScript("OnHide", function() ricon:SetTexture(nil) end)
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, onTooltipSetUnit)
 end

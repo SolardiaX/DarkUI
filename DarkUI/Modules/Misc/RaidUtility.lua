@@ -29,9 +29,7 @@ local GetInstanceInfo = GetInstanceInfo
 local function checkRaidStatus()
     local _, instanceType = IsInInstance()
     if instanceType == "pvp" or instanceType == "arena" then return false end
-    if GetNumGroupMembers() > 0 and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then
-        return true
-    end
+    if GetNumGroupMembers() > 0 and (UnitIsGroupLeader("player") or UnitIsGroupAssistant("player")) then return true end
     return false
 end
 
@@ -107,9 +105,7 @@ StaticPopupDialogs["DARKUI_DISBAND_RAID"] = {
         if numGroup > 0 then
             for i = 1, numGroup do
                 local name, _, _, _, _, _, _, online = GetRaidRosterInfo(i)
-                if online and name ~= E.myName then
-                    UninviteUnit(name)
-                end
+                if online and name ~= E.myName then UninviteUnit(name) end
             end
         end
         C_PartyInfo.LeaveParty()
@@ -143,7 +139,14 @@ function module:OnInit()
     panel.toggled = false
 
     -- Show button (toggle)
-    showButton = createButton("DarkUI_RaidUtilityShow", E.PetBattleFrameHider, "UIPanelButtonTemplate, SecureHandlerClickTemplate", panelWidth / 1.5, btnHeight, RAID_CONTROL)
+    showButton = createButton(
+        "DarkUI_RaidUtilityShow",
+        E.PetBattleFrameHider,
+        "UIPanelButtonTemplate, SecureHandlerClickTemplate",
+        panelWidth / 1.5,
+        btnHeight,
+        RAID_CONTROL
+    )
     showButton:SetPoint("TOP", panel, "TOP", 0, 0)
     showButton:SetFrameRef("panel", panel)
     showButton:SetAttribute("_onclick", [=[self:Hide(); self:GetFrameRef("panel"):Show();]=])
@@ -223,10 +226,13 @@ function module:OnInit()
 
     markerBtn:RegisterForClicks("AnyUp")
     markerBtn:SetFrameRef("markers", markersFrame)
-    markerBtn:SetAttribute("_onclick", [=[
+    markerBtn:SetAttribute(
+        "_onclick",
+        [=[
         local f = self:GetFrameRef("markers")
         if f:IsShown() then f:Hide() else f:Show() end
-    ]=])
+    ]=]
+    )
 
     local ground = { 5, 6, 3, 2, 7, 1, 4, 8 }
     local iconTexture = {

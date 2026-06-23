@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local module = C.aura
 
-
 local TIER = 12
 local INSTANCE
 

@@ -36,9 +36,7 @@ local eventFrame
 ------------------------------------------------------------------------
 
 local function printMsg(msg)
-    if cfg.resetNotice then
-        print(MSG_PREFIX .. msg)
-    end
+    if cfg.resetNotice then print(MSG_PREFIX .. msg) end
 end
 
 local function execReset(source)
@@ -51,15 +49,11 @@ local function execReset(source)
     end
     StaticPopup_Hide("DARKUI_DMETER_RESET_CONFIRM")
     local success = pcall(C_DamageMeter.ResetAllCombatSessions)
-    if success then
-        printMsg(string.format(MSG_RESET, source or SRC_AUTO))
-    end
+    if success then printMsg(string.format(MSG_RESET, source or SRC_AUTO)) end
 end
 
 local function scheduleReset(source)
-    C_Timer_After(0.5, function()
-        execReset(source)
-    end)
+    C_Timer_After(0.5, function() execReset(source) end)
 end
 
 ------------------------------------------------------------------------
@@ -67,9 +61,7 @@ end
 ------------------------------------------------------------------------
 
 local function onMeterClick(self, button)
-    if cfg.quickReset and button == "LeftButton" and IsControlKeyDown() then
-        execReset(SRC_QUICK)
-    end
+    if cfg.quickReset and button == "LeftButton" and IsControlKeyDown() then execReset(SRC_QUICK) end
 end
 
 local function installClickHooks()
@@ -90,9 +82,7 @@ local function onEvent(self, event, ...)
     local mode = cfg.resetMode
     if event == "PLAYER_ENTERING_WORLD" then
         local isLogin, isReload = ...
-        if isLogin or isReload then
-            return
-        end
+        if isLogin or isReload then return end
         local inInstance, instanceType = IsInInstance()
         if inInstance and (instanceType == "party" or instanceType == "raid") then
             if mode == "smart" then
@@ -102,17 +92,11 @@ local function onEvent(self, event, ...)
             end
         end
     elseif event == "CHALLENGE_MODE_START" then
-        if mode == "smart" or mode == "mplus" then
-            scheduleReset(SRC_MPLUS)
-        end
+        if mode == "smart" or mode == "mplus" then scheduleReset(SRC_MPLUS) end
     elseif event == "ENCOUNTER_START" then
-        if mode == "boss" then
-            scheduleReset(SRC_BOSS)
-        end
+        if mode == "boss" then scheduleReset(SRC_BOSS) end
     elseif event == "PLAYER_REGEN_DISABLED" then
-        if mode == "combat" then
-            scheduleReset(SRC_COMBAT)
-        end
+        if mode == "combat" then scheduleReset(SRC_COMBAT) end
     end
 end
 
@@ -131,9 +115,7 @@ function module.Reset:Init()
         text = POPUP_TEXT,
         button1 = POPUP_BTN_YES,
         button2 = POPUP_BTN_NO,
-        OnAccept = function()
-            execReset(SRC_ENTER_INST)
-        end,
+        OnAccept = function() execReset(SRC_ENTER_INST) end,
         OnShow = function(self)
             self:ClearAllPoints()
             self:SetPoint("CENTER", UIParent, "CENTER", 0, 100)
@@ -144,9 +126,7 @@ function module.Reset:Init()
         preferredIndex = 3,
     }
 
-    if not C_AddOns.IsAddOnLoaded("Blizzard_DamageMeter") then
-        return
-    end
+    if not C_AddOns.IsAddOnLoaded("Blizzard_DamageMeter") then return end
 
     installClickHooks()
 
@@ -157,22 +137,12 @@ function module.Reset:Init()
 
     local mode = cfg.resetMode
     eventFrame:UnregisterAllEvents()
-    if mode == "never" then
-        return
-    end
+    if mode == "never" then return end
 
-    if mode == "smart" or mode == "instance" then
-        eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    end
-    if mode == "smart" or mode == "mplus" then
-        eventFrame:RegisterEvent("CHALLENGE_MODE_START")
-    end
-    if mode == "boss" then
-        eventFrame:RegisterEvent("ENCOUNTER_START")
-    end
-    if mode == "combat" then
-        eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
-    end
+    if mode == "smart" or mode == "instance" then eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD") end
+    if mode == "smart" or mode == "mplus" then eventFrame:RegisterEvent("CHALLENGE_MODE_START") end
+    if mode == "boss" then eventFrame:RegisterEvent("ENCOUNTER_START") end
+    if mode == "combat" then eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED") end
 
     eventFrame:SetScript("OnEvent", onEvent)
 end

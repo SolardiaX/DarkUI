@@ -30,13 +30,9 @@ local function hookActionButton(self)
     module:UpdateBind(self, pet or stance or nil)
 end
 
-local function hookMacroButton(self)
-    module:UpdateBind(self, "MACRO")
-end
+local function hookMacroButton(self) module:UpdateBind(self, "MACRO") end
 
-local function hookSpellButton(self)
-    module:UpdateBind(self, "SPELL")
-end
+local function hookSpellButton(self) module:UpdateBind(self, "SPELL") end
 
 function module:RegisterButton(button)
     if button.IsProtected and button.IsObjectType and button:IsObjectType("CheckButton") and button:IsProtected() then
@@ -45,12 +41,8 @@ function module:RegisterButton(button)
 end
 
 function module:RegisterMacro(addon)
-    if addon ~= "Blizzard_MacroUI" then
-        return
-    end
-    if macroInit then
-        return
-    end
+    if addon ~= "Blizzard_MacroUI" then return end
+    if macroInit then return end
 
     hooksecurefunc(MacroFrame.MacroSelector.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -66,9 +58,7 @@ function module:RegisterMacro(addon)
 end
 
 function module:UpdateBind(button, spellmacro)
-    if not bind or not bind.enabled or InCombatLockdown() then
-        return
-    end
+    if not bind or not bind.enabled or InCombatLockdown() then return end
 
     bind.button = button
     bind.spellmacro = spellmacro
@@ -82,16 +72,12 @@ function module:UpdateBind(button, spellmacro)
         bind.bindings = { GetBindingKey(spellmacro .. " " .. bind.name) }
     elseif spellmacro == "MACRO" then
         bind.id = button.selectionIndex or button:GetID()
-        if MacroFrame and MacroFrame.selectedTab == 2 then
-            bind.id = bind.id + MAX_ACCOUNT_MACROS
-        end
+        if MacroFrame and MacroFrame.selectedTab == 2 then bind.id = bind.id + MAX_ACCOUNT_MACROS end
         bind.name = GetMacroInfo(bind.id)
         bind.bindings = { GetBindingKey(spellmacro .. " " .. bind.name) }
     elseif spellmacro == "STANCE" or spellmacro == "PET" then
         bind.name = button:GetName()
-        if not bind.name then
-            return
-        end
+        if not bind.name then return end
         bind.tipName = button.commandName and GetBindingName(button.commandName)
 
         bind.id = tonumber(button:GetID())
@@ -103,9 +89,7 @@ function module:UpdateBind(button, spellmacro)
         bind.bindings = { GetBindingKey(bind.bindstring) }
     else
         bind.name = button:GetName()
-        if not bind.name then
-            return
-        end
+        if not bind.name then return end
         bind.tipName = button.commandName and GetBindingName(button.commandName)
 
         bind.action = tonumber(button.action)
@@ -147,16 +131,10 @@ function module:Listener(key)
         return
     end
 
-    if ignoreKeys[key] then
-        return
-    end
+    if ignoreKeys[key] then return end
 
-    if key == "MiddleButton" then
-        key = "BUTTON3"
-    end
-    if strfind(key, "Button%d") then
-        key = strupper(key)
-    end
+    if key == "MiddleButton" then key = "BUTTON3" end
+    if strfind(key, "Button%d") then key = strupper(key) end
 
     local alt = IsAltKeyDown() and "ALT-" or ""
     local ctrl = IsControlKeyDown() and "CTRL-" or ""
@@ -181,9 +159,7 @@ end
 
 function module:Activate()
     bind.enabled = true
-    self:RegisterEvent("PLAYER_REGEN_DISABLED", function()
-        module:Deactivate(false)
-    end)
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", function() module:Deactivate(false) end)
 end
 
 function module:Deactivate(save)
@@ -203,9 +179,7 @@ function module:Deactivate(save)
 end
 
 function module:OnInit()
-    if not C.actionbar.hover_binding then
-        return
-    end
+    if not C.actionbar.hover_binding then return end
 
     bind = CreateFrame("Frame", "DarkUI_HoverBind", UIParent)
     bind:SetFrameStrata("DIALOG")
@@ -233,15 +207,9 @@ function module:OnInit()
         end
         GameTooltip:Show()
     end)
-    bind:SetScript("OnLeave", function()
-        module:HideFrame()
-    end)
-    bind:SetScript("OnKeyUp", function(_, key)
-        module:Listener(key)
-    end)
-    bind:SetScript("OnMouseUp", function(_, key)
-        module:Listener(key)
-    end)
+    bind:SetScript("OnLeave", function() module:HideFrame() end)
+    bind:SetScript("OnKeyUp", function(_, key) module:Listener(key) end)
+    bind:SetScript("OnMouseUp", function(_, key) module:Listener(key) end)
     bind:SetScript("OnMouseWheel", function(_, delta)
         if delta > 0 then
             module:Listener("MOUSEWHEELUP")
@@ -278,34 +246,24 @@ function module:OnInit()
     -- Stance/Pet buttons via commandName
     for i = 1, 10 do
         local b = _G["StanceButton" .. i]
-        if b then
-            module:RegisterButton(b)
-        end
+        if b then module:RegisterButton(b) end
     end
     for i = 1, 10 do
         local b = _G["PetActionButton" .. i]
-        if b then
-            module:RegisterButton(b)
-        end
+        if b then module:RegisterButton(b) end
     end
 
-    if ExtraActionButton1 then
-        module:RegisterButton(ExtraActionButton1)
-    end
+    if ExtraActionButton1 then module:RegisterButton(ExtraActionButton1) end
 
     -- Spellbook buttons
     for i = 1, 12 do
         local b = _G["SpellButton" .. i]
-        if b then
-            b:HookScript("OnEnter", hookSpellButton)
-        end
+        if b then b:HookScript("OnEnter", hookSpellButton) end
     end
 
     -- Macro UI (lazy load)
     if not C_AddOns.IsAddOnLoaded("Blizzard_MacroUI") then
-        hooksecurefunc(C_AddOns, "LoadAddOn", function(addon)
-            module:RegisterMacro(addon)
-        end)
+        hooksecurefunc(C_AddOns, "LoadAddOn", function(addon) module:RegisterMacro(addon) end)
     else
         module:RegisterMacro("Blizzard_MacroUI")
     end
@@ -315,12 +273,8 @@ function module:OnInit()
         text = L.ACTIONBAR_BINDING_MODETEXT or "Hover over a button and press a key to bind it. Press ESC to clear.",
         button1 = SAVE,
         button2 = CANCEL,
-        OnAccept = function()
-            module:Deactivate(true)
-        end,
-        OnCancel = function()
-            module:Deactivate(false)
-        end,
+        OnAccept = function() module:Deactivate(true) end,
+        OnCancel = function() module:Deactivate(false) end,
         timeout = 0,
         whileDead = 1,
         hideOnEscape = false,

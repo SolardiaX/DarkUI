@@ -38,9 +38,7 @@ function module:OnInit()
             bar:SetPoint(unpack(cfg.alt_powerbar_pos))
         end
     end)
-    bar:SetScript("OnMouseUp", function()
-        bar:StopMovingOrSizing()
-    end)
+    bar:SetScript("OnMouseUp", function() bar:StopMovingOrSizing() end)
 
     bar:RegisterEvent("UNIT_POWER_UPDATE")
     bar:RegisterEvent("UNIT_POWER_BAR_SHOW")

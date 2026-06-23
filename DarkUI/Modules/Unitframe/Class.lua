@@ -40,9 +40,7 @@ function core:SetupClassPower(self)
     -- (bypasses OnShow/AddManagedFrame which doesn't fire on fresh login)
     for _, name in ipairs(managedBars) do
         local bar = _G[name]
-        if bar then
-            bar:SetParent(container)
-        end
+        if bar then bar:SetParent(container) end
     end
 
     container:Layout()
@@ -54,12 +52,8 @@ function core:SetupClassPower(self)
     -- never fires. We must re-trigger bar setup on power type change (druid shapeshift).
     core:RegisterEvent("UNIT_DISPLAYPOWER", function(_, _, unit)
         if unit ~= "player" then return end
-        if PlayerFrame.classPowerBar then
-            PlayerFrame.classPowerBar:Setup()
-        end
-        if EssencePlayerFrame then
-            EssencePlayerFrame:Setup()
-        end
+        if PlayerFrame.classPowerBar then PlayerFrame.classPowerBar:Setup() end
+        if EssencePlayerFrame then EssencePlayerFrame:Setup() end
         container:Layout()
     end)
 end

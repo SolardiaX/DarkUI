@@ -90,17 +90,11 @@ function module:OnInit()
             bar.frameVisibility = "[petbattle][overridebar][vehicleui][possessbar,@vehicle,exists][shapeshift] hide; show"
             RegisterStateDriver(bar, "visibility", bar.frameVisibility)
 
-            if cfg.fader_mouseover then
-                E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-            end
+            if cfg.fader_mouseover then E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
 
-            if cfg.fader_combat then
-                E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-            end
+            if cfg.fader_combat then E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut) end
         elseif event == "UPDATE_SHAPESHIFT_FORMS" then
-            if InCombatLockdown() then
-                return
-            end
+            if InCombatLockdown() then return end
             for i = 1, NUM_STANCE_SLOTS do
                 local button = _G["StanceButton" .. i]
                 local icon = GetShapeshiftFormInfo(i)

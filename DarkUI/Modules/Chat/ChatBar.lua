@@ -35,19 +35,13 @@ local function createButton(f, b, l, r, m)
     end)
 
     if cfg.chat_bar_mouseover then
-        b:SetScript("OnEnter", function()
-            f:FadeIn()
-        end)
-        b:SetScript("OnLeave", function()
-            f:FadeOut()
-        end)
+        b:SetScript("OnEnter", function() f:FadeIn() end)
+        b:SetScript("OnLeave", function() f:FadeOut() end)
     end
 end
 
 function module:OnInit()
-    if not cfg.chat_bar then
-        return
-    end
+    if not cfg.chat_bar then return end
 
     local frame = CreateFrame("Frame", "ChatBar", UIParent)
     frame:SetWidth(16)
@@ -56,12 +50,8 @@ function module:OnInit()
 
     if cfg.chat_bar_mouseover then
         frame:SetAlpha(0)
-        frame:SetScript("OnEnter", function()
-            frame:FadeIn()
-        end)
-        frame:SetScript("OnLeave", function()
-            frame:FadeOut()
-        end)
+        frame:SetScript("OnEnter", function() frame:FadeIn() end)
+        frame:SetScript("OnLeave", function() frame:FadeOut() end)
     end
 
     local b1 = CreateFrame("Button", "$parentButton1", frame)

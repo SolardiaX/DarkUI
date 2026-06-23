@@ -10,17 +10,13 @@ local cfg = C.misc
 
 local function skipOnKeyDown(self, key)
     if key == "ESCAPE" then
-        if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
-            self.closeDialog:Hide()
-        end
+        if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then self.closeDialog:Hide() end
     end
 end
 
 local function skipOnKeyUp(self, key)
     if key == "SPACE" or key == "ESCAPE" or key == "ENTER" then
-        if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then
-            self.closeDialog.confirmButton:Click()
-        end
+        if self:IsShown() and self.closeDialog and self.closeDialog.confirmButton then self.closeDialog.confirmButton:Click() end
     end
 end
 

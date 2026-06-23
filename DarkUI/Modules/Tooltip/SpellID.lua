@@ -57,16 +57,12 @@ function module:OnInit()
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self, data)
         if self ~= GameTooltip or self:IsForbidden() then return end
-        if data and data.id then
-            addLine(self, data.id, L.TOOLTIP_SPELL_ID)
-        end
+        if data and data.id then addLine(self, data.id, L.TOOLTIP_SPELL_ID) end
     end)
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(self, data)
         if whiteTooltip[self] and not self:IsForbidden() then
-            if data and data.id then
-                addLine(self, data.id, L.TOOLTIP_ITEM_ID)
-            end
+            if data and data.id then addLine(self, data.id, L.TOOLTIP_ITEM_ID) end
         end
     end)
 
@@ -85,16 +81,12 @@ function module:OnInit()
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Toy, function(self, data)
         if self ~= GameTooltip or self:IsForbidden() then return end
-        if data and data.id then
-            addLine(self, data.id, L.TOOLTIP_ITEM_ID)
-        end
+        if data and data.id then addLine(self, data.id, L.TOOLTIP_ITEM_ID) end
     end)
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Currency, function(self, data)
         if self:IsForbidden() then return end
-        if data and data.id then
-            addLine(self, data.id, L.TOOLTIP_SPELL_ID)
-        end
+        if data and data.id then addLine(self, data.id, L.TOOLTIP_SPELL_ID) end
     end)
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.PetAction, function(self, data)
@@ -111,9 +103,7 @@ function module:OnInit()
     end)
 
     hooksecurefunc("QuestMapLogTitleButton_OnEnter", function(self)
-        if self.questID then
-            addLine(GameTooltip, self.questID, L.TOOLTIP_SPELL_ID)
-        end
+        if self.questID then addLine(GameTooltip, self.questID, L.TOOLTIP_SPELL_ID) end
     end)
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(self, data)
@@ -127,8 +117,6 @@ function module:OnInit()
         if not unit or UnitIsPlayer(unit) then return end
 
         local npcID = strmatch(guid, "%-(%d+)%-%x+$")
-        if npcID then
-            addLine(self, npcID, L.TOOLTIP_NPC_ID)
-        end
+        if npcID then addLine(self, npcID, L.TOOLTIP_NPC_ID) end
     end)
 end

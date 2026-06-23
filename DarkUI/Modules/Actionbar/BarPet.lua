@@ -9,16 +9,12 @@ local cfg = C.actionbar.bars.barpet
 local num = NUM_PET_ACTION_SLOTS
 
 local function hasPetActionHighlightMark(index)
-    if PET_ACTION_HIGHLIGHT_MARKS then
-        return PET_ACTION_HIGHLIGHT_MARKS[index]
-    end
+    if PET_ACTION_HIGHLIGHT_MARKS then return PET_ACTION_HIGHLIGHT_MARKS[index] end
     return false
 end
 
 local function updatePetBar()
-    if not PetHasActionBar() then
-        return
-    end
+    if not PetHasActionBar() then return end
 
     for i = 1, num do
         local buttonName = "PetActionButton" .. i
@@ -40,9 +36,9 @@ local function updatePetBar()
 
         if spellID then
             local spell = Spell:CreateFromSpellID(spellID)
-            petActionButton.spellDataLoadedCancelFunc = spell:ContinueWithCancelOnSpellLoad(function()
-                petActionButton.tooltipSubtext = spell:GetSpellSubtext()
-            end)
+            petActionButton.spellDataLoadedCancelFunc = spell:ContinueWithCancelOnSpellLoad(
+                function() petActionButton.tooltipSubtext = spell:GetSpellSubtext() end
+            )
         end
 
         if isActive then
@@ -61,9 +57,7 @@ local function updatePetBar()
 
         if petAutoCastOverlay then
             petAutoCastOverlay:SetShown(autoCastAllowed)
-            if petAutoCastOverlay.ShowAutoCastEnabled then
-                petAutoCastOverlay:ShowAutoCastEnabled(autoCastEnabled)
-            end
+            if petAutoCastOverlay.ShowAutoCastEnabled then petAutoCastOverlay:ShowAutoCastEnabled(autoCastEnabled) end
         end
 
         if texture then
@@ -128,13 +122,9 @@ function module:OnInit()
 
             RegisterStateDriver(bar, "visibility", "[petbattle][overridebar][vehicleui][possessbar][shapeshift] hide; [pet] show; hide")
 
-            if cfg.fader_mouseover then
-                E:ButtonBarFader(self, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-            end
+            if cfg.fader_mouseover then E:ButtonBarFader(self, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
 
-            if cfg.fader_combat then
-                E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut)
-            end
+            if cfg.fader_combat then E:CombatFrameFader(bar, cfg.fader_combat.fadeIn, cfg.fader_combat.fadeOut) end
         elseif event == "PET_BAR_UPDATE_COOLDOWN" then
             PetActionBar:UpdateCooldowns()
         else
@@ -143,9 +133,7 @@ function module:OnInit()
     end)
 
     hooksecurefunc(_G["PetActionButton10"], "SetPoint", function(_, _, anchor)
-        if InCombatLockdown() then
-            return
-        end
+        if InCombatLockdown() then return end
         if anchor and anchor == PetActionBar then
             for i = 1, num do
                 local button = _G["PetActionButton" .. i]

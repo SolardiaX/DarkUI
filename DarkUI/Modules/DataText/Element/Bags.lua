@@ -20,9 +20,7 @@ local GameTooltip = GameTooltip
 local cfg = module.config.Bags
 
 module:Inject("Bags", {
-    OnLoad = function(self)
-        module:RegEvents(self, "PLAYER_LOGIN BAG_UPDATE")
-    end,
+    OnLoad = function(self) module:RegEvents(self, "PLAYER_LOGIN BAG_UPDATE") end,
     OnEvent = function(self)
         local free, total = 0, 0
         for i = 0, NUM_BAG_SLOTS do

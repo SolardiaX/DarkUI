@@ -39,22 +39,16 @@ local function buildGuildTable()
     wipe(guildTable)
     for i = 1, GetNumGuildMembers() do
         local name, rank, _, level, _, zone, note, officernote, connected, status, class, _, _, mobile = GetGuildRosterInfo(i)
-        if not name then
-            break
-        end
+        if not name then break end
         name = Ambiguate(name, "none")
         guildTable[i] = { name, rank, level, zone, note, officernote, connected, status, class, mobile }
     end
     tsort(guildTable, function(a, b)
-        if a and b then
-            return a[1] < b[1]
-        end
+        if a and b then return a[1] < b[1] end
     end)
 end
 
-hooksecurefunc("SortGuildRoster", function(sortType)
-    CURRENT_GUILD_SORTING = sortType
-end)
+hooksecurefunc("SortGuildRoster", function(sortType) CURRENT_GUILD_SORTING = sortType end)
 
 local SortGuildRoster = SortGuildRoster
 
@@ -81,22 +75,14 @@ module:Inject("Guild", {
     OnEvent = function(self, event, arg1)
         if event == "GUILD_MOTD" then
             self.gmotd = arg1 or ""
-            if self.hovered then
-                self:GetScript("OnEnter")(self)
-            end
+            if self.hovered then self:GetScript("OnEnter")(self) end
             return
         end
-        if self.hovered then
-            self:GetScript("OnEnter")(self)
-        end
-        if IsInGuild() then
-            buildGuildTable()
-        end
+        if self.hovered then self:GetScript("OnEnter")(self) end
+        if IsInGuild() then buildGuildTable() end
     end,
     OnUpdate = function(self, u)
-        if IsInGuild() then
-            module:AltUpdate(self)
-        end
+        if IsInGuild() then module:AltUpdate(self) end
     end,
     OnClick = function(self, b)
         if b == "LeftButton" then
@@ -144,9 +130,7 @@ module:Inject("Guild", {
                                 ),
                                 arg1 = guildTable[i][1],
                                 notCheckable = true,
-                                func = function(_, arg1)
-                                    C_PartyInfo_InviteUnit(arg1)
-                                end,
+                                func = function(_, arg1) C_PartyInfo_InviteUnit(arg1) end,
                             }
                         end
                     end
@@ -165,9 +149,7 @@ module:Inject("Guild", {
                         ),
                         arg1 = guildTable[i][1],
                         notCheckable = true,
-                        func = function(_, arg1)
-                            SetItemRef("player:" .. arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton")
-                        end,
+                        func = function(_, arg1) SetItemRef("player:" .. arg1, ("|Hplayer:%1$s|h[%1$s]|h"):format(arg1), "LeftButton") end,
                     }
                 end
             end
@@ -223,9 +205,7 @@ module:Inject("Guild", {
                         else
                             zone_r, zone_g, zone_b = 1, 1, 1
                         end
-                        if isMobile then
-                            zone = "|cffa5a5a5" .. REMOTE_CHAT .. "|r"
-                        end
+                        if isMobile then zone = "|cffa5a5a5" .. REMOTE_CHAT .. "|r" end
                         classc, levelc = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class], GetQuestDifficultyColor(level)
                         grouped = (UnitInParty(name) or UnitInRaid(name)) and (GetRealZoneText() == zone and " |cff7fff00*|r" or " |cffff7f00*|r") or ""
                         if self.altdown then
@@ -239,12 +219,8 @@ module:Inject("Guild", {
                                 zone_g,
                                 zone_b
                             )
-                            if note ~= "" then
-                                GameTooltip:AddLine("   " .. NOTE_COLON .. " " .. note, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1)
-                            end
-                            if officernote ~= "" then
-                                GameTooltip:AddLine("   O." .. NOTE_COLON .. " " .. officernote, 0.3, 1, 0.3, 1)
-                            end
+                            if note ~= "" then GameTooltip:AddLine("   " .. NOTE_COLON .. " " .. note, module.ttsubh.r, module.ttsubh.g, module.ttsubh.b, 1) end
+                            if officernote ~= "" then GameTooltip:AddLine("   O." .. NOTE_COLON .. " " .. officernote, 0.3, 1, 0.3, 1) end
                         else
                             if status == 1 then
                                 status = " |cffE7E716" .. L.CHAT_AFK .. "|r"

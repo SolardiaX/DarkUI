@@ -18,9 +18,7 @@ local function getMedia()
 end
 
 function module:OnInit()
-    if not C.actionbar.bars.texture then
-        return
-    end
+    if not C.actionbar.bars.texture then return end
 
     local media = getMedia()
 

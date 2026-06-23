@@ -39,27 +39,19 @@ local function fadeOnUpdate(_, elapsed)
                 else
                     FADEFRAMES[frame] = nil
 
-                    if info.finishedFunc then
-                        info.finishedFunc(frame)
-                    end
+                    if info.finishedFunc then info.finishedFunc(frame) end
                 end
             end
         end
 
-        if not next(FADEFRAMES) then
-            FADEMANAGER:SetScript("OnUpdate", nil)
-        end
+        if not next(FADEFRAMES) then FADEMANAGER:SetScript("OnUpdate", nil) end
     end
 end
 
 function E:UIFrameFade(frame, info)
-    if not frame or frame:IsForbidden() then
-        return
-    end
+    if not frame or frame:IsForbidden() then return end
 
-    if not info.mode then
-        info.mode = "IN"
-    end
+    if not info.mode then info.mode = "IN" end
 
     if info.mode == "IN" then
         if not info.startAlpha then info.startAlpha = 0 end
@@ -82,9 +74,7 @@ function E:UIFrameFade(frame, info)
 end
 
 function E:UIFrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
-    if not frame or frame:IsForbidden() then
-        return
-    end
+    if not frame or frame:IsForbidden() then return end
 
     if frame.__fadeObject then
         frame.__fadeObject.fadeTimer = nil
@@ -102,9 +92,7 @@ function E:UIFrameFadeIn(frame, timeToFade, startAlpha, endAlpha)
 end
 
 function E:UIFrameFadeOut(frame, timeToFade, startAlpha, endAlpha)
-    if not frame or frame:IsForbidden() then
-        return
-    end
+    if not frame or frame:IsForbidden() then return end
 
     if frame.__fadeObject then
         frame.__fadeObject.fadeTimer = nil
@@ -123,9 +111,7 @@ end
 
 function E:UIFrameFadeRemoveFrame(frame)
     if frame and FADEFRAMES[frame] then
-        if frame.__fadeObject then
-            frame.__fadeObject.fadeTimer = nil
-        end
+        if frame.__fadeObject then frame.__fadeObject.fadeTimer = nil end
         FADEFRAMES[frame] = nil
     end
 end
@@ -135,98 +121,54 @@ end
 ----------------------------------------------------------------------------------------
 
 function E:ButtonBarFader(frame, buttonList, fadeIn, fadeOut)
-    if not frame or not buttonList then
-        return
-    end
-    if not fadeIn then
-        fadeIn = defaultFadeIn
-    end
-    if not fadeOut then
-        fadeOut = defaultFadeOut
-    end
+    if not frame or not buttonList then return end
+    if not fadeIn then fadeIn = defaultFadeIn end
+    if not fadeOut then fadeOut = defaultFadeOut end
 
     frame:EnableMouse(true)
-    frame:HookScript("OnEnter", function()
-        E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha)
-    end)
-    frame:HookScript("OnLeave", function()
-        E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
-    end)
+    frame:HookScript("OnEnter", function() E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha) end)
+    frame:HookScript("OnLeave", function() E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha) end)
     E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
 
     for _, button in pairs(buttonList) do
         if button then
-            button:HookScript("OnEnter", function()
-                E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha)
-            end)
-            button:HookScript("OnLeave", function()
-                E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
-            end)
+            button:HookScript("OnEnter", function() E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha) end)
+            button:HookScript("OnLeave", function() E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha) end)
         end
     end
 end
 
 function E:SpellFlyoutFader(frame, buttonList, fadeIn, fadeOut)
-    if not frame or not buttonList then
-        return
-    end
-    if not fadeIn then
-        fadeIn = defaultFadeIn
-    end
-    if not fadeOut then
-        fadeOut = defaultFadeOut
-    end
+    if not frame or not buttonList then return end
+    if not fadeIn then fadeIn = defaultFadeIn end
+    if not fadeOut then fadeOut = defaultFadeOut end
 
-    SpellFlyout:HookScript("OnEnter", function()
-        E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha)
-    end)
-    SpellFlyout:HookScript("OnLeave", function()
-        E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
-    end)
+    SpellFlyout:HookScript("OnEnter", function() E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha) end)
+    SpellFlyout:HookScript("OnLeave", function() E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha) end)
 
     for _, button in pairs(buttonList) do
         if button then
-            button:HookScript("OnEnter", function()
-                E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha)
-            end)
-            button:HookScript("OnLeave", function()
-                E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
-            end)
+            button:HookScript("OnEnter", function() E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha) end)
+            button:HookScript("OnLeave", function() E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha) end)
         end
     end
 end
 
 function E:FrameFader(frame, fadeIn, fadeOut)
-    if not frame then
-        return
-    end
-    if not fadeIn then
-        fadeIn = defaultFadeIn
-    end
-    if not fadeOut then
-        fadeOut = defaultFadeOut
-    end
+    if not frame then return end
+    if not fadeIn then fadeIn = defaultFadeIn end
+    if not fadeOut then fadeOut = defaultFadeOut end
 
     frame:EnableMouse(true)
-    frame:HookScript("OnEnter", function()
-        E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha)
-    end)
-    frame:HookScript("OnLeave", function()
-        E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
-    end)
+    frame:HookScript("OnEnter", function() E:UIFrameFadeIn(frame, fadeIn.time, frame:GetAlpha(), fadeIn.alpha) end)
+    frame:HookScript("OnLeave", function() E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha) end)
     E:UIFrameFadeOut(frame, fadeOut.time, frame:GetAlpha(), fadeOut.alpha)
 end
 
 function E:CombatFrameFader(frame, fadeIn, fadeOut)
-    if not frame then
-        return
-    end
-    if not fadeIn then
-        fadeIn = defaultFadeIn
-    end
-    if not fadeOut then
-        fadeOut = defaultFadeOut
-    end
+    if not frame then return end
+    if not fadeIn then fadeIn = defaultFadeIn end
+    if not fadeOut then fadeOut = defaultFadeOut end
 
     frame:RegisterEvent("PLAYER_REGEN_ENABLED")
     frame:RegisterEvent("PLAYER_REGEN_DISABLED")

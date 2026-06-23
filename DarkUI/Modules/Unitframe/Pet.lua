@@ -179,9 +179,7 @@ local function createThreatType(self)
     local threat_status_file
 
     local function event_handler(self, _, unit)
-        if unit and unit ~= self.unit then
-            return
-        end
+        if unit and unit ~= self.unit then return end
 
         local status = UnitCanAttack(self.unit, "target") and UnitThreatSituation(self.unit, "target") or (UnitThreatSituation(self.unit))
         local file = status and fg_files[status] or fg_files[default_status]

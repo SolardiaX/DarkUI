@@ -17,24 +17,24 @@ local CastbarInterruptibleColor = CreateColor(0.11, 0.58, 0.89)
 local CastbarNotInterruptibleColor = CreateColor(0.5, 0.5, 0.5)
 
 local channelingTicks = {
-    [740] = 4,        -- 宁静
-    [755] = 5,        -- 生命通道
-    [5143] = 4,       -- 奥术飞弹
-    [12051] = 6,      -- 唤醒
-    [15407] = 6,      -- 精神鞭笞
-    [47757] = 3,      -- 苦修
-    [47758] = 3,      -- 苦修
-    [48045] = 6,      -- 精神灼烧
-    [64843] = 4,      -- 神圣赞美诗
-    [198013] = 10,    -- 眼棱
-    [198590] = 5,     -- 吸取灵魂
-    [205021] = 5,     -- 冰霜射线
-    [205065] = 6,     -- 虚空洪流
-    [206931] = 3,     -- 饮血者
-    [212084] = 10,    -- 邪能毁灭
-    [234153] = 5,     -- 吸取生命
-    [257044] = 7,     -- 急速射击
-    [291944] = 6,     -- 再生，赞达拉巨魔
+    [740] = 4, -- 宁静
+    [755] = 5, -- 生命通道
+    [5143] = 4, -- 奥术飞弹
+    [12051] = 6, -- 唤醒
+    [15407] = 6, -- 精神鞭笞
+    [47757] = 3, -- 苦修
+    [47758] = 3, -- 苦修
+    [48045] = 6, -- 精神灼烧
+    [64843] = 4, -- 神圣赞美诗
+    [198013] = 10, -- 眼棱
+    [198590] = 5, -- 吸取灵魂
+    [205021] = 5, -- 冰霜射线
+    [205065] = 6, -- 虚空洪流
+    [206931] = 3, -- 饮血者
+    [212084] = 10, -- 邪能毁灭
+    [234153] = 5, -- 吸取生命
+    [257044] = 7, -- 急速射击
+    [291944] = 6, -- 再生，赞达拉巨魔
 }
 
 module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE", function()
@@ -50,15 +50,13 @@ end)
 --  methods for element                                         --
 ------------------------------------------------------------------
 function module:FlipTexture(texture)
-    if (texture and texture.SetTexCoord) then
-        return texture:SetTexCoord(1, 0, 0, 1)
-    end
+    if texture and texture.SetTexCoord then return texture:SetTexCoord(1, 0, 0, 1) end
 end
 
 function module:CreateFont(parent, fontname, fontHeight, fontStyle)
-    local fontStr = parent:CreateFontString(nil, 'OVERLAY')
+    local fontStr = parent:CreateFontString(nil, "OVERLAY")
     fontStr:SetFont(fontname or STANDARD_TEXT_FONT, fontHeight or 12, fontStyle)
-    fontStr:SetJustifyH('LEFT')
+    fontStr:SetJustifyH("LEFT")
     fontStr:SetShadowColor(0, 0, 0)
     fontStr:SetShadowOffset(0.85, -0.85)
 
@@ -113,28 +111,20 @@ module.SetCastbarNotInterruptible = setCastbarNotInterruptible
 function module:PostCastStart(unit)
     local Castbar = self
 
-    if Castbar.enableFader then
-        Castbar:SetAlpha(1)
-    end
+    if Castbar.enableFader then Castbar:SetAlpha(1) end
 
-    if Castbar.SafeZone then
-        Castbar.SafeZone:SetDrawLayer("BORDER")
-    end
+    if Castbar.SafeZone then Castbar.SafeZone:SetDrawLayer("BORDER") end
 
     if unit == "player" then
         local numTicks = 0
         if Castbar.channeling then
             local spellID = Castbar.spellID
-            if spellID and not issecretvalue(spellID) then
-                numTicks = channelingTicks[spellID] or 0
-            end
+            if spellID and not issecretvalue(spellID) then numTicks = channelingTicks[spellID] or 0 end
         end
         setBarTicks(Castbar, Castbar.castTicks, numTicks)
         Castbar:SetStatusBarColor(CastbarInterruptibleColor:GetRGB())
     elseif not UnitIsUnit(unit, "player") then
-        Castbar:GetStatusBarTexture():SetVertexColorFromBoolean(
-            Castbar.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor
-        )
+        Castbar:GetStatusBarTexture():SetVertexColorFromBoolean(Castbar.notInterruptible, CastbarNotInterruptibleColor, CastbarInterruptibleColor)
     else
         setCastbarInterruptible(Castbar)
     end
@@ -146,9 +136,7 @@ function module:PostCastFail(unit)
     Castbar:SetStatusBarColor(unpack(CastbarFailColor))
     Castbar:SetValue(1)
 
-    if Castbar.enableFader then
-        Castbar:FadeOut()
-    end
+    if Castbar.enableFader then Castbar:FadeOut() end
 end
 
 function module:PostCastStop(unit)
@@ -157,9 +145,7 @@ function module:PostCastStop(unit)
     Castbar:SetStatusBarColor(unpack(CastbarCompleteColor))
     Castbar:SetValue(1)
 
-    if Castbar.enableFader then
-        Castbar:FadeOut()
-    end
+    if Castbar.enableFader then Castbar:FadeOut() end
 end
 
 function module:PostCastInterruptible(unit)
@@ -174,12 +160,12 @@ end
 --  Empower Pips (for Evoker and similar)                       --
 ------------------------------------------------------------------
 local PipColors = {
-    [1] = { .08, 1, 0, .5 },
-    [2] = { 1, .1, .1, .5 },
-    [3] = { 1, .5, 0, .5 },
-    [4] = { .1, .7, .7, .5 },
-    [5] = { 0, 1, 1, .5 },
-    [6] = { 0, .5, 1, .5 },
+    [1] = { 0.08, 1, 0, 0.5 },
+    [2] = { 1, 0.1, 0.1, 0.5 },
+    [3] = { 1, 0.5, 0, 0.5 },
+    [4] = { 0.1, 0.7, 0.7, 0.5 },
+    [5] = { 0, 1, 1, 0.5 },
+    [6] = { 0, 0.5, 1, 0.5 },
 }
 
 function module:CreatePip(stage)
@@ -248,20 +234,14 @@ function module.PostUpdateButton(element, button, unit, data, position)
             button.Icon:SetDesaturated(true)
         elseif element.dispelColorCurve then
             local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
-            if color then
-                button.__shadow:SetBackdropBorderColor(color:GetRGBA())
-            end
+            if color then button.__shadow:SetBackdropBorderColor(color:GetRGBA()) end
         end
     else
-        if type(data.dispelName) ~= "nil" and not UnitIsFriend("player", unit) then
-            button.__shadow:SetBackdropBorderColor(1, 0.85, 0)
-        end
+        if type(data.dispelName) ~= "nil" and not UnitIsFriend("player", unit) then button.__shadow:SetBackdropBorderColor(1, 0.85, 0) end
     end
 end
 
-local function isAuraPassed(unit, data, filter, suffix)
-    return not C_UnitAuras.IsAuraFilteredOutByInstanceID(unit, data.auraInstanceID, filter .. "|" .. suffix)
-end
+local function isAuraPassed(unit, data, filter, suffix) return not C_UnitAuras.IsAuraFilteredOutByInstanceID(unit, data.auraInstanceID, filter .. "|" .. suffix) end
 
 function module.PostProcessAuraData(element, unit, data, filter)
     data.isImportantAura = isAuraPassed(unit, data, filter, "IMPORTANT")
@@ -305,18 +285,11 @@ end
 
 function module.FilterAuras(element, unit, data)
     if data.isHarmfulAura then
-        if element.onlyShowPlayer then
-            return data.isPlayerAura
-        end
+        if element.onlyShowPlayer then return data.isPlayerAura end
         return true
     else
-        if element.showStealableBuffs and type(data.dispelName) ~= "nil"
-            and not UnitIsPlayer(unit) then
-            return true
-        end
-        if element.onlyShowPlayer then
-            return data.isPlayerAura
-        end
+        if element.showStealableBuffs and type(data.dispelName) ~= "nil" and not UnitIsPlayer(unit) then return true end
+        if element.onlyShowPlayer then return data.isPlayerAura end
         return true
     end
 end
@@ -340,9 +313,7 @@ end
 function module:PostUpdatePower(Power, unit, _, max)
     if (UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit)) or (max == 0) then
         Power:SetValue(0)
-        if Power.Value then
-            Power.Value:SetText('')
-        end
+        if Power.Value then Power.Value:SetText("") end
 
         return
     end
@@ -355,14 +326,13 @@ end
 ------------------------------------------------------------------
 function module:SetFader(f, config)
     if config ~= nil then
-
         local index = 1
         for k, v in pairs(config) do
             if k == "NormalAlpha" then
                 f.NormalAlpha = v
             elseif k == "Range" then
                 f.Range = v
-                f.outsideRangeAlphaPerc = .3
+                f.outsideRangeAlphaPerc = 0.3
             else
                 if not f.Fader then f.Fader = {} end
 

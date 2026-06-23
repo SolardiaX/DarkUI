@@ -33,14 +33,10 @@ addon.Hooks["tooltip"] = function(a)
     local checked = master:GetChecked()
     master:HookScript("OnClick", function(self)
         for path, w in pairs(a.widgets) do
-            if path:find("^tooltip%.") and path ~= "tooltip.enable" then
-                w:SetEnabled(self:GetChecked())
-            end
+            if path:find("^tooltip%.") and path ~= "tooltip.enable" then w:SetEnabled(self:GetChecked()) end
         end
     end)
     for path, w in pairs(a.widgets) do
-        if path:find("^tooltip%.") and path ~= "tooltip.enable" then
-            w:SetEnabled(checked)
-        end
+        if path:find("^tooltip%.") and path ~= "tooltip.enable" then w:SetEnabled(checked) end
     end
 end

@@ -15,15 +15,9 @@ local ACCOUNT_BANK_START = 12
 local ACCOUNT_BANK_END = 16
 
 local cbNivaya = cargBags:NewImplementation("Nivaya")
-if cfg and cfg.enable then
-    cbNivaya:RegisterBlizzard()
-end
-cbNivaya:HookScript("OnShow", function()
-    PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
-end)
-cbNivaya:HookScript("OnHide", function()
-    PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
-end)
+if cfg and cfg.enable then cbNivaya:RegisterBlizzard() end
+cbNivaya:HookScript("OnShow", function() PlaySound(SOUNDKIT.IG_BACKPACK_OPEN) end)
+cbNivaya:HookScript("OnHide", function() PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE) end)
 
 function cbNivaya:UpdateBags()
     for i = 0, ACCOUNT_BANK_END do
@@ -67,30 +61,18 @@ local existsBankBag = module.existsBankBag
 -- Basic Filters
 ------------------------------------------------------------------------
 
-filters.fBags = function(item)
-    return item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS
-end
+filters.fBags = function(item) return item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS end
 
-filters.fBank = function(item)
-    return item.bagId >= BANK_START and item.bagId <= BANK_END
-end
+filters.fBank = function(item) return item.bagId >= BANK_START and item.bagId <= BANK_END end
 
-filters.fBankAccount = function(item)
-    return item.bagId >= ACCOUNT_BANK_START and item.bagId <= ACCOUNT_BANK_END
-end
+filters.fBankAccount = function(item) return item.bagId >= ACCOUNT_BANK_START and item.bagId <= ACCOUNT_BANK_END end
 
-filters.fBankReagent = function(item)
-    return item.bagId == 5
-end
+filters.fBankReagent = function(item) return item.bagId == 5 end
 
-filters.fBankFilter = function()
-    return module.opts.FilterBank
-end
+filters.fBankFilter = function() return module.opts.FilterBank end
 
 filters.fHideEmpty = function(item)
-    if module.opts.CompressEmpty then
-        return item.link ~= nil
-    end
+    if module.opts.CompressEmpty then return item.link ~= nil end
     return true
 end
 
@@ -114,12 +96,8 @@ local collectionClassIDs = {
 }
 
 filters.fItemClass = function(item, container)
-    if not item.id or not item.name then
-        return false
-    end
-    if not itemClass[item.id] then
-        cbNivaya:ClassifyItem(item)
-    end
+    if not item.id or not item.name then return false end
+    if not itemClass[item.id] then cbNivaya:ClassifyItem(item) end
 
     local t = itemClass[item.id]
     local isBankBag = item.bagId >= BANK_START and item.bagId <= BANK_END
@@ -234,22 +212,12 @@ end
 ------------------------------------------------------------------------
 
 filters.fNewItems = function(item)
-    if not module.opts.NewItems then
-        return false
-    end
-    if not (item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS) then
-        return false
-    end
-    if not item.link then
-        return false
-    end
+    if not module.opts.NewItems then return false end
+    if not (item.bagId >= 0 and item.bagId <= NUM_BAG_SLOTS) then return false end
+    if not item.link then return false end
     local knownItems = module.knownItems
-    if not knownItems then
-        return false
-    end
-    if not knownItems[item.id] then
-        return true
-    end
+    if not knownItems then return false end
+    if not knownItems[item.id] then return true end
     local t = GetItemCount(item.id)
     return t > knownItems[item.id]
 end
@@ -259,11 +227,7 @@ end
 ------------------------------------------------------------------------
 
 filters.fItemSets = function(item)
-    if not filterEnabled["ItemSets"] then
-        return false
-    end
-    if not item.link then
-        return false
-    end
+    if not filterEnabled["ItemSets"] then return false end
+    if not item.link then return false end
     return item.isInSet or false
 end

@@ -19,9 +19,7 @@ local buttonList = {
 local num = #buttonList
 
 function module:OnInit()
-    if not cfg then
-        return
-    end
+    if not cfg then return end
 
     local bar = CreateFrame("Frame", "DarkUI_BagsHolder", UIParent, "SecureHandlerStateTemplate")
     bar:SetWidth(num * cfg.button.size + (num - 1) * cfg.button.space)
@@ -32,9 +30,7 @@ function module:OnInit()
 
     bar:RegisterEvent("PLAYER_ENTERING_WORLD")
     bar:SetScript("OnEvent", function(self)
-        if BagBarExpandToggle then
-            BagBarExpandToggle:Hide()
-        end
+        if BagBarExpandToggle then BagBarExpandToggle:Hide() end
 
         local previous
         for i, b in pairs(buttonList) do
@@ -46,21 +42,11 @@ function module:OnInit()
 
                 button:SetSize(cfg.button.size, cfg.button.size)
                 button:ClearAllPoints()
-                if button:GetNormalTexture() then
-                    button:GetNormalTexture():SetAlpha(0)
-                end
-                if button:GetPushedTexture() then
-                    button:GetPushedTexture():SetAlpha(0)
-                end
-                if button:GetHighlightTexture() then
-                    button:GetHighlightTexture():SetAlpha(0)
-                end
-                if button.SlotHighlightTexture then
-                    button.SlotHighlightTexture:Kill()
-                end
-                if button.CircleMask then
-                    button.CircleMask:Hide()
-                end
+                if button:GetNormalTexture() then button:GetNormalTexture():SetAlpha(0) end
+                if button:GetPushedTexture() then button:GetPushedTexture():SetAlpha(0) end
+                if button:GetHighlightTexture() then button:GetHighlightTexture():SetAlpha(0) end
+                if button.SlotHighlightTexture then button.SlotHighlightTexture:Kill() end
+                if button.CircleMask then button.CircleMask:Hide() end
 
                 local icon = button.icon or _G[button:GetName() .. "IconTexture"]
                 if icon then
@@ -84,8 +70,6 @@ function module:OnInit()
 
         RegisterStateDriver(bar, "visibility", "[petbattle] hide; show")
 
-        if cfg.fader_mouseover then
-            E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut)
-        end
+        if cfg.fader_mouseover then E:ButtonBarFader(bar, bar.buttonList, cfg.fader_mouseover.fadeIn, cfg.fader_mouseover.fadeOut) end
     end)
 end

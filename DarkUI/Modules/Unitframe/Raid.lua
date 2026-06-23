@@ -13,16 +13,16 @@ local cfg = C.unitframe
 local mediaPath = cfg.mediaPath
 
 local media = {
-    foreground        = mediaPath .. "uf_raid_foreground",
+    foreground = mediaPath .. "uf_raid_foreground",
 
-    debuffHighlight   = mediaPath .. "uf_raid_debuffHigtlight",
+    debuffHighlight = mediaPath .. "uf_raid_debuffHigtlight",
 
-    hpTex             = mediaPath .. "uf_bartex_raid_main",
-    mpTex             = mediaPath .. "uf_bartex_raid_slight",
+    hpTex = mediaPath .. "uf_bartex_raid_main",
+    mpTex = mediaPath .. "uf_bartex_raid_slight",
 
     barTex_background = mediaPath .. "uf_bartex_raid_slight",
 
-    incoming_barTex   = mediaPath .. "uf_bartex_raid_main",
+    incoming_barTex = mediaPath .. "uf_bartex_raid_main",
 }
 
 local backdrop = {
@@ -33,23 +33,23 @@ local backdrop = {
 local function postUpdateHealth(bar, unit, min, max)
     local r, g, b, t
 
-    if (UnitIsPlayer(unit)) then
+    if UnitIsPlayer(unit) then
         t = oUF.colors.class[select(2, UnitClass(unit))]
     else
-        r, g, b = .1, .8, .3
+        r, g, b = 0.1, 0.8, 0.3
     end
 
-    if (t) then
+    if t then
         r, g, b = t[1], t[2], t[3]
     end
 
     if UnitIsDeadOrGhost(unit) or not UnitIsConnected(unit) then
-        bar.bg:SetVertexColor(.6, .6, .6)
-        bar:SetStatusBarColor(.6, .6, .6)
+        bar.bg:SetVertexColor(0.6, 0.6, 0.6)
+        bar:SetStatusBarColor(0.6, 0.6, 0.6)
     else
         bar.bg:SetVertexColor(r, g, b)
 
-        if (cfg.raid.reverseColors) then
+        if cfg.raid.reverseColors then
             bar:SetStatusBarColor(r, g, b)
         else
             bar:SetStatusBarColor(0, 0, 0)
@@ -92,9 +92,9 @@ local function createBar(self)
     self.Health:SetAlpha(1)
 
     self.Health:SetBackdrop(backdrop)
-    self.Health:SetBackdropColor(0, 0, 0, .85)
+    self.Health:SetBackdropColor(0, 0, 0, 0.85)
 
-    self.Health.bg = self.Health:CreateTexture(nil, 'BORDER')
+    self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
     self.Health.bg:SetTexture(media.barTex_background)
     self.Health.bg:SetAllPoints(self.Health)
     self.Health.bg:SetAlpha(0.3)
@@ -114,10 +114,10 @@ local function createBar(self)
     self.Power:SetStatusBarTexture(media.mpTex)
 
     self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
-    self.Power.bg.multiplier = .3
+    self.Power.bg.multiplier = 0.3
     self.Power.bg:SetAllPoints()
     self.Power.bg:SetTexture(media.mpTex)
-    
+
     self.Power.frequentUpdates = true
     self.Power.colorClass = true
     self.Power.colorReaction = true
@@ -147,7 +147,7 @@ local function createBar(self)
     overDamageAbsorbIndicator:SetWidth(15)
     overDamageAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Shield-Overshield")
     overDamageAbsorbIndicator:SetBlendMode("ADD")
-    overDamageAbsorbIndicator:SetAlpha(.7)
+    overDamageAbsorbIndicator:SetAlpha(0.7)
     overDamageAbsorbIndicator:SetPoint("TOPLEFT", self.Health, "TOPRIGHT", -7, 2)
     overDamageAbsorbIndicator:SetPoint("BOTTOMLEFT", self.Health, "BOTTOMRIGHT", -7, -2)
 
@@ -158,14 +158,14 @@ local function createBar(self)
     healAbsorb:SetWidth(self.Health:GetWidth() or 40)
     healAbsorb:SetReverseFill(true)
     healAbsorb:SetStatusBarTexture(media.incoming_barTex)
-    healAbsorb:SetStatusBarColor(0, .5, .8, .5)
+    healAbsorb:SetStatusBarColor(0, 0.5, 0.8, 0.5)
     healAbsorb:SetFrameLevel(self.Health:GetFrameLevel())
 
     local overHealAbsorbIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 1)
     overHealAbsorbIndicator:SetWidth(15)
     overHealAbsorbIndicator:SetTexture("Interface\\RaidFrame\\Absorb-Overabsorb")
     overHealAbsorbIndicator:SetBlendMode("ADD")
-    overHealAbsorbIndicator:SetAlpha(.5)
+    overHealAbsorbIndicator:SetAlpha(0.5)
     overHealAbsorbIndicator:SetPoint("TOPRIGHT", self.Health, "TOPLEFT", 5, 2)
     overHealAbsorbIndicator:SetPoint("BOTTOMRIGHT", self.Health, "BOTTOMLEFT", 5, -2)
 
@@ -173,25 +173,25 @@ local function createBar(self)
     self.Health.DamageAbsorb = damageAbsorb
     self.Health.OverDamageAbsorbIndicator = overDamageAbsorbIndicator
     self.Health.HealAbsorb = healAbsorb
-    self.Health.OverHealAbsorbIndicator = overHealAbsorbIndicator   
+    self.Health.OverHealAbsorbIndicator = overHealAbsorbIndicator
 end
 
 local function createTag(self)
     self.Tags = {}
 
-    self.Tags.name = self:CreateTag(self.Health, '[dd:raidname]')
-                         :SetFont(STANDARD_TEXT_FONT, 10, 'THICKOUTLINE')
-                         :SetPoint("CENTER", 0, 4)
-                         :SetJustifyH("CENTER")
-                         :SetShadowColor(0, 0, 0, 0)
-                         :done()
+    self.Tags.name = self:CreateTag(self.Health, "[dd:raidname]")
+        :SetFont(STANDARD_TEXT_FONT, 10, "THICKOUTLINE")
+        :SetPoint("CENTER", 0, 4)
+        :SetJustifyH("CENTER")
+        :SetShadowColor(0, 0, 0, 0)
+        :done()
 
-    self.Tags.hpval = self:CreateTag(self.Health, '[dd:misshp]')
-                          :SetFont(STANDARD_TEXT_FONT, 9, 'OUTLINE')
-                          :SetPoint("BOTTOM", 0, 12)
-                          :SetJustifyH("CENTER")
-                          :SetShadowOffset(1.25, -1.25)
-                          :done()
+    self.Tags.hpval = self:CreateTag(self.Health, "[dd:misshp]")
+        :SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+        :SetPoint("BOTTOM", 0, 12)
+        :SetJustifyH("CENTER")
+        :SetShadowOffset(1.25, -1.25)
+        :done()
 end
 
 local function createRaidDebuffs(self)
@@ -332,20 +332,31 @@ function module:OnInit()
             oUF:SetActiveStyle("DarkUI:party")
 
             local party = oUF:SpawnHeader(
-                    "DarkUIPartyHeader",
-                    nil,
-                    "showSolo", cfg.party.showSolo,
-                    "showPlayer", cfg.party.showPlayer,
-                    "showParty", true,
-                    "showRaid", false,
-                    "point", 'LEFT',
-                    "xOffset", -6,
-                    "yOffset", -10,
-                    "columnAnchorPoint", "TOPLEFT",
-                    "unitsPerColumn", cfg.party.unitsPerColumn,
-                    "maxColumns", 5,
-                    -- "columnSpacing", 60,
-                    "oUF-initialConfigFunction", ([[
+                "DarkUIPartyHeader",
+                nil,
+                "showSolo",
+                cfg.party.showSolo,
+                "showPlayer",
+                cfg.party.showPlayer,
+                "showParty",
+                true,
+                "showRaid",
+                false,
+                "point",
+                "LEFT",
+                "xOffset",
+                -6,
+                "yOffset",
+                -10,
+                "columnAnchorPoint",
+                "TOPLEFT",
+                "unitsPerColumn",
+                cfg.party.unitsPerColumn,
+                "maxColumns",
+                5,
+                -- "columnSpacing", 60,
+                "oUF-initialConfigFunction",
+                ([[
                         self:SetWidth(%d)
                         self:SetHeight(%d)
                         self:SetScale(%f)
@@ -354,9 +365,7 @@ function module:OnInit()
             party:SetVisibility("custom [group:raid][@player,exists,nogroup:party] show;hide")
             party:SetPoint(unpack(cfg.raid.position))
 
-            if CompactPartyFrame then
-                CompactPartyFrame:UnregisterAllEvents()
-            end
+            if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
         else
             oUF:RegisterStyle("DarkUI:raid", createStyle)
             oUF:SetActiveStyle("DarkUI:raid")
@@ -367,23 +376,36 @@ function module:OnInit()
                 local name = "DarkUIRaidGroup" .. i
 
                 group = oUF:SpawnHeader(
-                        name,
-                        nil,
-                        "showPlayer", true,
-                        "showSolo", cfg.raid.showSolo,
-                        "showParty", cfg.party.raidMode,
-                        "showRaid", true,
-                        "point", "LEFT",
-                        "yOffset", -6,
-                        "xoffset", -10,
-                        "groupFilter", tostring(i),
-                        'groupBy', 'GROUP',
-                        "groupingOrder", "TANK,HEALER,DAMAGER,NONE",
-                        -- "maxColumns", 5,
-                        "unitsPerColumn", 5,
-                        --"columnSpacing", 0,
-                        "columnAnchorPoint", "TOPLEFT",
-                        "oUF-initialConfigFunction", ([[
+                    name,
+                    nil,
+                    "showPlayer",
+                    true,
+                    "showSolo",
+                    cfg.raid.showSolo,
+                    "showParty",
+                    cfg.party.raidMode,
+                    "showRaid",
+                    true,
+                    "point",
+                    "LEFT",
+                    "yOffset",
+                    -6,
+                    "xoffset",
+                    -10,
+                    "groupFilter",
+                    tostring(i),
+                    "groupBy",
+                    "GROUP",
+                    "groupingOrder",
+                    "TANK,HEALER,DAMAGER,NONE",
+                    -- "maxColumns", 5,
+                    "unitsPerColumn",
+                    5,
+                    --"columnSpacing", 0,
+                    "columnAnchorPoint",
+                    "TOPLEFT",
+                    "oUF-initialConfigFunction",
+                    ([[
                             self:SetWidth(%d)
                             self:SetHeight(%d)
                         ]]):format(cfg.raid.size, cfg.raid.size)
@@ -401,18 +423,14 @@ function module:OnInit()
             end
 
             -- Hide Default Frames
-            if CompactPartyFrame then
-                CompactPartyFrame:UnregisterAllEvents()
-            end
+            if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
             if CompactRaidFrameManager_SetSetting then
                 CompactRaidFrameManager_SetSetting("IsShown", "0")
                 UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
                 CompactRaidFrameManager:UnregisterAllEvents()
                 CompactRaidFrameManager:SetParent(E.FrameHider)
             end
-            if _G.CompactRaidFrameContainer then
-                _G.CompactRaidFrameContainer:UnregisterAllEvents()
-            end
+            if _G.CompactRaidFrameContainer then _G.CompactRaidFrameContainer:UnregisterAllEvents() end
         end
     end)
 end

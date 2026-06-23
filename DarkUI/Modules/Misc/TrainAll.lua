@@ -28,14 +28,10 @@ local function onAddonLoaded(self, _, addon)
         GameTooltip:SetOwner(btn, "ANCHOR_RIGHT")
         GameTooltip:SetText(AVAILABLE .. ": " .. num .. "\n" .. COSTS_LABEL .. " " .. GetMoneyString(cost))
     end)
-    button:SetScript("OnLeave", function()
-        GameTooltip:Hide()
-    end)
+    button:SetScript("OnLeave", function() GameTooltip:Hide() end)
     button:SetScript("OnClick", function()
         for i = 1, GetNumTrainerServices() do
-            if select(2, GetTrainerServiceInfo(i)) == "available" then
-                BuyTrainerService(i)
-            end
+            if select(2, GetTrainerServiceInfo(i)) == "available" then BuyTrainerService(i) end
         end
     end)
 

@@ -98,9 +98,7 @@ end
 
 local function playShine(cooldown)
     local parent = cooldown:GetParent()
-    if not parent or not parent:IsVisible() then
-        return
-    end
+    if not parent or not parent:IsVisible() then return end
 
     local level = cooldown:GetFrameLevel()
     if issecretvalue(level) then level = 5 end
@@ -115,14 +113,10 @@ end
 
 local function playPulse(cooldown)
     local parent = cooldown:GetParent()
-    if not parent or not parent:IsVisible() then
-        return
-    end
+    if not parent or not parent:IsVisible() then return end
 
     local icon = parent.icon
-    if not icon then
-        return
-    end
+    if not icon then return end
 
     local shine = tremove(shinePool) or createShineFrame()
     shine:SetParent(parent)
@@ -151,66 +145,46 @@ local GetTime = GetTime
 
 local function onCooldownDone(cooldown)
     local startTime = cooldown._darkui_start
-    if not startTime then
-        return
-    end
+    if not startTime then return end
     cooldown._darkui_start = nil
-    if (GetTime() - startTime) < MIN_EFFECT_DURATION then
-        return
-    end
+    if (GetTime() - startTime) < MIN_EFFECT_DURATION then return end
     playEffect(cooldown)
 end
 
 local function trackCooldownStart(cooldown)
-    if cooldown then
-        cooldown._darkui_start = GetTime()
-    end
+    if cooldown then cooldown._darkui_start = GetTime() end
 end
 
 local function updateCooldown(cooldown)
-    if not cooldown or hookedCooldowns[cooldown] then
-        return
-    end
+    if not cooldown or hookedCooldowns[cooldown] then return end
 
     cooldown:SetCountdownFormatter(numberFormatter)
 
     local region = cooldown:GetRegions()
-    if region and region:IsObjectType("FontString") then
-        region:SetFont(FONT_FACE, FONT_SIZE, FONT_FLAG)
-    end
+    if region and region:IsObjectType("FontString") then region:SetFont(FONT_FACE, FONT_SIZE, FONT_FLAG) end
 
-    if EFFECT_TYPE ~= "none" then
-        cooldown:HookScript("OnCooldownDone", onCooldownDone)
-    end
+    if EFFECT_TYPE ~= "none" then cooldown:HookScript("OnCooldownDone", onCooldownDone) end
 
     hookedCooldowns[cooldown] = true
 end
 
 function module:OnEnable()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     local cooldownMT = getmetatable(ActionButton1Cooldown).__index
     local methods = { "SetCooldown", "SetCooldownDuration", "SetHideCountdownNumbers", "SetCooldownFromDurationObject" }
     for _, method in pairs(methods) do
-        if cooldownMT[method] then
-            hooksecurefunc(cooldownMT, method, updateCooldown)
-        end
+        if cooldownMT[method] then hooksecurefunc(cooldownMT, method, updateCooldown) end
     end
 
     -- Track start time for finish effect (hook all cooldown-setting methods)
     if EFFECT_TYPE ~= "none" then
         hooksecurefunc(cooldownMT, "SetCooldown", trackCooldownStart)
         hooksecurefunc(cooldownMT, "SetCooldownDuration", trackCooldownStart)
-        if cooldownMT.SetCooldownFromDurationObject then
-            hooksecurefunc(cooldownMT, "SetCooldownFromDurationObject", trackCooldownStart)
-        end
+        if cooldownMT.SetCooldownFromDurationObject then hooksecurefunc(cooldownMT, "SetCooldownFromDurationObject", trackCooldownStart) end
     end
 
-    if CooldownFrame_SetDisplayAsPercentage then
-        hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", updateCooldown)
-    end
+    if CooldownFrame_SetDisplayAsPercentage then hooksecurefunc("CooldownFrame_SetDisplayAsPercentage", updateCooldown) end
 
     C_CVar.SetCVar("countdownForCooldowns", 1)
 end

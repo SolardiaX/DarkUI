@@ -68,9 +68,7 @@ local function cleanMarks(now)
     if now - lastCleanTime < DEDUP_WINDOW * 3 then return end
     lastCleanTime = now
     for k, v in pairs(recentMarks) do
-        if now - v.time > DEDUP_WINDOW * 2 then
-            recentMarks[k] = nil
-        end
+        if now - v.time > DEDUP_WINDOW * 2 then recentMarks[k] = nil end
     end
 end
 
@@ -91,16 +89,12 @@ local function spellName(spellId)
 end
 
 local function getLastPlayerSpellId()
-    if lastPlayerSpellId and (GetTime() - lastPlayerCastTime) <= SPELL_TRACK_WINDOW then
-        return lastPlayerSpellId, lastPlayerSpellName
-    end
+    if lastPlayerSpellId and (GetTime() - lastPlayerCastTime) <= SPELL_TRACK_WINDOW then return lastPlayerSpellId, lastPlayerSpellName end
     return nil, nil
 end
 
 local function getLastPetSpellId()
-    if lastPetSpellId and (GetTime() - lastPetCastTime) <= SPELL_TRACK_WINDOW then
-        return lastPetSpellId, lastPetSpellName
-    end
+    if lastPetSpellId and (GetTime() - lastPetCastTime) <= SPELL_TRACK_WINDOW then return lastPetSpellId, lastPetSpellName end
     return nil, nil
 end
 
@@ -192,9 +186,7 @@ local CLEU_MISS = {
 ------------------------------------------------------------------------
 
 local function parseCLEU()
-    local timestamp, subevent, hideCaster,
-        srcGUID, srcName, srcFlags, srcRaidFlags,
-        destGUID, destName, destFlags, destRaidFlags = GetCombatLogInfo()
+    local timestamp, subevent, hideCaster, srcGUID, srcName, srcFlags, srcRaidFlags, destGUID, destName, destFlags, destRaidFlags = GetCombatLogInfo()
 
     local isMySource = band(srcFlags, FLAG_MINE) ~= 0
     if not isMySource then return end
@@ -301,9 +293,16 @@ end
 ------------------------------------------------------------------------
 
 local UC_MISS = {
-    BLOCK = true, DODGE = true, PARRY = true, MISS = true,
-    IMMUNE = true, DEFLECT = true, REFLECT = true,
-    RESIST = true, ABSORB = true, EVADE = true,
+    BLOCK = true,
+    DODGE = true,
+    PARRY = true,
+    MISS = true,
+    IMMUNE = true,
+    DEFLECT = true,
+    REFLECT = true,
+    RESIST = true,
+    ABSORB = true,
+    EVADE = true,
 }
 
 local function handleUnitCombat(unit, action, flagText, amount, schoolMask)
@@ -322,10 +321,7 @@ local function handleUnitCombat(unit, action, flagText, amount, schoolMask)
                 return
             end
             spellId, sName = getLastPetSpellId()
-            if spellId then
-                emitDamage(amount, schoolMask, spellId, sName, false, false, true, isCrit)
-            end
-
+            if spellId then emitDamage(amount, schoolMask, spellId, sName, false, false, true, isCrit) end
         elseif action == "HEAL" then
             if not cfg.outgoing_heal then return end
             local marked = consumeMark(amount, "heal")
@@ -333,10 +329,7 @@ local function handleUnitCombat(unit, action, flagText, amount, schoolMask)
             if (GetTime() - lastCLEUTime) < CLEU_ACTIVE_WINDOW then return end
 
             local spellId, sName = getLastPlayerSpellId()
-            if spellId then
-                emitHeal(amount, spellId, sName, false, isCrit)
-            end
-
+            if spellId then emitHeal(amount, spellId, sName, false, isCrit) end
         elseif UC_MISS[action] then
             if not cfg.outgoing_miss then return end
             local marked = consumeMark(action, "miss")
@@ -346,11 +339,8 @@ local function handleUnitCombat(unit, action, flagText, amount, schoolMask)
             local spellId = getLastPlayerSpellId()
             emitMiss(action, spellId)
         end
-
     elseif unit == "pet" then
-        if action == "WOUND" then
-            consumeMark(amount, "damage")
-        end
+        if action == "WOUND" then consumeMark(amount, "damage") end
     end
 end
 
@@ -380,17 +370,11 @@ local ucFrame = CreateFrame("Frame")
 local spellFrame = CreateFrame("Frame")
 local regenFrame = CreateFrame("Frame")
 
-cleuFrame:SetScript("OnEvent", function()
-    pcall(parseCLEU)
-end)
+cleuFrame:SetScript("OnEvent", function() pcall(parseCLEU) end)
 
-ucFrame:SetScript("OnEvent", function(_, _, unit, action, flagText, amount, school)
-    pcall(handleUnitCombat, unit, action, flagText, amount, school)
-end)
+ucFrame:SetScript("OnEvent", function(_, _, unit, action, flagText, amount, school) pcall(handleUnitCombat, unit, action, flagText, amount, school) end)
 
-spellFrame:SetScript("OnEvent", function(_, _, unit, _, spellId)
-    pcall(handleSpellcast, unit, nil, spellId)
-end)
+spellFrame:SetScript("OnEvent", function(_, _, unit, _, spellId) pcall(handleSpellcast, unit, nil, spellId) end)
 
 ------------------------------------------------------------------------
 -- Enable / Disable (with InCombatLockdown protection)
@@ -399,9 +383,7 @@ end)
 module.CombatLog = module.CombatLog or {}
 
 local function registerEvents()
-    if GetCombatLogInfo then
-        cleuFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    end
+    if GetCombatLogInfo then cleuFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED") end
     if ucFrame.RegisterUnitEvent then
         ucFrame:RegisterUnitEvent("UNIT_COMBAT", "target", "pet")
     else

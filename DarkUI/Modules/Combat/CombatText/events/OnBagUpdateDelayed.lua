@@ -36,9 +36,7 @@ local function buildInventoryCache(cacheToReuse)
 end
 
 local function onBagUpdateDelayed()
-    if not cfg.loot then
-        return
-    end
+    if not cfg.loot then return end
 
     local newInventoryCache = buildInventoryCache()
 
@@ -75,9 +73,7 @@ local function onBagUpdateDelayed()
     inventoryCache = newInventoryCache
 end
 
-local function onPlayerEnteringWorld()
-    inventoryCache = buildInventoryCache()
-end
+local function onPlayerEnteringWorld() inventoryCache = buildInventoryCache() end
 
 module.handlers = module.handlers or {}
 module.handlers["PLAYER_ENTERING_WORLD"] = onPlayerEnteringWorld

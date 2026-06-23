@@ -265,18 +265,12 @@ local ITEM_QUALITY_COLORS = {
 local function formatEvent(dataEvent)
     local fmt = EVENT_TYPE_FORMATS[dataEvent.eventType]
 
-    if not fmt and dataEvent.eventType and dataEvent.eventType:find("^SELF_ITEM_LOOTED_") then
-        fmt = EVENT_TYPE_FORMATS["SELF_ITEM_LOOTED"]
-    end
+    if not fmt and dataEvent.eventType and dataEvent.eventType:find("^SELF_ITEM_LOOTED_") then fmt = EVENT_TYPE_FORMATS["SELF_ITEM_LOOTED"] end
 
-    if not fmt then
-        return
-    end
+    if not fmt then return end
 
     local queueName = fmt.eligibleQueues and fmt.eligibleQueues[1]
-    if not queueName then
-        return
-    end
+    if not queueName then return end
 
     local displayEvent = {}
     displayEvent.eligibleScrollFrames = fmt.eligibleQueues
@@ -308,23 +302,15 @@ local function formatEvent(dataEvent)
                     text = component.value
                 elseif component.type == "variable" then
                     text = dataEvent[component.value]
-                    if component.value == "missType" and text then
-                        text = MISS_TYPE_TEXT[text] or text
-                    end
+                    if component.value == "missType" and text then text = MISS_TYPE_TEXT[text] or text end
                 elseif component.type == "money" then
                     local g = dataEvent.gold or 0
                     local s = dataEvent.silver or 0
                     local c = dataEvent.copper or 0
                     local parts = ""
-                    if g > 0 then
-                        parts = parts .. "|cFFFFD700" .. format("%d", g) .. "|r" .. GOLD_ICON
-                    end
-                    if s > 0 then
-                        parts = parts .. " |cFFC0C0C0" .. format("%d", s) .. "|r" .. SILVER_ICON
-                    end
-                    if c > 0 or (g == 0 and s == 0) then
-                        parts = parts .. " |cFFB87333" .. format("%d", c) .. "|r" .. COPPER_ICON
-                    end
+                    if g > 0 then parts = parts .. "|cFFFFD700" .. format("%d", g) .. "|r" .. GOLD_ICON end
+                    if s > 0 then parts = parts .. " |cFFC0C0C0" .. format("%d", s) .. "|r" .. SILVER_ICON end
+                    if c > 0 or (g == 0 and s == 0) then parts = parts .. " |cFFB87333" .. format("%d", c) .. "|r" .. COPPER_ICON end
                     text = parts
                 end
 
@@ -355,9 +341,7 @@ local function formatEvent(dataEvent)
                         if component.value == "itemName" and dataEvent.itemQuality and ITEM_QUALITY_COLORS[dataEvent.itemQuality] then
                             color = ITEM_QUALITY_COLORS[dataEvent.itemQuality]
                         end
-                        if color then
-                            text = "|cFF" .. color .. text .. "|r"
-                        end
+                        if color then text = "|cFF" .. color .. text .. "|r" end
                     end
                     message = message .. text
                 end

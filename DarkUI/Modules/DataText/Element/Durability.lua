@@ -33,9 +33,7 @@ local cfg = module.config.Durability
 
 module:Inject("Durability", {
     OnLoad = function(self)
-        if cfg.man then
-            DurabilityFrame.Show = DurabilityFrame.Hide
-        end
+        if cfg.man then DurabilityFrame.Show = DurabilityFrame.Hide end
         module:RegEvents(self, "UPDATE_INVENTORY_DURABILITY MERCHANT_SHOW PLAYER_LOGIN")
     end,
     OnEvent = function(self, event)
@@ -43,9 +41,7 @@ module:Inject("Durability", {
             local dmin = 100
             for id = 1, 18 do
                 local dur, dmax = GetInventoryItemDurability(id)
-                if dur ~= dmax then
-                    dmin = floor(min(dmin, dur / dmax * 100))
-                end
+                if dur ~= dmax then dmin = floor(min(dmin, dur / dmax * 100)) end
             end
             self.text:SetText(format(gsub(cfg.fmt, "%[color%]", (module:Gradient(dmin / 100))), dmin))
         end
@@ -90,9 +86,7 @@ module:Inject("Durability", {
                     local argVal = data.args and data.args[7]
                     if argVal and argVal.field == "repairCost" then
                         totalcost = totalcost + argVal.intVal
-                        if totalcost > 0 then
-                            nodur = false
-                        end
+                        if totalcost > 0 then nodur = false end
                     end
                 end
             end
@@ -123,9 +117,7 @@ module:Inject("Durability", {
             else
                 for i = 0, numSets - 1 do
                     local name, icon, setID = C_EquipmentSet_GetEquipmentSetInfo(i)
-                    if not icon then
-                        icon = 134400
-                    end
+                    if not icon then icon = 134400 end
                     tinsert(menulist, {
                         text = format("|T%s:" .. t_icon .. ":" .. t_icon .. ":0:0:64:64:5:59:5:59:%d|t %s", icon, t_icon, name),
                         notCheckable = 1,

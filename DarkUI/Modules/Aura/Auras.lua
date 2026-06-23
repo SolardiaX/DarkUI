@@ -42,9 +42,7 @@ end
 
 local function startOrStopFlash(animation, timeleft)
     if timeleft < cfg.flash_timer then
-        if not animation:IsPlaying() then
-            animation:Play()
-        end
+        if not animation:IsPlaying() then animation:Play() end
     elseif animation:IsPlaying() then
         animation:Stop()
     end
@@ -89,9 +87,7 @@ local function buttonUpdateTimer(button, elapsed)
         button.timer:SetText(timer)
     end
 
-    if onTooltip then
-        buttonSetTooltip(button)
-    end
+    if onTooltip then buttonSetTooltip(button) end
 end
 
 local function buttonOnAttributeChanged(button, attribute, value)
@@ -116,9 +112,7 @@ updateAuras = function(button, index)
     local unit, filter = button.header:GetAttribute("unit"), button.filter
     local auraData = C_UnitAuras_GetAuraDataByIndex(unit, index, filter)
 
-    if not auraData then
-        return
-    end
+    if not auraData then return end
 
     local duration = auraData.duration
     local hasDuration = not issecretvalue(duration) and duration > 0 and auraData.expirationTime
@@ -135,22 +129,16 @@ updateAuras = function(button, index)
         button.nextUpdate = -1
         buttonUpdateTimer(button, 0)
 
-        if cfg.enable_flash and button.animation then
-            startOrStopFlash(button.animation, timeLeft)
-        end
+        if cfg.enable_flash and button.animation then startOrStopFlash(button.animation, timeLeft) end
 
         if cfg.enable_animation and button.auraGrowth then
-            if timeLeft and auraData.duration == ceil(timeLeft) then
-                button.auraGrowth:Play()
-            end
+            if timeLeft and auraData.duration == ceil(timeLeft) then button.auraGrowth:Play() end
         end
     else
         button.timeLeft = nil
         button.timer:SetText("")
 
-        if cfg.enable_flash and button.animation then
-            button.animation:Stop()
-        end
+        if cfg.enable_flash and button.animation then button.animation:Stop() end
     end
 
     local applications = auraData.applications
@@ -329,9 +317,7 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     BuffFrame.numHideableBuffs = 0
     BuffFrame:Kill()

@@ -4,9 +4,7 @@ local E, C, L = select(2, ...):unpack()
 -- ruRU
 ----------------------------------------------------------------------------------------
 
-if E.locale ~= "ruRU" then
-    return
-end
+if E.locale ~= "ruRU" then return end
 
 L.WELCOME_LINE = "Добро пожаловать в DarkUI "
 L.POPUP_INSTALLUI =

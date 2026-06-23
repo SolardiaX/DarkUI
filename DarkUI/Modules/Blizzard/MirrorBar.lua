@@ -13,17 +13,13 @@ local cfg = C.blizzard
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg.custom_position then
-        return
-    end
+    if not cfg.custom_position then return end
 
     local bar_border = C.media.path .. C.general.style .. "\\" .. "tex_bar_border"
 
     local function setupTimer(container, timer)
         local bar = container:GetAvailableTimer(timer)
-        if not bar then
-            return
-        end
+        if not bar then return end
 
         if not bar.styled then
             bar:SetSize(200, 16)
@@ -55,9 +51,7 @@ function module:OnInit()
 
             local timerKey = string.lower(timer)
             local timerCfg = cfg.mirrorbar[timerKey]
-            if timerCfg and timerCfg.pos then
-                bar:SetPoint(unpack(timerCfg.pos))
-            end
+            if timerCfg and timerCfg.pos then bar:SetPoint(unpack(timerCfg.pos)) end
 
             bar.styled = true
         end

@@ -30,15 +30,9 @@ local function setTooltipIcon(self, icon)
 end
 
 local GetTextureByType = {
-    [Enum.TooltipDataType.Item] = function(id)
-        return C_Item.GetItemIconByID(id)
-    end,
-    [Enum.TooltipDataType.Toy] = function(id)
-        return C_Item.GetItemIconByID(id)
-    end,
-    [Enum.TooltipDataType.Spell] = function(id)
-        return C_Spell.GetSpellTexture(id)
-    end,
+    [Enum.TooltipDataType.Item] = function(id) return C_Item.GetItemIconByID(id) end,
+    [Enum.TooltipDataType.Toy] = function(id) return C_Item.GetItemIconByID(id) end,
+    [Enum.TooltipDataType.Spell] = function(id) return C_Spell.GetSpellTexture(id) end,
 }
 
 function module:OnInit()
@@ -47,9 +41,7 @@ function module:OnInit()
     for tooltipType, getTex in next, GetTextureByType do
         TooltipDataProcessor.AddTooltipPostCall(tooltipType, function(self, data)
             if whiteTooltip[self] and not self:IsForbidden() then
-                if data and data.id then
-                    setTooltipIcon(self, getTex(data.id))
-                end
+                if data and data.id then setTooltipIcon(self, getTex(data.id)) end
             end
         end)
     end
@@ -68,7 +60,5 @@ function module:OnInit()
         end
     end)
 
-    hooksecurefunc(GameTooltip, "SetUnitAura", function(self)
-        setTooltipIcon(self)
-    end)
+    hooksecurefunc(GameTooltip, "SetUnitAura", function(self) setTooltipIcon(self) end)
 end

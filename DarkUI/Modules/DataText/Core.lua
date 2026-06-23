@@ -56,9 +56,7 @@ local function handleMenuList(root, menuList)
             local func = item.func
             if func and item.arg1 then
                 local a1 = item.arg1
-                func = function()
-                    item.func(nil, a1)
-                end
+                func = function() item.func(nil, a1) end
             end
             root:CreateButton(item.text, func)
         end
@@ -66,9 +64,7 @@ local function handleMenuList(root, menuList)
 end
 
 function module:ShowMenu(anchor, menuList)
-    MenuUtil.CreateContextMenu(anchor, function(_, root)
-        handleMenuList(root, menuList)
-    end)
+    MenuUtil.CreateContextMenu(anchor, function(_, root) handleMenuList(root, menuList) end)
 end
 
 ------------------------------------------------------------------------
@@ -77,17 +73,13 @@ end
 
 local function getPlayerMapPos(mapID)
     tempVec2D.x, tempVec2D.y = UnitPosition("player")
-    if not tempVec2D.x then
-        return
-    end
+    if not tempVec2D.x then return end
 
     local mapRect = mapRects[mapID]
     if not mapRect then
         local _, pos1 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0))
         local _, pos2 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1))
-        if not pos1 or not pos2 then
-            return
-        end
+        if not pos1 or not pos2 then return end
         mapRect = { pos1, pos2 }
         mapRect[2]:Subtract(mapRect[1])
         mapRects[mapID] = mapRect
@@ -103,9 +95,7 @@ function module:HideTT(stat)
 end
 
 function module:AltUpdate(stat)
-    if not stat.hovered then
-        return
-    end
+    if not stat.hovered then return end
 
     if IsAltKeyDown() and not stat.altdown then
         stat.altdown = true
@@ -168,17 +158,11 @@ end
 ------------------------------------------------------------------------
 
 function module:Inject(name, stat)
-    if not name then
-        return
-    end
-    if not stat then
-        stat = { height = 1, width = 1 }
-    end
+    if not name then return end
+    if not stat then stat = { height = 1, width = 1 } end
 
     local m = self.config[name]
-    if not m or m.enable == false then
-        return
-    end
+    if not m or m.enable == false then return end
 
     for k, v in pairs({
         name = name,
@@ -192,27 +176,19 @@ function module:Inject(name, stat)
         strata = m.strata or "BACKGROUND",
         level = 20,
     }) do
-        if not stat[k] then
-            stat[k] = v
-        end
+        if not stat[k] then stat[k] = v end
     end
-    if not stat.text then
-        stat.text = {}
-    end
+    if not stat.text then stat.text = {} end
 
     for k, v in pairs(font) do
-        if not stat.text[k] then
-            stat.text[k] = m[k] or v
-        end
+        if not stat.text[k] then stat.text[k] = m[k] or v end
     end
 
     if stat.OnEnter then
         if stat.OnLeave then
             hooksecurefunc(stat, "OnLeave", self.HideTT)
         else
-            stat.OnLeave = function(s)
-                self:HideTT(s)
-            end
+            stat.OnLeave = function(s) self:HideTT(s) end
         end
     end
     tinsert(layout, stat)
@@ -225,9 +201,7 @@ end
 local function buildConfig()
     local stats = cfg
 
-    local function class(str)
-        return format(E.myColorString .. "%s|r", str or "")
-    end
+    local function class(str) return format(E.myColorString .. "%s|r", str or "") end
 
     local config = {
         Latency = {
@@ -400,9 +374,7 @@ local function makePanel(f)
     local panel = CreateFrame("Frame", f.name and ("LP_" .. f.name) or nil, parent)
 
     panel:SetFrameStrata(f.strata or "BACKGROUND")
-    if f.level then
-        panel:SetFrameLevel(f.level)
-    end
+    if f.level then panel:SetFrameLevel(f.level) end
 
     local anchorFrame = _G[f.parent] or parent
     panel:SetPoint(strupper(f.anchor_to or "BOTTOMLEFT"), anchorFrame, strupper(f.anchor_from or f.anchor_to or "BOTTOMLEFT"), f.x_off or 0, f.y_off or 0)
@@ -425,9 +397,7 @@ local function makePanel(f)
         local flags = "THINOUTLINE"
         text:SetFont(t.font or STANDARD_TEXT_FONT, t.size or 12, flags)
 
-        if not t.string then
-            t.string = ""
-        end
+        if not t.string then t.string = "" end
         text:SetText(type(t.string) == "function" and t.string(text) or t.string)
 
         local tx_r, tx_g, tx_b = setColor(t.color or { 1, 1, 1 })
@@ -435,9 +405,7 @@ local function makePanel(f)
 
         if t.shadow then
             local sh = t.shadow
-            if type(sh) == "number" then
-                sh = { x = sh, y = -sh, alpha = 1 }
-            end
+            if type(sh) == "number" then sh = { x = sh, y = -sh, alpha = 1 } end
             if type(sh) == "table" then
                 text:SetShadowOffset(sh.x or 1, sh.y or -1)
                 text:SetShadowColor(0, 0, 0, sh.alpha or 1)
@@ -471,30 +439,18 @@ local function makePanel(f)
         end
     end
 
-    if f.OnLoad then
-        f.OnLoad(panel)
-    end
+    if f.OnLoad then f.OnLoad(panel) end
 
-    if f.OnClick or f.OnEnter or f.OnLeave then
-        panel:EnableMouse(true)
-    end
+    if f.OnClick or f.OnEnter or f.OnLeave then panel:EnableMouse(true) end
 
-    if f.OnEvent then
-        panel:HookScript("OnEvent", f.OnEvent)
-    end
+    if f.OnEvent then panel:HookScript("OnEvent", f.OnEvent) end
     if f.OnUpdate then
         panel.elapsed = 0
         panel:HookScript("OnUpdate", f.OnUpdate)
     end
-    if f.OnClick then
-        panel:HookScript("OnMouseUp", f.OnClick)
-    end
-    if f.OnEnter then
-        panel:HookScript("OnEnter", f.OnEnter)
-    end
-    if f.OnLeave then
-        panel:HookScript("OnLeave", f.OnLeave)
-    end
+    if f.OnClick then panel:HookScript("OnMouseUp", f.OnClick) end
+    if f.OnEnter then panel:HookScript("OnEnter", f.OnEnter) end
+    if f.OnLeave then panel:HookScript("OnLeave", f.OnLeave) end
 
     return panel
 end
@@ -504,24 +460,16 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
-    if not DB:GetStats(E.realm) then
-        DB:SetStats(E.realm, {})
-    end
-    if not DB:GetStats(E.realm .. "." .. E.myName) then
-        DB:SetStats(E.realm .. "." .. E.myName, {})
-    end
+    if not DB:GetStats(E.realm) then DB:SetStats(E.realm, {}) end
+    if not DB:GetStats(E.realm .. "." .. E.myName) then DB:SetStats(E.realm .. "." .. E.myName, {}) end
     self.conf = DB:GetStats(E.realm .. "." .. E.myName)
 
     -- panels referencing other panel names need LP_ prefix for _G lookup
     for _, f in ipairs(layout) do
         for _, other in ipairs(layout) do
-            if f.name and f.name == other.parent then
-                other.parent = "LP_" .. other.parent
-            end
+            if f.name and f.name == other.parent then other.parent = "LP_" .. other.parent end
         end
     end
 

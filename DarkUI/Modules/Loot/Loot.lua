@@ -181,9 +181,7 @@ end
 ------------------------------------------------------------------------
 local function announce(channel)
     local nums = GetNumLootItems()
-    if nums == 0 or (nums == 1 and GetLootSlotType(1) == Enum.LootSlotType.Money) then
-        return
-    end
+    if nums == 0 or (nums == 1 and GetLootSlotType(1) == Enum.LootSlotType.Money) then return end
 
     if UnitIsPlayer("target") or not UnitExists("target") then
         SendChatMessage(">> " .. LOOT .. ":", channel)
@@ -217,36 +215,28 @@ local function announceDropdownInit()
     info.text = L.LOOT_TO_RAID
     info.value = "raid"
     info.notCheckable = 1
-    info.func = function(self)
-        announce(self.value)
-    end
+    info.func = function(self) announce(self.value) end
     UIDropDownMenu_AddButton(info)
 
     info = {}
     info.text = L.LOOT_TO_GUILD
     info.value = "guild"
     info.notCheckable = 1
-    info.func = function(self)
-        announce(self.value)
-    end
+    info.func = function(self) announce(self.value) end
     UIDropDownMenu_AddButton(info)
 
     info = {}
     info.text = L.LOOT_TO_PARTY
     info.value = "party"
     info.notCheckable = 1
-    info.func = function(self)
-        announce(self.value)
-    end
+    info.func = function(self) announce(self.value) end
     UIDropDownMenu_AddButton(info)
 
     info = {}
     info.text = L.LOOT_TO_SAY
     info.value = "say"
     info.notCheckable = 1
-    info.func = function(self)
-        announce(self.value)
-    end
+    info.func = function(self) announce(self.value) end
     UIDropDownMenu_AddButton(info)
 end
 
@@ -256,9 +246,7 @@ end
 local function onLootOpened(_, _, autoLoot)
     lootFrame:Show()
 
-    if not lootFrame:IsShown() then
-        CloseLoot(not autoLoot)
-    end
+    if not lootFrame:IsShown() then CloseLoot(not autoLoot) end
 
     if IsFishingLoot() then
         lootFrame.title:SetText(L.LOOT_FISH)
@@ -293,9 +281,7 @@ local function onLootOpened(_, _, autoLoot)
             local color = ITEM_QUALITY_COLORS[quality] or { r = 1, g = 1, b = 1 }
             local r, g, b = color.r, color.g, color.b
 
-            if GetLootSlotType(i) == Enum.LootSlotType.Money and item and not issecretvalue(item) then
-                item = item:gsub("\n", ", ")
-            end
+            if GetLootSlotType(i) == Enum.LootSlotType.Money and item and not issecretvalue(item) then item = item:gsub("\n", ", ") end
 
             if quantity and quantity > 1 then
                 slot.count:SetText(quantity)
@@ -325,9 +311,7 @@ local function onLootOpened(_, _, autoLoot)
             slot.name:SetTextColor(r, g, b)
             slot.icon:SetTexture(texture)
 
-            if quality then
-                maxQuality = math.max(maxQuality, quality)
-            end
+            if quality then maxQuality = math.max(maxQuality, quality) end
 
             if texture then
                 slot:Enable()
@@ -361,13 +345,9 @@ local function onLootOpened(_, _, autoLoot)
 end
 
 local function onLootSlotCleared(_, _, slot)
-    if not lootFrame:IsShown() then
-        return
-    end
+    if not lootFrame:IsShown() then return end
 
-    if slots[slot] then
-        slots[slot]:Hide()
-    end
+    if slots[slot] then slots[slot]:Hide() end
     anchorSlots()
 end
 
@@ -384,9 +364,7 @@ end
 -- Lifecycle
 ------------------------------------------------------------------------
 function module:OnInit()
-    if not cfg.enable then
-        return
-    end
+    if not cfg.enable then return end
 
     C_CVar.SetCVar("lootUnderMouse", 1)
     C_CVar.SetCVar("autoLootDefault", 1)
@@ -413,9 +391,7 @@ function module:OnInit()
     lootFrame.title = title
 
     local close = CreateFrame("Button", nil, lootFrame, "UIPanelCloseButton")
-    close:SetScript("OnClick", function()
-        CloseLoot()
-    end)
+    close:SetScript("OnClick", function() CloseLoot() end)
     E:StyleCloseButton(close, lootFrame)
 
     -- Announce button
@@ -437,12 +413,8 @@ function module:OnInit()
             announce(E:CheckChat())
         end
     end)
-    annBtn:SetScript("OnEnter", function(self)
-        self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
-    end)
-    annBtn:SetScript("OnLeave", function(self)
-        self:SetBackdropBorderColor(unpack(C.media.border_color))
-    end)
+    annBtn:SetScript("OnEnter", function(self) self:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b) end)
+    annBtn:SetScript("OnLeave", function(self) self:SetBackdropBorderColor(unpack(C.media.border_color)) end)
 
     UIDropDownMenu_Initialize(announceDropdown, announceDropdownInit, "MENU")
 
@@ -455,9 +427,7 @@ function module:OnInit()
             self:SetPoint(unpack(cfg.pos))
         end
     end)
-    lootFrame:SetScript("OnMouseUp", function(self)
-        self:StopMovingOrSizing()
-    end)
+    lootFrame:SetScript("OnMouseUp", function(self) self:StopMovingOrSizing() end)
     lootFrame:SetScript("OnHide", function()
         StaticPopup_Hide("CONFIRM_LOOT_DISTRIBUTION")
         CloseLoot()

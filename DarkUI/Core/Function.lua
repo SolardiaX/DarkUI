@@ -59,12 +59,8 @@ end
 
 --  UTF functions
 function E:UTF(string, i, dots)
-    if not string then
-        return
-    end
-    if not canaccessvalue(string) then
-        return string
-    end
+    if not string then return end
+    if not canaccessvalue(string) then return string end
     local bytes = string:len()
     if bytes <= i then
         return string
@@ -82,9 +78,7 @@ function E:UTF(string, i, dots)
             elseif c >= 240 and c <= 247 then
                 pos = pos + 4
             end
-            if len == i then
-                break
-            end
+            if len == i then break end
         end
         if len == i and pos <= bytes then
             return string:sub(1, pos - 1) .. (dots and "..." or "")
@@ -96,18 +90,18 @@ end
 
 -- Number value function
 function E:Round(number, decimals)
-    if not decimals then
-        decimals = 0
-    end
+    if not decimals then decimals = 0 end
     return (("%%.%df"):format(decimals)):format(number)
 end
 
-local defaultAbbrOptions = { config = CreateAbbreviateConfig({
-    { breakpoint = 1e12, abbreviation = "t", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-    { breakpoint = 1e9, abbreviation = "b", significandDivisor = 1e7, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-    { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
-    { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
-})}
+local defaultAbbrOptions = {
+    config = CreateAbbreviateConfig({
+        { breakpoint = 1e12, abbreviation = "t", significandDivisor = 1e10, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e9, abbreviation = "b", significandDivisor = 1e7, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e6, abbreviation = "m", significandDivisor = 1e4, fractionDivisor = 1e2, abbreviationIsGlobal = false },
+        { breakpoint = 1e3, abbreviation = "k", significandDivisor = 1e2, fractionDivisor = 1e1, abbreviationIsGlobal = false },
+    }),
+}
 
 function E:AbbreviateNumber(value)
     local options = C.general.useLocalNumberFormat and L.AbbrOptions or defaultAbbrOptions
@@ -157,9 +151,7 @@ local function EasyMenu_Initialize(frame, level, menuList)
 end
 
 function EasyMenu(menuList, menuFrame, anchor, x, y, displayMode, autoHideDelay)
-    if displayMode == "MENU" then
-        menuFrame.displayMode = displayMode
-    end
+    if displayMode == "MENU" then menuFrame.displayMode = displayMode end
     UIDropDownMenu_Initialize(menuFrame, EasyMenu_Initialize, displayMode, nil, menuList)
     ToggleDropDownMenu(1, nil, menuFrame, anchor, x, y, menuList, nil, autoHideDelay)
 end

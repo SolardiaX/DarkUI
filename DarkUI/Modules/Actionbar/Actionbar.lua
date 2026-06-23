@@ -59,9 +59,7 @@ local framesToDisable = {
 
 local function disableAllScripts(frame)
     for _, script in next, scripts do
-        if frame:HasScript(script) then
-            frame:SetScript(script, nil)
-        end
+        if frame:HasScript(script) then frame:SetScript(script, nil) end
     end
 end
 
@@ -71,12 +69,8 @@ local function buttonEventsRegisterFrame(self, added)
         local frame = frames[index]
         local wasAdded = frame == added
         if not added or wasAdded then
-            if not strmatch(frame:GetName(), "ExtraActionButton%d") then
-                self.frames[index] = nil
-            end
-            if wasAdded then
-                break
-            end
+            if not strmatch(frame:GetName(), "ExtraActionButton%d") then self.frames[index] = nil end
+            if wasAdded then break end
         end
     end
 end
@@ -120,8 +114,6 @@ end
 
 function module:OnEnable()
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE", function()
-        if TokenFrame and TokenFrame.Update then
-            TokenFrame:Update()
-        end
+        if TokenFrame and TokenFrame.Update then TokenFrame:Update() end
     end)
 end

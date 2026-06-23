@@ -62,9 +62,7 @@ function module:OnInit()
     end
 
     local function anchorAdjustAnchors(self, relativeAlert)
-        if self.anchorFrame:IsShown() then
-            return self.anchorFrame
-        end
+        if self.anchorFrame:IsShown() then return self.anchorFrame end
         return relativeAlert
     end
 
@@ -111,9 +109,7 @@ function module:OnInit()
         local _, isBlacklisted = replaceAnchors(alertFrameSubSystem)
         if isBlacklisted then
             for i, alertSubSystem in ipairs(AlertFrame.alertFrameSubSystems) do
-                if alertFrameSubSystem == alertSubSystem then
-                    return tremove(AlertFrame.alertFrameSubSystems, i)
-                end
+                if alertFrameSubSystem == alertSubSystem then return tremove(AlertFrame.alertFrameSubSystems, i) end
             end
         end
     end)
@@ -121,9 +117,7 @@ function module:OnInit()
     local remove = {}
     for i, alertFrameSubSystem in ipairs(AlertFrame.alertFrameSubSystems) do
         local _, isBlacklisted = replaceAnchors(alertFrameSubSystem)
-        if isBlacklisted then
-            remove[i] = true
-        end
+        if isBlacklisted then remove[i] = true end
     end
     for i in next, remove do
         tremove(AlertFrame.alertFrameSubSystems, i)

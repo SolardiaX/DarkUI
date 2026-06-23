@@ -3,19 +3,13 @@ local E, C, L = select(2, ...):unpack()
 ----------------------------------------------------------------------------------------
 -- Slash Commands
 ----------------------------------------------------------------------------------------
-SlashCmdList["RELOADUI"] = function()
-    ReloadUI()
-end
+SlashCmdList["RELOADUI"] = function() ReloadUI() end
 SLASH_RELOADUI1 = "/rl"
 
-SlashCmdList["RCSLASH"] = function()
-    DoReadyCheck()
-end
+SlashCmdList["RCSLASH"] = function() DoReadyCheck() end
 SLASH_RCSLASH1 = "/rc"
 
-SlashCmdList["TICKET"] = function()
-    ToggleHelpFrame()
-end
+SlashCmdList["TICKET"] = function() ToggleHelpFrame() end
 SLASH_TICKET1 = "/gm"
 
 -- Align by Akeru @wowinterface
@@ -84,9 +78,7 @@ function showGrid()
 end
 
 function hideGrid()
-    if grid then
-        grid:Hide()
-    end
+    if grid then grid:Hide() end
 end
 
 local isAligning = false
@@ -97,9 +89,7 @@ SlashCmdList["TOGGLEGRID"] = function(arg)
         isAligning = false
     else
         boxSize = (math.ceil((tonumber(arg) or boxSize) / 32) * 32)
-        if boxSize > 256 then
-            boxSize = 256
-        end
+        if boxSize > 256 then boxSize = 256 end
         showGrid()
         isAligning = true
     end
@@ -112,15 +102,11 @@ SlashCmdList["FRAME"] = function(arg)
     else
         arg = GetMouseFoci()[1]
     end
-    if arg ~= nil then
-        _G.FRAME = arg
-    end
+    if arg ~= nil then _G.FRAME = arg end
     if arg ~= nil and not arg:IsForbidden() then
         ChatFrame1:AddMessage("|cffCC0000~~~~~~~~~~~~~~~~~~~~~~~~~")
         ChatFrame1:AddMessage("Name: |cffFFD100" .. (arg:GetName() or "<unamed>"))
-        if arg:GetParent() and arg:GetParent():GetName() then
-            ChatFrame1:AddMessage("Parent: |cffFFD100" .. arg:GetParent():GetName())
-        end
+        if arg:GetParent() and arg:GetParent():GetName() then ChatFrame1:AddMessage("Parent: |cffFFD100" .. arg:GetParent():GetName()) end
 
         ChatFrame1:AddMessage("Width: |cffFFD100" .. format("%.2f", arg:GetWidth()))
         ChatFrame1:AddMessage("Height: |cffFFD100" .. format("%.2f", arg:GetHeight()))
@@ -137,12 +123,8 @@ SlashCmdList["FRAME"] = function(arg)
             if targetName then
                 ChatFrame1:AddMessage("Point-" .. i .. ": |cffFFD100" .. point .. "|r anchored to " .. targetName .. "'s |cffFFD100" .. relativePoint)
             end
-            if xOfs then
-                ChatFrame1:AddMessage("X: |cffFFD100" .. format("%.2f", xOfs))
-            end
-            if yOfs then
-                ChatFrame1:AddMessage("Y: |cffFFD100" .. format("%.2f", yOfs))
-            end
+            if xOfs then ChatFrame1:AddMessage("X: |cffFFD100" .. format("%.2f", xOfs)) end
+            if yOfs then ChatFrame1:AddMessage("Y: |cffFFD100" .. format("%.2f", yOfs)) end
         end
         ChatFrame1:AddMessage("|cffCC0000~~~~~~~~~~~~~~~~~~~~~~~~~")
     elseif arg == nil then
@@ -211,7 +193,13 @@ local function createTemplatePreview()
     -- Row 4: Other decorations
     local effects = {
         { label = "CreateShadow", fn = function(box) box:CreateShadow() end },
-        { label = "Shadow+Border", fn = function(box) box:CreateShadow(); box:CreateBorder() end },
+        {
+            label = "Shadow+Border",
+            fn = function(box)
+                box:CreateShadow()
+                box:CreateBorder()
+            end,
+        },
         { label = "CreateOverlay", fn = function(box) box:CreateOverlay(4) end },
         { label = "CreateGradient", fn = function(box) box:CreateGradient() end },
     }
@@ -236,17 +224,13 @@ SLASH_DARKUI1 = "/darkui"
 SlashCmdList["DARKUI"] = function(msg)
     msg = msg and msg:lower():trim() or ""
     if msg == "tpl" or msg == "template" then
-        if not tplFrames then
-            tplFrames = createTemplatePreview()
-        end
+        if not tplFrames then tplFrames = createTemplatePreview() end
         local visible = tplFrames[1]:IsShown()
         for _, frame in ipairs(tplFrames) do
             frame:SetShown(not visible)
         end
     elseif msg == "" then
-        if DarkUI_Options then
-            DarkUI_Options:Toggle()
-        end
+        if DarkUI_Options then DarkUI_Options:Toggle() end
     else
         print("|cff00ff00DarkUI|r commands:")
         print("  /darkui — Open options panel")

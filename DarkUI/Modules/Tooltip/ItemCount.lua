@@ -30,9 +30,7 @@ local function onTooltipSetItem(self, data)
     end
 
     local itemStackCount = select(8, C_Item_GetItemInfo(data.id))
-    if itemStackCount and itemStackCount > 1 then
-        self:AddDoubleLine(L.TOOLTIP_STACK_CAP .. ":", InfoColor .. itemStackCount .. "|r")
-    end
+    if itemStackCount and itemStackCount > 1 then self:AddDoubleLine(L.TOOLTIP_STACK_CAP .. ":", InfoColor .. itemStackCount .. "|r") end
 end
 
 function module:OnInit()

@@ -202,9 +202,7 @@ local function createThreatType(self)
     local threat_status_file
 
     local function event_handler(self, event, unit)
-        if unit and unit ~= self.unit then
-            return
-        end
+        if unit and unit ~= self.unit then return end
 
         local status = UnitCanAttack(self.unit, "target") and UnitThreatSituation(self.unit, "target") or (UnitThreatSituation(self.unit))
         local file = (status ~= nil) and fg_files[status] or fg_files[0]
@@ -284,9 +282,7 @@ local function createStyle(self)
 end
 
 function module:OnInit()
-    if not C.unitframe.party.enable or not C.unitframe.party.standalone then
-        return
-    end
+    if not C.unitframe.party.enable or not C.unitframe.party.standalone then return end
 
     local mediaPath = cfg.mediaPath
     media = {
@@ -369,8 +365,6 @@ function module:OnInit()
             end
         end)
 
-        if CompactPartyFrame then
-            CompactPartyFrame:UnregisterAllEvents()
-        end
+        if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
     end)
 end

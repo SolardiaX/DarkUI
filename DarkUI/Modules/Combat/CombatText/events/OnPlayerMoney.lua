@@ -14,9 +14,7 @@ local previousMoney
 local dataEvent = {}
 
 local function onPlayerMoney()
-    if not cfg.loot then
-        return
-    end
+    if not cfg.loot then return end
 
     local currentMoney = GetMoney()
     if not previousMoney then

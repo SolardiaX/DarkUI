@@ -35,15 +35,11 @@ local function createCopyFrame()
     copyEditBox:SetAutoFocus(false)
     copyEditBox:SetFontObject(ChatFontNormal)
     copyEditBox:SetSize(500, 300)
-    copyEditBox:SetScript("OnEscapePressed", function()
-        copyFrame:Hide()
-    end)
+    copyEditBox:SetScript("OnEscapePressed", function() copyFrame:Hide() end)
     copyEditBox:SetScript("OnTextSet", function(self)
         local text = self:GetText()
         for _, size in pairs(sizes) do
-            if string.find(text, size) and not string.find(text, size .. "]") then
-                self:SetText(string.gsub(text, size, ":12:12"))
-            end
+            if string.find(text, size) and not string.find(text, size .. "]") then self:SetText(string.gsub(text, size, ":12:12")) end
         end
     end)
 
@@ -63,19 +59,13 @@ local function createCopyFrame()
 end
 
 local function canChangeMessage(arg1, id)
-    if id and arg1 == "" then
-        return id
-    end
+    if id and arg1 == "" then return id end
 end
 
-local function messageIsProtected(message)
-    return message and (message ~= gsub(message, "(:?|?)|K(.-)|k", canChangeMessage))
-end
+local function messageIsProtected(message) return message and (message ~= gsub(message, "(:?|?)|K(.-)|k", canChangeMessage)) end
 
 local function copyChat(cf)
-    if not isCreated then
-        createCopyFrame()
-    end
+    if not isCreated then createCopyFrame() end
 
     if copyFrame:IsShown() then
         copyFrame:Hide()
@@ -102,9 +92,7 @@ local function copyChat(cf)
 
     C_Timer.After(0, function()
         local scrollArea = copyEditBox:GetParent()
-        if scrollArea and scrollArea.SetVerticalScroll then
-            scrollArea:SetVerticalScroll(scrollArea:GetVerticalScrollRange() or 0)
-        end
+        if scrollArea and scrollArea.SetVerticalScroll then scrollArea:SetVerticalScroll(scrollArea:GetVerticalScrollRange() or 0) end
     end)
 end
 
@@ -113,23 +101,15 @@ end
 ------------------------------------------------------------------------
 
 local function setupQuickJoin(button)
-    if not button then
-        return
-    end
+    if not button then return end
     hooksecurefunc(button, "ToastToFriendFinished", function(self)
         self.FriendsButton:SetShown(not self.displayedToast)
-        if self.FriendCount then
-            self.FriendCount:SetShown(not self.displayedToast)
-        end
+        if self.FriendCount then self.FriendCount:SetShown(not self.displayedToast) end
     end)
     hooksecurefunc(button, "UpdateQueueIcon", function(self)
-        if not self.displayedToast then
-            return
-        end
+        if not self.displayedToast then return end
         self.FriendsButton:SetShown(false)
-        if self.FriendCount then
-            self.FriendCount:SetShown(false)
-        end
+        if self.FriendCount then self.FriendCount:SetShown(false) end
     end)
 
     if button.Toast then
@@ -161,9 +141,7 @@ end
 ------------------------------------------------------------------------
 
 function module:OnInit()
-    if not cfg.chat_copy then
-        return
-    end
+    if not cfg.chat_copy then return end
 
     -- Copy buttons (one per ChatFrame, original ChatCopy style)
     local copyButtons = {}
@@ -182,32 +160,22 @@ function module:OnInit()
 
         button:SetScript("OnMouseUp", function(_, btn)
             if btn == "RightButton" then
-                if ChatFrameMenuButton and ChatFrameMenuButton.OpenMenu then
-                    ChatFrameMenuButton:OpenMenu()
-                end
+                if ChatFrameMenuButton and ChatFrameMenuButton.OpenMenu then ChatFrameMenuButton:OpenMenu() end
             elseif btn == "MiddleButton" then
                 RandomRoll(1, 100)
             else
                 copyChat(cf)
             end
         end)
-        button:SetScript("OnEnter", function()
-            button:FadeIn()
-        end)
-        button:SetScript("OnLeave", function()
-            button:FadeOut()
-        end)
+        button:SetScript("OnEnter", function() button:FadeIn() end)
+        button:SetScript("OnLeave", function() button:FadeOut() end)
 
         copyButtons[i] = button
     end
 
     if copyButtons[1] then
-        ChatFrame1:HookScript("OnEnter", function()
-            copyButtons[1]:FadeIn()
-        end)
-        ChatFrame1:HookScript("OnLeave", function()
-            copyButtons[1]:FadeOut()
-        end)
+        ChatFrame1:HookScript("OnEnter", function() copyButtons[1]:FadeIn() end)
+        ChatFrame1:HookScript("OnLeave", function() copyButtons[1]:FadeOut() end)
     end
 
     -- System buttons toolbar (right side, vertical)
@@ -222,9 +190,7 @@ function module:OnInit()
 
     local validButtons = {}
     for _, button in ipairs(systemButtons) do
-        if button then
-            tinsert(validButtons, button)
-        end
+        if button then tinsert(validButtons, button) end
     end
 
     if #validButtons > 0 then
@@ -236,13 +202,9 @@ function module:OnInit()
         toolbar:SetAlpha(0)
         toolbar:SetFrameStrata("MEDIUM")
 
-        local function showToolbar()
-            toolbar:FadeIn()
-        end
+        local function showToolbar() toolbar:FadeIn() end
         local function hideToolbar()
-            if not toolbar:IsMouseOver() then
-                toolbar:FadeOut()
-            end
+            if not toolbar:IsMouseOver() then toolbar:FadeOut() end
         end
 
         toolbar:SetScript("OnEnter", showToolbar)
@@ -268,7 +230,5 @@ function module:OnInit()
     setupQuickJoin(QuickJoinToastButton)
 
     -- Slash command
-    SlashCmdList.COPY_CHAT = function()
-        copyChat(ChatFrame1)
-    end
+    SlashCmdList.COPY_CHAT = function() copyChat(ChatFrame1) end
 end

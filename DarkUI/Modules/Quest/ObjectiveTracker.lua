@@ -14,9 +14,7 @@ local function getTrackerPos()
     local bars = C.actionbar and C.actionbar.bars
     if bars then
         for i = 4, 6 do
-            if bars["bar" .. i] and bars["bar" .. i].enable then
-                pos[4] = pos[4] - 30
-            end
+            if bars["bar" .. i] and bars["bar" .. i].enable then pos[4] = pos[4] - 30 end
         end
     end
     return pos
@@ -165,17 +163,11 @@ local function skinQuestIcons(_, block)
         finder.bg:SetFrameLevel(1)
 
         finder:HookScript("OnEnter", function(self)
-            if self:IsEnabled() then
-                self.bg:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b)
-            end
+            if self:IsEnabled() then self.bg:SetBackdropBorderColor(E.myColor.r, E.myColor.g, E.myColor.b) end
         end)
-        finder:HookScript("OnLeave", function(self)
-            self.bg:SetBackdropBorderColor(unpack(C.media.border_color))
-        end)
+        finder:HookScript("OnLeave", function(self) self.bg:SetBackdropBorderColor(unpack(C.media.border_color)) end)
 
-        hooksecurefunc(finder, "Show", function(self)
-            self.bg:SetFrameLevel(1)
-        end)
+        hooksecurefunc(finder, "Show", function(self) self.bg:SetFrameLevel(1) end)
 
         finder.skinned = true
     end
@@ -214,11 +206,7 @@ local function skinProgressBar(tracker, key)
             border:SetTemplate("Default")
             bar.newIconBg = border
 
-            if bar.AnimIn and bar.AnimIn.Play then
-                hooksecurefunc(bar.AnimIn, "Play", function()
-                    bar.AnimIn:Stop()
-                end)
-            end
+            if bar.AnimIn and bar.AnimIn.Play then hooksecurefunc(bar.AnimIn, "Play", function() bar.AnimIn:Stop() end) end
         end
 
         progressBar.styled = true
@@ -414,25 +402,19 @@ function module:OnInit()
     hooksecurefunc(QuestObjectiveTracker, "Update", colorQuestHeaders)
 
     -- Ctrl+Click in quest map
-    hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
-        onBlockClick(self.questID)
-    end)
+    hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self) onBlockClick(self.questID) end)
 
     -- Hook all tracker headers
     for i = 1, #headers do
         local header = headers[i].Header
-        if header then
-            header.Background:SetTexture(nil)
-        end
+        if header then header.Background:SetTexture(nil) end
 
         local tracker = headers[i]
         if tracker then
             hooksecurefunc(tracker, "AddBlock", skinQuestIcons)
             hooksecurefunc(tracker, "GetProgressBar", skinProgressBar)
             hooksecurefunc(tracker, "GetTimerBar", skinTimerBar)
-            hooksecurefunc(tracker, "OnBlockHeaderClick", function(_, block)
-                onBlockClick(block.id)
-            end)
+            hooksecurefunc(tracker, "OnBlockHeaderClick", function(_, block) onBlockClick(block.id) end)
 
             hooksecurefunc(tracker, "OnBlockHeaderEnter", function(_, block)
                 if isFramePositionedLeft(ObjectiveTrackerFrame) then
@@ -466,5 +448,4 @@ function module:OnInit()
     -- Mythic+ block
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "Activate", skinChallengeBlock)
     hooksecurefunc(ScenarioObjectiveTracker.ChallengeModeBlock, "SetUpAffixes", skinAffixes)
-
 end

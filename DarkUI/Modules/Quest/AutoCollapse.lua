@@ -37,43 +37,29 @@ function module:OnInit()
 
         if mode == "RAID" or mode == true then
             if inInstance then
-                C_Timer.After(0.1, function()
-                    ObjectiveTrackerFrame:SetCollapsed(true)
-                end)
+                C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
             elseif not InCombatLockdown() then
-                if ObjectiveTrackerFrame.isCollapsed then
-                    ObjectiveTrackerFrame:SetCollapsed(false)
-                end
+                if ObjectiveTrackerFrame.isCollapsed then ObjectiveTrackerFrame:SetCollapsed(false) end
             end
         elseif mode == "SCENARIO" then
             if inInstance then
                 if instanceType == "party" or instanceType == "scenario" then
                     C_Timer.After(0.1, function()
                         for i = 1, #headers do
-                            if headers[i] and headers[i].SetCollapsed then
-                                headers[i]:SetCollapsed(true)
-                            end
+                            if headers[i] and headers[i].SetCollapsed then headers[i]:SetCollapsed(true) end
                         end
                     end)
                 else
-                    C_Timer.After(0.1, function()
-                        ObjectiveTrackerFrame:SetCollapsed(true)
-                    end)
+                    C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
                 end
             elseif not InCombatLockdown() then
                 for i = 1, #headers do
-                    if headers[i] and headers[i].isCollapsed then
-                        headers[i]:SetCollapsed(false)
-                    end
+                    if headers[i] and headers[i].isCollapsed then headers[i]:SetCollapsed(false) end
                 end
-                if ObjectiveTrackerFrame.isCollapsed then
-                    ObjectiveTrackerFrame:SetCollapsed(false)
-                end
+                if ObjectiveTrackerFrame.isCollapsed then ObjectiveTrackerFrame:SetCollapsed(false) end
             end
         elseif mode == "RELOAD" then
-            C_Timer.After(0.1, function()
-                ObjectiveTrackerFrame:SetCollapsed(true)
-            end)
+            C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
         end
     end)
 
@@ -98,8 +84,6 @@ function module:OnInit()
     end)
 
     self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-        if not wasCollapsed and ObjectiveTrackerFrame:IsCollapsed() then
-            ObjectiveTrackerFrame:SetCollapsed(false)
-        end
+        if not wasCollapsed and ObjectiveTrackerFrame:IsCollapsed() then ObjectiveTrackerFrame:SetCollapsed(false) end
     end)
 end

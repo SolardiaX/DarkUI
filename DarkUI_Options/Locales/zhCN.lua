@@ -1,6 +1,4 @@
-if GetLocale() ~= "zhCN" then
-    return
-end
+if GetLocale() ~= "zhCN" then return end
 
 L_DARKUI_CONSOLE = "DarkUI 控制台"
 

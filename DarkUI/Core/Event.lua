@@ -12,9 +12,7 @@ local registry = {} -- [event] = { {handler, owner}, ... }
 
 frame:SetScript("OnEvent", function(_, event, ...)
     local handlers = registry[event]
-    if not handlers then
-        return
-    end
+    if not handlers then return end
 
     for i = #handlers, 1, -1 do
         local entry = handlers[i]
@@ -24,18 +22,14 @@ frame:SetScript("OnEvent", function(_, event, ...)
                 handler(owner, event, ...)
             elseif type(handler) == "string" and owner then
                 local fn = owner[handler]
-                if fn then
-                    fn(owner, event, ...)
-                end
+                if fn then fn(owner, event, ...) end
             end
         end
     end
 end)
 
 function Event:Register(event, handler, owner)
-    if not event or not handler then
-        return
-    end
+    if not event or not handler then return end
 
     if event:find(" ") then
         for ev in event:gmatch("%S+") do
@@ -55,9 +49,7 @@ function Event:Register(event, handler, owner)
 
     local handlers = registry[event]
     for _, entry in ipairs(handlers) do
-        if entry[1] == handler and entry[2] == owner then
-            return
-        end
+        if entry[1] == handler and entry[2] == owner then return end
     end
 
     handlers[#handlers + 1] = { handler, owner }
@@ -72,9 +64,7 @@ function Event:Unregister(event, handler, owner)
     end
 
     local handlers = registry[event]
-    if not handlers then
-        return
-    end
+    if not handlers then return end
 
     for i = #handlers, 1, -1 do
         local entry = handlers[i]
@@ -93,9 +83,7 @@ end
 function Event:UnregisterAll(owner)
     for event, handlers in pairs(registry) do
         for i = #handlers, 1, -1 do
-            if handlers[i][2] == owner then
-                table.remove(handlers, i)
-            end
+            if handlers[i][2] == owner then table.remove(handlers, i) end
         end
         if #handlers == 0 then
             registry[event] = nil
@@ -108,18 +96,12 @@ function Event:RegisterOnce(event, handler, owner)
     local wrapper
     wrapper = function(self, ev, ...)
         Event:Unregister(event, wrapper, owner or E)
-        if type(handler) == "function" then
-            handler(owner or self, ev, ...)
-        end
+        if type(handler) == "function" then handler(owner or self, ev, ...) end
     end
     Event:Register(event, wrapper, owner or E)
 end
 
 -- Convenience: register on E directly
-function E:RegisterEvent(event, handler)
-    Event:Register(event, handler, self)
-end
+function E:RegisterEvent(event, handler) Event:Register(event, handler, self) end
 
-function E:UnregisterEvent(event, handler)
-    Event:Unregister(event, handler, self)
-end
+function E:UnregisterEvent(event, handler) Event:Unregister(event, handler, self) end

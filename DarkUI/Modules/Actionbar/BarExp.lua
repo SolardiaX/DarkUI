@@ -21,24 +21,18 @@ local faction_standing_msg = {
 }
 
 local function switcherSetFactionByName(faction_name)
-    if faction_name == "Guild" then
-        faction_name = GetGuildInfo("player")
-    end
+    if faction_name == "Guild" then faction_name = GetGuildInfo("player") end
 
     for i = 1, C_Reputation.GetNumFactions() do
         local factionInfo = C_Reputation.GetFactionDataByIndex(i)
         if factionInfo and factionInfo.name == faction_name then
-            if C_Reputation.IsFactionActive(i) then
-                C_Reputation.SetWatchedFactionByIndex(i)
-            end
+            if C_Reputation.IsFactionActive(i) then C_Reputation.SetWatchedFactionByIndex(i) end
         end
     end
 end
 
 local function switcherOnEvent(_, event, ...)
-    if cfg.autoswitch ~= true then
-        return
-    end
+    if cfg.autoswitch ~= true then return end
 
     local arg1 = ...
     if event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
@@ -48,9 +42,7 @@ local function switcherOnEvent(_, event, ...)
             faction_name = smatch(arg1, faction_standing_msg[i])
             i = i + 1
         end
-        if faction_name ~= nil then
-            switcherSetFactionByName(faction_name)
-        end
+        if faction_name ~= nil then switcherSetFactionByName(faction_name) end
     end
 end
 
@@ -150,9 +142,7 @@ local function barOnEvent(self, event, arg1, arg2)
             end
         end
     elseif event == "UPDATE_FACTION" then
-        if IsPlayerAtEffectiveMaxLevel() then
-            barShowRep(self)
-        end
+        if IsPlayerAtEffectiveMaxLevel() then barShowRep(self) end
     end
 end
 
@@ -194,9 +184,7 @@ local function barOnEnter()
             )
         end
 
-        if IsXPUserDisabled() then
-            GameTooltip:AddLine("|cffff0000" .. XP .. LOCKED)
-        end
+        if IsXPUserDisabled() then GameTooltip:AddLine("|cffff0000" .. XP .. LOCKED) end
 
         withXp = true
     end
@@ -235,9 +223,7 @@ local function barOnEnter()
             local repRankInfo = C_GossipInfo.GetFriendshipReputationRanks(factionID)
             local currentRank, maxRank = repRankInfo.currentLevel, repRankInfo.maxLevel
             if friendID and friendID ~= 0 then
-                if maxRank > 0 then
-                    name = name .. " (" .. currentRank .. " / " .. maxRank .. ")"
-                end
+                if maxRank > 0 then name = name .. " (" .. currentRank .. " / " .. maxRank .. ")" end
                 if nextFriendThreshold then
                     barMin, barMax, value = friendThreshold, nextFriendThreshold, friendRep
                 else
@@ -254,9 +240,7 @@ local function barOnEnter()
             end
         end
 
-        if withXp then
-            GameTooltip:AddLine(" ")
-        end
+        if withXp then GameTooltip:AddLine(" ") end
 
         GameTooltip:AddLine(L.ACTIONBAR_REP or "Reputation")
         GameTooltip:AddLine(" ")
@@ -303,14 +287,10 @@ local function barOnEnter()
     GameTooltip:Show()
 end
 
-local function barOnLeave()
-    GameTooltip:Hide()
-end
+local function barOnLeave() GameTooltip:Hide() end
 
 function module:OnInit()
-    if not cfg or not cfg.enable then
-        return
-    end
+    if not cfg or not cfg.enable then return end
 
     local statusbar = CreateFrame("StatusBar", "DarkUI_XPBar", UIParent)
     statusbar:SetFrameStrata(cfg.bfstrata)

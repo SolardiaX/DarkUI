@@ -16,14 +16,10 @@ local hooksecurefunc = hooksecurefunc
 ------------------------------------------------------------------------
 
 local function disableTutorials()
-    if TutorialFrameAlertButton then
-        TutorialFrameAlertButton:Kill()
-    end
+    if TutorialFrameAlertButton then TutorialFrameAlertButton:Kill() end
 
     local function acknowledgeTips()
-        if InCombatLockdown() then
-            return
-        end
+        if InCombatLockdown() then return end
         if HelpTip and HelpTip.framePool then
             for frame in HelpTip.framePool:EnumerateActive() do
                 frame:Acknowledge()
@@ -32,9 +28,7 @@ local function disableTutorials()
     end
 
     acknowledgeTips()
-    if HelpTip then
-        hooksecurefunc(HelpTip, "Show", acknowledgeTips)
-    end
+    if HelpTip then hooksecurefunc(HelpTip, "Show", acknowledgeTips) end
 end
 
 ------------------------------------------------------------------------
@@ -103,9 +97,7 @@ function module:OnInit()
         firstTimeSetup()
         DB:SetStats("version", E.version, true)
 
-        if not DB:GetStats("inited", true) then
-            StaticPopup_Show("INSTALLUI_CONFIRM")
-        end
+        if not DB:GetStats("inited", true) then StaticPopup_Show("INSTALLUI_CONFIRM") end
     end
 
     disableTutorials()
@@ -149,6 +141,4 @@ StaticPopupDialogs["RESETUI_CONFIRM"] = {
 }
 
 SLASH_RESETUI1 = "/resetui"
-SlashCmdList.RESETUI = function()
-    StaticPopup_Show("RESETUI_CONFIRM")
-end
+SlashCmdList.RESETUI = function() StaticPopup_Show("RESETUI_CONFIRM") end
