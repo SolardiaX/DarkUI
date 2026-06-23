@@ -328,7 +328,7 @@ end
 ------------------------------------------------------------------------
 
 local function addMessageTimestamp(frame, msg, ...)
-    if type(msg) == "string" and msg ~= "" and canaccessvalue(msg) then
+    if type(msg) == "string" and canaccessvalue(msg) and msg ~= "" then
         msg = format("%s[%s]|r %s", E:RGBToHex(cfg.time_color), BetterDate(cfg.time_format or "%H:%M", time()), msg)
     end
     return frame.OldAddMessage(frame, msg, ...)
