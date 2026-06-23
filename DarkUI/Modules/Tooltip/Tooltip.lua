@@ -108,7 +108,7 @@ local function styleTooltip(tip)
             tt:DisableDrawLayer("BACKGROUND")
 
             tt:CreateBackdrop("default", 2, true)
-            tt.__backdrop:CreateGradient()
+            -- tt.__backdrop:CreateGradient()
             tt.__backdrop:CreateShadow()
             tt.__backdrop:SetBackdropEdge("regular")
 
@@ -212,12 +212,16 @@ local function onTooltipSetUnit(self)
     end
 
     if isPlayer then
-        if UnitIsAFK(unit) then
+        -- AFK/DND status can be a secret boolean on restricted units; guard the test.
+        local afk, dnd = UnitIsAFK(unit), UnitIsDND(unit)
+        if canaccessvalue(afk) and afk then
             self:AppendText((" %s"):format("|cffE7E716" .. L.CHAT_AFK .. "|r"))
-        elseif UnitIsDND(unit) then
+        elseif canaccessvalue(dnd) and dnd then
             self:AppendText((" %s"):format("|cffFF0000" .. L.CHAT_DND .. "|r"))
         end
-        if englishRace and (englishRace == "Pandaren" or englishRace == "Dracthyr" or englishRace == "EarthenDwarf" or englishRace == "Harronir") and faction ~= nil and faction ~= playerFaction then
+        if englishRace and canaccessvalue(englishRace) and faction and canaccessvalue(faction)
+            and (englishRace == "Pandaren" or englishRace == "Dracthyr" or englishRace == "EarthenDwarf" or englishRace == "Harronir")
+            and faction ~= playerFaction then
             local hex = "cffff3333"
             if faction == "Alliance" then
                 hex = "cff69ccf0"
@@ -228,7 +232,8 @@ local function onTooltipSetUnit(self)
         local guildName, guildRank = GetGuildInfo(unit)
         if guildName then
             _G["GameTooltipTextLeft2"]:SetFormattedText("%s", guildName)
-            if UnitIsInMyGuild(unit) then
+            local inGuild = UnitIsInMyGuild(unit)
+            if canaccessvalue(inGuild) and inGuild then
                 _G["GameTooltipTextLeft2"]:SetTextColor(1, 1, 0)
             else
                 _G["GameTooltipTextLeft2"]:SetTextColor(0, 1, 1)
@@ -251,9 +256,11 @@ local function onTooltipSetUnit(self)
         end
     else
         if levelColor then
+            local isBattlePet = UnitIsBattlePetCompanion(unit)
+            isBattlePet = canaccessvalue(isBattlePet) and isBattlePet
             for i = 2, lines do
                 local line = _G["GameTooltipTextLeft" .. i]
-                if not line or not line:GetText() or UnitIsBattlePetCompanion(unit) then break end
+                if not line or not line:GetText() or isBattlePet then break end
                 local text = line:GetText()
                 if not canaccessvalue(text) then break end
                 if (level and text:find("^" .. LEVEL)) or (creatureType and text:find("^" .. creatureType)) then
@@ -274,7 +281,8 @@ local function onTooltipSetUnit(self)
     end
 
     -- Setup inline health bar
-    if not UnitIsDeadOrGhost(unit) then
+    local deadOrGhost = UnitIsDeadOrGhost(unit)
+    if canaccessvalue(deadOrGhost) and not deadOrGhost then
         local bar = GameTooltip.StatusBar
         if bar then
             local r, g, b = getUnitColor(unit)
@@ -580,7 +588,7 @@ function module:OnInit()
             menuFrame:CreateBackdrop("Default", 8, true)
             menuFrame.__backdrop:CreateShadow()
             menuFrame.__backdrop:SetBackdropEdge("regular")
-                
+
             menuBackdrops[menuFrame] = menuFrame.__backdrop
         end
 
