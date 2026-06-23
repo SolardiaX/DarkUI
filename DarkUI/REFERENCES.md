@@ -32,6 +32,12 @@ Used for finding original sources when iterating or fixing bugs.
 |------|-----------|-------|
 | `Modules/Aura/CoolDownViewer.lua` | Blizzard `CooldownViewer` system | Restyle EssentialCooldownViewer, UtilityCooldownViewer, BuffIcon/BuffBar viewers |
 
+## Combat
+
+| File | Reference | Notes |
+|------|-----------|-------|
+| `Modules/Combat/DamageMeter/Texture.lua` | HDSkada `HDskada_Texture.lua` | Custom spec-icon atlas (`tex_class_spec`); FileDataID→specID and specID→texcoord tables share HDspec.tga's grid layout |
+
 ## Unitframe
 
 | File | Reference | Notes |

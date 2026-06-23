@@ -54,6 +54,7 @@ local config = {
         gradient = path .. "tex_gradient",
         gradient_rev = path .. "tex_gradient_rev",
         shadow = path .. "tex_shadow",
+        class_spec = path .. "tex_class_spec",
     },
 }
 
