@@ -405,6 +405,7 @@ C.quest = {
     auto_collapse = "SCENARIO", -- "NONE", "RAID", "SCENARIO", "RELOAD", or true (= RAID)
     auto_button = true,
     tracker_pos = { "TOPRIGHT", "Minimap", "BOTTOMRIGHT", 0, -60 },
+    tracker_height = 700,
 }
 
 ----------------------------------------------------------------------------------------

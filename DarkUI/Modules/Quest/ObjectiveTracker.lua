@@ -369,6 +369,12 @@ function module:OnInit()
         end
     end)
 
+    hooksecurefunc(ObjectiveTrackerFrame, "SetHeight", function(_, height)
+        if height ~= cfg.tracker_height then
+            ObjectiveTrackerFrame:SetHeight(cfg.tracker_height)
+        end
+    end)
+
     ObjectiveTrackerFrame.Header.Background:SetTexture(nil)
 
     -- Minimize button
