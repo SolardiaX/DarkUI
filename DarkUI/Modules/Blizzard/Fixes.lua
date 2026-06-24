@@ -47,7 +47,6 @@ FCF_StartAlertFlash = E.Dummy
 
 _G.SettingsPanel.TransitionBackOpeningPanel = _G.HideUIPanel
 
-
 ------------------------------------------------------------------------
 -- Fix money tooltip
 ------------------------------------------------------------------------
