@@ -366,8 +366,8 @@ local function callback(self, event, unit)
                 self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
                 self.Name:SetJustifyH("CENTER")
                 self.Highlight:ClearAllPoints()
-                self.Highlight:SetPoint("TOPLEFT", self.Name, -12, 6)
-                self.Highlight:SetPoint("BOTTOMRIGHT", self.Name, 12, -6)
+                self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
+                self.Highlight:SetSize(cfg.width, 20)
                 self.Highlight.texture:SetTexture(C.media.texture.spark)
                 self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
                 self.Highlight.texture:SetAlpha(0.5)
@@ -476,6 +476,17 @@ local function style(self, unit)
     self.Power.bg.multiplier = 0.2
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
+    -- Level Text
+    self.Level = self:CreateFontString(nil, "OVERLAY")
+    self.Level:SetFont(unpack(C.media.standard_font))
+    self.Level:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 6)
+    self:Tag(self.Level, "[dd:difficulty][level]")
+
+    -- Classification Indicator (elite/rare/boss)
+    self.ClassificationIndicator = self:CreateTexture(nil, "OVERLAY")
+    self.ClassificationIndicator:SetSize(cfg.height * 2, cfg.height * 2)
+    self.ClassificationIndicator:SetPoint("RIGHT", self.Level, "LEFT", -1, 0)
+
     -- Name Text
     self.Name = self:CreateFontString(nil, "OVERLAY")
     self.Name:SetFont(unpack(C.media.standard_font))
@@ -497,17 +508,6 @@ local function style(self, unit)
         self.arrow:SetPoint("BOTTOM", self, "TOP", 0, (cfg.show_auras and cfg.auras_size or 0) + 14)
         self.arrow:Hide()
     end
-
-    -- Level Text
-    self.Level = self:CreateFontString(nil, "OVERLAY")
-    self.Level:SetFont(unpack(C.media.standard_font))
-    self.Level:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 6)
-    self:Tag(self.Level, "[dd:difficulty][level]")
-
-    -- Classification Indicator (elite/rare/boss)
-    self.ClassificationIndicator = self:CreateTexture(nil, "OVERLAY")
-    self.ClassificationIndicator:SetSize(cfg.height * 2, cfg.height * 2)
-    self.ClassificationIndicator:SetPoint("RIGHT", self.Level, "LEFT", -1, 0)
 
     -- Cast Bar
     self.Castbar = CreateFrame("StatusBar", nil, self)
