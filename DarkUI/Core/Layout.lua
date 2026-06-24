@@ -1,41 +1,79 @@
 local E, C, L = select(2, ...):unpack()
 
-----------------------------------------------------------------------------------------
--- Mover
-----------------------------------------------------------------------------------------
-local string_format, math_abs = string.format, math.abs
+------------------------------------------------------------------------
+-- Layout — LibEditModeOverride + Anchor (Mover)
+------------------------------------------------------------------------
 
-----------------------------------------------------------------------------------------
+local string_format = string.format
+
+------------------------------------------------------------------------
 -- LibEditModeOverride
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------
 
-E.LEMO = LibStub("LibEditModeOverride-1.0")
-
+local LEMO = LibStub("LibEditModeOverride-1.0")
 local lemoReady = false
 
 local function initLEMO()
     if lemoReady then return end
-    if not E.LEMO:IsReady() then return end
+    if not LEMO:IsReady() then return end
     lemoReady = true
-    E.LEMO:LoadLayouts()
+    LEMO:LoadLayouts()
 end
 
-function E:IsLEMOReady()
-    if not lemoReady then initLEMO() end
-    return lemoReady
+------------------------------------------------------------------------
+-- Layout Registry (Edit Mode frames)
+------------------------------------------------------------------------
+
+local registry = {}
+
+function E:RegisterLayoutFrame(frame, point) registry[#registry + 1] = { frame = frame, point = point } end
+
+local function resolveFrame(entry)
+    local f = entry.frame
+    if type(f) == "string" then
+        f = _G[f]
+        if f then entry.frame = f end
+    end
+    return f
 end
 
-function E:ApplyEditModeChanges()
+local function resolvePoint(entry)
+    local p = entry.point
+    if type(p) == "function" then return p() end
+    return p
+end
+
+local function applyOverrides()
     if InCombatLockdown() then return end
-    if not self:IsLEMOReady() then return end
-    self.LEMO:LoadLayouts()
-    self.LEMO:ApplyChanges()
+    if not lemoReady then initLEMO() end
+    if not lemoReady then return end
+
+    LEMO:LoadLayouts()
+
+    if not LEMO:CanEditActiveLayout() then return end
+
+    for _, entry in ipairs(registry) do
+        local frame = resolveFrame(entry)
+        local point = resolvePoint(entry)
+        if frame and point and LEMO:HasEditModeSettings(frame) then LEMO:ReanchorFrame(frame, unpack(point)) end
+    end
+
+    LEMO:ApplyChanges()
 end
+
+function E:ApplyLayoutOverrides() applyOverrides() end
 
 local lemoFrame = CreateFrame("Frame")
 lemoFrame:RegisterEvent("EDIT_MODE_LAYOUTS_UPDATED")
 lemoFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-lemoFrame:SetScript("OnEvent", initLEMO)
+lemoFrame:SetScript("OnEvent", function()
+    initLEMO()
+    applyOverrides()
+end)
+
+------------------------------------------------------------------------
+-- Anchor (Mover for non-Edit-Mode frames)
+------------------------------------------------------------------------
 
 local Colors = {
     highlight = { 250 / 255, 250 / 255, 250 / 255 },
@@ -48,42 +86,34 @@ local function getVariable(t, vkey)
         t = t[k]
         if t == nil then return end
     end
-
     return t
 end
 
--- Get a properly parsed position of a frame,
--- relative to UIParent and the frame's scale.
 local getPosition = function(frame)
-    -- Retrieve UI coordinates, convert to unscaled screen coordinates
-    local worldHeight = WorldFrame:GetHeight() -- 768 --
+    local worldHeight = WorldFrame:GetHeight()
     local worldWidth = WorldFrame:GetWidth()
     local uiScale = UIParent:GetEffectiveScale()
     local uiWidth = UIParent:GetWidth() * uiScale
     local uiHeight = UIParent:GetHeight() * uiScale
     local uiBottom = UIParent:GetBottom() * uiScale
     local uiLeft = UIParent:GetLeft() * uiScale
-    local uiTop = UIParent:GetTop() * uiScale - worldHeight -- use values relative to edges, not origin
-    local uiRight = UIParent:GetRight() * uiScale - worldWidth -- use values relative to edges, not origin
+    local uiTop = UIParent:GetTop() * uiScale - worldHeight
+    local uiRight = UIParent:GetRight() * uiScale - worldWidth
 
-    -- Retrieve frame coordinates, convert to unscaled screen coordinates
     local frameScale = frame:GetEffectiveScale()
     local x, y = frame:GetCenter()
     x = x * frameScale
     y = y * frameScale
     local bottom = frame:GetBottom() * frameScale
     local left = frame:GetLeft() * frameScale
-    local top = frame:GetTop() * frameScale - worldHeight -- use values relative to edges, not origin
-    local right = frame:GetRight() * frameScale - worldWidth -- use values relative to edges, not origin
+    local top = frame:GetTop() * frameScale - worldHeight
+    local right = frame:GetRight() * frameScale - worldWidth
 
-    -- Figure out the frame position relative to UIParent
     left = left - uiLeft
     bottom = bottom - uiBottom
     right = right - uiRight
     top = top - uiTop
 
-    -- Figure out the point within the given coordinate space,
-    -- return values converted to the frame's own scale.
     if y < uiHeight * 1 / 3 then
         if x < uiWidth * 1 / 3 then
             return "BOTTOMLEFT", left / frameScale, bottom / frameScale
@@ -111,10 +141,8 @@ local getPosition = function(frame)
     end
 end
 
--- Anchor Template
 local Anchor = {}
 
--- Constructor
 Anchor.Create = function(self, frame, name, vkey)
     local anchor = CreateFrame("Button", nil, UIParent)
 
@@ -192,7 +220,6 @@ Anchor.UpdateHint = function(self)
     self.hint:Show()
 end
 
--- Anchor Script Handlers
 Anchor.OnDragStart = function(self, button)
     self:StartMoving()
     self:SetUserPlaced(false)
@@ -243,14 +270,5 @@ Anchor.OnUpdate = function(self, elapsed)
 
     self:UpdateHint()
 end
-
--- local default = CreateFrame("Frame", "TestMoverFrame", UIParent)
--- default:SetSize(64, 64)
--- default:SetPoint("CENTER", UIParent, -150, 200)
--- default:SetTemplate("Default")
--- default:CreateFontText(12, "Default", false, "TOP", 0, 15)
-
--- local mover = Anchor:Create(default, "Default Tooltip", "tooltip.position")
--- mover:Show()
 
 E.Anchor = Anchor

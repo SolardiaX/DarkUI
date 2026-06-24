@@ -13,7 +13,7 @@
     <Script file="Style.lua"/>
     <Script file="Skin.lua"/>
     <Script file="Fader.lua"/>
-    <Script file="Mover.lua"/>
+    <Script file="Layout.lua"/>
     <Script file="Variable.lua"/>
     <Script file="Cmd.lua"/>
 </Ui>
