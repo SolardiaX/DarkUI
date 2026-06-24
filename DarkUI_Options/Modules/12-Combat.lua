@@ -115,12 +115,13 @@ addon.Hooks["combat"] = function(a)
     if ctMaster then
         local checked = ctMaster:GetChecked()
         ctMaster:HookScript("OnClick", function(self)
+            local on = self:GetChecked()
             for path, w in pairs(a.widgets) do
-                if path:find("^combat%.combatText%.") and path ~= "combat.combatText.enable" then w:SetEnabled(self:GetChecked()) end
+                if path:find("^combat%.combatText%.") and path ~= "combat.combatText.enable" and w.SetEnabled then w:SetEnabled(on) end
             end
         end)
         for path, w in pairs(a.widgets) do
-            if path:find("^combat%.combatText%.") and path ~= "combat.combatText.enable" then w:SetEnabled(checked) end
+            if path:find("^combat%.combatText%.") and path ~= "combat.combatText.enable" and w.SetEnabled then w:SetEnabled(checked) end
         end
     end
 
@@ -128,12 +129,13 @@ addon.Hooks["combat"] = function(a)
     if dmMaster then
         local checked = dmMaster:GetChecked()
         dmMaster:HookScript("OnClick", function(self)
+            local on = self:GetChecked()
             for path, w in pairs(a.widgets) do
-                if path:find("^combat%.damageMeter%.") and path ~= "combat.damageMeter.enable" then w:SetEnabled(self:GetChecked()) end
+                if path:find("^combat%.damageMeter%.") and path ~= "combat.damageMeter.enable" and w.SetEnabled then w:SetEnabled(on) end
             end
         end)
         for path, w in pairs(a.widgets) do
-            if path:find("^combat%.damageMeter%.") and path ~= "combat.damageMeter.enable" then w:SetEnabled(checked) end
+            if path:find("^combat%.damageMeter%.") and path ~= "combat.damageMeter.enable" and w.SetEnabled then w:SetEnabled(checked) end
         end
     end
 end
