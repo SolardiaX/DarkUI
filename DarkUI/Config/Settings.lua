@@ -441,7 +441,7 @@ C.tooltip = {
 ----------------------------------------------------------------------------------------
 C.nameplate = {
     enable = true,
-    height = 6,
+    height = 8,
     width = 160,
     distance = 60,
     ad_height = 0,
@@ -473,6 +473,9 @@ C.nameplate = {
     cc_size = 26,
     arrow = true,
     quest = true,
+    friendly = {
+        nameOnly = true,
+    },
     visibility = {
         showAll = true,
         enemy = {

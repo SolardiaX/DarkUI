@@ -42,6 +42,7 @@
 	<Script file='Plugins\Fader.lua' />
 	<Script file='Plugins\DebuffHighlight.lua' />
 	<Script file='Plugins\QuestIcon.lua' />
+	<Script file='Plugins\ClassificationIndicator.lua' />
 	<Script file='Plugins\SpellsIndicator.lua' />
 	<Script file='Plugins\BuffsIndicator.lua' />
 	<Script file='Plugins\DebuffsIndicator.lua' />

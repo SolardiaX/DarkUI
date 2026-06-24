@@ -15,7 +15,7 @@ local oUF = select(2, ...).oUF
 local issecretvalue = issecretvalue
 local SetCVar = C_CVar.SetCVar
 local InCombatLockdown = InCombatLockdown
-local UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation = UnitFactionGroup, UnitAffectingCombat, UnitThreatSituation
+local UnitAffectingCombat, UnitThreatSituation = UnitAffectingCombat, UnitThreatSituation
 local UnitIsTapDenied = UnitIsTapDenied
 local UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass = UnitName, UnitIsUnit, UnitReaction, UnitIsPlayer, UnitClass
 local UnitExists = UnitExists
@@ -26,7 +26,7 @@ local UnitGUID = UnitGUID
 local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
 local UnitWidgetSet = UnitWidgetSet
 local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
-local IsInInstance, IsInGroup, IsInRaid = IsInInstance, IsInGroup, IsInRaid
+local IsInGroup, IsInRaid = IsInGroup, IsInRaid
 local GetNumGroupMembers = GetNumGroupMembers
 
 local cfg = C.nameplate
@@ -117,11 +117,9 @@ local function updateName(self)
             local texcoord = CLASS_ICON_TCOORDS[class]
             self.Class.Icon:SetTexCoord(texcoord[1] + 0.015, texcoord[2] - 0.02, texcoord[3] + 0.018, texcoord[4] - 0.02)
             self.Class:Show()
-            self.Level:SetPoint("RIGHT", self.Name, "LEFT", -12, 0)
         else
             self.Class.Icon:SetTexCoord(0, 0, 0, 0)
             self.Class:Hide()
-            self.Level:SetPoint("RIGHT", self.Health, "LEFT", -12, 0)
         end
     end
 end
@@ -138,7 +136,7 @@ end
 
 -- Threat color
 local function threatColor(self, forced)
-    if UnitIsPlayer(self.unit) then return end
+    if self.plateType ~= "ENEMY_NPC" then return end
     local combat = UnitAffectingCombat("player")
     local threatStatus = UnitThreatSituation("player", self.unit)
 
@@ -322,6 +320,14 @@ local function callback(self, event, unit)
         self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
 
         if UnitIsUnit(unit, "player") then
+            self.plateType = "PLAYER"
+        elseif (UnitReaction(unit, "player") or 0) > 4 then
+            self.plateType = UnitIsPlayer(unit) and "FRIENDLY_PLAYER" or "FRIENDLY_NPC"
+        else
+            self.plateType = UnitIsPlayer(unit) and "ENEMY_PLAYER" or "ENEMY_NPC"
+        end
+
+        if self.plateType == "PLAYER" then
             self:EnableElement("Power")
             self.Power:Show()
             self.Name:Hide()
@@ -339,11 +345,43 @@ local function callback(self, event, unit)
                 self.Level:SetAlpha(0)
                 self.Name:SetAlpha(0)
                 self.Castbar:SetAlpha(0)
+                self.ClassificationIndicator:SetAlpha(0)
             else
                 self.Health:SetAlpha(1)
                 self.Level:SetAlpha(1)
                 self.Name:SetAlpha(1)
                 self.Castbar:SetAlpha(1)
+                self.ClassificationIndicator:SetAlpha(1)
+            end
+
+            local isFriendly = self.plateType == "FRIENDLY_PLAYER" or self.plateType == "FRIENDLY_NPC"
+            if cfg.friendly.nameOnly and isFriendly and not self.widgetsOnly then
+                self.Health:SetAlpha(0)
+                self.Level:SetAlpha(0)
+                self.Castbar:SetAlpha(0)
+                self.ClassificationIndicator:SetAlpha(0)
+                if self.Auras then self.Auras:Hide() end
+                if self.Debuffs then self.Debuffs:Hide() end
+                self.Name:ClearAllPoints()
+                self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
+                self.Name:SetJustifyH("CENTER")
+                self.Highlight:ClearAllPoints()
+                self.Highlight:SetPoint("TOPLEFT", self.Name, -12, 6)
+                self.Highlight:SetPoint("BOTTOMRIGHT", self.Name, 12, -6)
+                self.Highlight.texture:SetTexture(C.media.texture.spark)
+                self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
+                self.Highlight.texture:SetAlpha(0.5)
+            else
+                self.Name:ClearAllPoints()
+                self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
+                self.Name:SetJustifyH("LEFT")
+                self.ClassificationIndicator:SetAlpha(1)
+                if self.Auras then self.Auras:Show() end
+                if self.Debuffs then self.Debuffs:Show() end
+                self.Highlight:ClearAllPoints()
+                self.Highlight:SetAllPoints(self.Health)
+                self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
+                self.Highlight.texture:SetAlpha(1)
             end
 
             local blizzPlate = self:GetParent().UnitFrame
@@ -381,7 +419,37 @@ local function style(self, unit)
     self.Health.border = self.Health:CreateTexture(nil, "BORDER")
     self.Health.border:SetTexture(bar_border)
     self.Health.border:SetPoint("CENTER")
-    -- E:ApplyBarBorder(self.Health)
+
+    -- Mouseover Highlight
+    local highlight = CreateFrame("Frame", nil, self)
+    highlight:SetAllPoints(self.Health)
+    highlight:SetFrameLevel(self.Health:GetFrameLevel() + 5)
+    highlight:EnableMouse(false)
+    highlight:Hide()
+
+    highlight.texture = highlight:CreateTexture(nil, "ARTWORK")
+    highlight.texture:SetAllPoints(highlight)
+    highlight.texture:SetColorTexture(1, 1, 1, 0.15)
+    highlight.texture:SetBlendMode("ADD")
+
+    highlight:SetScript("OnUpdate", function(hl, elapsed)
+        hl.elapsed = (hl.elapsed or 0) + elapsed
+        if hl.elapsed > 0.1 then
+            if not UnitExists("mouseover") or not UnitIsUnit("mouseover", self.unit or "") then hl:Hide() end
+            hl.elapsed = 0
+        end
+    end)
+
+    self.Highlight = highlight
+
+    local function highlightUpdate(frame)
+        if UnitExists("mouseover") and UnitIsUnit("mouseover", frame.unit or "") then
+            frame.Highlight:Show()
+        else
+            frame.Highlight:Hide()
+        end
+    end
+    self:RegisterEvent("UPDATE_MOUSEOVER_UNIT", highlightUpdate, true)
 
     -- Health Text
     if cfg.health_value == true then
@@ -408,20 +476,11 @@ local function style(self, unit)
     self.Power.bg.multiplier = 0.2
     self.Power.PostUpdateColor = core.PostUpdatePowerColor
 
-    -- Hide Blizzard Power Bar
-    hooksecurefunc(_G.NamePlateDriverFrame, "SetupClassNameplateBars", function(frame)
-        if not frame or frame:IsForbidden() then return end
-        if frame.classNamePlatePowerBar then
-            frame.classNamePlatePowerBar:Hide()
-            frame.classNamePlatePowerBar:UnregisterAllEvents()
-        end
-    end)
-
     -- Name Text
     self.Name = self:CreateFontString(nil, "OVERLAY")
     self.Name:SetFont(unpack(C.media.standard_font))
-    self.Name:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 6)
-    self.Name:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 3, 6)
+    self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
+    self.Name:SetJustifyH("LEFT")
     self.Name:SetWordWrap(false)
 
     if cfg.name_abbrev == true then
@@ -442,8 +501,13 @@ local function style(self, unit)
     -- Level Text
     self.Level = self:CreateFontString(nil, "OVERLAY")
     self.Level:SetFont(unpack(C.media.standard_font))
-    self.Level:SetPoint("RIGHT", self.Health, "LEFT", -12, 0)
+    self.Level:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -3, 6)
     self:Tag(self.Level, "[dd:difficulty][level]")
+
+    -- Classification Indicator (elite/rare/boss)
+    self.ClassificationIndicator = self:CreateTexture(nil, "OVERLAY")
+    self.ClassificationIndicator:SetSize(cfg.height * 2, cfg.height * 2)
+    self.ClassificationIndicator:SetPoint("RIGHT", self.Level, "LEFT", -1, 0)
 
     -- Cast Bar
     self.Castbar = CreateFrame("StatusBar", nil, self)
@@ -505,9 +569,9 @@ local function style(self, unit)
     self.Castbar.Icon.glowFrame:SetSize(self.Castbar.Icon:GetWidth() + 8, self.Castbar.Icon:GetHeight() + 8)
 
     -- Raid Icon
-    self.RaidTargetIndicator = self:CreateTexture(nil, "OVERLAY", nil, 7)
-    self.RaidTargetIndicator:SetSize(cfg.height * 2 + 8, cfg.height * 2 + 8)
-    self.RaidTargetIndicator:SetPoint("BOTTOM", self.Health, "TOP", 0, cfg.track_auras == true and 38 or 16)
+    self.RaidTargetIndicator = self.Health:CreateTexture(nil, "ARTWORK", nil, 7)
+    self.RaidTargetIndicator:SetSize(cfg.height * 2, cfg.height * 2)
+    self.RaidTargetIndicator:SetPoint("RIGHT", self.Health, "LEFT", -16, 0)
 
     -- Class Icon
     if cfg.class_icons == true then
@@ -519,21 +583,32 @@ local function style(self, unit)
         self.Class.Icon:SetTexCoord(0, 0, 0, 0)
     end
 
-    -- Quest Icon
+    -- Quest Icons
     if cfg.quest then
-        self.QuestIcon = self:CreateTexture(nil, "OVERLAY", nil, 7)
-        self.QuestIcon:SetSize(cfg.height * 2, cfg.height * 2)
-        self.QuestIcon:SetPoint("LEFT", self.Name, "RIGHT", 5, 0)
-        self.QuestIcon:Hide()
+        local size = cfg.height * 2
+        local qi = CreateFrame("Frame", nil, self)
+        qi:SetSize(size, size)
+        qi:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 3, 6)
+        qi:Hide()
 
-        self.QuestIcon.Text = self:CreateFontString(nil, "OVERLAY")
-        self.QuestIcon.Text:SetPoint("LEFT", self.QuestIcon, "RIGHT", -1, 0)
-        self.QuestIcon.Text:SetFont(unpack(C.media.standard_font))
+        local types = { "Default", "Item", "Skull", "Chat" }
+        for _, name in ipairs(types) do
+            local icon = qi:CreateTexture(nil, "OVERLAY", nil, 1)
+            icon:SetSize(size, size)
+            icon.Text = qi:CreateFontString(nil, "OVERLAY")
+            icon.Text:SetFont(unpack(C.media.standard_font))
+            icon.Text:SetPoint("LEFT", icon, "RIGHT", -1, 0)
+            icon:Hide()
+            qi[name] = icon
+        end
 
-        self.QuestIcon.Item = self:CreateTexture(nil, "OVERLAY")
-        self.QuestIcon.Item:SetSize(cfg.height * 2 - 2, cfg.height * 2 - 2)
-        self.QuestIcon.Item:SetPoint("LEFT", self.QuestIcon.Text, "RIGHT", -2, 0)
-        self.QuestIcon.Item:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+        qi.Default:SetAtlas("SmallQuestBang")
+        qi.Skull:SetTexture([[Interface\TargetingFrame\UI-TargetingFrame-Skull]])
+        qi.Chat:SetTexture([[Interface\WorldMap\ChatBubble_64.PNG]])
+        qi.Chat:SetTexCoord(0, 0.5, 0.5, 1)
+        qi.Item:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+
+        self.QuestIcons = qi
     end
 
     -- Aura tracking
@@ -576,13 +651,14 @@ local function style(self, unit)
         self.Debuffs.PostProcessAuraData = core.PostProcessAuraData
     end
 
-    -- Health color
-    self.Health:RegisterEvent("PLAYER_REGEN_DISABLED")
-    self.Health:RegisterEvent("PLAYER_REGEN_ENABLED")
-    self.Health:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE")
-    self.Health:RegisterEvent("UNIT_THREAT_LIST_UPDATE")
-
-    self.Health:SetScript("OnEvent", function() threatColor(main) end)
+    -- Threat (oUF element handles UNIT_THREAT_SITUATION_UPDATE with unit filtering)
+    self.ThreatIndicator = self:CreateTexture(nil, "OVERLAY")
+    self.ThreatIndicator:Hide()
+    self.ThreatIndicator.feedbackUnit = "player"
+    self.ThreatIndicator.Override = function(frame, event, unit)
+        if unit ~= frame.unit then return end
+        threatColor(frame)
+    end
 
     self.Health.PostUpdate = healthPostUpdate
 
@@ -607,9 +683,22 @@ local function style(self, unit)
     self.disableMovement = true
 end
 
-function module:PLAYER_REGEN_ENABLED() SetCVar("nameplateShowEnemies", 0) end
+local function updateAllThreat()
+    for _, plate in pairs(C_NamePlate.GetNamePlates()) do
+        local unitFrame = plate and plate.unitFrame
+        if unitFrame and unitFrame.ThreatIndicator then unitFrame.ThreatIndicator:ForceUpdate() end
+    end
+end
 
-function module:PLAYER_REGEN_DISABLED() SetCVar("nameplateShowEnemies", 1) end
+function module:PLAYER_REGEN_ENABLED()
+    if cfg.combat then SetCVar("nameplateShowEnemies", 0) end
+    updateAllThreat()
+end
+
+function module:PLAYER_REGEN_DISABLED()
+    if cfg.combat then SetCVar("nameplateShowEnemies", 1) end
+    updateAllThreat()
+end
 
 function module:PLAYER_ENTERING_WORLD()
     if InCombatLockdown() then
@@ -620,10 +709,14 @@ function module:PLAYER_ENTERING_WORLD()
 end
 
 function module:PLAYER_LOGIN()
+    C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
+    C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
+
     SetCVar("ShowClassColorInNameplate", 1)
     SetCVar("nameplateShowSelf", 0)
     SetCVar("nameplateResourceOnTarget", 0)
     SetCVar("nameplateMotion", 1)
+    SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnitNames", 0)
 
     if cfg.enhance_threat == true then SetCVar("threatWarning", 3) end
     SetCVar("nameplateGlobalScale", 1)
@@ -635,6 +728,13 @@ function module:PLAYER_LOGIN()
     SetCVar("nameplateMaxAlpha", 1)
     SetCVar("nameplateSelectedAlpha", 1)
     SetCVar("nameplateNotSelectedAlpha", 1)
+    SetCVar("nameplateSelfAlpha", 1)
+    SetCVar("nameplateOtherAtBase", 0)
+    SetCVar("nameplateMinScaleDistance", 0)
+    SetCVar("nameplateMaxScaleDistance", 40)
+    SetCVar("nameplateTargetBehindMaxDistance", 40)
+    SetCVar("nameplatePlayerMaxDistance", 60)
+    SetCVar("nameplateOverlapV", 1.1)
     SetCVar("nameplateLargeTopInset", 0.08)
 
     SetCVar("nameplateOtherTopInset", cfg.clamp and 0.08 or -1)
@@ -677,12 +777,18 @@ function module:OnInit()
     arrow = C.media.path .. "uf_nameplate_arrow"
 
     self:RegisterEvent("PLAYER_LOGIN")
+    self:RegisterEvent("PLAYER_REGEN_ENABLED")
+    self:RegisterEvent("PLAYER_REGEN_DISABLED")
 
-    if cfg.combat == true then
-        self:RegisterEvent("PLAYER_REGEN_ENABLED")
-        self:RegisterEvent("PLAYER_REGEN_DISABLED")
-        self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    end
+    if cfg.combat == true then self:RegisterEvent("PLAYER_ENTERING_WORLD") end
+
+    hooksecurefunc(_G.NamePlateDriverFrame, "SetupClassNameplateBars", function(frame)
+        if not frame or frame:IsForbidden() then return end
+        if frame.classNamePlatePowerBar then
+            frame.classNamePlatePowerBar:Hide()
+            frame.classNamePlatePowerBar:UnregisterAllEvents()
+        end
+    end)
 
     oUF:RegisterStyle("DarkUI:Nameplates", style)
     oUF:SetActiveStyle("DarkUI:Nameplates")
