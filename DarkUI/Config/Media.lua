@@ -50,11 +50,16 @@ local config = {
         status_bg = path .. "tex_status_bg",
         blank = path .. "tex_blank",
         empty = path .. "tex_empty",
+        close = path .. "tex_close",
         gray = path .. "tex_gray",
         gradient = path .. "tex_gradient",
         gradient_rev = path .. "tex_gradient_rev",
         shadow = path .. "tex_shadow",
         class_spec = path .. "tex_class_spec",
+        arrow = path .. "tex_arrow",
+        plus = path .. "tex_plus",
+        minus = path .. "tex_minus",
+        spark = path .. "tex_spark",
     },
 }
 
