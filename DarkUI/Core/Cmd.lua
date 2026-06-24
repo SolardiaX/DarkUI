@@ -12,6 +12,9 @@ SLASH_RCSLASH1 = "/rc"
 SlashCmdList["TICKET"] = function() ToggleHelpFrame() end
 SLASH_TICKET1 = "/gm"
 
+SlashCmdList["MOVEUI"] = function() E:ToggleMovers() end
+SLASH_MOVEUI1 = "/moveui"
+
 -- Align by Akeru @wowinterface
 
 local grid

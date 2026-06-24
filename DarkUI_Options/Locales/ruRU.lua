@@ -298,6 +298,7 @@ L_OPT_COMMAND_RC = "Проверка готовности"
 L_OPT_COMMAND_GM = "Обратиться к ГМ"
 L_OPT_COMMAND_RL = "Перезагрузить интерфейс"
 L_OPT_COMMAND_RESETUI = "Сбросить DarkUI к настройкам по умолчанию"
+L_OPT_COMMAND_MOVEUI = "Переключить маркеры перемещения подвижных рамок"
 
 -- UI
 L_GLOBAL_OPTION = "Глобальные настройки (для всех персонажей)"

@@ -297,6 +297,7 @@ L_OPT_COMMAND_RC = "就位確認"
 L_OPT_COMMAND_GM = "呼叫遊戲內 GM"
 L_OPT_COMMAND_RL = "立即重載插件"
 L_OPT_COMMAND_RESETUI = "重置 DarkUI 配置為默認值"
+L_OPT_COMMAND_MOVEUI = "切換拖動手柄以移動可移動框體"
 
 -- UI
 L_GLOBAL_OPTION = "使用全局設置 (對當前賬號下全部角色有效)"

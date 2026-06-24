@@ -159,5 +159,6 @@ function module:OnInit()
 
     oUF:RegisterStyle("DarkUI:focustarget", createStyle)
     oUF:SetActiveStyle("DarkUI:focustarget")
-    oUF:Spawn("focustarget", "DarkUIFocusTargetFrame")
+    local frame = oUF:Spawn("focustarget", "DarkUIFocusTargetFrame")
+    E:RegisterMover(frame, L.UF_MOVER_FOCUSTARGET, "unitframe.focustarget.position")
 end

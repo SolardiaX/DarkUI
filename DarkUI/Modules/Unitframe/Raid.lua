@@ -365,6 +365,8 @@ function module:OnInit()
             party:SetVisibility("custom [group:raid][@player,exists,nogroup:party] show;hide")
             party:SetPoint(unpack(cfg.raid.position))
 
+            E:RegisterMover(party, L.UF_MOVER_PARTY, "unitframe.raid.position", 200, 90)
+
             if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
         else
             oUF:RegisterStyle("DarkUI:raid", createStyle)
@@ -417,6 +419,7 @@ function module:OnInit()
 
                 if i == 1 then
                     group:SetPoint(unpack(cfg.raid.position))
+                    E:RegisterMover(group, L.UF_MOVER_RAID, "unitframe.raid.position", 200, 150)
                 else
                     group:SetPoint("TOPLEFT", groups[i - 1], "BOTTOMLEFT", 0, 6)
                 end

@@ -351,6 +351,8 @@ function module:OnInit()
 
         party:SetPoint(unpack(position))
 
+        E:RegisterMover(party, L.UF_MOVER_PARTY, "unitframe.party.position.dps", 200, 90)
+
         local updater = CreateFrame("Frame")
         updater:RegisterEvent("PLAYER_ROLES_ASSIGNED")
         updater:SetScript("OnEvent", function()

@@ -396,5 +396,6 @@ function module:OnInit()
 
     oUF:RegisterStyle("DarkUI:player", createStyle)
     oUF:SetActiveStyle("DarkUI:player")
-    oUF:Spawn("player", "DarkUIPlayerFrame")
+    local frame = oUF:Spawn("player", "DarkUIPlayerFrame")
+    E:RegisterMover(frame, L.UF_MOVER_PLAYER, "unitframe.player.position")
 end

@@ -281,6 +281,7 @@ function module:OnInit()
         local unit = oUF:Spawn("boss" .. i, name)
         if i == 1 then
             unit:SetPoint(unpack(cfg.boss.position))
+            E:RegisterMover(unit, L.UF_MOVER_BOSS, "unitframe.boss.position")
         else
             unit:SetPoint("TOP", boss[i - 1], "BOTTOM", 0, -cfg.boss.spacing)
         end
@@ -297,6 +298,7 @@ function module:OnInit()
         local unit = oUF:Spawn("arena" .. i, name)
         if i == 1 then
             unit:SetPoint(unpack(cfg.boss.position))
+            E:RegisterMover(unit, L.UF_MOVER_ARENA, "unitframe.boss.position")
         else
             unit:SetPoint("TOP", arena[i - 1], "BOTTOM", 0, -cfg.boss.spacing)
         end

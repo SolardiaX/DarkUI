@@ -297,6 +297,7 @@ L_OPT_COMMAND_RC = "Ready check"
 L_OPT_COMMAND_GM = "Call GM"
 L_OPT_COMMAND_RL = "Reload UI"
 L_OPT_COMMAND_RESETUI = "Reset DarkUI to defaults"
+L_OPT_COMMAND_MOVEUI = "Toggle drag handles to reposition movable frames"
 
 -- UI
 L_GLOBAL_OPTION = "Set as global options (available for all characters)"

@@ -185,5 +185,6 @@ function module:OnInit()
         partypet:SetVisibility("custom [group:party,nogroup:raid][@player,exists,nogroup:party] show;hide")
 
         partypet:SetPoint(unpack(cfg.partypet.position))
+        E:RegisterMover(partypet, L.UF_MOVER_PARTYPET, "unitframe.partypet.position", 200, 70)
     end)
 end

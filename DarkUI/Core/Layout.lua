@@ -1,10 +1,11 @@
-local E, C, L = select(2, ...):unpack()
+local E, C, L, DB = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Layout — LibEditModeOverride + Anchor (Mover)
 ------------------------------------------------------------------------
 
 local string_format = string.format
+local math_floor = math.floor
 
 ------------------------------------------------------------------------
 -- LibEditModeOverride
@@ -52,13 +53,19 @@ local function applyOverrides()
 
     if not LEMO:CanEditActiveLayout() then return end
 
+    local applied = false
     for _, entry in ipairs(registry) do
         local frame = resolveFrame(entry)
         local point = resolvePoint(entry)
-        if frame and point and LEMO:HasEditModeSettings(frame) then LEMO:ReanchorFrame(frame, unpack(point)) end
+        if frame and point and LEMO:HasEditModeSettings(frame) then
+            LEMO:ReanchorFrame(frame, unpack(point))
+            applied = true
+        end
     end
 
-    LEMO:ApplyChanges()
+    -- Skip ApplyChanges when nothing was reanchored: entering/exiting Edit Mode
+    -- with no real change only taints Blizzard secure code (secret encounter values).
+    if applied then LEMO:ApplyChanges() end
 end
 
 function E:ApplyLayoutOverrides() applyOverrides() end
@@ -81,93 +88,52 @@ local Colors = {
     normal = { 229 / 255, 178 / 255, 38 / 255 },
 }
 
-local function getVariable(t, vkey)
-    for k in gmatch(vkey, "([^.%s]+)") do
-        t = t[k]
-        if t == nil then return end
-    end
-    return t
-end
-
-local getPosition = function(frame)
-    local worldHeight = WorldFrame:GetHeight()
-    local worldWidth = WorldFrame:GetWidth()
-    local uiScale = UIParent:GetEffectiveScale()
-    local uiWidth = UIParent:GetWidth() * uiScale
-    local uiHeight = UIParent:GetHeight() * uiScale
-    local uiBottom = UIParent:GetBottom() * uiScale
-    local uiLeft = UIParent:GetLeft() * uiScale
-    local uiTop = UIParent:GetTop() * uiScale - worldHeight
-    local uiRight = UIParent:GetRight() * uiScale - worldWidth
-
-    local frameScale = frame:GetEffectiveScale()
-    local x, y = frame:GetCenter()
-    x = x * frameScale
-    y = y * frameScale
-    local bottom = frame:GetBottom() * frameScale
-    local left = frame:GetLeft() * frameScale
-    local top = frame:GetTop() * frameScale - worldHeight
-    local right = frame:GetRight() * frameScale - worldWidth
-
-    left = left - uiLeft
-    bottom = bottom - uiBottom
-    right = right - uiRight
-    top = top - uiTop
-
-    if y < uiHeight * 1 / 3 then
-        if x < uiWidth * 1 / 3 then
-            return "BOTTOMLEFT", left / frameScale, bottom / frameScale
-        elseif x > uiWidth * 2 / 3 then
-            return "BOTTOMRIGHT", right / frameScale, bottom / frameScale
-        else
-            return "BOTTOM", (x - uiWidth / 2) / frameScale, bottom / frameScale
-        end
-    elseif y > uiHeight * 2 / 3 then
-        if x < uiWidth * 1 / 3 then
-            return "TOPLEFT", left / frameScale, top / frameScale
-        elseif x > uiWidth * 2 / 3 then
-            return "TOPRIGHT", right / frameScale, top / frameScale
-        else
-            return "TOP", (x - uiWidth / 2) / frameScale, top / frameScale
-        end
-    else
-        if x < uiWidth * 1 / 3 then
-            return "LEFT", left / frameScale, (y - uiHeight / 2) / frameScale
-        elseif x > uiWidth * 2 / 3 then
-            return "RIGHT", right / frameScale, (y - uiHeight / 2) / frameScale
-        else
-            return "CENTER", (x - uiWidth / 2) / frameScale, (y - uiHeight / 2) / frameScale
-        end
-    end
-end
-
 local Anchor = {}
 
-Anchor.Create = function(self, frame, name, vkey)
-    local anchor = CreateFrame("Button", nil, UIParent)
+-- Holder pattern (NDui/ElvUI style): the mover IS an independent holder placed at
+-- the frame's anchor; the frame is pinned to the holder. Dragging the holder moves
+-- the frame automatically (no per-frame SetPoint on drag), so SecureGroupHeaders
+-- follow precisely and stay visible even when empty. Only the holder position is saved.
+Anchor.Create = function(self, frame, name, vkey, width, height)
+    local holder = CreateFrame("Button", nil, UIParent)
 
     for method, func in next, Anchor do
-        if method ~= "Create" then anchor[method] = func end
+        if method ~= "Create" then holder[method] = func end
     end
 
-    anchor:Hide()
-    anchor:Enable()
-    anchor:SetFrameStrata("HIGH")
-    anchor:SetFrameLevel(1000)
-    anchor:SetAllPoints(frame)
-    anchor:SetMovable(true)
-    anchor:SetHitRectInsets(-20, -20, -20, -20)
-    anchor:RegisterForDrag("LeftButton")
-    anchor:RegisterForClicks("AnyUp")
-    anchor:SetScript("OnDragStart", self.OnDragStart)
-    anchor:SetScript("OnDragStop", self.OnDragStop)
-    anchor:SetScript("OnClick", self.OnClick)
-    anchor:SetScript("OnShow", self.OnShow)
-    anchor:SetScript("OnHide", self.OnHide)
-    anchor:SetScript("OnEnter", self.OnEnter)
-    anchor:SetScript("OnLeave", self.OnLeave)
+    holder:Hide()
+    holder:SetFrameStrata("HIGH")
+    holder:SetFrameLevel(1000)
+    holder:SetMovable(true)
+    holder:SetClampedToScreen(true)
+    holder:EnableMouse(true)
+    holder:SetHitRectInsets(-8, -8, -8, -8)
+    holder:RegisterForDrag("LeftButton")
+    holder:RegisterForClicks("AnyUp")
+    holder:SetScript("OnDragStart", self.OnDragStart)
+    holder:SetScript("OnDragStop", self.OnDragStop)
+    holder:SetScript("OnClick", self.OnClick)
+    holder:SetScript("OnEnter", self.OnEnter)
+    holder:SetScript("OnLeave", self.OnLeave)
 
-    local overlay = CreateFrame("Frame", nil, anchor, "BackdropTemplate")
+    -- Size tracks the frame's live size so the holder matches the actually displayed
+    -- frames; width/height are only a fallback for group headers that report 0 when empty.
+    holder.frame = frame
+    holder.minW = width
+    holder.minH = height
+    holder:SyncSize()
+
+    -- Place the holder exactly where the frame currently sits, preserving its relativeTo,
+    -- then pin the frame to the holder (same point, no offset) so it overlaps and follows.
+    local point, relTo, relPoint, x, y = frame:GetPoint()
+    point = point or "CENTER"
+    relPoint = relPoint or point
+    holder:SetPoint(point, relTo or UIParent, relPoint, x or 0, y or 0)
+
+    frame:ClearAllPoints()
+    frame:SetPoint(point, holder, point, 0, 0)
+
+    local overlay = CreateFrame("Frame", nil, holder, "BackdropTemplate")
     overlay:SetAllPoints()
     overlay:SetBackdrop({
         bgFile = [[Interface\Tooltips\UI-Tooltip-Background]],
@@ -175,54 +141,49 @@ Anchor.Create = function(self, frame, name, vkey)
         tileSize = 16,
         edgeFile = [[Interface\Tooltips\UI-Tooltip-Border]],
         edgeSize = 16,
-        insets = { left = 5, right = 3, top = 3, bottom = 5 },
+        insets = { left = 4, right = 4, top = 4, bottom = 4 },
     })
-    overlay:SetBackdropColor(0.5, 1, 0.5, 0.75)
-    overlay:SetBackdropBorderColor(0.5, 1, 0.5, 1)
-    anchor.overlay = overlay
+    overlay:SetBackdropColor(0.1, 0.6, 0.1, 0.55)
+    overlay:SetBackdropBorderColor(0.2, 1, 0.2, 1)
+    holder.overlay = overlay
 
-    anchor.name = overlay:CreateFontText(13, "")
-    anchor.name:SetTextColor(unpack(Colors.highlight))
-    anchor.name:SetIgnoreParentScale(true)
-    anchor.name:SetIgnoreParentAlpha(true)
-    anchor.name:SetJustifyV("MIDDLE")
-    anchor.name:SetJustifyH("CENTER")
-    anchor.name:SetText(name)
+    holder.name = overlay:CreateFontText(13, name)
+    holder.name:SetTextColor(unpack(Colors.highlight))
 
-    anchor.hint = overlay:CreateFontText(13, "")
-    anchor.hint:SetTextColor(unpack(Colors.highlight))
-    anchor.hint:SetIgnoreParentScale(true)
-    anchor.hint:SetIgnoreParentAlpha(true)
-    anchor.hint:SetPoint("TOP", overlay, "BOTTOM", -20)
-    anchor.hint:SetText("")
+    holder.hint = overlay:CreateFontText(11, "")
+    holder.hint:ClearAllPoints()
+    holder.hint:SetPoint("TOP", overlay, "BOTTOM", 0, -4)
+    holder.hint:SetText("")
 
-    anchor.vkey = vkey
-    anchor.position = { getPosition(anchor) }
-    anchor.frame = frame
+    holder.frame = frame
+    holder.vkey = vkey
+    holder.default = { point, relTo or UIParent, relPoint, x or 0, y or 0 }
 
-    return anchor
+    return holder
 end
 
-Anchor.Enable = function(self) self.enabled = true end
-
-Anchor.Disable = function(self) self.enabled = false end
-
-Anchor.IsEnabled = function(self) return self.enabled end
-
-Anchor.SetEnabled = function(self, enable) self.enabled = enable and true or false end
+-- Match the holder to the frame's current size; fall back to the registered min size
+-- when the frame reports ~0 (empty SecureGroupHeader with no members shown).
+Anchor.SyncSize = function(self)
+    local w, h = self.frame:GetWidth(), self.frame:GetHeight()
+    if not w or w <= 1 then w = self.minW or 100 end
+    if not h or h <= 1 then h = self.minH or 40 end
+    self:SetSize(w, h)
+end
 
 Anchor.UpdateHint = function(self)
-    local msg = string_format(E:RGBToHex(Colors.highlight) .. "%s, %.0f, %.0f|r", unpack(self.position))
-    msg = msg .. E:RGBToHex(Colors.green) .. "\n<Left-Click and drag to move>|r"
-    msg = msg .. E:RGBToHex(Colors.green) .. "\n<Right-Click to undo change>|r"
+    local point, _, _, x, y = self:GetPoint()
+    local msg = string_format(E:RGBToHex(Colors.highlight) .. "%s  %.0f, %.0f|r", point or "CENTER", x or 0, y or 0)
+    msg = msg .. E:RGBToHex(Colors.green) .. "\n" .. L.UF_MOVER_HINT_DRAG .. "|r"
+    msg = msg .. E:RGBToHex(Colors.green) .. "\n" .. L.UF_MOVER_HINT_RESET .. "|r"
 
     self.hint:SetText(msg)
     self.hint:Show()
 end
 
-Anchor.OnDragStart = function(self, button)
+Anchor.OnDragStart = function(self)
+    if InCombatLockdown() then return end
     self:StartMoving()
-    self:SetUserPlaced(false)
     self.elapsed = 0
     self:SetScript("OnUpdate", self.OnUpdate)
 end
@@ -230,45 +191,76 @@ end
 Anchor.OnDragStop = function(self)
     self:StopMovingOrSizing()
     self:SetScript("OnUpdate", nil)
-    self.frame:ClearAllPoints()
-    self.frame:SetPoint(unpack(self.position))
+
+    local point, _, relPoint, x, y = self:GetPoint()
+    point = point or "CENTER"
+    relPoint = relPoint or point
+    x = math_floor((x or 0) + 0.5)
+    y = math_floor((y or 0) + 0.5)
+
+    -- Normalize to a UIParent-relative anchor so the saved value re-applies cleanly on login.
+    self:ClearAllPoints()
+    self:SetPoint(point, UIParent, relPoint, x, y)
+
+    self:UpdateHint()
+
+    if self.vkey then DB:Set(self.vkey, { point, "UIParent", relPoint, x, y }) end
 end
 
 Anchor.OnClick = function(self, button)
-    if button == "RightButton" then
-        self.frame:ClearAllPoints()
-        self.frame:SetPoint(unpack(getVariable(C, self.vkey)))
+    if button == "RightButton" and self.default then
+        if self.vkey then DB:Reset(self.vkey) end
+
+        self:ClearAllPoints()
+        self:SetPoint(unpack(self.default))
+
+        self:UpdateHint()
     end
 end
 
-Anchor.OnShow = function(self)
-    self:SetFrameLevel(50)
-    self:SetAlpha(0.75)
-end
-
-Anchor.OnHide = function(self)
-    self:SetScript("OnUpdate", nil)
-    self.elapsed = 0
-end
-
 Anchor.OnEnter = function(self)
-    self:UpdateHint()
     self:SetAlpha(1)
+    self.overlay:SetBackdropBorderColor(unpack(Colors.normal))
+    self:UpdateHint()
 end
 
 Anchor.OnLeave = function(self)
-    self:UpdateHint()
-    self:SetAlpha(0.75)
+    self:SetAlpha(0.85)
+    self.overlay:SetBackdropBorderColor(0.2, 1, 0.2, 1)
 end
 
 Anchor.OnUpdate = function(self, elapsed)
-    self.elapsed = self.elapsed + elapsed
+    self.elapsed = (self.elapsed or 0) + elapsed
     if self.elapsed < 0.02 then return end
     self.elapsed = 0
-
-    self.position = { getPosition(self) }
 
     self:UpdateHint()
 end
 
 E.Anchor = Anchor
+
+------------------------------------------------------------------------
+-- Mover Registry (toggle all anchors)
+------------------------------------------------------------------------
+
+local movers = {}
+
+function E:RegisterMover(frame, name, vkey, width, height)
+    if type(frame) == "string" then frame = _G[frame] end
+    if not frame then return end
+
+    local anchor = Anchor:Create(frame, name, vkey, width, height)
+    movers[#movers + 1] = anchor
+
+    return anchor
+end
+
+function E:ToggleMovers()
+    if InCombatLockdown() then return end
+
+    self.moversShown = not self.moversShown
+    for _, anchor in ipairs(movers) do
+        if self.moversShown then anchor:SyncSize() end
+        anchor:SetShown(self.moversShown)
+    end
+end

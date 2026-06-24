@@ -238,5 +238,6 @@ function module:OnInit()
 
     oUF:RegisterStyle("DarkUI:pet", createStyle)
     oUF:SetActiveStyle("DarkUI:pet")
-    oUF:Spawn("pet", "DarkUIPetFrame")
+    local frame = oUF:Spawn("pet", "DarkUIPetFrame")
+    E:RegisterMover(frame, L.UF_MOVER_PET, "unitframe.pet.position")
 end

@@ -161,5 +161,6 @@ function module:OnInit()
 
     oUF:RegisterStyle("DarkUI:targettarget", createStyle)
     oUF:SetActiveStyle("DarkUI:targettarget")
-    oUF:Spawn("targettarget", "DarkUIToTFrame")
+    local frame = oUF:Spawn("targettarget", "DarkUIToTFrame")
+    E:RegisterMover(frame, L.UF_MOVER_TOT, "unitframe.targettarget.position")
 end

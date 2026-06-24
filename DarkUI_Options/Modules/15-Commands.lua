@@ -8,6 +8,7 @@ addon.OptionList["commands"] = {
     { BUTTON, "/darkui tpl", L_OPT_COMMAND_TPL },
     { BUTTON, "/align", L_OPT_COMMAND_ALIGN },
     { BUTTON, "/frame", L_OPT_COMMAND_FRAME },
+    { BUTTON, "/moveui", L_OPT_COMMAND_MOVEUI },
     { BUTTON, "/testroll", L_OPT_COMMAND_TESTROLL },
     { BUTTON, "/rc", L_OPT_COMMAND_RC },
     { BUTTON, "/gm", L_OPT_COMMAND_GM },

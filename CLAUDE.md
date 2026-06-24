@@ -124,6 +124,28 @@ function module:OnInit()
 end
 ```
 
+## Mover System
+
+`Core/Layout.lua` provides a **global** drag-to-reposition system for non-Edit-Mode frames (oUF unit frames, etc.). It is toggled by the `/moveui` slash (also exposed as a GUI button under the **Commands** tab in DarkUI_Options) and shows/hides ALL registered movers at once. Combat-gated via `InCombatLockdown` (SecureGroupHeaders cannot move in combat).
+
+**Holder pattern** (NDui/ElvUI style): the mover IS an independent holder placed at the frame's anchor; the frame is pinned to the holder (`frame:SetPoint(point, holder, point, 0, 0)`). Dragging the holder moves the frame automatically — no per-frame `SetPoint` during drag, so SecureGroupHeaders follow precisely and stay visible even when empty. Holder size tracks the frame's live size (synced on toggle); `width`/`height` are only a fallback for group headers that report 0 size when empty. Only the holder position is saved.
+
+**To make a new frame movable** (zero changes to the command, GUI button, or combat gate):
+
+1. **`Config/Settings.lua`** — add a position config: `xxx.position = { "POINT", "UIParent", "POINT", x, y }`
+2. **`Locales/enUS.lua`** (base, required) + other locales — add a display-name key: `L.XXX_MOVER = "..."`
+3. In the module's `OnInit`/`OnEnable`, **after** the frame is spawned and positioned (`frame:SetPoint(unpack(cfg.xxx.position))`), call:
+   ```lua
+   E:RegisterMover(frame, L.XXX_MOVER, "xxx.position")          -- single frame
+   E:RegisterMover(header, L.XXX_MOVER, "xxx.position", w, h)   -- group header: w,h = empty-state fallback size
+   ```
+
+`RegisterMover` handles everything else: registry insertion, `/moveui` show/hide, live size sync, drag persistence (`DB:Set(vkey, {...})`), right-click reset (`DB:Reset(vkey)` + restore registration-time position). For multi-frame chains (boss/arena/raid groups) only register the first frame — the rest follow via relative anchoring.
+
+Notes:
+- `vkey` is the same config path the frame reads at spawn, so the saved override re-applies on next login automatically.
+- The LEMO (`LibEditModeOverride`) half of `Layout.lua` is separate — it only reanchors Blizzard **Edit Mode registered** system frames (`E:RegisterLayoutFrame`), NOT oUF self-built frames. Use the mover (`E:RegisterMover`) for self-built frames.
+
 ## Git Commit Convention
 Format: `type: [Scope] description`
 
