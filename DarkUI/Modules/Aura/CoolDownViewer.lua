@@ -310,7 +310,6 @@ local function setup()
     if EditModeManagerFrame then
         hooksecurefunc(EditModeManagerFrame, "ExitEditMode", function()
             if InCombatLockdown() then return end
-            if E:IsLEMOReady() then E.LEMO:LoadLayouts() end
             forceRefresh()
             C_Timer_After(0, forceRefresh)
         end)
@@ -325,7 +324,7 @@ local function setup()
 
     C_Timer_After(0.2, doLayout)
     C_Timer_After(1, function()
-        if not InCombatLockdown() then E:ApplyEditModeChanges() end
+        if not InCombatLockdown() then E:ApplyLayoutOverrides() end
     end)
 end
 
