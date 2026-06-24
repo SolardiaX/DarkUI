@@ -47,17 +47,6 @@ FCF_StartAlertFlash = E.Dummy
 
 _G.SettingsPanel.TransitionBackOpeningPanel = _G.HideUIPanel
 
-------------------------------------------------------------------------
--- Fix BackdropTemplate secret value error
-------------------------------------------------------------------------
-
--- TODO: test if disabling this fixes UIWidgetTemplateTextWithState taint error
--- local old_SetupTextureCoordinates = BackdropTemplateMixin.SetupTextureCoordinates
--- function BackdropTemplateMixin:SetupTextureCoordinates()
---     local width = self:GetWidth()
---     if issecretvalue and issecretvalue(width) then return end
---     old_SetupTextureCoordinates(self)
--- end
 
 ------------------------------------------------------------------------
 -- Fix money tooltip

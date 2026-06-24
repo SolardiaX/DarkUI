@@ -224,8 +224,17 @@ end
 -- SetTemplate / SetBackdropEdge
 ------------------------------------------------------------------------
 
+local function safeSetupTextureCoordinates(self)
+    local width, height = self:GetSize()
+    if issecretvalue(width) or issecretvalue(height) then return end
+    BackdropTemplateMixin.SetupTextureCoordinates(self)
+end
+
+E.SafeSetupTextureCoordinates = safeSetupTextureCoordinates
+
 local function setTemplate(f, t, tile)
     Mixin(f, BackdropTemplateMixin)
+    f.SetupTextureCoordinates = safeSetupTextureCoordinates
 
     local cfg = BACKDROP[t and t:lower() or "default"] or BACKDROP.default
     local edge = EDGE.pixel

@@ -250,6 +250,7 @@ local function setupBackdrop(button, bdCfg)
     if not bdCfg or button.__bg then return end
 
     Mixin(button, BackdropTemplateMixin)
+    button.SetupTextureCoordinates = E.SafeSetupTextureCoordinates
     local bg = CreateFrame("Frame", nil, button, "BackdropTemplate")
     applyPoints(bg, bdCfg.points)
     bg:SetFrameLevel(button:GetFrameLevel() - 1)

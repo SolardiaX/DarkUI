@@ -45,6 +45,7 @@ local function skinStatusBar(widget)
         local parent = widget:GetParent():GetParent()
         if parent and (parent.castBar or parent.UnitFrame) then
             Mixin(bar, BackdropTemplateMixin)
+            bar.SetupTextureCoordinates = E.SafeSetupTextureCoordinates
             bar:SetBackdrop({ bgFile = C.media.texture.blank, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
             bar:SetBackdropColor(0.1, 0.1, 0.1, 1)
             bar:SetStatusBarTexture(C.media.texture.status_f)
