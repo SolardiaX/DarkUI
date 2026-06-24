@@ -499,6 +499,8 @@ function module:OnInit()
     anchor:SetPoint(unpack(cfg.position))
 
     hooksecurefunc("GameTooltip_SetDefaultAnchor", function(tooltip, parent)
+        if tooltip:IsForbidden() then return end
+        if not parent or parent:IsForbidden() then return end
         if cfg.hide_combat and InCombatLockdown() and not IsShiftKeyDown() then
             tooltip:Hide()
             return

@@ -224,12 +224,15 @@ end
 -- SetTemplate / SetBackdropEdge
 ------------------------------------------------------------------------
 
+local origSetupTextureCoordinates = BackdropTemplateMixin.SetupTextureCoordinates
+
 local function safeSetupTextureCoordinates(self)
     local width, height = self:GetSize()
     if issecretvalue(width) or issecretvalue(height) then return end
-    BackdropTemplateMixin.SetupTextureCoordinates(self)
+    origSetupTextureCoordinates(self)
 end
 
+BackdropTemplateMixin.SetupTextureCoordinates = safeSetupTextureCoordinates
 E.SafeSetupTextureCoordinates = safeSetupTextureCoordinates
 
 local function setTemplate(f, t, tile)
