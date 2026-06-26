@@ -1,12 +1,12 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Skin Engine
+-- Skin Engine — global E:Reskin* skins + E:RegisterSkin dispatch.
+-- The Skins module (S:Handle* compat layer + per-frame dispatcher) lives
+-- in Skins/Core.lua, since it serves the Skins ports rather than the engine.
 ------------------------------------------------------------------------
 
 local _G = _G
-local pairs, type, select = pairs, type, select
-local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 local unpack = unpack
 
@@ -53,7 +53,7 @@ function E:ReskinFrame(frame)
     if frame:IsForbidden() then return end
 
     frame:StripTextures()
-    frame:SetTemplate("Default")
+    frame:SetTemplate("default")
     frame:CreateShadow()
 
     frame.__styled = true
@@ -63,16 +63,18 @@ end
 -- E:ReskinButton — button skin (strips + fill + hover)
 ------------------------------------------------------------------------
 
-function E:ReskinButton(button)
+function E:ReskinButton(button, strip)
     if not button or button.__styled then return end
     if button:IsForbidden() then return end
 
-    button:StripTextures()
-
+    -- Clear the button's own art (named textures). Only StripTextures when
+    -- explicitly asked: a blanket strip also wipes unnamed icon regions
+    -- (e.g. MerchantSellAllJunkButton's coin icon). Mirrors ElvUI HandleButton.
     if button.SetNormalTexture then button:SetNormalTexture("") end
-    if button.SetHighlightTexture then button:SetHighlightTexture("") end
     if button.SetPushedTexture then button:SetPushedTexture("") end
     if button.SetDisabledTexture then button:SetDisabledTexture("") end
+
+    if strip then button:StripTextures() end
 
     if button.Left then button.Left:SetAlpha(0) end
     if button.Right then button.Right:SetAlpha(0) end
@@ -92,6 +94,24 @@ function E:ReskinButton(button)
     if button.MiddleMiddle then button.MiddleMiddle:Hide() end
 
     button:SetTemplate("Fill")
+    button:CreateGradient(C.media.gradient_color_light)
+
+    -- white edge tinted to the resting border color; hover recolors it to the theme gold.
+    -- __borderColor is what onLeaveHighlight restores to after a hover.
+    button.__borderColor = C.media.button_border_color
+    button:SetBackdropEdge("round_white", C.media.button_border_color)
+
+    -- mouseover highlight fill (ADD-blend glow, visible regardless of border color)
+    if button.SetHighlightTexture then
+        button:SetHighlightTexture(C.media.texture.blank)
+        local hl = button:GetHighlightTexture()
+        if hl then
+            hl:SetBlendMode("ADD")
+            hl:SetVertexColor(1, 1, 1, 0.12)
+            hl:SetInside()
+        end
+    end
+
     button:HookScript("OnEnter", onEnterHighlight)
     button:HookScript("OnLeave", onLeaveHighlight)
 
@@ -99,23 +119,17 @@ function E:ReskinButton(button)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinTab — tab button
+-- E:ReskinTab — tab button (intentional no-op)
 ------------------------------------------------------------------------
 
+-- The Blizzard tab art (uiframe-tab / uiframe-activetab atlases) already reads
+-- as a dark theme and carries its own selected-state highlight (the Active
+-- textures). Stripping it and rebuilding a backdrop loses that built-in
+-- selected indicator for no visual gain, so ReskinTab is kept as a no-op:
+-- callers / S:HandleTab still route here, but the native art is left untouched.
 function E:ReskinTab(tab)
     if not tab or tab.__styled then return end
     if tab:IsForbidden() then return end
-
-    tab:StripTextures()
-
-    local bg = CreateFrame("Frame", nil, tab, "BackdropTemplate")
-    bg:SetInside(tab, 4, 4)
-    bg:SetFrameLevel(tab:GetFrameLevel() - 1)
-    bg:SetTemplate("Fill")
-    tab.__bg = bg
-
-    tab:HookScript("OnEnter", function(self) self.__bg:SetBackdropBorderColor(r, g, b) end)
-    tab:HookScript("OnLeave", function(self) self.__bg:SetBackdropBorderColor(unpack(C.media.border_color)) end)
 
     tab.__styled = true
 end
@@ -188,7 +202,8 @@ function E:ReskinDropDown(dropdown)
     dropdown:SetTemplate("Default")
     dropdown:SetBackdropEdge("blur")
 
-    local button = dropdown.Button or (dropdown.GetName and _G[dropdown:GetName() .. "Button"])
+    local name = dropdown.GetName and dropdown:GetName()
+    local button = dropdown.Button or (name and _G[name .. "Button"])
     if button then
         button:StripTextures()
         button:SetTemplate("Fill")
@@ -229,8 +244,11 @@ function E:ReskinPortrait(frame)
     if frame.PortraitFrame then frame.PortraitFrame:SetAlpha(0) end
 
     frame:StripTextures()
-    frame:SetTemplate("Default")
-    frame:CreateShadow()
+    frame:CreateBackdrop("default", 4)
+    frame.__backdrop:CreateGradient()
+    frame.__backdrop:CreateBorder("regular")
+    frame.__backdrop.__border:CreateShadow()
+    -- frame.__backdrop:SetBackdropBorderColor(.5, .5, .5)
 
     frame.__styled = true
 end
@@ -266,7 +284,6 @@ function E:ReskinTrimScrollBar(scrollBar)
     if scrollBar.Thumb then
         scrollBar.Thumb:StripTextures()
         scrollBar.Thumb:SetTemplate("Fill")
-        scrollBar.Thumb:SetFixedPanelTemplate(nil)
     end
     if scrollBar.Back then scrollBar.Back:StripTextures() end
     if scrollBar.Forward then scrollBar.Forward:StripTextures() end

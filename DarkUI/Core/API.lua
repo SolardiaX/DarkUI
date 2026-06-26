@@ -53,13 +53,24 @@ local BACKDROP = {
         bgColor = false,
         borderColor = false,
     },
+    button = {
+        bgFile = C.media.button.buttonback,
+        edgeFile = C.media.texture.blank,
+        bgColor = C.media.backdrop_color,
+        borderColor = C.media.border_color,
+    },
 }
 
 local EDGE = {
     pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
     blur = { edgeFile = C.media.texture.shadow, edgeSize = Mult, insets = Mult },
-    thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, insets = 2 },
+    thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, insets = 4 },
+    thin_white = { edgeFile = C.media.texture.border_thin_white, edgeSize = 16, insets = 4 },
+    line = { edgeFile = C.media.texture.border_line, edgeSize = 8, insets = 2 },
+    line_white = { edgeFile = C.media.texture.border_line_white, edgeSize = 8, insets = 2 },
     regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, insets = 2 },
+    round = { edgeFile = C.media.texture.border_round, edgeSize = 16, insets = 2 },
+    round_white = { edgeFile = C.media.texture.border_round_white, edgeSize = 16, insets = 2 },
     bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, insets = 8, borderColor = { 1, 1, 1, 1 } },
     bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, insets = { left = 8, right = 8, top = 16, bottom = 16 }, borderColor = { 1, 1, 1, 1 } },
 }
@@ -68,7 +79,12 @@ local EFFECT = {
     pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
     shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4, borderColor = C.media.shadow_color },
     thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, margin = 4 },
+    thin_white = { edgeFile = C.media.texture.border_thin_white, edgeSize = 16, margin = 4 },
+    line = { edgeFile = C.media.texture.border_line, edgeSize = 8, margin = 2 },
+    line_white = { edgeFile = C.media.texture.border_line_white, edgeSize = 8, margin = 2 },
     regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult, borderColor = C.media.border_color },
+    round = { edgeFile = C.media.texture.border_round, edgeSize = 16, margin = 2 },
+    round_white = { edgeFile = C.media.texture.border_round_white, edgeSize = 16, margin = 2 },
     bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, margin = 8 },
     bolder = { edgeFile = C.media.texture.border_bolder, edgeSize = 32, margin = { left = 8, right = 8, top = 16, bottom = 16 } },
 }
@@ -78,6 +94,9 @@ local EFFECT = {
 ------------------------------------------------------------------------
 
 E.Dummy = function() return end
+
+-- Transparent texture used to "clear" Normal/Pushed/Highlight textures (ElvUI compat)
+E.ClearTexture = C.media.texture.empty
 
 E.FrameHider = CreateFrame("Frame")
 E.FrameHider:Hide()
@@ -270,7 +289,7 @@ local function setTemplate(f, t, tile)
     end
 end
 
-local function setBackdropEdge(f, t, size)
+local function setBackdropEdge(f, t, color, size)
     local cfg = EDGE[t]
     if not cfg or not f.__template then return end
 
@@ -291,7 +310,10 @@ local function setBackdropEdge(f, t, size)
         f:SetBackdropColor(unpack(E.media.backdrop_color))
     end
 
-    if cfg.borderColor then
+    -- explicit color overrides the cfg/__borderColor fallback chain
+    if color then
+        f:SetBackdropBorderColor(unpack(color))
+    elseif cfg.borderColor then
         f:SetBackdropBorderColor(unpack(cfg.borderColor))
     elseif f.__borderColor then
         f:SetBackdropBorderColor(unpack(f.__borderColor))
@@ -304,7 +326,7 @@ end
 -- CreateBackdrop / CreateShadow / CreateBorder
 ------------------------------------------------------------------------
 
-local function createBackdrop(f, t, margin, tile)
+local function createBackdrop(f, t, margin, tile, frameLevel)
     if f.__backdrop then return f.__backdrop end
 
     t = t or "Default"
@@ -317,15 +339,16 @@ local function createBackdrop(f, t, margin, tile)
 
     local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     child:SetOutside(f, margin, margin)
-    child:SetFrameLevel(lvl == 0 and 0 or lvl - 1)
+    child:SetFrameLevel(frameLevel or (lvl == 0 and 0 or lvl - 1))
 
     setTemplate(child, t, tile)
 
     f.__backdrop = child
+    f.backdrop = child -- ElvUI-compat alias
     return child
 end
 
-local function createShadow(f, margin)
+local function createShadow(f, margin, color, size)
     if f.__shadow then return f.__shadow end
 
     local cfg = EFFECT.shadow
@@ -337,14 +360,16 @@ local function createShadow(f, margin)
     local child = CreateFrame("Frame", nil, frame, "BackdropTemplate")
     child:SetOutside(f, margin, margin)
     child:SetFrameLevel(0)
-    child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
-    if cfg.borderColor then child:SetBackdropBorderColor(unpack(cfg.borderColor)) end
+    child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = size or cfg.edgeSize })
+
+    local borderColor = color or cfg.borderColor
+    if borderColor then child:SetBackdropBorderColor(unpack(borderColor)) end
 
     f.__shadow = child
     return child
 end
 
-local function createBorder(f, t, margin)
+local function createBorder(f, t, margin, color)
     if f.__border then return f.__border end
 
     local cfg = EFFECT[t] or EFFECT.regular
@@ -364,7 +389,9 @@ local function createBorder(f, t, margin)
     end
     child:SetFrameLevel(lvl + 1)
     child:SetBackdrop({ edgeFile = cfg.edgeFile, edgeSize = cfg.edgeSize })
-    if cfg.borderColor then child:SetBackdropBorderColor(unpack(cfg.borderColor)) end
+
+    local borderColor = color or cfg.borderColor
+    if borderColor then child:SetBackdropBorderColor(unpack(borderColor)) end
 
     f.__border = child
     return child
@@ -393,13 +420,13 @@ end
 -- CreateGradient
 ------------------------------------------------------------------------
 
-local function createGradient(f)
+local function createGradient(f, color)
     if f.__gradient then return f.__gradient end
 
     local gradient = f:CreateTexture(nil, "BORDER")
     gradient:SetInside(f)
     gradient:SetTexture(C.media.texture.gradient)
-    gradient:SetVertexColor(unpack(C.media.gradient_color))
+    gradient:SetVertexColor(unpack(color or C.media.gradient_color))
 
     f.__gradient = gradient
     return gradient
@@ -441,6 +468,58 @@ local function setGhost(f)
 end
 
 ------------------------------------------------------------------------
+-- ElvUI-compat atoms (for near-verbatim Skins/Frames ports)
+------------------------------------------------------------------------
+
+-- Geometry shorthands (ElvUI single-arg Size = square)
+local function point(obj, ...) obj:SetPoint(...) end
+local function size(obj, w, h, ...) obj:SetSize(w, h or w, ...) end
+local function width(obj, w) obj:SetWidth(w) end
+local function height(obj, h) obj:SetHeight(h) end
+
+-- Crop a texture to DarkUI's standard texCoord (or explicit coords)
+local function setTexCoords(tex, x1, x2, y1, y2)
+    if issecretvalue and issecretvalue(tex:GetTexture()) then return end
+    if x1 then
+        tex:SetTexCoord(x1, x2, y1, y2)
+    else
+        tex:SetTexCoord(unpack(C.media.texCoord))
+    end
+end
+
+-- Strip all FontString regions from a frame
+local function stripTexts(object, killFlag)
+    if not object.GetNumRegions then return end
+    for i = 1, object:GetNumRegions() do
+        local region = select(i, object:GetRegions())
+        if region and region.IsObjectType and region:IsObjectType("FontString") then
+            if killFlag then
+                region:Kill()
+            else
+                region:SetText("")
+            end
+        end
+    end
+end
+
+-- Apply DarkUI standard font to a FontString
+local function fontTemplate(fs, font, fontSize, fontStyle)
+    fs:SetFont(font or C.media.standard_font[1], fontSize or C.media.standard_font[2], fontStyle or C.media.standard_font[3])
+    fs:SetShadowColor(0, 0, 0)
+    fs:SetShadowOffset(0.85, -0.85)
+end
+
+-- Method-form of E:StyleButton (ElvUI files call button:StyleButton()).
+-- Skip DarkUI's outer vignette overlay for ElvUI-compat item buttons.
+local function styleButton(button) return E:StyleButton(button, nil, true) end
+
+-- Set frame level relative to another frame's level (default self)
+local function offsetFrameLevel(frame, offset, secondary)
+    secondary = secondary or frame
+    frame:SetFrameLevel(secondary:GetFrameLevel() + (offset or 0))
+end
+
+------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
 
@@ -460,6 +539,17 @@ local function addapi(object)
     mt.CreateOverlay = createOverlay
     mt.CreateGradient = createGradient
     mt.CreateFontText = createFontText
+
+    -- ElvUI-compat atoms
+    mt.Point = point
+    mt.Size = size
+    mt.Width = width
+    mt.Height = height
+    mt.SetTexCoords = setTexCoords
+    mt.StripTexts = stripTexts
+    mt.FontTemplate = fontTemplate
+    mt.StyleButton = styleButton
+    mt.OffsetFrameLevel = offsetFrameLevel
 
     if not mt.FadeIn then mt.FadeIn = fadeIn end
     if not mt.FadeOut then mt.FadeOut = fadeOut end
@@ -486,6 +576,7 @@ addapi(baseFrame)
 addapi(baseFrame:CreateTexture())
 addapi(baseFrame:CreateFontString())
 addapi(baseFrame:CreateMaskTexture())
+addapi(CreateFont("DarkUIAPIFont")) -- Font objects (e.g. InvoiceTextFontNormal) need FontTemplate too
 
 local object = EnumerateFrames()
 while object do

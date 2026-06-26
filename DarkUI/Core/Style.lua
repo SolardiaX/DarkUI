@@ -19,7 +19,7 @@ local function onEnterHighlight(self)
 end
 
 local function onLeaveHighlight(self)
-    self:SetBackdropBorderColor(unpack(C.media.border_color))
+    self:SetBackdropBorderColor(unpack(self.__borderColor or C.media.border_color))
     if self.__overlay then self.__overlay:SetVertexColor(0.1, 0.1, 0.1, 1) end
 end
 
@@ -98,13 +98,15 @@ end
 -- E:StyleButton — action button overlay/highlight/push textures
 ------------------------------------------------------------------------
 
-function E:StyleButton(button, margin)
+function E:StyleButton(button, margin, skipOverlay)
     local margin = margin or 2
 
-    local overlay = button:CreateTexture(nil, "OVERLAY")
-    overlay:SetOutside(button, margin, margin)
-    overlay:SetTexture(C.media.texture.overlay)
-    button.__overlay = overlay
+    if not skipOverlay then
+        local overlay = button:CreateTexture(nil, "OVERLAY")
+        overlay:SetOutside(button, margin, margin)
+        overlay:SetTexture(C.media.texture.overlay)
+        button.__overlay = overlay
+    end
 
     local icon = button.Icon or button.icon
     if icon then
@@ -146,35 +148,36 @@ end
 -- E:StyleCloseButton — close button (X)
 ------------------------------------------------------------------------
 
+local function closeOnEnter(self)
+    if self.__tex then self.__tex:SetVertexColor(1, 1, 1) end
+end
+
+local function closeOnLeave(self)
+    if self.__tex then self.__tex:SetVertexColor(r, g, b) end
+end
+
 function E:StyleCloseButton(button, anchor)
     if not button or button.__styled then return end
 
     button:StripTextures()
-    button:SetSize(18, 18)
 
-    button:SetTemplate("Fill")
-    button:HookScript("OnEnter", onEnterHighlight)
-    button:HookScript("OnLeave", onLeaveHighlight)
+    if button.SetNormalTexture then button:SetNormalTexture("") end
+    if button.SetPushedTexture then button:SetPushedTexture("") end
+    if button.SetDisabledTexture then button:SetDisabledTexture("") end
+    if button.SetHighlightTexture then button:SetHighlightTexture("") end
 
-    if not button.text then
-        button.text = button:CreateFontText(16, "x")
-        button.text:SetPoint("CENTER", 0, 1)
-    end
+    local tex = button:CreateTexture(nil, "OVERLAY")
+    tex:SetPoint("CENTER")
+    tex:SetTexture(C.media.texture.close)
+    tex:SetSize(12, 12)
+    tex:SetVertexColor(r, g, b)
+    button.__tex = tex
 
-    if anchor then
-        button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -4, -4)
-    else
-        button:SetPoint("TOPRIGHT", -4, -4)
-    end
+    button:SetHitRectInsets(6, 6, 7, 7)
+    button:HookScript("OnEnter", closeOnEnter)
+    button:HookScript("OnLeave", closeOnLeave)
 
-    button:HookScript("OnEnter", function(self)
-        if self:IsEnabled() then
-            if self.__border then self.__border:SetBackdropBorderColor(r * 0.3, g * 0.3, b * 0.3, 1) end
-        end
-    end)
-    button:HookScript("OnLeave", function(self)
-        if self.__border then self.__border:SetBackdropBorderColor(0.1, 0.1, 0.1, 1) end
-    end)
+    if anchor then button:SetPoint("TOPRIGHT", anchor, "TOPRIGHT", -4, -4) end
 
     button.__styled = true
 end

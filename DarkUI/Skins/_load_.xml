@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
+    <!-- Skins module: S:Handle* dispatcher + compat layer (global engine E:Reskin* stays in Core/Skin.lua) -->
+    <Script file="Core.lua" />
+    <!-- per-frame skins -->
+    <Script file="Frames\Gossip.lua" />
+    <Script file="Frames\Merchant.lua" />
+    <Script file="Frames\Macro.lua" />
+    <Script file="Frames\Guild.lua" />
+    <Script file="Frames\Trade.lua" />
+    <Script file="Frames\Mail.lua" />
+</Ui>

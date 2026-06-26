@@ -16,6 +16,8 @@ local config = {
     highlight_color = { 1, 1, 1, 0.35 },
     shadow_color = { 0, 0, 0, 0.88 },
     gradient_color = { 0.8, 0.8, 0.8, 0.15 },
+    gradient_color_light = { 0.8, 0.8, 0.8, 0.28 },
+    button_border_color = { 0.12, 0.12, 0.15, 1 },
     vertex_color = { 140 / 255, 118 / 255, 110 / 255 },
 
     texCoord = { 0.08, 0.92, 0.08, 0.92 },
@@ -40,9 +42,14 @@ local config = {
     texture = {
         overlay = path .. "tex_overlay",
         border_thin = path .. "tex_border_thin",
+        border_thin_white = path .. "tex_border_thin_white",
+        border_line = path .. "tex_border_line",
+        border_line_white = path .. "tex_border_line_white",
         border_regular = path .. "tex_border_regular",
         border_bold = path .. "tex_border_bold",
         border_bolder = path .. "tex_border_bolder",
+        border_round = path .. "tex_border_round",
+        border_round_white = path .. "tex_border_round_white",
         status = path .. "tex_status",
         status_f = path .. "tex_status_f",
         status_s = path .. "tex_status_s",
@@ -73,4 +80,9 @@ config.qualityColors[Enum.ItemQuality.Poor] = { r = COMMON_GRAY_COLOR.r, g = COM
 config.qualityColors[Enum.ItemQuality.Common] = { r = 0, g = 0, b = 0 }
 config.qualityColors[99] = { r = 1, g = 0, b = 0 }
 
+-- ElvUI-compat aliases (for near-verbatim Skins/Frames ports)
+config.normTex = config.texture.blank
+config.bordercolor = config.border_color
+
 C.media = config
+E.media = config

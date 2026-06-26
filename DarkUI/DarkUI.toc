@@ -22,6 +22,7 @@ Locales\_load_.xml
 
 Config\_load_.xml
 Core\_load_.xml
+Skins\_load_.xml
 Modules\_load_.xml
 
 TaintLess.xml

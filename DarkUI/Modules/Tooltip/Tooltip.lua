@@ -115,7 +115,7 @@ local function styleTooltip(tip)
                 header:StripTextures()
                 header:CreateBackdrop("default")
                 header.__backdrop:CreateGradient()
-                header.__backdrop:SetBackdropEdge("pixel", 2)
+                header.__backdrop:SetBackdropEdge("pixel", nil, 2)
             end
 
             tt.styled = true
