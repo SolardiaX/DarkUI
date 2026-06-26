@@ -41,10 +41,13 @@ These ElvUI-shaped APIs already exist so ported code needs no edit for them:
   `S:HandleStepSlider`, `S:HandleCollapseTexture`, …
 - **Method-form atoms** (Core/API.lua metatable injection): `:Point`, `:Size`,
   `:Width`, `:Height`, `:SetTexCoords`, `:StripTexts`, `:FontTemplate`,
-  `:StyleButton` (→ `E:StyleIconButton`), `:OffsetFrameLevel`, `:Kill`,
-  `:StripTextures`, `:SetTemplate`, `:SetInside`, `:SetOutside`,
+  `:StyleButton` (→ `E:StyleIconButton`), `:OffsetFrameLevel`, `:NudgePoint`,
+  `:Kill`, `:StripTextures`, `:SetTemplate`, `:SetInside`, `:SetOutside`,
   `:CreateBackdrop`, `:CreateShadow`, `:CreateBorder`, `:CreateGradient`.
-- **Field aliases:** `frame.backdrop` (alias of our `__backdrop`), `E.media`,
+- **Engine helpers** (Core/API.lua `E:` methods): `E:GetItemQualityColor(quality)`
+  → r,g,b from `C.media.qualityColors` (issecretvalue-guarded).
+- **Field aliases:** `frame.backdrop` (alias of our `__backdrop`), `button.hover`
+  (alias of our `button.highlight` set by `:StyleButton()`), `E.media`,
   `E.ClearTexture`, `config.normTex`, `config.bordercolor`.
 
 If an upstream file calls an ElvUI API we have **not** provided, add the shim to
@@ -100,6 +103,16 @@ perl -pi -e '
 - **EditBox:** our `E:ReskinEditBox` is simpler than ElvUI `HandleEditBox` (no
   per-type backdrop positioning for SendMail money fields). If a synced frame
   relies on that, special-case it in the port, not in Core.
+- **Multi-arg `CreateBackdrop`:** ElvUI's signature is
+  `CreateBackdrop(frame, template, glossTex, ignoreUpdates, forcePixelMode, isUFE, isNP, noScale, allPoints, frameLevel)`;
+  ours is `(frame, template, margin, tile, frameLevel)` — positions 3+ differ.
+  Calls that only pass `template` map cleanly. For calls passing `allPoints=true`
+  (e.g. Friends summon/invite/RAF-tab), rewrite to `:CreateBackdrop(template)` +
+  `:backdrop:SetAllPoints()` in the port. `glossTex` has no DarkUI equivalent — drop it.
+- **`E.PixelMode` / `E.Border` / `E.Spacing`:** DarkUI runs pixel mode; collapse
+  `E.PixelMode and 0 or E.Border + E.Spacing` to the pixel-mode branch (`0`).
+- **`E:RegisterStatusBar`:** no DarkUI equivalent (we don't hot-swap statusbar
+  media at runtime). Drop the call; keep the manual `Progress:SetTexture(...)`.
 
 ## Re-sync workflow
 

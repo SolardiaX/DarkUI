@@ -333,6 +333,8 @@ C.skins = {
     guild = true,
     trade = true,
     mail = true,
+    friends = true,
+    communities = true,
 }
 
 ----------------------------------------------------------------------------------------

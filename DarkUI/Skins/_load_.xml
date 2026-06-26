@@ -10,4 +10,6 @@
     <Script file="Frames\Guild.lua" />
     <Script file="Frames\Trade.lua" />
     <Script file="Frames\Mail.lua" />
+    <Script file="Frames\Friends.lua" />
+    <Script file="Frames\Communities.lua" />
 </Ui>
