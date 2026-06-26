@@ -520,6 +520,26 @@ local function offsetFrameLevel(frame, offset, secondary)
     frame:SetFrameLevel(secondary:GetFrameLevel() + (offset or 0))
 end
 
+-- Nudge a frame's existing anchor by (x, y) without changing its point/relative.
+-- ElvUI scales the nudge; DarkUI keeps raw offsets to match our Point convention.
+local function nudgePoint(obj, x, y)
+    local point, relativeTo, relativePoint, xOfs, yOfs = obj:GetPoint()
+    if not point then return end
+    obj:ClearAllPoints()
+    obj:SetPoint(point, relativeTo, relativePoint, xOfs + (x or 0), yOfs + (y or 0))
+end
+
+-- r, g, b for an item quality (ElvUI E:GetItemQualityColor compat). Reads our
+-- C.media.qualityColors table; falls back to the standard border color.
+function E:GetItemQualityColor(quality)
+    if issecretvalue and issecretvalue(quality) then return unpack(C.media.border_color) end
+
+    local color = quality and C.media.qualityColors[quality]
+    if color then return color.r, color.g, color.b end
+
+    return unpack(C.media.border_color)
+end
+
 ------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
@@ -551,6 +571,7 @@ local function addapi(object)
     mt.FontTemplate = fontTemplate
     mt.StyleButton = styleButton
     mt.OffsetFrameLevel = offsetFrameLevel
+    mt.NudgePoint = nudgePoint
 
     if not mt.FadeIn then mt.FadeIn = fadeIn end
     if not mt.FadeOut then mt.FadeOut = fadeOut end

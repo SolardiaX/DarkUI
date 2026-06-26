@@ -147,6 +147,7 @@ function E:StyleIconButton(button, margin, skipOverlay)
         highlight:SetTexture(C.media.button.hover)
         highlight:SetInside(button, margin, margin)
         button.highlight = highlight
+        button.hover = highlight -- ElvUI-compat alias (ports reference button.hover)
         button:SetHighlightTexture(highlight)
     end
 
