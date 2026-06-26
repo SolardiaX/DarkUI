@@ -1,15 +1,7 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Skin Engine — global E:Reskin* adapters (strip Blizzard art + delegate to
--- E:Style* look builders). The Skins module (S:Handle* compat layer + per-frame
--- dispatcher) lives in Skins/Core.lua, since it serves the Skins ports.
---
--- Guard convention: `frame.__styled` is the single canonical "this widget has
--- been skinned" flag, shared by E:Reskin*/E:Style* AND Skins' S:Handle* (so the
--- two layers recognize each other's work and never double-skin). Narrowly-scoped
--- one-shot guards for distinct sub-features that may coexist with __styled on the
--- same object keep their own names (e.g. __iconBorderHooked, collapsedSkinned).
+-- Skin Engine — E:Reskin* Blizzard widget adapters
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -22,6 +14,17 @@ local onLeaveHighlight = E.onLeaveHighlight
 -- instead of a blanket StripTextures, which would also blank the region the
 -- blinking caret renders against and leave a focused box with no cursor.
 local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
+
+------------------------------------------------------------------------
+-- Guard Convention
+--
+-- Each E:Reskin* strips the native Blizzard art then delegates the look to an
+-- E:Style* builder. `frame.__styled` is the single canonical "already skinned"
+-- flag, shared by E:Reskin*/E:Style* and the Skins module's S:Handle* layer
+-- (which routes here) so no widget is skinned twice. Distinct one-shot
+-- sub-feature guards that may coexist with __styled keep their own names
+-- (e.g. __iconBorderHooked, collapsedSkinned).
+------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 -- E:ReskinPanel — skin a Blizzard panel/window (strip native art + StyleContainer).

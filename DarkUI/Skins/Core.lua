@@ -2,16 +2,6 @@ local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
 -- Skins Module — ElvUI-compatible per-frame skin dispatcher
---
--- The S layer (this file) is Skins-only: the per-frame dispatcher
--- (AddCallback*/OnEnable) and the S:Handle* compat layer that Skins/Frames
--- ports call. The global engine (E:Reskin*/E:Style*) stays in Core/.
--- Frames reference this via `local S = E:GetModule("Skins")`.
---
--- Guard convention: S:Handle* use the same `frame.__styled` flag as the Core
--- engine (not ElvUI's IsSkinned) so both layers see each other's work. Distinct
--- sub-feature one-shot guards keep their own names (__iconBorderHooked,
--- collapsedSkinned) since they may coexist with __styled on the same object.
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -34,6 +24,20 @@ S.initialized = false
 
 -- Arrow texture points up by default; rotate per direction (radians)
 S.ArrowRotation = { up = 0, down = 3.14, left = 1.57, right = -1.57 }
+
+------------------------------------------------------------------------
+-- Notes
+--
+-- This S layer is Skins-only: the dispatcher (AddCallback*/OnEnable) and the
+-- S:Handle* compat layer that Skins/Frames ports call. The global engine
+-- (E:Reskin*/E:Style*) stays in Core/; ports reference this module via
+-- `local S = E:GetModule("Skins")`.
+--
+-- Guard convention: S:Handle* use the same `frame.__styled` flag as the Core
+-- engine (not ElvUI's IsSkinned) so both layers see each other's work. Distinct
+-- one-shot sub-feature guards keep their own names (__iconBorderHooked,
+-- collapsedSkinned) as they may coexist with __styled on the same object.
+------------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 -- Dispatch (mirrors ElvUI AddCallback / AddCallbackForAddon / Initialize)
