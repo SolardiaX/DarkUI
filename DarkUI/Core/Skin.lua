@@ -20,6 +20,11 @@ local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
 local onEnterHighlight = E.onEnterHighlight
 local onLeaveHighlight = E.onLeaveHighlight
 
+-- EditBox native border pieces (InputBoxTemplate & kin). Hidden individually
+-- instead of a blanket StripTextures, which would also blank the region the
+-- blinking caret renders against and leave a focused box with no cursor.
+local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
+
 ------------------------------------------------------------------------
 -- Skin Registration (ADDON_LOADED dispatch)
 ------------------------------------------------------------------------
@@ -167,8 +172,22 @@ function E:ReskinEditBox(editbox)
     if not editbox or editbox.__styled then return end
     if editbox:IsForbidden() then return end
 
-    editbox:StripTextures()
-    E:StyleInput(editbox)
+    -- Hide native border art WITHOUT a blanket StripTextures: that also blanks
+    -- the region the caret renders against, so a focused box shows no cursor.
+    -- Mirror ElvUI HandleEditBox — hide named border pieces + the NineSlice.
+    local name = editbox.GetName and editbox:GetName()
+    for _, area in ipairs(EDITBOX_BORDER_REGIONS) do
+        local region = (name and _G[name .. area]) or editbox[area]
+        if region then region:SetAlpha(0) end
+    end
+    if editbox.NineSlice then editbox.NineSlice:StripTextures() end
+
+    local bg = E:StyleInput(editbox)
+
+    -- modest left clearance so the border line doesn't sit on the caret's home
+    -- position (editbox x=0); ElvUI/NDui extend the editbox backdrop the same way.
+    bg:SetPoint("TOPLEFT", editbox, "TOPLEFT", -3, 0)
+    bg:SetPoint("BOTTOMRIGHT", editbox, "BOTTOMRIGHT", 3, 0)
 
     editbox.__styled = true
 end
