@@ -313,7 +313,7 @@ function MyContainer:OnCreate(name, settings)
     background:SetFrameLevel(1)
     background:SetPoint("TOPLEFT", -4, 4)
     background:SetPoint("BOTTOMRIGHT", 4, -4)
-    E:StyleFrame(background, { border = "thin" })
+    E:StyleContainer(background, { border = "thin" })
 
     -- Caption
     local caption = background:CreateFontString(nil, "OVERLAY", nil)

@@ -4,6 +4,12 @@ local E, C, L = select(2, ...):unpack()
 -- Skin Engine — global E:Reskin* skins + E:RegisterSkin dispatch.
 -- The Skins module (S:Handle* compat layer + per-frame dispatcher) lives
 -- in Skins/Core.lua, since it serves the Skins ports rather than the engine.
+--
+-- Guard convention: `frame.__styled` is the single canonical "this widget has
+-- been skinned" flag, shared by E:Reskin*/E:Style* AND Skins' S:Handle* (so the
+-- two layers recognize each other's work and never double-skin). Narrowly-scoped
+-- one-shot guards for distinct sub-features that may coexist with __styled on the
+-- same object keep their own names (e.g. __iconBorderHooked, collapsedSkinned).
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -45,25 +51,24 @@ end
 E.Event:Register("ADDON_LOADED", onAddonLoaded, E)
 
 ------------------------------------------------------------------------
--- E:ReskinFrame — generic frame skin
+-- E:ReskinPanel — skin a Blizzard panel/window (strip native art + StyleContainer).
+-- opts forwards to StyleContainer; the portrait/inset/navbar container reskins
+-- specialize through this rather than re-stripping themselves.
 ------------------------------------------------------------------------
 
-function E:ReskinFrame(frame)
+function E:ReskinPanel(frame, opts)
     if not frame or frame.__styled then return end
     if frame:IsForbidden() then return end
 
     frame:StripTextures()
-    frame:SetTemplate("default")
-    frame:CreateShadow()
-
-    frame.__styled = true
+    E:StyleContainer(frame, opts) -- default: backdrop + shadow (pixel square edge)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinButton — button skin (strips + fill + hover)
+-- E:ReskinUIPanelButton — text/push button (UIPanelButtonTemplate): strips + fill + hover
 ------------------------------------------------------------------------
 
-function E:ReskinButton(button, strip)
+function E:ReskinUIPanelButton(button, strip)
     if not button or button.__styled then return end
     if button:IsForbidden() then return end
 
@@ -163,8 +168,7 @@ function E:ReskinEditBox(editbox)
     if editbox:IsForbidden() then return end
 
     editbox:StripTextures()
-    editbox:SetTemplate("Default")
-    editbox:SetBackdropEdge("blur")
+    E:StyleInput(editbox)
 
     editbox.__styled = true
 end
@@ -191,27 +195,38 @@ function E:ReskinSlider(slider)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinDropDown — dropdown menu
+-- E:ReskinDropDown — dropdown menu (input control: blur edge + own arrow)
 ------------------------------------------------------------------------
 
-function E:ReskinDropDown(dropdown)
-    if not dropdown or dropdown.__styled then return end
-    if dropdown:IsForbidden() then return end
+function E:ReskinDropDown(dropdown, width, template)
+    if not dropdown or dropdown:IsForbidden() then return end
 
-    dropdown:StripTextures()
-    dropdown:SetTemplate("Default")
-    dropdown:SetBackdropEdge("blur")
+    -- width re-applies every call; the chrome is built only once
+    if width then dropdown:SetWidth(width) end
 
+    if dropdown.__styled then return end
+    dropdown.__styled = true
+
+    dropdown:StripTextures(true)
+    local bg = E:StyleInput(dropdown, template)
+    dropdown:OffsetFrameLevel(2)
+
+    -- modern WowStyle dropdowns expose Arrow; legacy ones a Button child
+    if dropdown.Arrow then dropdown.Arrow:SetAlpha(0) end
     local name = dropdown.GetName and dropdown:GetName()
     local button = dropdown.Button or (name and _G[name .. "Button"])
-    if button then
-        button:StripTextures()
-        button:SetTemplate("Fill")
-        button:SetSize(20, 20)
-        button:SetPoint("RIGHT", -2, 0)
-    end
+    if button then button:SetAlpha(0) end
 
-    dropdown.__styled = true
+    bg:SetPoint("TOPLEFT", 0, -2)
+    bg:SetPoint("BOTTOMRIGHT", 0, 2)
+
+    -- our own dropdown arrow (tex_arrow points up → rotate to point down)
+    local arrow = dropdown:CreateTexture(nil, "ARTWORK")
+    arrow:SetTexture(C.media.texture.arrow)
+    arrow:SetRotation(math.pi)
+    arrow:SetPoint("RIGHT", bg, -3, 0)
+    arrow:SetSize(14, 14)
+    dropdown.__ddArrow = arrow
 end
 
 ------------------------------------------------------------------------
@@ -243,14 +258,8 @@ function E:ReskinPortrait(frame)
     if portrait then portrait:SetAlpha(0) end
     if frame.PortraitFrame then frame.PortraitFrame:SetAlpha(0) end
 
-    frame:StripTextures()
-    frame:CreateBackdrop("default", 4)
-    frame.__backdrop:CreateGradient()
-    frame.__backdrop:CreateBorder("regular")
-    frame.__backdrop.__border:CreateShadow()
-    -- frame.__backdrop:SetBackdropBorderColor(.5, .5, .5)
-
-    frame.__styled = true
+    -- = ReskinPanel + hidden portrait region
+    E:ReskinPanel(frame, { border = "regular", margin = 4, gradient = true })
 end
 
 ------------------------------------------------------------------------
@@ -259,15 +268,11 @@ end
 
 function E:ReskinNavBar(navBar)
     if not navBar or navBar.__styled then return end
-    if navBar:IsForbidden() then return end
 
-    navBar:StripTextures()
-    navBar:SetTemplate("Transparent")
+    E:ReskinPanel(navBar, { backdrop = "transparent", shadow = false })
 
     local overflowButton = navBar.overflow
-    if overflowButton then E:ReskinButton(overflowButton) end
-
-    navBar.__styled = true
+    if overflowButton then E:ReskinUIPanelButton(overflowButton) end
 end
 
 ------------------------------------------------------------------------
@@ -295,12 +300,4 @@ end
 -- E:ReskinInsetFrame — inset panels
 ------------------------------------------------------------------------
 
-function E:ReskinInsetFrame(frame)
-    if not frame or frame.__styled then return end
-    if frame:IsForbidden() then return end
-
-    frame:StripTextures()
-    frame:SetTemplate("Transparent")
-
-    frame.__styled = true
-end
+function E:ReskinInsetFrame(frame) E:ReskinPanel(frame, { backdrop = "transparent", shadow = false }) end

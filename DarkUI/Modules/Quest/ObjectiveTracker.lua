@@ -121,7 +121,7 @@ local function skinQuestIcons(_, block)
         item:SetSize(25, 25)
         item:SetTemplate("Default")
         item:SetNormalTexture(0)
-        E:StyleButton(item)
+        E:StyleIconButton(item)
 
         item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
         item.icon:SetPoint("TOPLEFT", item, 2, -2)
@@ -379,7 +379,7 @@ function module:OnInit()
     local button = ObjectiveTrackerFrame.Header.MinimizeButton
     button:SetSize(17, 17)
     button:StripTextures()
-    E:StyleButton(button)
+    E:StyleIconButton(button)
 
     button.minus = button:CreateTexture(nil, "OVERLAY")
     button.minus:SetSize(7, 1)

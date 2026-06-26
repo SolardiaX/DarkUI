@@ -509,9 +509,10 @@ local function fontTemplate(fs, font, fontSize, fontStyle)
     fs:SetShadowOffset(0.85, -0.85)
 end
 
--- Method-form of E:StyleButton (ElvUI files call button:StyleButton()).
--- Skip DarkUI's outer vignette overlay for ElvUI-compat item buttons.
-local function styleButton(button) return E:StyleButton(button, nil, true) end
+-- Method-form of E:StyleIconButton (ElvUI files call button:StyleButton()).
+-- The method name stays StyleButton for ElvUI-compat; it routes to our canonical
+-- E:StyleIconButton. Skip DarkUI's outer vignette overlay for compat item buttons.
+local function styleButton(button) return E:StyleIconButton(button, nil, true) end
 
 -- Set frame level relative to another frame's level (default self)
 local function offsetFrameLevel(frame, offset, secondary)

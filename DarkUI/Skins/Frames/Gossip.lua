@@ -47,7 +47,7 @@ local function ItemTextPage_SetTextColor(pageText, headerType, r, g, b)
 end
 
 local function GreetingPanel_UpdateChild(button)
-    if not button.IsSkinned then
+    if not button.__styled then
         if button.GreetingText then
             button.GreetingText:SetTextColor(1, 1, 1)
             hooksecurefunc(button.GreetingText, "SetTextColor", Gossip_SetTextColor)
@@ -63,7 +63,7 @@ local function GreetingPanel_UpdateChild(button)
             hooksecurefunc(button, "SetFormattedText", Gossip_SetFormattedText)
         end
 
-        button.IsSkinned = true
+        button.__styled = true
     end
 end
 

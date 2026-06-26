@@ -11,8 +11,9 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 local function HandleIconButton(button, ...)
+    -- button chrome is owned by Core's ReskinUIPanelButton (round border + gold hover);
+    -- only the icon/region handling below is merchant-specific.
     S:HandleButton(button)
-    button:StyleButton()
 
     -- inset the icon past the round-edge line so it isn't occluded
     S:HandleIcon(button.Icon)

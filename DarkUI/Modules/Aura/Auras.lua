@@ -275,7 +275,7 @@ function module:CreateAuraIcon(button)
     button.timer:SetPoint(unpack(cfg.dur_pos))
     button.timer:SetFont(unpack(cfg.dur_font_style))
 
-    E:StyleButton(button)
+    E:StyleIconButton(button)
     button:CreateShadow()
 
     button:SetScript("OnAttributeChanged", buttonOnAttributeChanged)

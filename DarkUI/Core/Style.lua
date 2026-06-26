@@ -27,21 +27,44 @@ E.onEnterHighlight = onEnterHighlight
 E.onLeaveHighlight = onLeaveHighlight
 
 ------------------------------------------------------------------------
--- E:StyleFrame — full styled panel (bg + shadow + optional gradient)
+-- E:StyleContainer — the canonical container look (bg + optional border/shadow/gradient)
+-- Applies our standard decorated backdrop to ANY frame (chat/bags surfaces,
+-- and via the container reskins E:ReskinPanel/Portrait/InsetFrame/NavBar, which
+-- only strip the Blizzard art then call this for the appearance).
+-- opts: { backdrop = template, margin, border = edge|false, shadow = false?, gradient = bool }
+-- Default = backdrop's pixel square edge + drop shadow (no textured border).
 ------------------------------------------------------------------------
 
-function E:StyleFrame(frame, opts)
+function E:StyleContainer(frame, opts)
     if not frame or frame:IsForbidden() then return end
     if frame.__styled then return end
 
     if type(opts) ~= "table" then opts = { gradient = opts } end
 
-    frame:CreateBackdrop(opts.backdrop)
-    frame:CreateBorder(opts.border)
-    if opts.shadow ~= false then frame.__border:CreateShadow() end
-    if opts.gradient then frame:CreateGradient() end
+    local bg = frame:CreateBackdrop(opts.backdrop, opts.margin)
+    if opts.gradient then bg:CreateGradient() end
+
+    -- textured border is opt-in; otherwise the backdrop's pixel square edge stands
+    if opts.border then bg:CreateBorder(opts.border) end
+
+    -- drop shadow on by default: on the border frame if present, else the backdrop
+    if opts.shadow ~= false then
+        local shadowHost = bg.__border or bg
+        shadowHost:CreateShadow()
+    end
 
     frame.__styled = true
+end
+
+------------------------------------------------------------------------
+-- E:StyleInput — the canonical input-control look (blur-edged backdrop)
+-- ReskinEditBox/ReskinDropDown delegate here (strip art, then call this).
+------------------------------------------------------------------------
+
+function E:StyleInput(frame, template)
+    local bg = frame:CreateBackdrop(template or "Default")
+    bg:SetBackdropEdge("blur")
+    return bg
 end
 
 ------------------------------------------------------------------------
@@ -95,10 +118,13 @@ function E:StyleCheckBox(frame)
 end
 
 ------------------------------------------------------------------------
--- E:StyleButton — action button overlay/highlight/push textures
+-- E:StyleIconButton — icon button look (square button with a swappable Icon):
+-- overlay border + highlight/pushed/checked state textures + icon texCoord.
+-- Distinct from E:ReskinUIPanelButton (text/push buttons). The ElvUI-compat
+-- method form button:StyleButton() routes here (see Core/API.lua).
 ------------------------------------------------------------------------
 
-function E:StyleButton(button, margin, skipOverlay)
+function E:StyleIconButton(button, margin, skipOverlay)
     local margin = margin or 2
 
     if not skipOverlay then
@@ -149,11 +175,11 @@ end
 ------------------------------------------------------------------------
 
 local function closeOnEnter(self)
-    if self.__tex then self.__tex:SetVertexColor(1, 1, 1) end
+    if self.__tex then self.__tex:SetVertexColor(r, g, b) end
 end
 
 local function closeOnLeave(self)
-    if self.__tex then self.__tex:SetVertexColor(r, g, b) end
+    if self.__tex then self.__tex:SetVertexColor(1, 1, 1) end
 end
 
 function E:StyleCloseButton(button, anchor)
@@ -170,7 +196,7 @@ function E:StyleCloseButton(button, anchor)
     tex:SetPoint("CENTER")
     tex:SetTexture(C.media.texture.close)
     tex:SetSize(12, 12)
-    tex:SetVertexColor(r, g, b)
+    tex:SetVertexColor(1, 1, 1)
     button.__tex = tex
 
     button:SetHitRectInsets(6, 6, 7, 7)

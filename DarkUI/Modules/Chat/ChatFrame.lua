@@ -122,7 +122,7 @@ local function setChatStyle(frame)
         lang:GetRegions():SetAlpha(0)
         lang:SetPoint("TOPLEFT", eb, "TOPRIGHT", 5, 0)
         lang:SetPoint("BOTTOMRIGHT", eb, "BOTTOMRIGHT", 29, 0)
-        E:StyleFrame(lang, true)
+        E:StyleContainer(lang, true)
     end
 
     if cfg.editbox_color == true then

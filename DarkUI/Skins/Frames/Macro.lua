@@ -11,7 +11,7 @@ local next = next
 local hooksecurefunc = hooksecurefunc
 
 local function MacroSelectorScrollUpdateChild(button)
-    if button.Icon and not button.IsSkinned then S:HandleItemButton(button, true, true) end
+    if button.Icon and not button.__styled then S:HandleItemButton(button, true, true) end
 end
 
 local function MacroSelectorScrollUpdate(frame)
@@ -19,7 +19,7 @@ local function MacroSelectorScrollUpdate(frame)
 end
 
 local function MacroPopup_OnShow(frame)
-    if not frame.IsSkinned then -- set by HandleIconSelectionFrame
+    if not frame.__styled then -- set by HandleIconSelectionFrame
         S:HandleIconSelectionFrame(frame, nil, nil, "MacroPopup")
     end
 end

@@ -32,7 +32,7 @@ function module:OnInit()
     button:SetAttribute("type1", "item")
     button:SetAttribute("type2", "item")
 
-    E:StyleButton(button)
+    E:StyleIconButton(button)
 
     button.t = button:CreateTexture(nil, "BORDER")
     button.t:SetPoint("TOPLEFT", 2, -2)

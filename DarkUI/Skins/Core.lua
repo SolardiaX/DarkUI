@@ -7,6 +7,11 @@ local E, C, L = select(2, ...):unpack()
 -- (AddCallback*/OnEnable) and the S:Handle* compat layer that Skins/Frames
 -- ports call. The global engine (E:Reskin*/E:Style*) stays in Core/.
 -- Frames reference this via `local S = E:GetModule("Skins")`.
+--
+-- Guard convention: S:Handle* use the same `frame.__styled` flag as the Core
+-- engine (not ElvUI's IsSkinned) so both layers see each other's work. Distinct
+-- sub-feature one-shot guards keep their own names (__iconBorderHooked,
+-- collapsedSkinned) since they may coexist with __styled on the same object.
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -87,7 +92,7 @@ end
 -- Routing compat layer (S:Handle* → existing E:Reskin*/E:Style*)
 ------------------------------------------------------------------------
 
-function S:HandleButton(button, strip) return E:ReskinButton(button, strip) end
+function S:HandleButton(button, strip) return E:ReskinUIPanelButton(button, strip) end
 
 function S:HandleCloseButton(button, anchor) return E:StyleCloseButton(button, anchor) end
 
@@ -137,7 +142,7 @@ end
 
 function S:HandleFrame(frame)
     if not frame then return end
-    E:ReskinFrame(frame)
+    E:ReskinPanel(frame)
     handleFrameExtras(frame)
 end
 
@@ -145,33 +150,7 @@ function S:HandleSliderFrame(frame) return E:ReskinSlider(frame) end
 
 function S:HandleCheckBox(frame) return E:StyleCheckBox(frame) end
 
-function S:HandleDropDownBox(frame, width, template)
-    if not frame or frame:IsForbidden() then return end
-
-    frame:Width(width or 155)
-
-    if frame.__ddStyled then return end
-    frame.__ddStyled = true
-
-    frame:StripTextures(true)
-    frame:CreateBackdrop(template)
-    frame:OffsetFrameLevel(2)
-
-    -- modern WowStyle dropdowns expose Arrow; legacy ones a Button child
-    if frame.Arrow then frame.Arrow:SetAlpha(0) end
-    if frame.Button then frame.Button:SetAlpha(0) end
-
-    frame.backdrop:Point("TOPLEFT", 0, -2)
-    frame.backdrop:Point("BOTTOMRIGHT", 0, 2)
-
-    -- our own dropdown arrow (tex_arrow points up → rotate to point down)
-    local arrow = frame:CreateTexture(nil, "ARTWORK")
-    arrow:SetTexture(C.media.texture.arrow)
-    arrow:SetRotation(math.pi)
-    arrow:Point("RIGHT", frame.backdrop, -3, 0)
-    arrow:Size(14)
-    frame.__ddArrow = arrow
-end
+function S:HandleDropDownBox(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
 
 ------------------------------------------------------------------------
 -- HandleBlizzardRegions — hide named Blizzard art regions
@@ -258,7 +237,7 @@ end
 ------------------------------------------------------------------------
 
 function S:HandleItemButton(b, setInside, ignoreParent)
-    if not b or b.IsSkinned then return end
+    if not b or b.__styled then return end
     if b:IsForbidden() then return end
 
     local name = b:GetName()
@@ -327,7 +306,7 @@ function S:HandleItemButton(b, setInside, ignoreParent)
     -- (HandleIconBorder builds __qualityBorder at frameLevel +1, covering bg's dark edge)
     if b.IconBorder then S:HandleIconBorder(b.IconBorder) end
 
-    b.IsSkinned = true
+    b.__styled = true
 end
 
 ------------------------------------------------------------------------
@@ -462,7 +441,7 @@ end
 ------------------------------------------------------------------------
 
 function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
-    if not btn or btn.IsSkinned then return end
+    if not btn or btn.__styled then return end
     if btn:IsForbidden() then return end
 
     if not arrowDir then
@@ -484,7 +463,7 @@ function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
     btn:StripTextures()
     if btn.Texture then btn.Texture:SetAlpha(0) end
 
-    if not noBackdrop then E:ReskinButton(btn) end
+    if not noBackdrop then E:ReskinUIPanelButton(btn) end
     if stripTexts then btn:StripTexts() end
 
     local arrow = C.media.texture.arrow
@@ -524,7 +503,7 @@ function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
         Normal:SetVertexColor(1, 1, 1)
     end
 
-    btn.IsSkinned = true
+    btn.__styled = true
 end
 
 ------------------------------------------------------------------------
@@ -564,7 +543,7 @@ local function selectionOffset(frame)
 end
 
 function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
-    if not frame or frame.IsSkinned then return end
+    if not frame or frame.__styled then return end
 
     if not dontOffset then -- place it off to the side of parent with correct offsets
         frame:HookScript("OnShow", selectionOffset)
@@ -578,7 +557,8 @@ function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     local okay = frame.OkayButton or (borderBox and borderBox.OkayButton) or (frameName and _G[frameName .. "Okay"])
 
     frame:StripTextures()
-    frame:SetTemplate("default")
+    -- frame:SetTemplate("default")
+    E:ReskinPanel(frame)
 
     if borderBox then
         borderBox:StripTextures()
@@ -620,7 +600,7 @@ function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
         if iconSelector.ScrollBox then iconSelector.ScrollBox:ForEachFrame(skinIconSelectorButton) end
     end
 
-    frame.IsSkinned = true
+    frame.__styled = true
 end
 
 ------------------------------------------------------------------------
@@ -648,7 +628,7 @@ end
 ------------------------------------------------------------------------
 
 function S:HandleRotateButton(button, width, height, noSize)
-    if not button or button.IsSkinned then return end
+    if not button or button.__styled then return end
     if button:IsForbidden() then return end
 
     if not noSize then button:Size(width or 24, height or 24) end
@@ -679,7 +659,7 @@ function S:HandleRotateButton(button, width, height, noSize)
         highlightTex:SetColorTexture(1, 1, 1, 0.3)
     end
 
-    button.IsSkinned = true
+    button.__styled = true
 end
 
 ------------------------------------------------------------------------
@@ -702,7 +682,7 @@ do
     end
 
     function S:HandleMaxMinFrame(frame)
-        if not frame or frame.IsSkinned then return end
+        if not frame or frame.__styled then return end
         if frame:IsForbidden() then return end
 
         frame:StripTextures(true)
@@ -746,7 +726,7 @@ do
             end
         end
 
-        frame.IsSkinned = true
+        frame.__styled = true
     end
 end
 
@@ -758,7 +738,7 @@ do
     local maskBackground = [[Interface\Minimap\UI-Minimap-Background]]
 
     function S:HandleRadioButton(button)
-        if not button or button.IsSkinned then return end
+        if not button or button.__styled then return end
         if button:IsForbidden() then return end
 
         local insideMask = button:CreateMaskTexture()
@@ -805,7 +785,7 @@ do
         hooksecurefunc(button, "SetDisabledTexture", S.ClearDisabledTexture)
         hooksecurefunc(button, "SetHighlightTexture", S.ClearHighlightTexture)
 
-        button.IsSkinned = true
+        button.__styled = true
     end
 end
 
@@ -909,7 +889,7 @@ do
         for _, name in next, layoutKeys do
             local button = frame[name]
             if button then
-                if not button.IsSkinned then
+                if not button.__styled then
                     S:HandleButton(button)
                     button:Size(22)
                     if button.Icon then button.Icon:SetInside(nil, 2, 2) end
@@ -929,9 +909,9 @@ do
     end
 
     function S:HandleModelSceneControlButtons(frame)
-        if not frame or frame.IsSkinned then return end
+        if not frame or frame.__styled then return end
         if frame:IsForbidden() then return end
-        frame.IsSkinned = true
+        frame.__styled = true
 
         hooksecurefunc(frame, "UpdateLayout", updateLayout)
     end

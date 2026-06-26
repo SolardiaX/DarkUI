@@ -33,7 +33,7 @@ function module:OnInit()
 
     local button = ExtraActionButton1
     button:SetSize(cfg.button.size, cfg.button.size)
-    E:StyleButton(button, 2)
+    E:StyleIconButton(button, 2)
 
     if button.style then
         button.style:SetTexture(nil)
@@ -86,7 +86,7 @@ function module:OnInit()
         for spellButton in self.SpellButtonContainer:EnumerateActive() do
             if spellButton and not spellButton.__styled then
                 spellButton:SetSize(cfg.button.size, cfg.button.size)
-                E:StyleButton(spellButton)
+                E:StyleIconButton(spellButton)
                 -- spellButton:CreateShadow()
                 spellButton.__styled = true
             end
