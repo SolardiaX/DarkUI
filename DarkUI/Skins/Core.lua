@@ -534,12 +534,12 @@ end
 -- overlap (xOffset <= 0). MacroPopupFrame re-anchors to MacroFrame.
 local function selectionOffset(frame)
     local point, anchor, relativePoint, xOffset = frame:GetPoint()
-    if xOffset <= 0 then
-        local x = frame.BorderBox and 4 or 38
-        local y = frame.BorderBox and 0 or -10
-        frame:ClearAllPoints()
-        frame:Point(point, (frame == _G.MacroPopupFrame and _G.MacroFrame) or anchor, relativePoint, strfind(point, "LEFT") and x or -x, y)
-    end
+    if not point or xOffset > 0 then return end -- no anchor yet / already nudged aside
+
+    local x = frame.BorderBox and 8 or 40
+    local y = frame.BorderBox and 4 or -10
+    frame:ClearAllPoints()
+    frame:Point(point, (frame == _G.MacroPopupFrame and _G.MacroFrame) or anchor, relativePoint, strfind(point, "LEFT") and x or -x, y)
 end
 
 function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
@@ -548,6 +548,9 @@ function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     if not dontOffset then -- place it off to the side of parent with correct offsets
         frame:HookScript("OnShow", selectionOffset)
         frame:Height(frame:GetHeight() + 10)
+        -- We're called from the popup's own OnShow, so the hook above was added
+        -- mid-dispatch and won't fire for this first show — apply it directly.
+        if frame:IsShown() then selectionOffset(frame) end
     end
 
     local borderBox = frame.BorderBox or _G.BorderBox
