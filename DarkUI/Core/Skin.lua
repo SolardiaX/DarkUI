@@ -1,9 +1,9 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Skin Engine — global E:Reskin* skins + E:RegisterSkin dispatch.
--- The Skins module (S:Handle* compat layer + per-frame dispatcher) lives
--- in Skins/Core.lua, since it serves the Skins ports rather than the engine.
+-- Skin Engine — global E:Reskin* adapters (strip Blizzard art + delegate to
+-- E:Style* look builders). The Skins module (S:Handle* compat layer + per-frame
+-- dispatcher) lives in Skins/Core.lua, since it serves the Skins ports.
 --
 -- Guard convention: `frame.__styled` is the single canonical "this widget has
 -- been skinned" flag, shared by E:Reskin*/E:Style* AND Skins' S:Handle* (so the
@@ -13,8 +13,6 @@ local E, C, L = select(2, ...):unpack()
 ------------------------------------------------------------------------
 
 local _G = _G
-local CreateFrame = CreateFrame
-local unpack = unpack
 
 local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
 local onEnterHighlight = E.onEnterHighlight
@@ -24,36 +22,6 @@ local onLeaveHighlight = E.onLeaveHighlight
 -- instead of a blanket StripTextures, which would also blank the region the
 -- blinking caret renders against and leave a focused box with no cursor.
 local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
-
-------------------------------------------------------------------------
--- Skin Registration (ADDON_LOADED dispatch)
-------------------------------------------------------------------------
-
-local themes = {}
-local loaded = {}
-
-function E:RegisterSkin(addonName, func)
-    if loaded[addonName] then return end
-    if C_AddOns.IsAddOnLoaded(addonName) then
-        local ok, err = pcall(func)
-        if not ok then geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err)) end
-        loaded[addonName] = true
-    else
-        themes[addonName] = func
-    end
-end
-
-local function onAddonLoaded(_, event, addonName)
-    local func = themes[addonName]
-    if func then
-        local ok, err = pcall(func)
-        if not ok then geterrorhandler()(("DarkUI Skin [%s]: %s"):format(addonName, err)) end
-        themes[addonName] = nil
-        loaded[addonName] = true
-    end
-end
-
-E.Event:Register("ADDON_LOADED", onAddonLoaded, E)
 
 ------------------------------------------------------------------------
 -- E:ReskinPanel — skin a Blizzard panel/window (strip native art + StyleContainer).
