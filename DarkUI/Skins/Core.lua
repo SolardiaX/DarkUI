@@ -96,7 +96,13 @@ end
 -- Routing compat layer (S:Handle* → existing E:Reskin*/E:Style*)
 ------------------------------------------------------------------------
 
-function S:HandleButton(button, strip) return E:ReskinUIPanelButton(button, strip) end
+function S:HandleButton(button, strip)
+    E:ReskinUIPanelButton(button, strip)
+    -- ElvUI parity: HandleButton always sweeps leftover Blizzard art regions
+    -- (Border/Background/Center/…) that ReskinUIPanelButton's own list misses,
+    -- e.g. the gold backdrop on FriendsFrame ContactsMenuButton.
+    if button and button.__styled then S:HandleBlizzardRegions(button) end
+end
 
 function S:HandleCloseButton(button, anchor) return E:StyleCloseButton(button, anchor) end
 
