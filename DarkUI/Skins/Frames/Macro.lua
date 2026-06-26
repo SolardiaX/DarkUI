@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Macro UI (Blizzard_MacroUI)
--- Ported from ElvUI Mainline/Skins/Macro.lua
+-- Ported from ElvUI Mainline/Skins/Macro.lua (v15.15, 2026-06)
 ------------------------------------------------------------------------
 
 local _G = _G

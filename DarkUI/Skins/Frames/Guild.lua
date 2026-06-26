@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Guild invite frame
--- Ported from ElvUI Mainline/Skins/Guild.lua
+-- Ported from ElvUI Mainline/Skins/Guild.lua (v15.15, 2026-06)
 ------------------------------------------------------------------------
 
 local _G = _G

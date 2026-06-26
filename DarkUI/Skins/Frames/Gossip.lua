@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Gossip / ItemText frame
--- Ported from ElvUI Mainline/Skins/Gossip.lua
+-- Ported from ElvUI Mainline/Skins/Gossip.lua (v15.15, 2026-06)
 ------------------------------------------------------------------------
 
 local _G = _G

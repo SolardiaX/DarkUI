@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Merchant frame
--- Ported from ElvUI Mainline/Skins/Merchant.lua
+-- Ported from ElvUI Mainline/Skins/Merchant.lua (v15.15, 2026-06)
 -- (dropped ElvUI's quest-icon texture swap — purely cosmetic, kept native)
 ------------------------------------------------------------------------
 

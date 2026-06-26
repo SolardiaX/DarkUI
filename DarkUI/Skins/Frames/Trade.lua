@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Trade frame
--- Ported from ElvUI Mainline/Skins/Trade.lua
+-- Ported from ElvUI Mainline/Skins/Trade.lua (v15.15, 2026-06)
 ------------------------------------------------------------------------
 
 local _G = _G

@@ -3,7 +3,7 @@ local S = E:GetModule("Skins")
 
 ------------------------------------------------------------------------
 -- Mail frame (inbox / send / open)
--- Ported from ElvUI Mainline/Skins/Mail.lua
+-- Ported from ElvUI Mainline/Skins/Mail.lua (v15.15, 2026-06)
 ------------------------------------------------------------------------
 
 local _G = _G
