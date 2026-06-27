@@ -28,16 +28,21 @@ local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
 
 ------------------------------------------------------------------------
 -- E:ReskinPanel — skin a Blizzard panel/window (strip native art + StyleContainer).
--- opts forwards to StyleContainer; the portrait/inset/navbar container reskins
--- specialize through this rather than re-stripping themselves.
+-- opts forwards to StyleContainer. When called with NO opts, applies the DarkUI
+-- house look (opaque bg + gradient + regular border + shadow) so every plain
+-- Blizzard window matches the portrait frames (Macro/Merchant). Transparent
+-- container reskins (inset/navbar) pass their own opts and override this.
 ------------------------------------------------------------------------
+
+-- shared by E:ReskinPanel (no-opts default) and E:ReskinPortrait
+E.HOUSE_PANEL_OPTS = { border = "regular", margin = 4, gradient = true }
 
 function E:ReskinPanel(frame, opts)
     if not frame or frame.__styled then return end
     if frame:IsForbidden() then return end
 
     frame:StripTextures()
-    E:StyleContainer(frame, opts) -- default: backdrop + shadow (pixel square edge)
+    E:StyleContainer(frame, opts or E.HOUSE_PANEL_OPTS)
 end
 
 ------------------------------------------------------------------------
@@ -272,7 +277,7 @@ function E:ReskinPortrait(frame)
     if frame.PortraitFrame then frame.PortraitFrame:SetAlpha(0) end
 
     -- = ReskinPanel + hidden portrait region
-    E:ReskinPanel(frame, { border = "regular", margin = 4, gradient = true })
+    E:ReskinPanel(frame, E.HOUSE_PANEL_OPTS)
 end
 
 ------------------------------------------------------------------------
