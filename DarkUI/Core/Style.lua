@@ -103,6 +103,7 @@ function E:StyleCheckBox(frame)
     bg:SetTemplate("Default")
     bg:SetBackdropEdge("blur")
     frame.__bg = bg
+    frame.backdrop = bg -- ElvUI-compat alias (ports reference checkbox.backdrop)
 
     frame.hl = frame:GetHighlightTexture()
     frame.hl:SetInside(bg)

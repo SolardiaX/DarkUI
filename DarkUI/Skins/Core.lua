@@ -182,6 +182,15 @@ function S:ForEachCheckboxTextureRegion(checkbox, func)
     end
 end
 
+-- ElvUI parity: rescale inline texture escapes in a FontString's text (ports hook
+-- this on SetText). Called with self = the FontString.
+function S:ReplaceIconString(text)
+    if not text then text = self:GetText() end
+    if not text or text == "" then return end
+    local newText, count = text:gsub("|T([^:]-):[%d+:]+|t", "|T%1:14:14:0:0:64:64:5:59:5:59|t")
+    if count > 0 then self:SetFormattedText("%s", newText) end
+end
+
 function S:HandleDropDownBox(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
 
 ------------------------------------------------------------------------
