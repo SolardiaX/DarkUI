@@ -12,4 +12,15 @@
     <Script file="Frames\Mail.lua" />
     <Script file="Frames\Friends.lua" />
     <Script file="Frames\Communities.lua" />
+    <!-- wave 1: small common panels -->
+    <Script file="Frames\WeeklyRewards.lua" />
+    <Script file="Frames\Inspect.lua" />
+    <Script file="Frames\Socket.lua" />
+    <Script file="Frames\Trainer.lua" />
+    <Script file="Frames\Barber.lua" />
+    <Script file="Frames\Stable.lua" />
+    <Script file="Frames\ItemUpgrade.lua" />
+    <Script file="Frames\TimeManager.lua" />
+    <Script file="Frames\Binding.lua" />
+    <Script file="Frames\DressingRoom.lua" />
 </Ui>

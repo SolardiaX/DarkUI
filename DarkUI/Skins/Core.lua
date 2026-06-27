@@ -106,6 +106,20 @@ end
 
 function S:HandleCloseButton(button, anchor) return E:StyleCloseButton(button, anchor) end
 
+-- ElvUI-compat hover handlers: ports hook these on OnEnter/OnLeave for buttons
+-- that carry a separate `.backdrop` child (SetTemplate'd controls). Recolor the
+-- backdrop border to the theme gold on enter, back to the resting color on leave.
+function S.SetModifiedBackdrop(self)
+    if not self:IsEnabled() then return end
+    local bd = self.backdrop or self
+    if bd.SetBackdropBorderColor then bd:SetBackdropBorderColor(r, g, b) end
+end
+
+function S.SetOriginalBackdrop(self)
+    local bd = self.backdrop or self
+    if bd.SetBackdropBorderColor then bd:SetBackdropBorderColor(unpack(C.media.border_color)) end
+end
+
 function S:HandleTab(tab) return E:ReskinTab(tab) end
 
 function S:HandleEditBox(frame) return E:ReskinEditBox(frame) end

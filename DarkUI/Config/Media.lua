@@ -67,6 +67,9 @@ local config = {
         plus = path .. "tex_plus",
         minus = path .. "tex_minus",
         spark = path .. "tex_spark",
+        play = path .. "tex_play",
+        pause = path .. "tex_pause",
+        reset = path .. "tex_reset",
     },
 }
 
@@ -83,6 +86,28 @@ config.qualityColors[99] = { r = 1, g = 0, b = 0 }
 -- ElvUI-compat aliases (for near-verbatim Skins/Frames ports)
 config.normTex = config.texture.blank
 config.bordercolor = config.border_color
+
+-- ElvUI-compat: DarkUI always runs pixel mode, so PixelMode ternaries in ports
+-- (`E.PixelMode and X or Y`) resolve to the pixel branch with no per-file edit.
+E.PixelMode = true
+
+-- ElvUI-compat E.Media.Textures table: ports reference E.Media.Textures.<Name>.
+-- Mapped to our own media so the perl transform stays mechanical. Names ElvUI
+-- ships that have no DarkUI equivalent (Dashboard/Catalog/PetBroom/…) are left
+-- unmapped on purpose — those ports handle them per-file (see SYNC.md).
+E.Media = E.Media or {}
+E.Media.Textures = {
+    Invisible = config.texture.empty,
+    White8x8 = config.texture.blank,
+    NormTex = config.texture.blank,
+    ArrowUp = config.texture.arrow,
+    Melli = config.texture.close,
+    PlusButton = config.texture.plus,
+    MinusButton = config.texture.minus,
+    Play = config.texture.play,
+    Pause = config.texture.pause,
+    Reset = config.texture.reset,
+}
 
 C.media = config
 E.media = config

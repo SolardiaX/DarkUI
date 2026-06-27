@@ -44,11 +44,24 @@ These ElvUI-shaped APIs already exist so ported code needs no edit for them:
   `:StyleButton` (→ `E:StyleIconButton`), `:OffsetFrameLevel`, `:NudgePoint`,
   `:Kill`, `:StripTextures`, `:SetTemplate`, `:SetInside`, `:SetOutside`,
   `:CreateBackdrop`, `:CreateShadow`, `:CreateBorder`, `:CreateGradient`.
-- **Engine helpers** (Core/API.lua `E:` methods): `E:GetItemQualityColor(quality)`
-  → r,g,b from `C.media.qualityColors` (issecretvalue-guarded).
-- **Field aliases:** `frame.backdrop` (alias of our `__backdrop`), `button.hover`
-  (alias of our `button.highlight` set by `:StyleButton()`), `E.media`,
-  `E.ClearTexture`, `config.normTex`, `config.bordercolor`.
+- **Engine helpers** (Core/API.lua / Core/Skin.lua `E:` methods):
+  `E:GetItemQualityColor(quality)` → r,g,b from `C.media.qualityColors`
+  (issecretvalue-guarded); `E:RegisterStatusBar()` → **no-op** (DarkUI has no
+  runtime media hot-swap — ports set the bar texture manually, the call just
+  needs to exist).
+- **ElvUI hover handlers** (Skins/Core.lua): `S.SetModifiedBackdrop` /
+  `S.SetOriginalBackdrop` — recolor `self.backdrop or self`'s border to the theme
+  gold on enter / resting color on leave. Ports hook them on OnEnter/OnLeave.
+- **Field / texture aliases:** `frame.backdrop` (alias of our `__backdrop`),
+  `button.hover` (alias of our `button.highlight` set by `:StyleButton()`),
+  `E.media`, `E.ClearTexture`, `config.normTex`, `config.bordercolor`,
+  `E.PixelMode = true` (so PixelMode ternaries resolve to the pixel branch),
+  and `E.Media.Textures.<Name>` (Config/Media.lua) mapping the common ElvUI
+  texture keys to ours: Invisible→empty, White8x8/NormTex→blank, ArrowUp→arrow,
+  Melli→close, PlusButton→plus, MinusButton→minus, Play/Pause/Reset→tex_play/
+  pause/reset (copied from ElvUI Shared/Media). Keys ElvUI ships that we lack
+  (Dashboard/Catalog/PetBroom/Copy/Backpack/BagQuestIcon) are unmapped — handle
+  those per-file.
 
 If an upstream file calls an ElvUI API we have **not** provided, add the shim to
 `Skins/Core.lua` (a thin `S:HandleX` routing to `E:Reskin*`/`E:Style*`) or
@@ -109,10 +122,15 @@ perl -pi -e '
   Calls that only pass `template` map cleanly. For calls passing `allPoints=true`
   (e.g. Friends summon/invite/RAF-tab), rewrite to `:CreateBackdrop(template)` +
   `:backdrop:SetAllPoints()` in the port. `glossTex` has no DarkUI equivalent — drop it.
-- **`E.PixelMode` / `E.Border` / `E.Spacing`:** DarkUI runs pixel mode; collapse
-  `E.PixelMode and 0 or E.Border + E.Spacing` to the pixel-mode branch (`0`).
-- **`E:RegisterStatusBar`:** no DarkUI equivalent (we don't hot-swap statusbar
-  media at runtime). Drop the call; keep the manual `Progress:SetTexture(...)`.
+- **`E.PixelMode` / `E.Border` / `E.Spacing`:** `E.PixelMode` is now a compat
+  global (`= true`), so `E.PixelMode and X or Y` ternaries resolve to the pixel
+  branch with **no edit**. Standalone `E.Border` / `E.Spacing` are not yet
+  provided — if a port uses one outside a short-circuited PixelMode ternary,
+  collapse it to its pixel value (1 / -1) or add the global.
+- **`E:RegisterStatusBar`:** now a no-op compat shim — keep the call verbatim;
+  the manual `Progress:SetTexture(...)` / `SetStatusBarTexture(...)` still does
+  the real work. (Communities.lua predates the shim and drops the call manually;
+  harmless, left as-is.)
 
 ## Re-sync workflow
 

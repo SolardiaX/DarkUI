@@ -240,6 +240,16 @@ function E:ReskinStatusBar(bar)
 end
 
 ------------------------------------------------------------------------
+-- E:RegisterStatusBar — ElvUI-compat no-op
+--
+-- ElvUI registers a status bar for live media hot-swap (re-textures it when the
+-- user changes the statusbar media setting). DarkUI has no runtime media swap,
+-- so ports that set the bar texture manually then call this just need it to exist.
+------------------------------------------------------------------------
+
+function E:RegisterStatusBar() end
+
+------------------------------------------------------------------------
 -- E:ReskinPortrait — portrait frame
 ------------------------------------------------------------------------
 

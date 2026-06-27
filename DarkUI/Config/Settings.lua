@@ -335,6 +335,32 @@ C.skins = {
     mail = true,
     friends = true,
     communities = true,
+    -- batch 2 (ElvUI key names kept verbatim so the re-sync transform stays mechanical)
+    weeklyRewards = true,
+    inspect = true,
+    socket = true,
+    trainer = true,
+    barber = true,
+    stable = true,
+    itemUpgrade = true,
+    timemanager = true,
+    binding = true,
+    dressingroom = true,
+    lfg = true, -- gates both LFG and Delves (ElvUI shares the key)
+    talent = true, -- PlayerSpells
+    spellbook = true,
+    misc = true, -- Menu
+    majorFactions = true,
+    calendar = true,
+    transmogrify = true,
+    character = true,
+    auctionhouse = true,
+    collections = true,
+    campsites = true, -- warband campsites (Collectables)
+    tradeskill = true, -- Professions
+    encounterjournal = true,
+    pvp = true,
+    tooltip = false, -- DarkUI owns tooltip skinning; skip in-port tooltip branches
 }
 
 ----------------------------------------------------------------------------------------

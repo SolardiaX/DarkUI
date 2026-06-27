@@ -540,6 +540,32 @@ function E:GetItemQualityColor(quality)
     return unpack(C.media.border_color)
 end
 
+-- Class icon texcoords (ElvUI E:GetClassCoords compat). Reads CLASS_ICON_TCOORDS.
+function E:GetClassCoords(classFile, crop, get)
+    local t = _G.CLASS_ICON_TCOORDS[classFile]
+    if not t then return 0, 1, 0, 1 end
+
+    if get then
+        return t
+    elseif type(crop) == "number" then
+        return t[1] + crop, t[2] - crop, t[3] + crop, t[4] - crop
+    elseif crop then
+        return t[1] + 0.022, t[2] - 0.025, t[3] + 0.022, t[4] - 0.025
+    else
+        return t[1], t[2], t[3], t[4]
+    end
+end
+
+-- Run func after `delay` seconds (ElvUI E:Delay compat). C_Timer.After wrapper.
+function E:Delay(delay, func, ...)
+    if type(delay) ~= "number" or type(func) ~= "function" then return false end
+
+    local args = { ... }
+    C_Timer.After(delay < 0.01 and 0.01 or delay, #args > 0 and function() func(unpack(args)) end or func)
+
+    return true
+end
+
 ------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
