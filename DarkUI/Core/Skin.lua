@@ -51,9 +51,12 @@ function E:ReskinUIPanelButton(button, strip)
     -- Clear the button's own art (named textures). Only StripTextures when
     -- explicitly asked: a blanket strip also wipes unnamed icon regions
     -- (e.g. MerchantSellAllJunkButton's coin icon). Mirrors ElvUI HandleButton.
-    if button.SetNormalTexture then button:SetNormalTexture("") end
-    if button.SetPushedTexture then button:SetPushedTexture("") end
-    if button.SetDisabledTexture then button:SetDisabledTexture("") end
+    -- Overwrite with a transparent texture (E.ClearTexture) rather than "": an
+    -- empty path does not reliably blank atlas-based art (e.g. the gold NormalTexture
+    -- on FriendsFrame ContactsMenuButton).
+    if button.SetNormalTexture then button:SetNormalTexture(E.ClearTexture) end
+    if button.SetPushedTexture then button:SetPushedTexture(E.ClearTexture) end
+    if button.SetDisabledTexture then button:SetDisabledTexture(E.ClearTexture) end
 
     if strip then button:StripTextures() end
 
