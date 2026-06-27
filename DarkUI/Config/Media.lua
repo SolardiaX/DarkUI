@@ -91,6 +91,13 @@ config.bordercolor = config.border_color
 -- (`E.PixelMode and X or Y`) resolve to the pixel branch with no per-file edit.
 E.PixelMode = true
 
+-- ElvUI-compat: minimal E.global so ports that branch on its options resolve.
+-- disableTutorialButtons = false keeps DarkUI's existing behavior (hide the
+-- tutorial-button Ring rather than Kill the whole button — see Binding.lua).
+E.global = E.global or {}
+E.global.general = E.global.general or {}
+if E.global.general.disableTutorialButtons == nil then E.global.general.disableTutorialButtons = false end
+
 -- ElvUI-compat E.Media.Textures table: ports reference E.Media.Textures.<Name>.
 -- Mapped to our own media so the perl transform stays mechanical. Names ElvUI
 -- ships that have no DarkUI equivalent (Dashboard/Catalog/PetBroom/…) are left

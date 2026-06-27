@@ -250,6 +250,16 @@ end
 function E:RegisterStatusBar() end
 
 ------------------------------------------------------------------------
+-- E:RegisterCooldown — ElvUI-compat no-op
+--
+-- ElvUI registers a cooldown so it can restyle the spiral/edge and OnUpdate text.
+-- DarkUI owns cooldown styling separately (CooldownManager module), so ports that
+-- call this just need it to exist — the cooldown keeps DarkUI's own treatment.
+------------------------------------------------------------------------
+
+function E:RegisterCooldown() end
+
+------------------------------------------------------------------------
 -- E:ReskinPortrait — portrait frame
 ------------------------------------------------------------------------
 

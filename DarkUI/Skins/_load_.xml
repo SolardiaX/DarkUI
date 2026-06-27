@@ -23,4 +23,10 @@
     <Script file="Frames\TimeManager.lua" />
     <Script file="Frames\Binding.lua" />
     <Script file="Frames\DressingRoom.lua" />
+    <!-- wave 2: 12.0 content -->
+    <Script file="Frames\Delves.lua" />
+    <Script file="Frames\PlayerSpells.lua" />
+    <Script file="Frames\SpellBook.lua" />
+    <Script file="Frames\Menu.lua" />
+    <Script file="Frames\MajorFaction.lua" />
 </Ui>
