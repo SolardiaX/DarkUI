@@ -35,7 +35,7 @@ function S:Blizzard_Calendar()
 
     local CalendarFrame = _G.CalendarFrame
     CalendarFrame:DisableDrawLayer("BORDER")
-    CalendarFrame:CreateBackdrop("Transparent")
+    S:HandlePortraitFrame(CalendarFrame) -- DarkUI container look (no portrait: hide step skips safely)
 
     S:HandleButton(CalendarFrame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
     S:HandleCloseButton(_G.CalendarCloseButton)

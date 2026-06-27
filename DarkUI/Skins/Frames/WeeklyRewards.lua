@@ -106,11 +106,9 @@ function S:Blizzard_WeeklyRewards()
 
     -- /run UIParent_OnEvent({}, 'WEEKLY_REWARDS_SHOW')
     local frame = _G.WeeklyRewardsFrame
+    S:HandlePortraitFrame(frame) -- DarkUI container look in both parchment on/off paths (also styles CloseButton)
 
     if C.skins.parchment_remover then
-        frame:StripTextures()
-        frame:SetTemplate("Transparent")
-
         local header = frame.HeaderFrame
         if header then
             header:ClearAllPoints()
@@ -123,7 +121,6 @@ function S:Blizzard_WeeklyRewards()
         frame.ConcessionFrame:StripTextures()
     end
 
-    S:HandleCloseButton(frame.CloseButton)
     S:HandleButton(frame.SelectRewardButton)
 
     SkinActivityFrame(frame.RaidFrame)

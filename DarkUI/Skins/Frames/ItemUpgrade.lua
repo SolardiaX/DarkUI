@@ -21,14 +21,12 @@ function S:Blizzard_ItemUpgradeUI()
     if not (C.skins.enable and C.skins.itemUpgrade) then return end
 
     local frame = _G.ItemUpgradeFrame
+    S:HandlePortraitFrame(frame) -- DarkUI container look (hides portrait + NineSlice via StripTextures)
     _G.ItemUpgradeFrameBg:Hide()
-    _G.ItemUpgradeFramePortrait:Hide()
     _G.ItemUpgradeFramePlayerCurrenciesBorder:StripTextures()
 
-    frame:CreateBackdrop("Transparent")
     frame.UpgradeCostFrame.BGTex:StripTextures()
 
-    frame.NineSlice:Hide()
     frame.TopTileStreaks:Hide()
     frame.BottomBG:CreateBackdrop("Transparent")
     frame.ItemInfo.UpgradeTo:SetFontObject("GameFontHighlightMedium")
