@@ -29,4 +29,7 @@
     <Script file="Frames\SpellBook.lua" />
     <Script file="Frames\Menu.lua" />
     <Script file="Frames\MajorFaction.lua" />
+    <!-- wave 3: calendar + transmog -->
+    <Script file="Frames\Calendar.lua" />
+    <Script file="Frames\Transmog.lua" />
 </Ui>

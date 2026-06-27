@@ -86,10 +86,17 @@ config.qualityColors[99] = { r = 1, g = 0, b = 0 }
 -- ElvUI-compat aliases (for near-verbatim Skins/Frames ports)
 config.normTex = config.texture.blank
 config.bordercolor = config.border_color
+config.blankTex = config.texture.blank
+config.glossTex = config.texture.blank -- ElvUI gloss statusbar tex; blank reads fine as a highlight
+config.backdropfadecolor = { 0.06, 0.06, 0.06, 0.8 } -- ElvUI default faded-black backdrop
+config.rgbvaluecolor = { E.myColor.r, E.myColor.g, E.myColor.b } -- theme/value color as {r,g,b}
 
 -- ElvUI-compat: DarkUI always runs pixel mode, so PixelMode ternaries in ports
 -- (`E.PixelMode and X or Y`) resolve to the pixel branch with no per-file edit.
 E.PixelMode = true
+
+-- ElvUI-compat no-op (ports assign it to neutralize a method, e.g. icon.SetTexCoord = E.noop)
+E.noop = function() end
 
 -- ElvUI-compat: minimal E.global so ports that branch on its options resolve.
 -- disableTutorialButtons = false keeps DarkUI's existing behavior (hide the
