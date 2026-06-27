@@ -119,18 +119,33 @@ perl -pi -e '
 - **Multi-arg `CreateBackdrop`:** ElvUI's signature is
   `CreateBackdrop(frame, template, glossTex, ignoreUpdates, forcePixelMode, isUFE, isNP, noScale, allPoints, frameLevel)`;
   ours is `(frame, template, margin, tile, frameLevel)` — positions 3+ differ.
-  Calls that only pass `template` map cleanly. For calls passing `allPoints=true`
-  (e.g. Friends summon/invite/RAF-tab), rewrite to `:CreateBackdrop(template)` +
-  `:backdrop:SetAllPoints()` in the port. `glossTex` has no DarkUI equivalent — drop it.
-- **`E.PixelMode` / `E.Border` / `E.Spacing`:** `E.PixelMode` is now a compat
-  global (`= true`), so `E.PixelMode and X or Y` ternaries resolve to the pixel
-  branch with **no edit**. Standalone `E.Border` / `E.Spacing` are not yet
-  provided — if a port uses one outside a short-circuited PixelMode ternary,
-  collapse it to its pixel value (1 / -1) or add the global.
-- **`E:RegisterStatusBar`:** now a no-op compat shim — keep the call verbatim;
-  the manual `Progress:SetTexture(...)` / `SetStatusBarTexture(...)` still does
-  the real work. (Communities.lua predates the shim and drops the call manually;
-  harmless, left as-is.)
+  Calls that only pass `template` map cleanly. **Danger:** a boolean in ElvUI
+  position 4 (`forcePixelMode`) lands on our `frameLevel` → `SetFrameLevel(true)`
+  **crashes**. Rewrite: drop the trailing booleans. For `allPoints=true`, use
+  `:CreateBackdrop(template)` + `:backdrop:SetAllPoints()`. `glossTex` — drop it.
+- **`backdrop.Center` / `X.Center` after SetTemplate — CRITICAL:** ElvUI's
+  `SetTemplate`/`CreateBackdrop` build the backdrop from individual textures
+  (`.Center`, `.bordertop`, …); DarkUI uses a `BackdropTemplate` (`SetBackdrop`)
+  with **no sub-textures**. Any `frame.backdrop.Center:…` or (after `:SetTemplate()`)
+  `frame.Center:…` dereferences nil and **crashes**. **Drop these lines** — the
+  draw-layer reordering they did is moot (our bg sits at BACKGROUND already).
+  Grep every port for `\.Center\b` before shipping.
+- **`E.PixelMode` / `E.Border` / `E.Spacing`:** all compat globals now —
+  `E.PixelMode = true`, `E.Border = 1`, `E.Spacing = 0` (pixel-mode values), so
+  both ternaries and standalone arithmetic resolve with **no edit**.
+- **`E:RegisterStatusBar` / `E:RegisterCooldown`:** both no-op compat shims — keep
+  the call verbatim; the manual texture set still does the real work. DarkUI owns
+  cooldown styling (CooldownManager) and has no runtime statusbar media swap.
+- **Other compat globals/aliases** (Config/Media.lua) so ports stay mechanical:
+  `E.noop`, `E.Retail = true`, `E.OtherAddons = {}`, `E.global.general.disableTutorialButtons = false`,
+  `E.private.skins.checkBoxSkin = true`, `E.Libs.CustomGlow` (our bundled LibCustomGlow),
+  `E.GemTypeInfo` (socket colors), `E.Media.Textures.*` (Copy added; copied
+  Copy.tga alongside Play/Pause/Reset), and `E.media.{normFont,blankTex,glossTex,
+  backdropfadecolor,rgbvaluecolor}`. `E.TimerunningID` is intentionally **not**
+  provided — nil resolves the non-timerunning branch of its ternary.
+- **Skins helpers added** (Skins/Core.lua, ElvUI parity): `S:ForEachCheckboxTextureRegion`,
+  `S:SetupArrow`, `S:SkinReadyDialog`, `S:OverlayButton` (E.UIParent → _G.UIParent,
+  border-color calls inlined; `.Center` reorder dropped).
 
 ## Re-sync workflow
 

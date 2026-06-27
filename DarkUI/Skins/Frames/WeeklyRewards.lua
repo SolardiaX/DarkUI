@@ -64,7 +64,6 @@ local function SkinActivityFrame(frame, isObject)
             frame.Background:SetDrawLayer("ARTWORK", 2)
 
             frame.Background:CreateBackdrop("Transparent")
-            frame.Background.backdrop.Center:SetDrawLayer("ARTWORK", 1)
         end
     end
 end

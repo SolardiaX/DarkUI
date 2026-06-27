@@ -26,7 +26,6 @@ function S:Blizzard_ItemUpgradeUI()
     _G.ItemUpgradeFramePlayerCurrenciesBorder:StripTextures()
 
     frame:CreateBackdrop("Transparent")
-    frame.backdrop.Center:SetDrawLayer("BACKGROUND", -2)
     frame.UpgradeCostFrame.BGTex:StripTextures()
 
     frame.NineSlice:Hide()
@@ -51,7 +50,6 @@ function S:Blizzard_ItemUpgradeUI()
         local holder = button.ButtonFrame
         holder:StripTextures()
         holder:CreateBackdrop("Transparent")
-        holder.backdrop.Center:SetDrawLayer("BACKGROUND", -1)
     else
         frame.TopBG:CreateBackdrop("Transparent")
     end

@@ -174,7 +174,126 @@ function S:HandleSliderFrame(frame) return E:ReskinSlider(frame) end
 
 function S:HandleCheckBox(frame) return E:StyleCheckBox(frame) end
 
+-- ElvUI parity: iterate a checkbox's texture regions (ports hook these to swap
+-- the mini-checkbox art, e.g. LFD role checkboxes).
+function S:ForEachCheckboxTextureRegion(checkbox, func)
+    for _, region in next, { checkbox:GetRegions() } do
+        if region:IsObjectType("Texture") then func(checkbox, region) end
+    end
+end
+
 function S:HandleDropDownBox(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
+
+------------------------------------------------------------------------
+-- ElvUI-parity helpers (SetupArrow / SkinReadyDialog / OverlayButton)
+------------------------------------------------------------------------
+
+-- texture's arrow points up by default; rotate per direction
+local ARROW_DEGREE = { up = 0, down = 180, left = 90, right = -90 }
+function S:SetupArrow(tex, direction)
+    if not tex then return end
+    tex:SetTexture(C.media.texture.arrow)
+    tex:SetRotation(math.rad(ARROW_DEGREE[direction] or 0))
+end
+
+-- LFG / PVP ready-check dialog. ElvUI used forcePixelMode + backdrop.Center args
+-- our BackdropTemplate doesn't have; create the art backdrop and outset it instead.
+function S:SkinReadyDialog(dialog, bottom)
+    local background = dialog.background
+    if background then
+        background:ClearAllPoints()
+        background:Point("TOPLEFT", E.Border, -E.Border)
+        background:Point("BOTTOMRIGHT", -E.Border, bottom or 50)
+
+        dialog:CreateBackdrop("Transparent")
+        dialog.backdrop:SetOutside(background)
+    end
+
+    if dialog.bottomArt then dialog.bottomArt:SetAlpha(0) end
+
+    if dialog.Border then
+        dialog.Border:StripTextures()
+        dialog.Border:CreateBackdrop("Transparent")
+        dialog.Border.backdrop:SetAllPoints()
+    end
+
+    local instance = dialog.instanceInfo
+    if instance and instance.underline then instance.underline:SetAlpha(0) end
+
+    if dialog.enterButton then
+        S:HandleButton(dialog.enterButton)
+        dialog.enterButton:ClearAllPoints()
+        dialog.enterButton:Point("BOTTOMRIGHT", dialog, "BOTTOM", -10, 15)
+    end
+
+    if dialog.leaveButton then
+        S:HandleButton(dialog.leaveButton)
+        dialog.leaveButton:ClearAllPoints()
+        dialog.leaveButton:Point("BOTTOMLEFT", dialog, "BOTTOM", 10, 15)
+    end
+end
+
+do
+    -- a floating templated overlay mirroring a button that can't be templated in
+    -- place (e.g. the StartGroupButton inside an LFG ScrollBox).
+    local overlays = {}
+
+    local function overlayHide(button)
+        local overlay = overlays[button]
+        if overlay then overlay:Hide() end
+    end
+
+    local function overlayShow(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay:ClearAllPoints()
+        overlay:SetPoint(button:GetPoint())
+        overlay:Show()
+    end
+
+    local function overlayOnEnter(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay.text:SetTextColor(1, 1, 1)
+        overlay:SetBackdropBorderColor(r, g, b)
+    end
+
+    local function overlayOnLeave(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay.text:SetTextColor(1, 0.81, 0)
+        overlay:SetBackdropBorderColor(unpack(C.media.border_color))
+    end
+
+    function S:OverlayButton(button, name, width, height, text, textLayer, level, strata)
+        if overlays[button] then return end
+
+        local overlay = CreateFrame("Frame", "DarkUI_OverlayButton_" .. name, _G.UIParent)
+        overlay:Size(width or 120, height or 22) -- not GetSize: it can taint the owner
+        overlay:SetTemplate(nil, true)
+        overlay:SetPoint(button:GetPoint())
+        overlay:SetFrameLevel(level or 10)
+        overlay:SetFrameStrata(strata or "MEDIUM")
+        overlay:Hide()
+
+        local txt = overlay:CreateFontString(nil, textLayer or "OVERLAY")
+        if txt then
+            txt:FontTemplate()
+            txt:SetPoint("CENTER")
+            txt:SetTextColor(1, 0.81, 0)
+            txt:SetText(text)
+            overlay.text = txt
+
+            button:HookScript("OnEnter", overlayOnEnter)
+            button:HookScript("OnLeave", overlayOnLeave)
+        end
+
+        button:HookScript("OnHide", overlayHide)
+        button:HookScript("OnShow", overlayShow)
+
+        overlays[button] = overlay
+    end
+end
 
 ------------------------------------------------------------------------
 -- HandleBlizzardRegions — hide named Blizzard art regions

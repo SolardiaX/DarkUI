@@ -32,4 +32,12 @@
     <!-- wave 3: calendar + transmog -->
     <Script file="Frames\Calendar.lua" />
     <Script file="Frames\Transmog.lua" />
+    <!-- wave 4: core large panels -->
+    <Script file="Frames\Character.lua" />
+    <Script file="Frames\AuctionHouse.lua" />
+    <Script file="Frames\Collectables.lua" />
+    <Script file="Frames\Professions.lua" />
+    <Script file="Frames\EncounterJournal.lua" />
+    <Script file="Frames\LFG.lua" />
+    <Script file="Frames\PVP.lua" />
 </Ui>

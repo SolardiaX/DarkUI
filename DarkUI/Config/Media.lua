@@ -70,6 +70,7 @@ local config = {
         play = path .. "tex_play",
         pause = path .. "tex_pause",
         reset = path .. "tex_reset",
+        copy = path .. "tex_copy",
     },
 }
 
@@ -90,6 +91,7 @@ config.blankTex = config.texture.blank
 config.glossTex = config.texture.blank -- ElvUI gloss statusbar tex; blank reads fine as a highlight
 config.backdropfadecolor = { 0.06, 0.06, 0.06, 0.8 } -- ElvUI default faded-black backdrop
 config.rgbvaluecolor = { E.myColor.r, E.myColor.g, E.myColor.b } -- theme/value color as {r,g,b}
+config.normFont = STANDARD_TEXT_FONT -- ElvUI normFont path (FontTemplate(font, size, style))
 
 -- ElvUI-compat: DarkUI always runs pixel mode, so PixelMode ternaries in ports
 -- (`E.PixelMode and X or Y`) resolve to the pixel branch with no per-file edit.
@@ -104,6 +106,12 @@ E.noop = function() end
 E.global = E.global or {}
 E.global.general = E.global.general or {}
 if E.global.general.disableTutorialButtons == nil then E.global.general.disableTutorialButtons = false end
+
+-- ElvUI-compat: minimal E.private.skins for ports that branch on skin options.
+-- checkBoxSkin = true so checkbox-texture branches take the skinned path.
+E.private = E.private or {}
+E.private.skins = E.private.skins or {}
+if E.private.skins.checkBoxSkin == nil then E.private.skins.checkBoxSkin = true end
 
 -- ElvUI-compat E.Media.Textures table: ports reference E.Media.Textures.<Name>.
 -- Mapped to our own media so the perl transform stays mechanical. Names ElvUI
@@ -121,6 +129,38 @@ E.Media.Textures = {
     Play = config.texture.play,
     Pause = config.texture.pause,
     Reset = config.texture.reset,
+    Copy = config.texture.copy,
+}
+
+-- ElvUI-compat engine flags / tables referenced by Skins/Frames ports.
+E.Retail = true
+E.Border = 1 -- ElvUI pixel-mode border mult
+E.Spacing = 0 -- ElvUI pixel-mode spacing
+E.OtherAddons = E.OtherAddons or {} -- ports test E.OtherAddons.<name>; empty = none detected
+E.Libs = E.Libs or {}
+E.Libs.CustomGlow = E.Libs.CustomGlow or (LibStub and LibStub("LibCustomGlow-1.0", true))
+
+-- ElvUI-compat: gem socket border colors (Socket.lua: E.GemTypeInfo[gemColor])
+E.GemTypeInfo = {
+    Yellow = { r = 0.97, g = 0.82, b = 0.29, a = 1 },
+    Red = { r = 1.00, g = 0.47, b = 0.47, a = 1 },
+    Blue = { r = 0.47, g = 0.67, b = 1.00, a = 1 },
+    Hydraulic = { r = 1.00, g = 1.00, b = 1.00, a = 1 },
+    Cogwheel = { r = 1.00, g = 1.00, b = 1.00, a = 1 },
+    Meta = { r = 1.00, g = 1.00, b = 1.00, a = 1 },
+    Prismatic = { r = 1.00, g = 1.00, b = 1.00, a = 1 },
+    PunchcardRed = { r = 1.00, g = 0.47, b = 0.47, a = 1 },
+    PunchcardYellow = { r = 0.97, g = 0.82, b = 0.29, a = 1 },
+    PunchcardBlue = { r = 0.47, g = 0.67, b = 1.00, a = 1 },
+    Domination = { r = 0.24, g = 0.50, b = 0.70, a = 1 },
+    Cypher = { r = 1.00, g = 0.80, b = 0.00, a = 1 },
+    Tinker = { r = 1.00, g = 0.47, b = 0.47, a = 1 },
+    Primordial = { r = 1.00, g = 0.00, b = 1.00, a = 1 },
+    Fragrance = { r = 1.00, g = 1.00, b = 1.00, a = 1 },
+    SingingThunder = { r = 0.97, g = 0.82, b = 0.29, a = 1 },
+    SingingSea = { r = 0.47, g = 0.67, b = 1.00, a = 1 },
+    SingingWind = { r = 1.00, g = 0.47, b = 0.47, a = 1 },
+    Fiber = { r = 0.90, g = 0.80, b = 0.50, a = 1 },
 }
 
 C.media = config
