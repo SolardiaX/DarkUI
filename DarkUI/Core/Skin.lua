@@ -108,17 +108,51 @@ function E:ReskinUIPanelButton(button, strip)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinTab — tab button (intentional no-op)
+-- E:ReskinTab — tab button (NDui-style: drop atlas art + dark pill + gold hover)
+--
+-- DisableDrawLayer("BACKGROUND") removes the Blizzard tab art but KEEPS the text
+-- layer, so the native selected/deselected text brightness still carries the
+-- active-tab indicator (this is why stripping the atlas no longer loses it).
+-- resetTabAnchor (hooked once) re-centers the text Blizzard shifts on select.
+-- The pill is an inset transparent backdrop; hover = theme-gold highlight.
 ------------------------------------------------------------------------
 
--- The Blizzard tab art (uiframe-tab / uiframe-activetab atlases) already reads
--- as a dark theme and carries its own selected-state highlight (the Active
--- textures). Stripping it and rebuilding a backdrop loses that built-in
--- selected indicator for no visual gain, so ReskinTab is kept as a no-op:
--- callers / S:HandleTab still route here, but the native art is left untouched.
+local function resetTabAnchor(tab)
+    local text = tab.Text or (tab.GetName and _G[tab:GetName() .. "Text"])
+    if text then text:SetPoint("CENTER", tab) end
+end
+
+local tabAnchorHooked
+
 function E:ReskinTab(tab)
     if not tab or tab.__styled then return end
     if tab:IsForbidden() then return end
+
+    tab:DisableDrawLayer("BACKGROUND")
+    if tab.LeftHighlight then tab.LeftHighlight:SetAlpha(0) end
+    if tab.RightHighlight then tab.RightHighlight:SetAlpha(0) end
+    if tab.MiddleHighlight then tab.MiddleHighlight:SetAlpha(0) end
+
+    -- inset pill backdrop (left/right 8, top 3) — NDui proportions
+    local bg = tab:CreateBackdrop("transparent")
+    bg:ClearAllPoints()
+    bg:SetPoint("TOPLEFT", 8, -3)
+    bg:SetPoint("BOTTOMRIGHT", -8, 0)
+
+    if tab.SetHighlightTexture then
+        tab:SetHighlightTexture(C.media.texture.blank)
+        local hl = tab:GetHighlightTexture()
+        if hl then
+            hl:SetInside(bg)
+            hl:SetVertexColor(r, g, b, 0.25)
+        end
+    end
+
+    if not tabAnchorHooked then
+        tabAnchorHooked = true
+        hooksecurefunc("PanelTemplates_SelectTab", resetTabAnchor)
+        hooksecurefunc("PanelTemplates_DeselectTab", resetTabAnchor)
+    end
 
     tab.__styled = true
 end
