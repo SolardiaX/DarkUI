@@ -573,21 +573,25 @@ function module:OnInit()
         GameTooltip_ClearStatusBars(tt)
     end)
 
-    -- Menu skin
+    -- Menu skin (guard via external table — frame pool wipes custom fields)
     local menuManagerProxy = Menu.GetManager()
+    local menuBackdrops = {}
     local function skinMenu(menuFrame)
         menuFrame:DisableDrawLayer("BACKGROUND")
         menuFrame:StripTextures()
 
-        -- single-field .backdrop is its own created-once guard (survives pooling)
-        if not menuFrame.backdrop then
-            menuFrame:CreateBackdrop("Default", 8, true)
-            menuFrame.backdrop:CreateShadow()
-            menuFrame.backdrop:SetBackdropEdge("regular")
+        local bd = menuBackdrops[menuFrame]
+        if not bd then
+            bd = menuFrame:CreateBackdrop("Default", 8, true)
+            bd:CreateShadow()
+            bd:SetBackdropEdge("regular")
+            menuBackdrops[menuFrame] = bd
+        else
+            menuFrame.backdrop = bd
         end
 
         local lvl = menuFrame:GetFrameLevel() - 1
-        menuFrame.backdrop:SetFrameLevel(lvl < 0 and 0 or lvl)
+        bd:SetFrameLevel(lvl < 0 and 0 or lvl)
     end
     local function setupMenu(manager, _, menuDescription)
         local menuFrame = manager:GetOpenMenu()
