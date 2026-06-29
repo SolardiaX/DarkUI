@@ -491,6 +491,11 @@ local function SkinToyFrame()
         local button = ToyBox.iconsFrame["spellButton" .. i]
         S:HandleItemButton(button, true)
 
+        -- our HandleItemButton doesn't StripTextures (unlike ElvUI's), so the
+        -- toy slot frame art must be hidden explicitly (mirrors the heirloom path)
+        button.slotFrameCollected:SetAlpha(0)
+        button.slotFrameUncollected:SetAlpha(0)
+
         button.iconTextureUncollected:SetTexCoords()
         button.iconTextureUncollected:SetInside(button)
         button.hover:SetAllPoints(button.iconTexture)

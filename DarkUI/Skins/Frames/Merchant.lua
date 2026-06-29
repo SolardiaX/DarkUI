@@ -91,7 +91,7 @@ function S:MerchantFrame()
     -- Reposition tabs
     _G.MerchantFrameTab1:ClearAllPoints()
     _G.MerchantFrameTab2:ClearAllPoints()
-    _G.MerchantFrameTab1:Point("TOPLEFT", _G.MerchantFrame, "BOTTOMLEFT", 3, -5)
+    _G.MerchantFrameTab1:Point("TOPLEFT", _G.MerchantFrame, "BOTTOMLEFT", 3, 0)
     _G.MerchantFrameTab2:Point("TOPLEFT", _G.MerchantFrameTab1, "TOPRIGHT", 3, 0)
 
     -- Skin icons / merchant slots

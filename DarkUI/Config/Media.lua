@@ -71,6 +71,7 @@ local config = {
         pause = path .. "tex_pause",
         reset = path .. "tex_reset",
         copy = path .. "tex_copy",
+        wallpaper = path .. "pngs\\prototype\\bgFile.png", -- prototype panel background (explicit .png)
     },
 }
 
@@ -101,11 +102,12 @@ E.PixelMode = true
 E.noop = function() end
 
 -- ElvUI-compat: minimal E.global so ports that branch on its options resolve.
--- disableTutorialButtons = false keeps DarkUI's existing behavior (hide the
--- tutorial-button Ring rather than Kill the whole button — see Binding.lua).
+-- disableTutorialButtons = true so every panel Kills its tutorial/hint ("?")
+-- button outright (Professions/SpellBook/PlayerSpells/Transmog/PVP/Collectables/
+-- EncounterJournal/Binding all gate on this flag).
 E.global = E.global or {}
 E.global.general = E.global.general or {}
-if E.global.general.disableTutorialButtons == nil then E.global.general.disableTutorialButtons = false end
+if E.global.general.disableTutorialButtons == nil then E.global.general.disableTutorialButtons = true end
 
 -- ElvUI-compat: minimal E.private.skins for ports that branch on skin options.
 -- checkBoxSkin = true so checkbox-texture branches take the skinned path.

@@ -96,12 +96,45 @@ end
 -- Routing compat layer (S:Handle* → existing E:Reskin*/E:Style*)
 ------------------------------------------------------------------------
 
-function S:HandleButton(button, strip)
+function S:HandleButton(
+    button,
+    strip,
+    isDecline,
+    noStyle,
+    createBackdrop,
+    template,
+    noGlossTex,
+    overrideTex,
+    frameLevel,
+    regionsKill,
+    regionsZero,
+    isFilterButton,
+    filterDirection
+)
+    if not button then return end
+
     E:ReskinUIPanelButton(button, strip)
     -- ElvUI parity: HandleButton always sweeps leftover Blizzard art regions
     -- (Border/Background/Center/…) that ReskinUIPanelButton's own list misses,
     -- e.g. the gold backdrop on FriendsFrame ContactsMenuButton.
-    if button and button.__styled then S:HandleBlizzardRegions(button) end
+    if button.__styled then S:HandleBlizzardRegions(button, nil, regionsKill, regionsZero) end
+
+    -- ElvUI createBackdrop=true: give the button a real .backdrop child frame.
+    -- ReskinUIPanelButton styles the button in place (no child), so ports that
+    -- reposition the backdrop (e.g. MountJournal SlotButton .backdrop:SetOutside)
+    -- need the child created explicitly.
+    if createBackdrop and not button.backdrop then button:CreateBackdrop(template) end
+
+    -- ElvUI isFilterButton: re-add the dropdown filter arrow (stripped above);
+    -- filterDirection rotates it (FilterDropdown/FilterButton pass "right").
+    if isFilterButton and not button.__filterArrow then
+        local arrow = button:CreateTexture(nil, "ARTWORK")
+        arrow:Size(10)
+        arrow:ClearAllPoints()
+        arrow:Point("RIGHT", -1, 0)
+        if filterDirection then S:SetupArrow(arrow, filterDirection) end
+        button.__filterArrow = arrow
+    end
 end
 
 function S:HandleCloseButton(button, anchor) return E:StyleCloseButton(button, anchor) end
@@ -279,7 +312,7 @@ do
 
         local overlay = CreateFrame("Frame", "DarkUI_OverlayButton_" .. name, _G.UIParent)
         overlay:Size(width or 120, height or 22) -- not GetSize: it can taint the owner
-        overlay:SetTemplate(nil, true)
+        overlay:SetTemplate()
         overlay:SetPoint(button:GetPoint())
         overlay:SetFrameLevel(level or 10)
         overlay:SetFrameStrata(strata or "MEDIUM")
@@ -381,7 +414,7 @@ function S:HandleIcon(icon, backdrop)
     if not icon then return end
 
     icon:SetTexCoords()
-    if backdrop and not icon.backdrop then icon:CreateBackdrop() end
+    if backdrop and not icon.backdrop then icon:CreateBackdrop("Button", 1) end
 end
 
 ------------------------------------------------------------------------
@@ -403,8 +436,7 @@ function S:HandleItemButton(b, setInside, ignoreParent)
     -- backdrop: grey gloss base only (frameLevel -1, behind). The edge is
     -- covered by the higher/wider quality frame qb, so we skip it; the base
     -- still gives empty slots a solid fill.
-    local bg = b:CreateBackdrop("Button", 1)
-    b.__bg = bg
+    b:CreateBackdrop("Button", 1)
 
     -- icon
     if icon then
@@ -412,7 +444,10 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         if setInside then
             icon:SetInside(b)
         else
-            icon:SetInside(b, 1, 1)
+            -- ElvUI parity: wrap the backdrop around the icon at its native
+            -- size/position — do NOT stretch the icon to the button (battle-pet
+            -- loadout slots are larger than their icon, which would balloon it).
+            b.backdrop:SetOutside(icon, 1, 1)
         end
         if not ignoreParent then icon:SetParent(b) end
     end
@@ -427,30 +462,35 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         end
     end
 
-    -- pushed
-    if b.SetPushedTexture then
+    -- pushed (exposed as b.pushed so ElvUI ports can reposition it; preset skips)
+    if b.SetPushedTexture and not b.pushed then
         b:SetPushedTexture(C.media.button.glow)
         local pt = b:GetPushedTexture()
-        if pt then pt:SetOutside(b, 2, 2) end
+        if pt then
+            pt:SetOutside(b, 2, 2)
+            b.pushed = pt
+        end
     end
 
-    -- highlight (plain white fill, like the action button)
-    if b.SetHighlightTexture then
+    -- highlight (plain white fill; exposed as b.hover for ElvUI-port parity)
+    if b.SetHighlightTexture and not b.hover then
         b:SetHighlightTexture(C.media.texture.blank)
         local hl = b:GetHighlightTexture()
         if hl then
             hl:SetColorTexture(1, 1, 1, 0.25)
             hl:SetAllPoints(b)
+            b.hover = hl
         end
     end
 
-    -- checked (gold)
-    if b.SetCheckedTexture then
+    -- checked (gold; exposed as b.checked for ElvUI-port parity)
+    if b.SetCheckedTexture and not b.checked then
         b:SetCheckedTexture(C.media.texture.blank)
         local ct = b:GetCheckedTexture()
         if ct then
             ct:SetColorTexture(1, 0.8, 0, 0.35)
             ct:SetAllPoints(b)
+            b.checked = ct
         end
     end
 
@@ -462,7 +502,9 @@ function S:HandleItemButton(b, setInside, ignoreParent)
 end
 
 ------------------------------------------------------------------------
--- HandleIconBorder — recolor item-quality border onto our backdrop
+-- HandleIconBorder — drive the item-quality color onto a textured border frame
+-- (qb) drawn above the icon. Pass icon.backdrop to make it hug the icon; omit it
+-- for slot buttons (qb wraps the slot). Returns the qb.
 -- (secret-safe: GetAtlas/GetVertexColor may return secrets on protected
 --  item buttons; fall back to the default border color in that case)
 ------------------------------------------------------------------------
@@ -557,20 +599,27 @@ do
     function S:HandleIconBorder(border, backdrop, customFunc)
         if not border or border:IsForbidden() then return end
 
-        backdrop = backdrop or qualityBorder(border)
-        border.customBackdrop = backdrop
+        -- Always render the quality color on a textured border frame (qb) drawn
+        -- ABOVE the icon, matching the item-slot look. The optional `backdrop` (the
+        -- icon's own backdrop) is a geometry hint: when given, the qb hugs it (i.e.
+        -- the icon) instead of the border's parent (the slot/button). This unifies
+        -- the look across panels — slot buttons pass no backdrop (qb wraps the
+        -- slot); display icons pass icon.backdrop (qb wraps the icon).
+        local qb = qualityBorder(border)
+        if backdrop then qb:SetOutside(backdrop, 0, 0) end
+        border.customBackdrop = qb
 
         -- initial color from current atlas / vertex color
         local quality = atlasQuality(border.GetAtlas and border:GetAtlas())
         local q = quality and C.media.qualityColors[quality]
         if q then
-            backdrop:SetBackdropBorderColor(q.r, q.g, q.b, 1)
+            qb:SetBackdropBorderColor(q.r, q.g, q.b, 1)
         else
             local cr, cg, cb, ca = border:GetVertexColor()
             if cr ~= nil and not (issecretvalue and issecretvalue(cr)) then
-                backdrop:SetBackdropBorderColor(cr, cg, cb, ca)
+                qb:SetBackdropBorderColor(cr, cg, cb, ca)
             else
-                backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
+                qb:SetBackdropBorderColor(unpack(C.media.border_color))
             end
         end
 
@@ -584,6 +633,8 @@ do
             hooksecurefunc(border, "Show", borderShow)
             hooksecurefunc(border, "Hide", borderHide)
         end
+
+        return qb
     end
 end
 
@@ -1096,7 +1147,7 @@ do
         local main = portrait.Portrait
         if not main then return end
 
-        if not main.__backdrop then main:CreateBackdrop("Transparent") end
+        if not main.backdrop then main:CreateBackdrop("Transparent") end
 
         local level = portrait.Level or portrait.LevelText
         if level then
@@ -1112,7 +1163,7 @@ do
             portrait.PortraitRing:Hide()
             portrait.PortraitRingQuality:SetTexture(E.ClearTexture)
             portrait.PortraitRingCover:SetColorTexture(0, 0, 0)
-            portrait.PortraitRingCover:SetAllPoints(main.__backdrop)
+            portrait.PortraitRingCover:SetAllPoints(main.backdrop)
         end
 
         if portrait.Empty then
@@ -1130,7 +1181,7 @@ do
 
             local roleIcon = portrait.HealthBar.RoleIcon
             roleIcon:ClearAllPoints()
-            roleIcon:Point("CENTER", main.__backdrop, "TOPRIGHT")
+            roleIcon:Point("CENTER", main.backdrop, "TOPRIGHT")
 
             if updateAtlas then
                 handleFollowerRole(roleIcon, roleIcon:GetAtlas())
@@ -1140,8 +1191,8 @@ do
 
             local background = portrait.HealthBar.Background
             background:SetAlpha(0)
-            background:SetInside(main.__backdrop, 2, 1)
-            background:Point("TOPLEFT", main.__backdrop, "BOTTOMLEFT", 2, 7)
+            background:SetInside(main.backdrop, 2, 1)
+            background:Point("TOPLEFT", main.backdrop, "BOTTOMLEFT", 2, 7)
             portrait.HealthBar.Health:SetTexture(C.media.texture.blank)
         end
     end
