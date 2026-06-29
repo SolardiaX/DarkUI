@@ -239,6 +239,12 @@ local function setInside(obj, anchor, xOffset, yOffset)
     obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -xOffset, yOffset)
 end
 
+-- Hide a Blizzard frame's own backdrop art (NineSlice + any SetBackdrop)
+local function hideBackdrop(frame)
+    if frame.NineSlice then frame.NineSlice:SetAlpha(0) end
+    if frame.SetBackdrop then frame:SetBackdrop(nil) end
+end
+
 ------------------------------------------------------------------------
 -- SetTemplate / SetBackdropEdge
 ------------------------------------------------------------------------
@@ -508,9 +514,8 @@ local function fontTemplate(fs, font, fontSize, fontStyle)
     fs:SetShadowOffset(0.85, -0.85)
 end
 
--- Method-form of E:StyleIconButton (ElvUI files call button:StyleButton()).
--- The method name stays StyleButton for ElvUI-compat; it routes to our canonical
--- E:StyleIconButton. Skip DarkUI's outer vignette overlay for compat item buttons.
+-- Method-form of E:StyleIconButton: button:StyleButton() routes here (used by the
+-- icon-selector grid skin). Skips DarkUI's outer vignette overlay for item buttons.
 local function styleButton(button) return E:StyleIconButton(button, nil, true) end
 
 -- Set frame level relative to another frame's level (default self)
@@ -575,6 +580,7 @@ local function addapi(object)
 
     mt.SetOutside = setOutside
     mt.SetInside = setInside
+    mt.HideBackdrop = hideBackdrop
     mt.Kill = kill
     mt.StripTextures = stripTextures
     mt.SetTemplate = setTemplate
@@ -586,7 +592,7 @@ local function addapi(object)
     mt.CreateGradient = createGradient
     mt.CreateFontText = createFontText
 
-    -- ElvUI-compat atoms
+    -- Geometry / text / style atoms
     mt.Point = point
     mt.Size = size
     mt.Width = width
@@ -624,6 +630,41 @@ addapi(baseFrame:CreateTexture())
 addapi(baseFrame:CreateFontString())
 addapi(baseFrame:CreateMaskTexture())
 addapi(CreateFont("DarkUIAPIFont")) -- Font objects (e.g. InvoiceTextFontNormal) need FontTemplate too
+
+-- Widget types that may have NO instance at login (Model/PlayerModel/… are only
+-- created when a panel like Collections loads). Their shared metatable would miss
+-- the atoms until first use, so seed one throwaway of each to inject it now.
+for _, frameType in ipairs({
+    "PlayerModel",
+    "Model",
+    "ModelScene",
+    "CinematicModel",
+    "DressUpModel",
+    "StatusBar",
+    "Slider",
+    "Button",
+    "CheckButton",
+    "EditBox",
+    "ScrollFrame",
+    "Cooldown",
+    "SimpleHTML",
+    "MessageFrame",
+    "ScrollingMessageFrame",
+}) do
+    local ok, widget = pcall(CreateFrame, frameType)
+    if ok and widget then
+        if not handled[widget:GetObjectType()] then
+            addapi(widget)
+            handled[widget:GetObjectType()] = true
+        end
+        -- Neutralize the throwaway: a freshly created EditBox auto-focuses on
+        -- show and swallows ALL keyboard input (kills every keybind). Drop focus
+        -- and hide every seeded widget so it never interacts with the UI.
+        if widget.SetAutoFocus then widget:SetAutoFocus(false) end
+        if widget.ClearFocus then widget:ClearFocus() end
+        widget:Hide()
+    end
+end
 
 local object = EnumerateFrames()
 while object do

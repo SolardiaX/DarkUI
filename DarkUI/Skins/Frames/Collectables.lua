@@ -1,727 +1,629 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
+local DB = S.DB
+local cr, cg, cb = DB.r, DB.g, DB.b
 
 ------------------------------------------------------------------------
--- Collections journal (mounts / pets / toys / heirlooms)
--- Ported from ElvUI Mainline/Skins/Collectables.lua (v15.15, 2026-06)
+-- Collections (Mounts / Pets / Toys / Heirlooms / Wardrobe / Warband)
+-- Ported from AuroraClassic AddOns/Blizzard_Collections.lua (2026-06)
 ------------------------------------------------------------------------
-local TT = E:GetModule("Tooltip")
 
 local _G = _G
-local next, unpack = next, unpack
-local ipairs, pairs = ipairs, pairs
-local select, strfind = select, strfind
+local select, ipairs, unpack = select, ipairs, unpack
 local hooksecurefunc = hooksecurefunc
 
-local CreateFrame = CreateFrame
-local PlayerHasToy = PlayerHasToy
+local function reskinFrameButton(self)
+    for i = 1, self.ScrollTarget:GetNumChildren() do
+        local child = select(i, self.ScrollTarget:GetChildren())
+        if not child.__styled then
+            child:GetRegions():Hide()
+            child:SetHighlightTexture(0)
+            child.iconBorder:SetTexture("")
+            child.selectedTexture:SetTexture("")
 
-local C_Heirloom_PlayerHasHeirloom = C_Heirloom.PlayerHasHeirloom
-local C_TransmogCollection_GetSourceInfo = C_TransmogCollection.GetSourceInfo
-local GetItemQualityByID = C_Item.GetItemQualityByID
+            local bg = child:CreateBackdrop()
+            bg:SetBackdropEdge("round_white")
+            bg:SetPoint("TOPLEFT", 3, -1)
+            bg:SetPoint("BOTTOMRIGHT", 0, 1)
+            bg:SetBackdropColor(0, 0, 0, 0.25) -- initial fill; selection re-tints the fill (Aurora style)
+            bg:SetBackdropBorderColor(0, 0, 0) -- constant row border
+            child.bg = bg
+            -- Release the .backdrop slot: DarkUI's CreateBackdrop dedups on it,
+            -- so without this the icon's ReskinIcon below would reuse THIS row
+            -- frame (Aurora's CreateBDFrame makes a fresh frame each call) and
+            -- SetOutside would shrink the row highlight onto the icon -> the
+            -- selection tint becomes invisible. Keep row bg and icon bg separate.
+            child.backdrop = nil
 
-local ITEMQUALITY_HEIRLOOM = Enum.ItemQuality.Heirloom or 7
+            local icon = child.icon
+            icon:SetSize(40, 40)
+            icon.bg = S:ReskinIcon(icon)
+            child.name:SetParent(bg)
 
-local function CheckAndDisplayHeirloomsTab()
-    if not _G.CollectionsJournalTab5 then return end
+            if child.DragButton then
+                -- active (summoned) cue moves to ActiveTexture as a yellow tint,
+                -- freeing the icon border for the quality color (ElvUI style)
+                child.DragButton.ActiveTexture:SetColorTexture(0.9, 0.8, 0.1, 0.3)
+                child.DragButton.ActiveTexture:SetAllPoints(icon)
+                child.DragButton:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+                child.DragButton:GetHighlightTexture():SetAllPoints(icon)
+            else
+                child.dragButton.ActiveTexture:SetColorTexture(0.9, 0.8, 0.1, 0.3)
+                child.dragButton.ActiveTexture:SetAllPoints(icon)
+                child.dragButton.levelBG:SetAlpha(0)
+                child.dragButton.level:SetFontObject(GameFontNormal)
+                child.dragButton.level:SetTextColor(1, 1, 1)
+                child.dragButton:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+                child.dragButton:GetHighlightTexture():SetAllPoints(icon)
+            end
 
-    _G.CollectionsJournalTab5:Point("TOPLEFT", E.TimerunningID and _G.CollectionsJournalTab3 or _G.CollectionsJournalTab4, "TOPRIGHT", -5, 0)
-end
-
-local function ToyTextColor(text, r, g, b)
-    if r == 0.33 and g == 0.27 and b == 0.2 then
-        text:SetTextColor(0.4, 0.4, 0.4)
-    elseif r == 1 and g == 0.82 and b == 0 then
-        text:SetTextColor(0.9, 0.9, 0.9)
+            child.__styled = true
+        end
     end
 end
 
-local function MountNameColor(object)
-    local button = object:GetParent()
-    local name = button.name
+function S:Collectables()
+    if not (C.skins.enable and C.skins.collections) then return end
 
-    if name:GetFontObject() == _G.GameFontDisable then
-        name:SetTextColor(0.4, 0.4, 0.4)
-    else
-        if button.background then
-            local _, g, b = button.background:GetVertexColor()
-            if g == 0 and b == 0 then
-                name:SetTextColor(0.9, 0.3, 0.3)
-                return
+    -- [[ General ]]
+
+    CollectionsJournal.bg = S:ReskinPortraitFrame(CollectionsJournal) -- need this for Rematch skin
+    for i = 1, 6 do
+        local tab = _G["CollectionsJournalTab" .. i]
+        if tab then
+            S:ReskinTab(tab)
+            if i ~= 1 then
+                tab:ClearAllPoints()
+                tab:SetPoint("TOPLEFT", _G["CollectionsJournalTab" .. (i - 1)], "TOPRIGHT", -15, 0)
             end
         end
-
-        name:SetTextColor(0.9, 0.9, 0.9)
-    end
-end
-
-local function SelectedTextureSetShown(texture, shown) -- used sets list
-    local parent = texture:GetParent()
-    if shown then
-        parent.backdrop:SetBackdropBorderColor(1, 0.8, 0.1)
-    else
-        local r, g, b = unpack(E.media.bordercolor)
-        parent.backdrop:SetBackdropBorderColor(r, g, b)
-    end
-end
-
-local function SelectedTextureShow(texture) -- used for pets/mounts
-    local parent = texture:GetParent()
-    parent.backdrop:SetBackdropBorderColor(1, 0.8, 0.1)
-end
-
-local function SelectedTextureHide(texture) -- used for pets/mounts
-    local parent = texture:GetParent()
-    if not parent.hovered then
-        local r, g, b = unpack(E.media.bordercolor)
-        parent.backdrop:SetBackdropBorderColor(r, g, b)
-    end
-end
-
-local function ButtonOnEnter(button)
-    local r, g, b = unpack(E.media.rgbvaluecolor)
-    button.backdrop:SetBackdropBorderColor(r, g, b)
-
-    button.hovered = true
-end
-
-local function ButtonOnLeave(button)
-    if button.selected or (button.SelectedTexture and button.SelectedTexture:IsShown()) then
-        button.backdrop:SetBackdropBorderColor(1, 0.8, 0.1)
-    else
-        local r, g, b = unpack(E.media.bordercolor)
-        button.backdrop:SetBackdropBorderColor(r, g, b)
     end
 
-    button.hovered = nil
-end
+    -- [[ Mounts and pets ]]
 
-local function SkinJournalScrollButton(bu)
-    if not bu.__styled then
-        local icon = bu.icon or bu.Icon
-        local savedIconTexture = icon:GetTexture()
-        icon:Size(40)
-        icon:Point("LEFT", -43, 0)
-        S:HandleIcon(icon, true)
-        S:HandleIconBorder(bu.iconBorder, icon.backdrop)
+    local PetJournal = PetJournal
+    local MountJournal = MountJournal
 
-        local savedPetTypeTexture = bu.petTypeIcon and bu.petTypeIcon:GetTexture()
-        local savedFactionAtlas = bu.factionIcon and bu.factionIcon:GetAtlas()
+    MountJournal.LeftInset:Hide()
+    MountJournal.RightInset:Hide()
+    MountJournal.MountDisplay.YesMountsTex:SetAlpha(0)
+    MountJournal.MountDisplay.NoMountsTex:SetAlpha(0)
+    MountJournal.MountDisplay.ShadowOverlay:Hide()
+    PetJournal.LeftInset:Hide()
+    PetJournal.RightInset:SetAlpha(0)
+    PetJournal.PetCardInset:Hide()
+    PetJournal.loadoutBorder:SetAlpha(0)
+    PetJournalTutorialButton.Ring:Hide()
 
-        bu:StripTextures()
-        bu:CreateBackdrop("Transparent") -- ElvUI 4th arg was forcePixelMode (always on for DarkUI)
-        bu.backdrop:ClearAllPoints()
-        bu.backdrop:Point("TOPLEFT", bu, 0, -2)
-        bu.backdrop:Point("BOTTOMRIGHT", bu, 0, 2)
-        icon:SetTexture(savedIconTexture) -- restore the texture
-
-        bu:HookScript("OnEnter", ButtonOnEnter)
-        bu:HookScript("OnLeave", ButtonOnLeave)
-
-        if bu.ProgressBar then
-            bu.ProgressBar:SetTexture(E.media.normTex)
-            bu.ProgressBar:SetVertexColor(0.251, 0.753, 0.251, 1) -- 0.0118, 0.247, 0.00392
-        end
-
-        local parent = bu:GetParent():GetParent():GetParent()
-        if parent == _G.WardrobeCollectionFrame.SetsCollectionFrame then
-            bu.Favorite:SetAtlas("PetJournal-FavoritesIcon", true)
-            bu.Favorite:Point("TOPLEFT", bu.Icon, "TOPLEFT", -8, 8)
-
-            hooksecurefunc(bu.SelectedTexture, "SetShown", SelectedTextureSetShown)
-        else
-            bu.selectedTexture:SetTexture()
-            hooksecurefunc(bu.selectedTexture, "Show", SelectedTextureShow)
-            hooksecurefunc(bu.selectedTexture, "Hide", SelectedTextureHide)
-
-            if parent == _G.PetJournal then
-                bu.petList = true
-                bu.petTypeIcon:SetTexture(savedPetTypeTexture)
-                bu.petTypeIcon:Point("TOPRIGHT", -1, -1)
-                bu.petTypeIcon:Point("BOTTOMRIGHT", -1, 1)
-
-                bu.dragButton.ActiveTexture:SetTexture(E.Media.Textures.White8x8)
-                bu.dragButton.ActiveTexture:SetVertexColor(0.9, 0.8, 0.1, 0.3)
-
-                bu.dragButton.levelBG:SetTexture()
-                bu.dragButton.level:FontTemplate(nil, 12)
-
-                local hl = bu.dragButton:GetHighlightTexture()
-                hl:SetTexture(E.media.blankTex)
-                hl:SetVertexColor(1, 1, 1, 0.25)
-                hl:SetAllPoints(bu.icon)
-            elseif parent == _G.MountJournal then
-                bu.mountList = true
-                bu.factionIcon:SetAtlas(savedFactionAtlas)
-                bu.factionIcon:SetDrawLayer("OVERLAY")
-                bu.factionIcon:Point("TOPRIGHT", -1, -1)
-                bu.factionIcon:Point("BOTTOMRIGHT", -1, 1)
-
-                icon.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-                bu.DragButton.ActiveTexture:SetTexture(E.Media.Textures.White8x8)
-                bu.DragButton.ActiveTexture:SetVertexColor(0.9, 0.8, 0.1, 0.3)
-
-                local hl = bu.DragButton:GetHighlightTexture()
-                hl:SetTexture(E.media.blankTex)
-                hl:SetVertexColor(1, 1, 1, 0.25)
-                hl:SetAllPoints(bu.icon)
-
-                bu.favorite:SetTexture([[Interface\COMMON\FavoritesIcon]])
-                bu.favorite:Point("TOPLEFT", bu.DragButton, "TOPLEFT", -8, 8)
-                bu.favorite:Size(32)
-
-                hooksecurefunc(bu.name, "SetFontObject", MountNameColor)
-                hooksecurefunc(bu.background, "SetVertexColor", MountNameColor)
-            end
-        end
-
-        bu.__styled = true
-    end
-end
-
-local function JournalScrollButtons(frame) frame:ForEachFrame(SkinJournalScrollButton) end
-
-local function ToySpellButtonUpdateButton(button)
-    local quality = button.itemID and PlayerHasToy(button.itemID) and GetItemQualityByID(button.itemID)
-    local r, g, b = E:GetItemQualityColor(quality)
-    button.backdrop:SetBackdropBorderColor(r, g, b)
-end
-
-local function HeirloomsJournalUpdateButton(_, button)
-    if not button.__styled then
-        S:HandleItemButton(button, true)
-
-        button.iconTextureUncollected:SetTexCoords()
-        button.iconTextureUncollected:SetInside(button)
-        button.iconTexture:SetDrawLayer("ARTWORK")
-        button.hover:SetAllPoints(button.iconTexture)
-        button.slotFrameCollected:SetAlpha(0)
-        button.slotFrameUncollected:SetAlpha(0)
-        button.special:SetJustifyH("RIGHT")
-        button.special:ClearAllPoints()
-
-        button.cooldown:SetAllPoints(button.iconTexture)
-
-        E:RegisterCooldown(button.cooldown)
-
-        button.__styled = true
-    end
-
-    button.levelBackground:SetTexture()
-
-    button.name:Point("LEFT", button, "RIGHT", 4, 8)
-    button.level:Point("TOPLEFT", button.levelBackground, "TOPLEFT", 25, 2)
-
-    if C_Heirloom_PlayerHasHeirloom(button.itemID) then
-        local r, g, b = E:GetItemQualityColor(ITEMQUALITY_HEIRLOOM)
-        button.name:SetTextColor(0.9, 0.9, 0.9)
-        button.level:SetTextColor(0.9, 0.9, 0.9)
-        button.special:SetTextColor(1, 0.82, 0)
-        button.backdrop:SetBackdropBorderColor(r, g, b)
-    else
-        button.name:SetTextColor(0.4, 0.4, 0.4)
-        button.level:SetTextColor(0.4, 0.4, 0.4)
-        button.special:SetTextColor(0.4, 0.4, 0.4)
-        button.backdrop:SetBackdropBorderColor(unpack(E.media.bordercolor))
-    end
-end
-
-local function HeirloomsJournalLayoutCurrentPage()
-    local headers = _G.HeirloomsJournal.heirloomHeaderFrames
-    if headers and next(headers) then
-        for _, header in next, headers do
-            header:StripTextures()
-            header.text:FontTemplate(nil, 15, "SHADOW")
-            header.text:SetTextColor(0.9, 0.9, 0.9)
-        end
-    end
-end
-
-local function SetsFrame_ScrollBoxUpdateChild(child)
-    if not child.__styled then
-        child.Background:Hide()
-        child.HighlightTexture:SetTexture(E.ClearTexture)
-        child.IconFrame.Icon:SetSize(42, 42)
-        S:HandleIcon(child.IconFrame.Icon)
-
-        child.SelectedTexture:SetDrawLayer("BACKGROUND")
-        child.SelectedTexture:SetColorTexture(1, 1, 1, 0.25)
-        child.SelectedTexture:ClearAllPoints()
-        child.SelectedTexture:Point("TOPLEFT", 4, -2)
-        child.SelectedTexture:Point("BOTTOMRIGHT", -1, 2)
-        child.SelectedTexture:CreateBackdrop("Transparent")
-
-        child.__styled = true
-    end
-end
-
-local function SetsFrame_ScrollBoxUpdate(frame) frame:ForEachFrame(SetsFrame_ScrollBoxUpdateChild) end
-
-local function SetsFrame_SetItemFrameQuality(_, itemFrame)
-    local icon = itemFrame.Icon
-    if not icon.backdrop then
-        icon:CreateBackdrop()
-        icon:SetTexCoords()
-        itemFrame.IconBorder:Hide()
-    end
-
-    local source = itemFrame.collected and itemFrame.sourceID and C_TransmogCollection_GetSourceInfo(itemFrame.sourceID)
-    local r, g, b = E:GetItemQualityColor(source and source.quality)
-    icon.backdrop:SetBackdropBorderColor(r, g, b)
-end
-
-local function HandleDynamicFlightTexture(button, index)
-    local icon = index and select(index, button:GetRegions())
-    if icon then S:HandleIcon(icon, true) end
-end
-
-local function HandleDynamicFlightButton(button, index)
-    if button.BorderShadow then button.BorderShadow:SetAlpha(0) end
-    if button.Border then button.Border:SetAlpha(0) end
-
-    button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
-    button:SetPushedTexture(0)
-    button:SetNormalTexture(0)
-
-    HandleDynamicFlightTexture(button, index)
-end
-
-local function SkinMountFrame()
-    S:HandleItemButton(_G.MountJournal.SummonRandomFavoriteSpellFrame.Button)
-    S:HandleButton(_G.MountJournal.FilterDropdown, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
-
-    HandleDynamicFlightButton(_G.MountJournal.ToggleDynamicFlightFlyoutButton, 3)
-
-    local Flyout = _G.MountJournal.ToggleDynamicFlightFlyoutButton.popup
-    if Flyout then
-        Flyout.Background:Hide()
-
-        local DynamicFlight = Flyout.DynamicFlightModeButton
-        if DynamicFlight then HandleDynamicFlightButton(DynamicFlight, 4) end
-
-        local OpenFlight = Flyout.OpenDynamicFlightSkillTreeButton
-        if OpenFlight then HandleDynamicFlightButton(OpenFlight, 4) end
-    end
-
-    _G.MountJournal.FilterDropdown:ClearAllPoints()
-    _G.MountJournal.FilterDropdown:Point("LEFT", _G.MountJournalSearchBox, "RIGHT", 5, 0)
-
-    S:HandleCloseButton(_G.MountJournal.FilterDropdown.ResetButton)
-    _G.MountJournal.FilterDropdown.ResetButton:ClearAllPoints()
-    _G.MountJournal.FilterDropdown.ResetButton:Point("CENTER", _G.MountJournal.FilterDropdown, "TOPRIGHT", 0, 0)
-
-    local MountJournal = _G.MountJournal
-    MountJournal:StripTextures()
     MountJournal.MountCount:StripTextures()
+    MountJournal.MountCount:CreateBackdrop()
+    PetJournal.PetCount:StripTextures()
+    PetJournal.PetCount:CreateBackdrop()
+    PetJournal.PetCount:SetWidth(140)
+    MountJournal.MountDisplay.ModelScene:CreateBackdrop()
+    S:ReskinIcon(MountJournal.MountDisplay.InfoButton.Icon)
+    S:ReskinModelControl(MountJournal.MountDisplay.ModelScene)
 
-    local MountDisplay = MountJournal.MountDisplay
-    if MountDisplay then
-        MountJournal.MountDisplay:StripTextures()
-        MountJournal.MountDisplay.ShadowOverlay:StripTextures()
-        MountJournal.MountDisplay.ModelScene.TogglePlayer:Size(22)
+    S:Reskin(MountJournalMountButton)
+    S:Reskin(PetJournalSummonButton)
+    S:Reskin(PetJournalFindBattle)
 
-        S:HandleIcon(MountJournal.MountDisplay.InfoButton.Icon, true)
-        S:HandleCheckBox(MountJournal.MountDisplay.ModelScene.TogglePlayer)
-        S:HandleModelSceneControlButtons(_G.MountJournal.MountDisplay.ModelScene.ControlFrame)
-    end
+    S:ReskinTrimScroll(MountJournal.ScrollBar)
+    hooksecurefunc(MountJournal.ScrollBox, "Update", reskinFrameButton)
+    hooksecurefunc("MountJournal_InitMountButton", function(button)
+        if not button.bg then return end
 
-    S:HandleButton(_G.MountJournalMountButton)
-    _G.MountJournalMountButton:NudgePoint(0, -3)
-    S:HandleEditBox(_G.MountJournalSearchBox)
-    S:HandleTrimScrollBar(_G.MountJournal.ScrollBar)
+        button.icon:SetShown(button.index ~= nil)
+
+        -- selection tints the row fill (Aurora style); mounts have no quality so
+        -- the icon border stays default, active is shown via ActiveTexture.
+        if button.selectedTexture:IsShown() then
+            button.bg:SetBackdropColor(cr, cg, cb, 0.25)
+        else
+            button.bg:SetBackdropColor(0, 0, 0, 0.25)
+        end
+    end)
+
+    S:ReskinTrimScroll(PetJournal.ScrollBar)
+    hooksecurefunc(PetJournal.ScrollBox, "Update", reskinFrameButton)
+    hooksecurefunc("PetJournal_InitPetButton", function(button)
+        if not button.bg then return end
+        local index = button.index
+        if not index then return end
+
+        local petID, _, isOwned = C_PetJournal.GetPetInfoByIndex(index)
+        local r, g, b = 0.5, 0.5, 0.5 -- not owned
+        if petID and isOwned then
+            local rarity = select(5, C_PetJournal.GetPetStats(petID))
+            if rarity then
+                r, g, b = C_Item.GetItemQualityColor(rarity - 1)
+            else
+                r, g, b = 1, 1, 1
+            end
+        end
+        button.name:SetTextColor(r, g, b)
+        button.icon.bg:SetBackdropBorderColor(r, g, b) -- quality border (ElvUI style)
+
+        if button.selectedTexture:IsShown() then
+            button.bg:SetBackdropColor(cr, cg, cb, 0.25)
+        else
+            button.bg:SetBackdropColor(0, 0, 0, 0.25)
+        end
+    end)
+
+    S:ReskinEditBox(MountJournalSearchBox)
+    S:ReskinEditBox(PetJournalSearchBox)
+    S:ReskinFilterButton(PetJournal.FilterDropdown)
+    S:ReskinFilterButton(MountJournal.FilterDropdown)
+
+    local togglePlayer = MountJournal.MountDisplay.ModelScene.TogglePlayer
+    S:ReskinCheck(togglePlayer)
+    togglePlayer:SetSize(28, 28)
 
     MountJournal.BottomLeftInset:StripTextures()
-    MountJournal.BottomLeftInset:SetTemplate("Transparent")
-    MountJournal.BottomLeftInset.SlotButton:StripTextures()
-    S:HandleIcon(MountJournal.BottomLeftInset.SlotButton.ItemIcon)
-    S:HandleButton(MountJournal.BottomLeftInset.SlotButton, nil, nil, nil, true)
-    MountJournal.BottomLeftInset.SlotButton.backdrop:SetOutside(nil, -3, -3)
-    hooksecurefunc(MountJournal.ScrollBox, "Update", JournalScrollButtons)
-end
+    local bottomBg = MountJournal.BottomLeftInset:CreateBackdrop()
+    bottomBg:SetPoint("TOPLEFT", 3, 0)
+    bottomBg:SetPoint("BOTTOMRIGHT", -24, 2)
+    PetJournalTutorialButton:SetPoint("TOPLEFT", PetJournal, "TOPLEFT", -14, 14)
 
-local function SkinPetFrame()
-    local PetJournal = _G.PetJournal
+    local function reskinToolButton(button)
+        button.Border:Hide()
+        button:SetPushedTexture(0)
+        button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+        S:ReskinIcon(button.Icon)
+    end
+    reskinToolButton(PetJournal.HealPetSpellFrame.Button)
+    reskinToolButton(PetJournal.SummonRandomPetSpellFrame.Button)
 
-    _G.PetJournalSummonButton:StripTextures()
-    _G.PetJournalFindBattle:StripTextures()
-    S:HandleButton(_G.PetJournalSummonButton)
-    S:HandleButton(_G.PetJournalFindBattle)
-    _G.PetJournalRightInset:StripTextures()
-    _G.PetJournalLeftInset:StripTextures()
-    S:HandleItemButton(PetJournal.SummonRandomPetSpellFrame.Button, true)
-    E:RegisterCooldown(PetJournal.SummonRandomPetSpellFrame.Button.Cooldown)
+    PetJournalLoadoutBorderSlotHeaderText:SetParent(PetJournal)
+    PetJournalLoadoutBorderSlotHeaderText:SetPoint("CENTER", PetJournalLoadoutBorderTop, "TOP", 0, 4)
 
-    if E.global.general.disableTutorialButtons then _G.PetJournalTutorialButton:Kill() end
+    -- Favourite mount button
 
-    PetJournal.PetCount:StripTextures()
-    S:HandleEditBox(_G.PetJournalSearchBox)
-    _G.PetJournalSearchBox:ClearAllPoints()
-    _G.PetJournalSearchBox:Point("TOPLEFT", _G.PetJournalLeftInset, "TOPLEFT", (E.PixelMode and 13 or 10), -9)
+    reskinToolButton(MountJournal.SummonRandomFavoriteSpellFrame.Button)
 
-    S:HandleButton(PetJournal.FilterDropdown, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
-    PetJournal.FilterDropdown:Height(E.PixelMode and 22 or 24)
-    PetJournal.FilterDropdown:ClearAllPoints()
-    PetJournal.FilterDropdown:Point("TOPRIGHT", _G.PetJournalLeftInset, "TOPRIGHT", -5, -(E.PixelMode and 8 or 7))
-    S:HandleCloseButton(PetJournal.FilterDropdown.ResetButton)
-    PetJournal.FilterDropdown.ResetButton:ClearAllPoints()
-    PetJournal.FilterDropdown.ResetButton:Point("CENTER", PetJournal.FilterDropdown, "TOPRIGHT", 0, 0)
+    local function reskinDynamicButton(button, index)
+        if button.Border then button.Border:Hide() end
+        button:SetPushedTexture(0)
+        button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+        S:ReskinIcon(select(index, button:GetRegions()), nil)
+        button:SetNormalTexture(0)
+    end
+    reskinDynamicButton(MountJournal.ToggleDynamicFlightFlyoutButton, 3)
 
-    S:HandleTrimScrollBar(PetJournal.ScrollBar)
-    hooksecurefunc(PetJournal.ScrollBox, "Update", JournalScrollButtons)
-
-    _G.PetJournalAchievementStatus:DisableDrawLayer("BACKGROUND")
-
-    S:HandleItemButton(PetJournal.HealPetSpellFrame.Button, true)
-    E:RegisterCooldown(PetJournal.HealPetSpellFrame.Button.Cooldown)
-    PetJournal.HealPetSpellFrame.Button.Icon:SetTexture([[Interface\Icons\spell_magic_polymorphrabbit]])
-    _G.PetJournalLoadoutBorder:StripTextures()
-    _G.PetJournalSpellSelect:StripTextures()
-
-    for i = 1, 3 do
-        local petButton = _G["PetJournalLoadoutPet" .. i]
-        local petButtonHighlight = _G["PetJournalLoadoutPet" .. i .. "Highlight"]
-        local petButtonHealthFrame = _G["PetJournalLoadoutPet" .. i .. "HealthFrame"]
-        local petButtonXPBar = _G["PetJournalLoadoutPet" .. i .. "XPBar"]
-        petButton:StripTextures()
-        petButton:SetTemplate()
-        petButton.petTypeIcon:Point("BOTTOMLEFT", 2, 2)
-
-        petButtonHighlight:SetTexture(E.media.blankTex)
-        petButtonHighlight:SetVertexColor(1, 1, 1, 0.25)
-        petButtonHighlight:SetAllPoints(petButton.icon)
-
-        local helpFrame = _G["PetJournalLoadoutPet" .. i .. "HelpFrame"]
-        helpFrame:StripTextures()
-
-        petButton.dragButton:SetOutside(_G["PetJournalLoadoutPet" .. i .. "Icon"])
-        petButton.dragButton:OffsetFrameLevel(1, _G["PetJournalLoadoutPet" .. i].dragButton)
-
-        petButton.hover = true
-        petButton.pushed = true
-        petButton.checked = true
-        S:HandleItemButton(petButton)
-        S:HandleIconBorder(petButton.qualityBorder, petButton.backdrop)
-
-        petButton.levelBG:SetTexture()
-        petButton.level:FontTemplate(nil, 12)
-
-        petButton.setButton:StripTextures()
-        petButtonHealthFrame.healthBar:StripTextures()
-        petButtonHealthFrame.healthBar:CreateBackdrop()
-        petButtonHealthFrame.healthBar:SetStatusBarTexture(E.media.normTex)
-        E:RegisterStatusBar(petButtonHealthFrame.healthBar)
-        petButtonXPBar:StripTextures()
-        petButtonXPBar:CreateBackdrop()
-        petButtonXPBar:SetStatusBarTexture(E.media.normTex)
-        E:RegisterStatusBar(petButtonXPBar)
-        petButtonXPBar:OffsetFrameLevel(2)
-
-        for index = 1, 3 do
-            local f = _G["PetJournalLoadoutPet" .. i .. "Spell" .. index]
-            S:HandleItemButton(f)
-            f.FlyoutArrow:SetTexture([[Interface\Buttons\ActionBarFlyoutButton]])
-            _G["PetJournalLoadoutPet" .. i .. "Spell" .. index .. "Icon"]:SetInside(f)
-        end
+    local flyout = MountJournal.ToggleDynamicFlightFlyoutButton.popup or MountJournal.DynamicFlightFlyout
+    if flyout then
+        flyout.Background:Hide()
+        reskinDynamicButton(flyout.OpenDynamicFlightSkillTreeButton, 4)
+        reskinDynamicButton(flyout.DynamicFlightModeButton, 4)
     end
 
-    for i = 1, 2 do
-        local btn = _G["PetJournalSpellSelectSpell" .. i]
-        S:HandleItemButton(btn)
+    -- Pet card
 
-        local icon = _G["PetJournalSpellSelectSpell" .. i .. "Icon"]
-        icon:SetInside(btn)
-        icon:SetDrawLayer("BORDER")
+    local card = PetJournalPetCard
+
+    PetJournalPetCardBG:Hide()
+    card.PetInfo.levelBG:SetAlpha(0)
+    card.PetInfo.qualityBorder:SetAlpha(0)
+    card.AbilitiesBG1:SetAlpha(0)
+    card.AbilitiesBG2:SetAlpha(0)
+    card.AbilitiesBG3:SetAlpha(0)
+
+    card.PetInfo.level:SetFontObject(GameFontNormal)
+    card.PetInfo.level:SetTextColor(1, 1, 1)
+
+    card.PetInfo.icon.bg = S:ReskinIcon(card.PetInfo.icon)
+
+    card:CreateBackdrop()
+
+    for i = 2, 12 do
+        select(i, card.xpBar:GetRegions()):Hide()
     end
 
-    local Card = _G.PetJournalPetCard
+    card.xpBar:SetStatusBarTexture(DB.bdTex)
+    card.xpBar:CreateBackdrop()
 
-    Card:StripTextures()
-    Card:SetTemplate("Transparent")
-    _G.PetJournalPetCardInset:StripTextures()
+    PetJournalPetCardHealthFramehealthStatusBarLeft:Hide()
+    PetJournalPetCardHealthFramehealthStatusBarRight:Hide()
+    PetJournalPetCardHealthFramehealthStatusBarMiddle:Hide()
+    PetJournalPetCardHealthFramehealthStatusBarBGMiddle:Hide()
 
-    Card.PetInfo:OffsetFrameLevel(2, Card)
-    Card.PetInfo.level:FontTemplate(nil, 12)
-    Card.PetInfo.levelBG:SetTexture()
-    S:HandleIcon(Card.PetInfo.icon, true)
-    S:HandleIconBorder(Card.PetInfo.qualityBorder, Card.PetInfo.icon.backdrop)
-    Card.PetInfo.qualityBorder:SetAlpha(0)
-
-    if C.skins.tooltip then TT:SetStyle(_G.PetJournalPrimaryAbilityTooltip) end
+    card.HealthFrame.healthBar:SetStatusBarTexture(DB.bdTex)
+    card.HealthFrame.healthBar:CreateBackdrop()
 
     for i = 1, 6 do
-        local frame = _G["PetJournalPetCardSpell" .. i]
-        frame:OffsetFrameLevel(2)
-        frame:DisableDrawLayer("BACKGROUND")
-        frame:SetTemplate()
-        frame.icon:SetTexCoords()
+        local bu = card["spell" .. i]
+        S:ReskinIcon(bu.icon)
     end
 
-    Card.HealthFrame.healthBar:StripTextures()
-    Card.HealthFrame.healthBar:CreateBackdrop()
-    Card.HealthFrame.healthBar:SetStatusBarTexture(E.media.normTex)
-    E:RegisterStatusBar(Card.HealthFrame.healthBar)
+    hooksecurefunc("PetJournal_UpdatePetCard", function(self)
+        local border = self.PetInfo.qualityBorder
+        local r, g, b
 
-    Card.xpBar:StripTextures()
-    Card.xpBar:CreateBackdrop()
-    Card.xpBar:SetStatusBarTexture(E.media.normTex)
-    E:RegisterStatusBar(Card.xpBar)
-end
-
-local function SkinToyFrame()
-    local ToyBox = _G.ToyBox
-    S:HandleEditBox(ToyBox.searchBox)
-
-    S:HandleButton(_G.ToyBox.FilterDropdown, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
-    _G.ToyBox.FilterDropdown:Point("LEFT", ToyBox.searchBox, "RIGHT", 2, 0)
-    S:HandleCloseButton(_G.ToyBox.FilterDropdown.ResetButton)
-    _G.ToyBox.FilterDropdown.ResetButton:ClearAllPoints()
-    _G.ToyBox.FilterDropdown.ResetButton:Point("CENTER", _G.ToyBox.FilterDropdown, "TOPRIGHT", 0, 0)
-
-    ToyBox.iconsFrame:StripTextures()
-    S:HandleNextPrevButton(ToyBox.PagingFrame.NextPageButton, nil, nil, true)
-    S:HandleNextPrevButton(ToyBox.PagingFrame.PrevPageButton, nil, nil, true)
-
-    ToyBox.progressBar.border:Hide()
-    ToyBox.progressBar:DisableDrawLayer("BACKGROUND")
-    ToyBox.progressBar:SetStatusBarTexture(E.media.normTex)
-    ToyBox.progressBar:CreateBackdrop()
-    E:RegisterStatusBar(ToyBox.progressBar)
-
-    for i = 1, 18 do
-        local button = ToyBox.iconsFrame["spellButton" .. i]
-        S:HandleItemButton(button, true)
-
-        -- our HandleItemButton doesn't StripTextures (unlike ElvUI's), so the
-        -- toy slot frame art must be hidden explicitly (mirrors the heirloom path)
-        button.slotFrameCollected:SetAlpha(0)
-        button.slotFrameUncollected:SetAlpha(0)
-
-        button.iconTextureUncollected:SetTexCoords()
-        button.iconTextureUncollected:SetInside(button)
-        button.hover:SetAllPoints(button.iconTexture)
-        button.checked:SetAllPoints(button.iconTexture)
-        button.pushed:SetAllPoints(button.iconTexture)
-        button.cooldown:SetAllPoints(button.iconTexture)
-
-        E:RegisterCooldown(button.cooldown)
-
-        hooksecurefunc(button.name, "SetTextColor", ToyTextColor)
-        hooksecurefunc(button.new, "SetTextColor", ToyTextColor)
-    end
-
-    hooksecurefunc("ToySpellButton_UpdateButton", ToySpellButtonUpdateButton)
-end
-
-local function SkinHeirloomFrame()
-    local HeirloomsJournal = _G.HeirloomsJournal
-    S:HandleEditBox(HeirloomsJournal.SearchBox)
-    HeirloomsJournal.iconsFrame:StripTextures()
-
-    S:HandleNextPrevButton(HeirloomsJournal.PagingFrame.NextPageButton, nil, nil, true)
-    S:HandleNextPrevButton(HeirloomsJournal.PagingFrame.PrevPageButton, nil, nil, true)
-    S:HandleDropDownBox(_G.HeirloomsJournal.ClassDropdown)
-
-    S:HandleButton(_G.HeirloomsJournal.FilterDropdown, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
-    S:HandleCloseButton(_G.HeirloomsJournal.FilterDropdown.ResetButton)
-    _G.HeirloomsJournal.FilterDropdown.ResetButton:ClearAllPoints()
-    _G.HeirloomsJournal.FilterDropdown.ResetButton:Point("CENTER", _G.HeirloomsJournal.FilterDropdown, "TOPRIGHT", 0, 0)
-
-    HeirloomsJournal.progressBar.border:Hide()
-    HeirloomsJournal.progressBar:DisableDrawLayer("BACKGROUND")
-    HeirloomsJournal.progressBar:SetStatusBarTexture(E.media.normTex)
-    HeirloomsJournal.progressBar:CreateBackdrop()
-    E:RegisterStatusBar(HeirloomsJournal.progressBar)
-
-    hooksecurefunc(HeirloomsJournal, "UpdateButton", HeirloomsJournalUpdateButton)
-    hooksecurefunc(HeirloomsJournal, "LayoutCurrentPage", HeirloomsJournalLayoutCurrentPage)
-end
-
-local function HandleTabs()
-    local tab = _G.CollectionsJournalTab1
-    local index, lastTab = 1, tab
-    while tab do
-        S:HandleTab(tab)
-
-        tab:ClearAllPoints()
-
-        if index == 1 then
-            tab:Point("TOPLEFT", _G.CollectionsJournal, "BOTTOMLEFT", -3, 0)
+        if border:IsShown() then
+            r, g, b = self.PetInfo.qualityBorder:GetVertexColor()
         else
-            tab:Point("TOPLEFT", lastTab, "TOPRIGHT", -5, 0)
-            lastTab = tab
+            r, g, b = 0, 0, 0
         end
 
-        index = index + 1
-        tab = _G["CollectionsJournalTab" .. index]
+        self.PetInfo.icon.bg:SetBackdropBorderColor(r, g, b)
+    end)
+
+    -- Pet loadout
+
+    for i = 1, 3 do
+        local bu = PetJournal.Loadout["Pet" .. i]
+
+        _G["PetJournalLoadoutPet" .. i .. "BG"]:Hide()
+
+        bu.iconBorder:SetAlpha(0)
+        bu.qualityBorder:SetTexture("")
+        bu.levelBG:SetAlpha(0)
+        bu.helpFrame:GetRegions():Hide()
+        bu.dragButton:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+
+        bu.level:SetFontObject(GameFontNormal)
+        bu.level:SetTextColor(1, 1, 1)
+
+        bu.icon.bg = S:ReskinIcon(bu.icon)
+
+        bu.setButton:GetRegions():SetPoint("TOPLEFT", bu.icon, -5, 5)
+        bu.setButton:GetRegions():SetPoint("BOTTOMRIGHT", bu.icon, 5, -5)
+
+        bu:CreateBackdrop()
+
+        for j = 2, 12 do
+            select(j, bu.xpBar:GetRegions()):Hide()
+        end
+
+        bu.xpBar:SetStatusBarTexture(DB.bdTex)
+        bu.xpBar:CreateBackdrop()
+
+        bu.healthFrame.healthBar:StripTextures()
+        bu.healthFrame.healthBar:SetStatusBarTexture(DB.bdTex)
+        bu.healthFrame.healthBar:CreateBackdrop()
+
+        for j = 1, 3 do
+            local spell = bu["spell" .. j]
+
+            spell:SetPushedTexture(0)
+            spell:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+            spell.selected:SetTexture(DB.pushedTex)
+            spell:GetRegions():Hide()
+
+            local flyoutArrow = spell.FlyoutArrow
+            S:SetupArrow(flyoutArrow, "down")
+            flyoutArrow:SetSize(14, 14)
+            flyoutArrow:SetTexCoord(0, 1, 0, 1)
+
+            S:ReskinIcon(spell.icon)
+        end
     end
 
-    -- Blizzard clears points on the wardrobe tab
-    hooksecurefunc("CollectionsJournal_CheckAndDisplayHeirloomsTab", CheckAndDisplayHeirloomsTab)
-end
+    hooksecurefunc("PetJournal_UpdatePetLoadOut", function()
+        for i = 1, 3 do
+            local bu = PetJournal.Loadout["Pet" .. i]
 
-local function SkinWardrobeFrame()
-    local WardrobeCollectionFrame = _G.WardrobeCollectionFrame
-    S:HandleTab(_G.WardrobeCollectionFrameTab1)
-    S:HandleTab(_G.WardrobeCollectionFrameTab2)
+            bu.icon.bg:SetShown(not bu.helpFrame:IsShown())
+            bu.icon.bg:SetBackdropBorderColor(bu.qualityBorder:GetVertexColor())
 
-    local ProgressBar = WardrobeCollectionFrame.progressBar
-    if ProgressBar then
-        ProgressBar.border:Hide()
-        ProgressBar:DisableDrawLayer("BACKGROUND")
-        ProgressBar:SetStatusBarTexture(E.media.normTex)
-        ProgressBar:CreateBackdrop()
+            bu.dragButton:SetEnabled(not bu.helpFrame:IsShown())
+        end
+    end)
 
-        E:RegisterStatusBar(ProgressBar)
+    PetJournal.SpellSelect.BgEnd:Hide()
+    PetJournal.SpellSelect.BgTiled:Hide()
+
+    for i = 1, 2 do
+        local bu = PetJournal.SpellSelect["Spell" .. i]
+
+        bu:SetCheckedTexture(DB.pushedTex)
+        bu:SetPushedTexture(0)
+        bu:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+
+        S:ReskinIcon(bu.icon)
     end
 
-    if E.global.general.disableTutorialButtons then WardrobeCollectionFrame.InfoButton:Kill() end
+    -- [[ Toy box ]]
 
-    S:HandleEditBox(_G.WardrobeCollectionFrameSearchBox)
-    _G.WardrobeCollectionFrameSearchBox:SetFrameLevel(5)
-    S:HandleDropDownBox(_G.WardrobeCollectionFrame.ClassDropdown, 145)
+    local ToyBox = ToyBox
+    local iconsFrame = ToyBox.iconsFrame
 
-    S:HandleButton(WardrobeCollectionFrame.FilterButton, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, true, "right")
-    WardrobeCollectionFrame.FilterButton:Point("LEFT", WardrobeCollectionFrame.searchBox, "RIGHT", 2, 0)
-    S:HandleCloseButton(WardrobeCollectionFrame.FilterButton.ResetButton)
-    WardrobeCollectionFrame.FilterButton.ResetButton:ClearAllPoints()
-    WardrobeCollectionFrame.FilterButton.ResetButton:Point("CENTER", WardrobeCollectionFrame.FilterButton, "TOPRIGHT", 0, 0)
+    iconsFrame:StripTextures()
+    S:ReskinEditBox(ToyBox.searchBox)
+    S:ReskinFilterButton(ToyBox.FilterDropdown)
+    S:ReskinArrow(ToyBox.PagingFrame.PrevPageButton, "left")
+    S:ReskinArrow(ToyBox.PagingFrame.NextPageButton, "right")
 
-    S:HandleDropDownBox(_G.WardrobeCollectionFrame.ItemsCollectionFrame.WeaponDropdown)
-    WardrobeCollectionFrame.ItemsCollectionFrame:StripTextures()
-    WardrobeCollectionFrame.ItemsCollectionFrame:SetTemplate("Transparent")
+    -- Progress bar
 
-    for _, Frame in ipairs(WardrobeCollectionFrame.ContentFrames) do
-        if Frame.Models then
-            for _, Model in pairs(Frame.Models) do
-                Model.Border:SetAlpha(0)
-                Model.TransmogStateTexture:SetAlpha(0)
+    local toyProgress = ToyBox.progressBar
+    toyProgress.border:Hide()
+    toyProgress:DisableDrawLayer("BACKGROUND")
 
-                local border = CreateFrame("Frame", nil, Model)
-                border:SetTemplate()
-                border:ClearAllPoints()
-                border:Point("TOPLEFT", Model, "TOPLEFT", 0, 1) -- dont use set inside, left side needs to be 0
-                border:Point("BOTTOMRIGHT", Model, "BOTTOMRIGHT", 1, -1)
-                border:SetBackdropColor(0, 0, 0, 0)
-                -- ElvUI re-applied the color via a callbackBackdropColor closure;
-                -- DarkUI has no color callback, the SetBackdropColor above stands.
+    toyProgress.text:SetPoint("CENTER", 0, 1)
+    toyProgress:SetStatusBarTexture(DB.bdTex)
 
-                if Model.NewGlow then Model.NewGlow:SetParent(border) end
-                if Model.NewString then Model.NewString:SetParent(border) end
+    toyProgress:CreateBackdrop()
 
-                for _, region in next, { Model:GetRegions() } do
-                    if region:IsObjectType("Texture") then -- check for hover glow
-                        local texture, regionName = region:GetTexture(), region:GetDebugName() -- find transmogrify.blp (sets:1569530 or items:1116940)
-                        if
-                            texture == 1569530
-                            or (texture == 1116940 and not strfind(regionName, "SlotInvalidTexture") and not strfind(regionName, "DisabledOverlay"))
-                        then
-                            region:SetColorTexture(1, 1, 1, 0.25)
-                            region:SetBlendMode("ADD")
-                            region:SetAllPoints(Model)
-                        end
-                    end
-                end
+    -- Toys!
 
-                hooksecurefunc(Model.Border, "SetAtlas", function(_, texture)
-                    if texture == "transmog-wardrobe-border-uncollected" then
-                        border:SetBackdropBorderColor(0.9, 0.9, 0.3)
-                    elseif texture == "transmog-wardrobe-border-unusable" then
-                        border:SetBackdropBorderColor(0.9, 0.3, 0.3)
-                    elseif Model.TransmogStateTexture:IsShown() then
-                        border:SetBackdropBorderColor(1, 0.7, 1)
-                    else
-                        border:SetBackdropBorderColor(unpack(E.media.bordercolor))
-                    end
-                end)
+    local function changeTextColor(text)
+        if text.isSetting then return end
+        text.isSetting = true
+
+        local bu = text:GetParent()
+        local itemID = bu.itemID
+
+        if PlayerHasToy(itemID) then
+            local quality = select(3, C_Item.GetItemInfo(itemID))
+            if quality then
+                local r, g, b = C_Item.GetItemQualityColor(quality)
+                text:SetTextColor(r, g, b)
+                if bu.iconbg then bu.iconbg:SetBackdropBorderColor(r, g, b) end -- quality border
+            else
+                text:SetTextColor(1, 1, 1)
+                if bu.iconbg then bu.iconbg:SetBackdropBorderColor(0, 0, 0) end
+            end
+        else
+            text:SetTextColor(0.5, 0.5, 0.5)
+            if bu.iconbg then bu.iconbg:SetBackdropBorderColor(0, 0, 0) end
+        end
+
+        text.isSetting = nil
+    end
+
+    for i = 1, 18 do
+        local bu = iconsFrame["spellButton" .. i]
+        local ic = bu.iconTexture
+
+        bu:SetPushedTexture(0)
+        bu:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+        bu:GetHighlightTexture():SetAllPoints(ic)
+        bu.cooldown:SetAllPoints(ic)
+        bu.slotFrameCollected:SetTexture("")
+        bu.slotFrameUncollected:SetTexture("")
+        bu.iconbg = S:ReskinIcon(ic)
+
+        hooksecurefunc(bu.name, "SetTextColor", changeTextColor)
+    end
+
+    -- [[ Heirlooms ]]
+
+    local HeirloomsJournal = HeirloomsJournal
+    local heirloomIcons = HeirloomsJournal.iconsFrame
+
+    heirloomIcons:StripTextures()
+    S:ReskinEditBox(HeirloomsJournalSearchBox)
+    S:ReskinDropDown(HeirloomsJournal.ClassDropdown)
+    S:ReskinFilterButton(HeirloomsJournal.FilterDropdown)
+    S:ReskinArrow(HeirloomsJournal.PagingFrame.PrevPageButton, "left")
+    S:ReskinArrow(HeirloomsJournal.PagingFrame.NextPageButton, "right")
+
+    hooksecurefunc(HeirloomsJournal, "UpdateButton", function(_, button)
+        button.level:SetFontObject("GameFontWhiteSmall")
+        button.special:SetTextColor(1, 0.8, 0)
+    end)
+
+    -- Progress bar
+
+    local heirloomProgress = HeirloomsJournal.progressBar
+    heirloomProgress.border:Hide()
+    heirloomProgress:DisableDrawLayer("BACKGROUND")
+
+    heirloomProgress.text:SetPoint("CENTER", 0, 1)
+    heirloomProgress:SetStatusBarTexture(DB.bdTex)
+
+    heirloomProgress:CreateBackdrop()
+
+    -- Buttons
+
+    local hr, hg, hb = C_Item.GetItemQualityColor(Enum.ItemQuality.Heirloom or 7) -- heirloom quality color
+
+    hooksecurefunc("HeirloomsJournal_UpdateButton", function(button)
+        if not button.__styled then
+            local ic = button.iconTexture
+
+            button.slotFrameCollected:SetTexture("")
+            button.slotFrameUncollected:SetTexture("")
+            button.levelBackground:SetAlpha(0)
+            button:SetPushedTexture(0)
+            button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+            button:GetHighlightTexture():SetAllPoints(ic)
+
+            button.iconTextureUncollected:SetTexCoord(unpack(DB.TexCoord))
+            button.bg = S:ReskinIcon(ic)
+
+            button.level:ClearAllPoints()
+            button.level:SetPoint("BOTTOM", 0, 1)
+
+            local newLevelBg = button:CreateTexture(nil, "OVERLAY")
+            newLevelBg:SetColorTexture(0, 0, 0, 0.5)
+            newLevelBg:SetPoint("BOTTOMLEFT", button, "BOTTOMLEFT", 4, 5)
+            newLevelBg:SetPoint("BOTTOMRIGHT", button, "BOTTOMRIGHT", -4, 5)
+            newLevelBg:SetHeight(11)
+            button.newLevelBg = newLevelBg
+
+            button.__styled = true
+        end
+
+        if button.iconTexture:IsShown() then
+            button.name:SetTextColor(1, 1, 1)
+            button.bg:SetBackdropBorderColor(hr, hg, hb)
+            button.newLevelBg:Show()
+        else
+            button.name:SetTextColor(0.5, 0.5, 0.5)
+            button.bg:SetBackdropBorderColor(0, 0, 0)
+            button.newLevelBg:Hide()
+        end
+    end)
+
+    hooksecurefunc(HeirloomsJournal, "LayoutCurrentPage", function()
+        for i = 1, #HeirloomsJournal.heirloomHeaderFrames do
+            local header = HeirloomsJournal.heirloomHeaderFrames[i]
+            if not header.__styled then
+                header.text:SetTextColor(1, 1, 1)
+                header.text:FontTemplate(nil, 16)
+
+                header.__styled = true
             end
         end
 
-        local paging = Frame.PagingFrame
-        if paging then
-            S:HandleNextPrevButton(paging.PrevPageButton, nil, nil, true)
-            S:HandleNextPrevButton(paging.NextPageButton, nil, nil, true)
+        for i = 1, #HeirloomsJournal.heirloomEntryFrames do
+            local button = HeirloomsJournal.heirloomEntryFrames[i]
+
+            if button.iconTexture:IsShown() then
+                button.name:SetTextColor(1, 1, 1)
+                if button.bg then button.bg:SetBackdropBorderColor(hr, hg, hb) end
+                if button.newLevelBg then button.newLevelBg:Show() end
+            else
+                button.name:SetTextColor(0.5, 0.5, 0.5)
+                if button.bg then button.bg:SetBackdropBorderColor(0, 0, 0) end
+                if button.newLevelBg then button.newLevelBg:Hide() end
+            end
         end
-    end
+    end)
+
+    -- [[ WardrobeCollectionFrame ]]
+
+    local WardrobeCollectionFrame = WardrobeCollectionFrame
+    local ItemsCollectionFrame = WardrobeCollectionFrame.ItemsCollectionFrame
+
+    ItemsCollectionFrame:StripTextures()
+    S:ReskinFilterButton(WardrobeCollectionFrame.FilterButton)
+    S:ReskinEditBox(WardrobeCollectionFrameSearchBox)
+    S:ReskinDropDown(WardrobeCollectionFrame.ClassDropdown)
+    S:ReskinDropDown(ItemsCollectionFrame.WeaponDropdown)
+
+    hooksecurefunc(WardrobeCollectionFrame, "SetTab", function(self, tabID)
+        for index = 1, 2 do
+            local tab = self.Tabs[index]
+            if not tab.bg then S:ReskinTab(tab) end
+            if tabID == index then
+                tab.bg:SetBackdropColor(cr, cg, cb, 0.25)
+            else
+                tab.bg:SetBackdropColor(0, 0, 0, 0.25)
+            end
+        end
+    end)
+
+    S:ReskinArrow(ItemsCollectionFrame.PagingFrame.PrevPageButton, "left")
+    S:ReskinArrow(ItemsCollectionFrame.PagingFrame.NextPageButton, "right")
+    ItemsCollectionFrame.BGCornerTopLeft:SetAlpha(0)
+    ItemsCollectionFrame.BGCornerTopRight:SetAlpha(0)
+
+    local wardrobeProgress = WardrobeCollectionFrame.progressBar
+    wardrobeProgress:DisableDrawLayer("BACKGROUND")
+    select(2, wardrobeProgress:GetRegions()):Hide()
+    wardrobeProgress.text:SetPoint("CENTER", 0, 1)
+    wardrobeProgress:SetStatusBarTexture(DB.bdTex)
+    wardrobeProgress:CreateBackdrop()
+
+    -- ItemSetsCollection
 
     local SetsCollectionFrame = WardrobeCollectionFrame.SetsCollectionFrame
-    SetsCollectionFrame:SetTemplate("Transparent")
-    SetsCollectionFrame.RightInset:StripTextures()
-    SetsCollectionFrame.LeftInset:StripTextures()
-    S:HandleTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
+    SetsCollectionFrame.LeftInset:Hide()
+    SetsCollectionFrame.RightInset:Hide()
+    SetsCollectionFrame.Model:CreateBackdrop()
 
-    hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, "Update", SetsFrame_ScrollBoxUpdate)
+    S:ReskinTrimScroll(SetsCollectionFrame.ListContainer.ScrollBar)
+    hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, "Update", function(self)
+        for i = 1, self.ScrollTarget:GetNumChildren() do
+            local child = select(i, self.ScrollTarget:GetChildren())
+            if not child.__styled then
+                child.Background:Hide()
+                child.HighlightTexture:SetTexture("")
+
+                local icon = child.IconFrame and child.IconFrame.Icon or child.Icon
+                if icon then
+                    icon:SetSize(42, 42)
+                    S:ReskinIcon(icon)
+                    if child.IconCover then child.IconCover:SetOutside(icon) end
+                end
+
+                child.SelectedTexture:SetDrawLayer("BACKGROUND")
+                child.SelectedTexture:SetColorTexture(cr, cg, cb, 0.25)
+                child.SelectedTexture:ClearAllPoints()
+                child.SelectedTexture:SetPoint("TOPLEFT", 4, -2)
+                child.SelectedTexture:SetPoint("BOTTOMRIGHT", -1, 2)
+                child.SelectedTexture:CreateBackdrop()
+
+                child.__styled = true
+            end
+        end
+    end)
 
     local DetailsFrame = SetsCollectionFrame.DetailsFrame
     DetailsFrame.ModelFadeTexture:Hide()
     DetailsFrame.IconRowBackground:Hide()
-    DetailsFrame.Name:FontTemplate(nil, 16)
-    DetailsFrame.LongName:FontTemplate(nil, 16)
-    S:HandleDropDownBox(DetailsFrame.VariantSetsDropdown)
-    hooksecurefunc(SetsCollectionFrame, "SetItemFrameQuality", SetsFrame_SetItemFrameQuality)
-end
+    S:ReskinDropDown(DetailsFrame.VariantSetsDropdown)
 
-local function SkinCollectionsFrames()
-    S:HandlePortraitFrame(_G.CollectionsJournal, true)
-    SkinWardrobeFrame()
+    hooksecurefunc(SetsCollectionFrame, "SetItemFrameQuality", function(_, itemFrame)
+        local ic = itemFrame.Icon
+        if not ic.bg then ic.bg = S:ReskinIcon(ic) end
+        itemFrame.IconBorder:SetTexture("")
 
-    HandleTabs()
+        if itemFrame.collected then
+            local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
+            local color = DB.QualityColors[quality or 1]
+            ic.bg:SetBackdropBorderColor(color.r, color.g, color.b)
+        else
+            ic.bg:SetBackdropBorderColor(0, 0, 0)
+        end
+    end)
 
-    SkinMountFrame()
-    SkinPetFrame()
-    SkinToyFrame()
-    SkinHeirloomFrame()
-end
+    -- HPetBattleAny
+    local reskinHPet
+    CollectionsJournal:HookScript("OnShow", function()
+        if not C_AddOns.IsAddOnLoaded("HPetBattleAny") then return end
+        if not reskinHPet then
+            if HPetInitOpenButton then S:Reskin(HPetInitOpenButton) end
+            if HPetAllInfoButton then
+                HPetAllInfoButton:StripTextures()
+                S:Reskin(HPetAllInfoButton)
+            end
 
-local function UpdateWarbandSceneData(frame)
-    if frame and frame.warbandSceneInfo and not frame.artBackdrop then
-        frame.artBackdrop = CreateFrame("Frame", nil, frame)
-        frame.artBackdrop:OffsetFrameLevel(-1, frame)
-        frame.artBackdrop:SetOutside(frame.Icon, -5, -5)
-        frame.artBackdrop:SetTemplate()
+            if PetJournalBandageButton then
+                PetJournalBandageButton:SetPushedTexture(0)
+                PetJournalBandageButton:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
+                PetJournalBandageButtonBorder:Hide()
+                PetJournalBandageButton:SetPoint("TOPRIGHT", PetJournalHealPetButton, "TOPLEFT", -3, 0)
+                PetJournalBandageButton:SetPoint("BOTTOMLEFT", PetJournalHealPetButton, "BOTTOMLEFT", -35, 0)
+                S:ReskinIcon(PetJournalBandageButtonIcon)
+            end
+            reskinHPet = true
+        end
+    end)
 
-        frame.Border:SetAlpha(0)
-        S:HandleIcon(frame.Icon)
+    -- WarbandSceneJournal
+    if WarbandSceneJournal then
+        local warbandIcons = WarbandSceneJournal.IconsFrame
+        if warbandIcons then
+            warbandIcons:StripTextures()
 
-        if frame.SetHighlightTexture then
-            local highlight = frame:CreateTexture()
-            highlight:SetColorTexture(1, 1, 1, 0.25)
-            highlight:SetAllPoints(frame.Icon)
+            local controls = warbandIcons.Icons and warbandIcons.Icons.Controls
+            if controls then
+                local showCheck = controls and controls.ShowOwned and controls.ShowOwned.Checkbox
+                if showCheck then
+                    -- Checkbox sits in a 20x20 ShowOwned slot laid out by a
+                    -- HorizontalLayoutFrame; do NOT SetSize it (28 overflows the
+                    -- slot and breaks the row's vertical centering). Reskin only.
+                    S:ReskinCheck(showCheck)
+                end
 
-            frame:SetHighlightTexture(highlight)
+                if controls.PagingControls then
+                    S:ReskinArrow(controls.PagingControls.PrevPageButton, "left")
+                    S:ReskinArrow(controls.PagingControls.NextPageButton, "right")
+
+                    -- ReskinArrow resized the buttons; re-flow the horizontal
+                    -- layout frames so PageText + arrows re-center on new sizes
+                    -- (otherwise the arrows keep the original, higher baseline).
+                    if controls.PagingControls.Layout then controls.PagingControls:Layout() end
+                    if controls.Layout then controls:Layout() end
+                end
+            end
         end
     end
 end
 
-local function SkinCampsitesFrame()
-    local Frame = _G.WarbandSceneJournal
-
-    local IconsFrame = Frame.IconsFrame
-    if IconsFrame then
-        IconsFrame:StripTextures()
-        IconsFrame.NineSlice:SetTemplate("Transparent")
-
-        local Controls = IconsFrame.Icons and IconsFrame.Icons.Controls
-        if Controls then
-            local CheckBox = Controls and Controls.ShowOwned and Controls.ShowOwned.Checkbox
-            if CheckBox then
-                CheckBox:Size(28)
-                S:HandleCheckBox(CheckBox)
-            end
-
-            if Controls.PagingControls then
-                S:HandleNextPrevButton(Controls.PagingControls.PrevPageButton, nil, nil, true)
-                S:HandleNextPrevButton(Controls.PagingControls.NextPageButton, nil, nil, true)
-            end
-        end
-    end
-
-    hooksecurefunc(_G.WarbandSceneEntryMixin, "UpdateWarbandSceneData", UpdateWarbandSceneData)
-end
-
-function S:Blizzard_Collections()
-    if not C.skins.enable then return end
-    if C.skins.collections then SkinCollectionsFrames() end
-    if C.skins.campsites then SkinCampsitesFrame() end
-end
-
-S:AddCallbackForAddon("Blizzard_Collections")
+S:AddCallbackForAddon("Blizzard_Collections", "Collectables")

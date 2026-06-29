@@ -1,15 +1,24 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Skins Module — ElvUI-compatible per-frame skin dispatcher
+-- Skins Module — AuroraClassic-style per-frame skin engine
+--
+-- Ports under Skins/Frames/ are near-verbatim translations of AuroraClassic
+-- (AddOns/*.lua + FrameXML/*.lua). They call this module's S:Reskin* methods
+-- (Aurora's B:Reskin* set, self=S + explicit target frame) and the metatable
+-- atoms from Core/API.lua (frame:CreateBackdrop / :StripTextures / :SetInside …).
+-- The Aurora B:Reskin* primitives route to DarkUI's own engine (E:Reskin*/
+-- E:Style*) + the qb quality-border system, so the look stays DarkUI (textured
+-- backdrop + qb), not Aurora's flat fill. See Skins/SYNC.md for the recipe.
 ------------------------------------------------------------------------
 
 local _G = _G
-local pairs, ipairs, type, select = pairs, ipairs, type, select
+local pairs, ipairs, type, next, select = pairs, ipairs, type, next, select
 local tinsert, wipe, strfind = tinsert, wipe, strfind
 local hooksecurefunc = hooksecurefunc
 local CreateFrame = CreateFrame
 local unpack = unpack
+local rad = math.rad
 local issecretvalue = issecretvalue
 local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
@@ -26,21 +35,29 @@ S.initialized = false
 S.ArrowRotation = { up = 0, down = 3.14, left = 1.57, right = -1.57 }
 
 ------------------------------------------------------------------------
--- Notes
---
--- This S layer is Skins-only: the dispatcher (AddCallback*/OnEnable) and the
--- S:Handle* compat layer that Skins/Frames ports call. The global engine
--- (E:Reskin*/E:Style*) stays in Core/; ports reference this module via
--- `local S = E:GetModule("Skins")`.
---
--- Guard convention: S:Handle* use the same `frame.__styled` flag as the Core
--- engine (not ElvUI's IsSkinned) so both layers see each other's work. Distinct
--- one-shot sub-feature guards keep their own names (__iconBorderHooked,
--- collapsedSkinned) as they may coexist with __styled on the same object.
+-- S.DB — AuroraClassic constant map (Aurora DB.* names → DarkUI values)
+-- Ports keep `local DB = S.DB` and reference DB.x with no per-symbol rewrite.
 ------------------------------------------------------------------------
 
+S.DB = {
+    bdTex = C.media.texture.blank,
+    bgTex = C.media.texture.blank,
+    normTex = C.media.texture.blank,
+    glowTex = C.media.texture.blank,
+    closeTex = C.media.texture.close,
+    ArrowUp = C.media.texture.arrow,
+    sparkTex = C.media.texture.spark,
+    pushedTex = C.media.button and C.media.button.glow,
+    TexCoord = C.media.texCoord,
+    QualityColors = C.media.qualityColors,
+    r = r,
+    g = g,
+    b = b,
+}
+local DB = S.DB
+
 ------------------------------------------------------------------------
--- Dispatch (mirrors ElvUI AddCallback / AddCallbackForAddon / Initialize)
+-- Dispatch (per-addon callbacks fired on ADDON_LOADED; pcall-isolated)
 ------------------------------------------------------------------------
 
 local function runFunc(func)
@@ -93,57 +110,13 @@ function S:OnEnable()
 end
 
 ------------------------------------------------------------------------
--- Routing compat layer (S:Handle* → existing E:Reskin*/E:Style*)
+-- Shared helpers
 ------------------------------------------------------------------------
 
-function S:HandleButton(
-    button,
-    strip,
-    isDecline,
-    noStyle,
-    createBackdrop,
-    template,
-    noGlossTex,
-    overrideTex,
-    frameLevel,
-    regionsKill,
-    regionsZero,
-    isFilterButton,
-    filterDirection
-)
-    if not button then return end
-
-    E:ReskinUIPanelButton(button, strip)
-    -- ElvUI parity: HandleButton always sweeps leftover Blizzard art regions
-    -- (Border/Background/Center/…) that ReskinUIPanelButton's own list misses,
-    -- e.g. the gold backdrop on FriendsFrame ContactsMenuButton.
-    if button.__styled then S:HandleBlizzardRegions(button, nil, regionsKill, regionsZero) end
-
-    -- ElvUI createBackdrop=true: give the button a real .backdrop child frame.
-    -- ReskinUIPanelButton styles the button in place (no child), so ports that
-    -- reposition the backdrop (e.g. MountJournal SlotButton .backdrop:SetOutside)
-    -- need the child created explicitly.
-    if createBackdrop and not button.backdrop then button:CreateBackdrop(template) end
-
-    -- ElvUI isFilterButton: re-add the dropdown filter arrow (stripped above);
-    -- filterDirection rotates it (FilterDropdown/FilterButton pass "right").
-    if isFilterButton and not button.__filterArrow then
-        local arrow = button:CreateTexture(nil, "ARTWORK")
-        arrow:Size(10)
-        arrow:ClearAllPoints()
-        arrow:Point("RIGHT", -1, 0)
-        if filterDirection then S:SetupArrow(arrow, filterDirection) end
-        button.__filterArrow = arrow
-    end
-end
-
-function S:HandleCloseButton(button, anchor) return E:StyleCloseButton(button, anchor) end
-
--- ElvUI-compat hover handlers: ports hook these on OnEnter/OnLeave for buttons
--- that carry a separate `.backdrop` child (SetTemplate'd controls). Recolor the
--- backdrop border to the theme gold on enter, back to the resting color on leave.
+-- hover handlers: recolor a control's backdrop border to theme gold on enter,
+-- resting color on leave (ports hook these; Aurora's Texture_OnEnter/Leave).
 function S.SetModifiedBackdrop(self)
-    if not self:IsEnabled() then return end
+    if self.IsEnabled and not self:IsEnabled() then return end
     local bd = self.backdrop or self
     if bd.SetBackdropBorderColor then bd:SetBackdropBorderColor(r, g, b) end
 end
@@ -153,194 +126,15 @@ function S.SetOriginalBackdrop(self)
     if bd.SetBackdropBorderColor then bd:SetBackdropBorderColor(unpack(C.media.border_color)) end
 end
 
-function S:HandleTab(tab) return E:ReskinTab(tab) end
-
-function S:HandleEditBox(frame) return E:ReskinEditBox(frame) end
-
-function S:HandleScrollBar(frame) return E:ReskinScrollBar(frame) end
-
-function S:HandleTrimScrollBar(frame) return E:ReskinTrimScrollBar(frame) end
-
-function S:HandleStatusBar(bar) return E:ReskinStatusBar(bar) end
-
--- ElvUI parity: HandlePortraitFrame/HandleFrame also skin the inset + close button
-local INSET_PIECES = {
-    "InsetBorderTop",
-    "InsetBorderTopLeft",
-    "InsetBorderTopRight",
-    "InsetBorderBottom",
-    "InsetBorderBottomLeft",
-    "InsetBorderBottomRight",
-    "InsetBorderLeft",
-    "InsetBorderRight",
-    "Bg",
-}
-
-function S:HandleInsetFrame(frame)
-    if not frame then return end
-    for _, piece in ipairs(INSET_PIECES) do
-        if frame[piece] then frame[piece]:Hide() end
-    end
-end
-
-local function handleFrameExtras(frame)
-    local name = frame.GetName and frame:GetName()
-    local inset = frame.Inset or (name and _G[name .. "Inset"])
-    if inset then S:HandleInsetFrame(inset) end
-
-    if frame.CloseButton then E:StyleCloseButton(frame.CloseButton) end
-end
-
-function S:HandlePortraitFrame(frame)
-    if not frame then return end
-    E:ReskinPortrait(frame)
-    handleFrameExtras(frame)
-end
-
-function S:HandleFrame(frame)
-    if not frame then return end
-    E:ReskinPanel(frame)
-    handleFrameExtras(frame)
-end
-
-function S:HandleSliderFrame(frame) return E:ReskinSlider(frame) end
-
-function S:HandleCheckBox(frame) return E:StyleCheckBox(frame) end
-
--- ElvUI parity: iterate a checkbox's texture regions (ports hook these to swap
--- the mini-checkbox art, e.g. LFD role checkboxes).
-function S:ForEachCheckboxTextureRegion(checkbox, func)
-    for _, region in next, { checkbox:GetRegions() } do
-        if region:IsObjectType("Texture") then func(checkbox, region) end
-    end
-end
-
--- ElvUI parity: rescale inline texture escapes in a FontString's text (ports hook
--- this on SetText). Called with self = the FontString.
-function S:ReplaceIconString(text)
-    if not text then text = self:GetText() end
-    if not text or text == "" then return end
-    local newText, count = text:gsub("|T([^:]-):[%d+:]+|t", "|T%1:14:14:0:0:64:64:5:59:5:59|t")
-    if count > 0 then self:SetFormattedText("%s", newText) end
-end
-
-function S:HandleDropDownBox(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
-
-------------------------------------------------------------------------
--- ElvUI-parity helpers (SetupArrow / SkinReadyDialog / OverlayButton)
-------------------------------------------------------------------------
-
--- texture's arrow points up by default; rotate per direction
+-- texture's arrow points up by default; rotate per direction (Aurora SetupArrow)
 local ARROW_DEGREE = { up = 0, down = 180, left = 90, right = -90 }
 function S:SetupArrow(tex, direction)
     if not tex then return end
     tex:SetTexture(C.media.texture.arrow)
-    tex:SetRotation(math.rad(ARROW_DEGREE[direction] or 0))
+    tex:SetRotation(rad(ARROW_DEGREE[direction] or 0))
 end
 
--- LFG / PVP ready-check dialog. ElvUI used forcePixelMode + backdrop.Center args
--- our BackdropTemplate doesn't have; create the art backdrop and outset it instead.
-function S:SkinReadyDialog(dialog, bottom)
-    local background = dialog.background
-    if background then
-        background:ClearAllPoints()
-        background:Point("TOPLEFT", E.Border, -E.Border)
-        background:Point("BOTTOMRIGHT", -E.Border, bottom or 50)
-
-        dialog:CreateBackdrop("Transparent")
-        dialog.backdrop:SetOutside(background)
-    end
-
-    if dialog.bottomArt then dialog.bottomArt:SetAlpha(0) end
-
-    if dialog.Border then
-        dialog.Border:StripTextures()
-        dialog.Border:CreateBackdrop("Transparent")
-        dialog.Border.backdrop:SetAllPoints()
-    end
-
-    local instance = dialog.instanceInfo
-    if instance and instance.underline then instance.underline:SetAlpha(0) end
-
-    if dialog.enterButton then
-        S:HandleButton(dialog.enterButton)
-        dialog.enterButton:ClearAllPoints()
-        dialog.enterButton:Point("BOTTOMRIGHT", dialog, "BOTTOM", -10, 15)
-    end
-
-    if dialog.leaveButton then
-        S:HandleButton(dialog.leaveButton)
-        dialog.leaveButton:ClearAllPoints()
-        dialog.leaveButton:Point("BOTTOMLEFT", dialog, "BOTTOM", 10, 15)
-    end
-end
-
-do
-    -- a floating templated overlay mirroring a button that can't be templated in
-    -- place (e.g. the StartGroupButton inside an LFG ScrollBox).
-    local overlays = {}
-
-    local function overlayHide(button)
-        local overlay = overlays[button]
-        if overlay then overlay:Hide() end
-    end
-
-    local function overlayShow(button)
-        local overlay = overlays[button]
-        if not overlay then return end
-        overlay:ClearAllPoints()
-        overlay:SetPoint(button:GetPoint())
-        overlay:Show()
-    end
-
-    local function overlayOnEnter(button)
-        local overlay = overlays[button]
-        if not overlay then return end
-        overlay.text:SetTextColor(1, 1, 1)
-        overlay:SetBackdropBorderColor(r, g, b)
-    end
-
-    local function overlayOnLeave(button)
-        local overlay = overlays[button]
-        if not overlay then return end
-        overlay.text:SetTextColor(1, 0.81, 0)
-        overlay:SetBackdropBorderColor(unpack(C.media.border_color))
-    end
-
-    function S:OverlayButton(button, name, width, height, text, textLayer, level, strata)
-        if overlays[button] then return end
-
-        local overlay = CreateFrame("Frame", "DarkUI_OverlayButton_" .. name, _G.UIParent)
-        overlay:Size(width or 120, height or 22) -- not GetSize: it can taint the owner
-        overlay:SetTemplate()
-        overlay:SetPoint(button:GetPoint())
-        overlay:SetFrameLevel(level or 10)
-        overlay:SetFrameStrata(strata or "MEDIUM")
-        overlay:Hide()
-
-        local txt = overlay:CreateFontString(nil, textLayer or "OVERLAY")
-        if txt then
-            txt:FontTemplate()
-            txt:SetPoint("CENTER")
-            txt:SetTextColor(1, 0.81, 0)
-            txt:SetText(text)
-            overlay.text = txt
-
-            button:HookScript("OnEnter", overlayOnEnter)
-            button:HookScript("OnLeave", overlayOnLeave)
-        end
-
-        button:HookScript("OnHide", overlayHide)
-        button:HookScript("OnShow", overlayShow)
-
-        overlays[button] = overlay
-    end
-end
-
-------------------------------------------------------------------------
--- HandleBlizzardRegions — hide named Blizzard art regions
-------------------------------------------------------------------------
-
+-- named Blizzard art regions, hidden in bulk (Aurora blizzRegions sweep)
 S.BlizzardRegions = {
     "Left",
     "Middle",
@@ -389,7 +183,7 @@ S.BlizzardRegions = {
     "ScrollDownBorder",
 }
 
-function S:HandleBlizzardRegions(frame, name, kill, zero)
+function S:ReskinBlizzardRegions(frame, name, kill, zero)
     if not name then name = frame.GetName and frame:GetName() end
 
     for _, area in ipairs(S.BlizzardRegions) do
@@ -407,52 +201,233 @@ function S:HandleBlizzardRegions(frame, name, kill, zero)
 end
 
 ------------------------------------------------------------------------
--- HandleIcon — crop icon + optional backdrop
+-- Backdrop shorthand (Aurora SetBD/CreateBDFrame)
 ------------------------------------------------------------------------
 
-function S:HandleIcon(icon, backdrop)
-    if not icon then return end
-
-    icon:SetTexCoords()
-    if backdrop and not icon.backdrop then icon:CreateBackdrop("Button", 1) end
+-- Aurora SetBD: a textured backdrop frame (+ shadow) on a frame, with optional
+-- inset points. Routes to our CreateBackdrop atom (textured) + CreateShadow.
+function S:SetBD(frame, _, x, y, x2, y2)
+    local bg = frame:CreateBackdrop()
+    if x then
+        bg:ClearAllPoints()
+        bg:SetPoint("TOPLEFT", frame, x, y)
+        bg:SetPoint("BOTTOMRIGHT", frame, x2, y2)
+    end
+    bg:CreateShadow()
+    return bg
 end
 
 ------------------------------------------------------------------------
--- HandleItemButton — item slot button (icon + backdrop + style)
+-- Buttons (Aurora Reskin / ReskinFilterButton / ReskinMenuButton / ReskinClose)
 ------------------------------------------------------------------------
 
-function S:HandleItemButton(b, setInside, ignoreParent)
+function S:Reskin(button, noHighlight, override)
+    if not button then return end
+
+    E:ReskinUIPanelButton(button, override)
+    -- sweep leftover Blizzard art regions ReskinUIPanelButton's own list misses
+    if button.__styled then S:ReskinBlizzardRegions(button) end
+
+    if not noHighlight and button.HookScript then
+        button:HookScript("OnEnter", S.SetModifiedBackdrop)
+        button:HookScript("OnLeave", S.SetOriginalBackdrop)
+    end
+end
+
+function S:ReskinClose(button, parent, xOffset, yOffset) return E:StyleCloseButton(button, parent or (button.GetParent and button:GetParent())) end
+
+function S:ReskinMenuButton(button)
+    if not button then return end
+    button:StripTextures()
+    button.bg = button:CreateBackdrop()
+    button:HookScript("OnEnter", S.SetModifiedBackdrop)
+    button:HookScript("OnLeave", S.SetOriginalBackdrop)
+end
+
+-- Aurora ReskinFilterReset: small red X on the reset sub-button
+function S:ReskinFilterReset(button)
+    if not button then return end
+    button:StripTextures()
+    button:ClearAllPoints()
+    button:SetPoint("TOPRIGHT", -5, 10)
+
+    local tex = button:CreateTexture(nil, "ARTWORK")
+    tex:SetInside(nil, 2, 2)
+    tex:SetTexture(C.media.texture.close)
+    tex:SetVertexColor(1, 0, 0)
+end
+
+-- Aurora ReskinFilterButton: filter dropdown styled as a button + right arrow
+function S:ReskinFilterButton(button)
+    if not button then return end
+    button:StripTextures()
+    S:Reskin(button)
+
+    if button.Text then button.Text:SetPoint("CENTER") end
+    if button.Icon then
+        S:SetupArrow(button.Icon, "right")
+        button.Icon:SetPoint("RIGHT")
+        button.Icon:Size(14)
+    end
+    if button.ResetButton then S:ReskinFilterReset(button.ResetButton) end
+
+    if not button.__filterArrow then
+        local tex = button:CreateTexture(nil, "ARTWORK")
+        S:SetupArrow(tex, "right")
+        tex:Size(16)
+        tex:Point("RIGHT", -2, 0)
+        button.__filterArrow = tex
+    end
+end
+
+------------------------------------------------------------------------
+-- Routing facades (Aurora names → DarkUI engine)
+------------------------------------------------------------------------
+
+function S:ReskinTab(tab)
+    E:ReskinTab(tab)
+    if tab then tab.bg = tab.backdrop end -- Aurora ports reference tab.bg for active-tab tinting
+    return tab and tab.backdrop
+end
+function S:ReskinScroll(frame) return E:ReskinScrollBar(frame) end
+function S:ReskinTrimScroll(frame) return E:ReskinTrimScrollBar(frame) end
+function S:ReskinStatusBar(bar) return E:ReskinStatusBar(bar) end
+function S:ReskinSlider(frame) return E:ReskinSlider(frame) end
+function S:ReskinCheck(frame) return E:StyleCheckBox(frame) end
+function S:ReskinNavBar(navBar) return E:ReskinNavBar(navBar) end
+function S:ReskinDropDown(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
+
+function S:ReskinEditBox(frame) return E:ReskinEditBox(frame) end
+S.ReskinInput = S.ReskinEditBox -- Aurora alias
+
+-- ElvUI-parity inset pieces hidden by portrait/frame skins
+local INSET_PIECES = {
+    "InsetBorderTop",
+    "InsetBorderTopLeft",
+    "InsetBorderTopRight",
+    "InsetBorderBottom",
+    "InsetBorderBottomLeft",
+    "InsetBorderBottomRight",
+    "InsetBorderLeft",
+    "InsetBorderRight",
+    "Bg",
+}
+
+function S:ReskinInsetFrame(frame)
+    if not frame then return end
+    for _, piece in ipairs(INSET_PIECES) do
+        if frame[piece] then frame[piece]:Hide() end
+    end
+end
+
+local function handleFrameExtras(frame)
+    local name = frame.GetName and frame:GetName()
+    local inset = frame.Inset or (name and _G[name .. "Inset"])
+    if inset then S:ReskinInsetFrame(inset) end
+
+    if frame.CloseButton then E:StyleCloseButton(frame.CloseButton) end
+end
+
+function S:ReskinPortraitFrame(frame)
+    if not frame then return end
+    E:ReskinPortrait(frame)
+    handleFrameExtras(frame)
+    return frame.backdrop
+end
+
+function S:ReskinFrame(frame)
+    if not frame then return end
+    E:ReskinPanel(frame)
+    handleFrameExtras(frame)
+    return frame.backdrop
+end
+
+------------------------------------------------------------------------
+-- Checkbox region iterator / inline-icon string rescale (port hooks)
+------------------------------------------------------------------------
+
+function S:ForEachCheckboxTextureRegion(checkbox, func)
+    for _, region in next, { checkbox:GetRegions() } do
+        if region:IsObjectType("Texture") then func(checkbox, region) end
+    end
+end
+
+function S:ReplaceIconString(text)
+    if not text then text = self:GetText() end
+    if not text or text == "" then return end
+    local newText, count = text:gsub("|T([^:]-):[%d+:]+|t", "|T%1:14:14:0:0:64:64:5:59:5:59|t")
+    if count > 0 then self:SetFormattedText("%s", newText) end
+end
+
+------------------------------------------------------------------------
+-- Icons (Aurora ReskinIcon / ClassIconTexCoord / CreateAndUpdateBarTicks)
+------------------------------------------------------------------------
+
+function S:ReskinIcon(icon, shadow)
+    if not icon then return end
+    return E:StyleIcon(icon, shadow)
+end
+
+local CLASS_ICON_TCOORDS = CLASS_ICON_TCOORDS
+function S:ClassIconTexCoord(tex, class)
+    local c = CLASS_ICON_TCOORDS[class]
+    if c then tex:SetTexCoord(c[1] + 0.022, c[2] - 0.025, c[3] + 0.022, c[4] - 0.025) end
+end
+
+function S:CreateAndUpdateBarTicks(bar, ticks, numTicks)
+    for i = 1, #ticks do
+        ticks[i]:Hide()
+    end
+
+    if numTicks and numTicks > 0 then
+        local width, height = bar:GetSize()
+        local delta = width / numTicks
+        for i = 1, numTicks - 1 do
+            if not ticks[i] then
+                ticks[i] = bar:CreateTexture(nil, "OVERLAY")
+                ticks[i]:SetTexture(C.media.texture.blank)
+                ticks[i]:SetVertexColor(0, 0, 0, 0.7)
+                ticks[i]:SetWidth(E.mult)
+                ticks[i]:SetHeight(height)
+            end
+            ticks[i]:ClearAllPoints()
+            ticks[i]:SetPoint("RIGHT", bar, "LEFT", delta * i, 0)
+            ticks[i]:Show()
+        end
+    end
+end
+
+------------------------------------------------------------------------
+-- ReskinItemButton — item slot button (icon + backdrop + qb quality border)
+-- DarkUI enhancement (no direct Aurora equivalent; Aurora uses ReskinIcon +
+-- ReskinIconBorder per slot). Use for full item slots that carry IconBorder.
+------------------------------------------------------------------------
+
+function S:ReskinItemButton(b, setInside, ignoreParent)
     if not b or b.__styled then return end
     if b:IsForbidden() then return end
 
     local name = b:GetName()
     local icon = b.icon or b.Icon or b.IconTexture or b.iconTexture or (name and (_G[name .. "IconTexture"] or _G[name .. "Icon"]))
 
-    -- clear Blizzard slot art (mirror the action button's individual clears)
     if b.SlotBackground then b.SlotBackground:Hide() end
     if b.IconMask then b.IconMask:Hide() end
     if b.NewActionTexture then b.NewActionTexture:SetTexture("") end
 
-    -- backdrop: grey gloss base only (frameLevel -1, behind). The edge is
-    -- covered by the higher/wider quality frame qb, so we skip it; the base
-    -- still gives empty slots a solid fill.
+    -- backdrop: grey gloss base only (frameLevel -1, behind); qb covers the edge
     b:CreateBackdrop("Button", 1)
 
-    -- icon
     if icon then
         icon:SetTexCoords()
         if setInside then
             icon:SetInside(b)
         else
-            -- ElvUI parity: wrap the backdrop around the icon at its native
-            -- size/position — do NOT stretch the icon to the button (battle-pet
-            -- loadout slots are larger than their icon, which would balloon it).
+            -- wrap the backdrop around the icon at native size (don't balloon it)
             b.backdrop:SetOutside(icon, 1, 1)
         end
         if not ignoreParent then icon:SetParent(b) end
     end
 
-    -- normal gloss
     if b.SetNormalTexture then
         b:SetNormalTexture(C.media.button.normal)
         local nt = b:GetNormalTexture()
@@ -462,7 +437,6 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         end
     end
 
-    -- pushed (exposed as b.pushed so ElvUI ports can reposition it; preset skips)
     if b.SetPushedTexture and not b.pushed then
         b:SetPushedTexture(C.media.button.glow)
         local pt = b:GetPushedTexture()
@@ -472,7 +446,6 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         end
     end
 
-    -- highlight (plain white fill; exposed as b.hover for ElvUI-port parity)
     if b.SetHighlightTexture and not b.hover then
         b:SetHighlightTexture(C.media.texture.blank)
         local hl = b:GetHighlightTexture()
@@ -483,7 +456,6 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         end
     end
 
-    -- checked (gold; exposed as b.checked for ElvUI-port parity)
     if b.SetCheckedTexture and not b.checked then
         b:SetCheckedTexture(C.media.texture.blank)
         local ct = b:GetCheckedTexture()
@@ -494,19 +466,15 @@ function S:HandleItemButton(b, setInside, ignoreParent)
         end
     end
 
-    -- item-quality color routed onto a dedicated high-layer border frame
-    -- (HandleIconBorder builds __qualityBorder at frameLevel +1, covering bg's dark edge)
-    if b.IconBorder then S:HandleIconBorder(b.IconBorder) end
+    if b.IconBorder then S:ReskinIconBorder(b.IconBorder) end
 
     b.__styled = true
 end
 
 ------------------------------------------------------------------------
--- HandleIconBorder — drive the item-quality color onto a textured border frame
--- (qb) drawn above the icon. Pass icon.backdrop to make it hug the icon; omit it
--- for slot buttons (qb wraps the slot). Returns the qb.
--- (secret-safe: GetAtlas/GetVertexColor may return secrets on protected
---  item buttons; fall back to the default border color in that case)
+-- ReskinIconBorder — item-quality color onto a textured qb border frame drawn
+-- above the icon. Pass needInit to color from the current atlas/vertex now.
+-- (secret-safe: GetAtlas/GetVertexColor may return secrets on protected buttons)
 ------------------------------------------------------------------------
 
 do
@@ -527,14 +495,11 @@ do
         ["Professions-Slot-Frame-Legendary"] = ITEMQUALITY.Legendary,
     }
 
-    -- atlas → quality with secret guard (atlas may be a secret on protected
-    -- item buttons; using a secret as a table key is forbidden)
     local function atlasQuality(atlas)
         if not atlas or (issecretvalue and issecretvalue(atlas)) then return nil end
         return iconColors[atlas]
     end
 
-    -- hook on SetAtlas: atlas-keyed quality takes precedence over vertex color
     local function colorAtlas(border, atlas)
         local quality = atlasQuality(atlas)
         if not quality then return end
@@ -546,8 +511,6 @@ do
         if q then backdrop:SetBackdropBorderColor(q.r, q.g, q.b, 1) end
     end
 
-    -- hook on SetVertexColor: skip when an atlas already defines the quality;
-    -- r/g/b may be secrets but SetBackdropBorderColor accepts secret aspects
     local function colorVertex(border, r, g, b)
         if atlasQuality(border.GetAtlas and border:GetAtlas()) then return end
 
@@ -557,8 +520,6 @@ do
         backdrop:SetBackdropBorderColor(r, g, b)
     end
 
-    -- hook on Hide: value == 0 is our own sentinel re-hide (no recolor);
-    -- a real Blizzard Hide() means "no quality border" → restore default color
     local function borderHide(border, value)
         if value == 0 then return end
 
@@ -568,10 +529,8 @@ do
         backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
     end
 
-    -- hook on Show: suppress Blizzard's own border, keep ours instead
     local function borderShow(border) border:Hide(0) end
 
-    -- hook on SetShown: route through the same suppress / default-color paths
     local function borderShown(border, show)
         if show then
             border:Hide(0)
@@ -580,9 +539,6 @@ do
         end
     end
 
-    -- quality-border frame, created once per button and drawn ABOVE the icon
-    -- (frameLevel +1) so it covers the slot bg's dark edge; geometry matches
-    -- the action-button item slot. highlight is left to the caller.
     local function qualityBorder(border)
         local parent = border:GetParent()
         local qb = parent.__qualityBorder
@@ -596,20 +552,15 @@ do
         return qb
     end
 
-    function S:HandleIconBorder(border, backdrop, customFunc)
+    -- Aurora signature: ReskinIconBorder(border, needInit, useAtlas). needInit
+    -- forces an initial color now; useAtlas/backdrop kept for call-site parity.
+    function S:ReskinIconBorder(border, needInit, backdrop)
         if not border or border:IsForbidden() then return end
 
-        -- Always render the quality color on a textured border frame (qb) drawn
-        -- ABOVE the icon, matching the item-slot look. The optional `backdrop` (the
-        -- icon's own backdrop) is a geometry hint: when given, the qb hugs it (i.e.
-        -- the icon) instead of the border's parent (the slot/button). This unifies
-        -- the look across panels — slot buttons pass no backdrop (qb wraps the
-        -- slot); display icons pass icon.backdrop (qb wraps the icon).
         local qb = qualityBorder(border)
-        if backdrop then qb:SetOutside(backdrop, 0, 0) end
+        if type(backdrop) == "table" and backdrop.SetBackdropBorderColor then qb:SetOutside(backdrop, 0, 0) end
         border.customBackdrop = qb
 
-        -- initial color from current atlas / vertex color
         local quality = atlasQuality(border.GetAtlas and border:GetAtlas())
         local q = quality and C.media.qualityColors[quality]
         if q then
@@ -639,11 +590,11 @@ do
 end
 
 ------------------------------------------------------------------------
--- HandleNextPrevButton — arrow paging button
+-- ReskinArrow / ReskinNextPrevButton — arrow paging button
 -- (secret-safe: GetDebugName may return a secret on protected buttons)
 ------------------------------------------------------------------------
 
-function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
+function S:ReskinNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
     if not btn or btn.__styled then return end
     if btn:IsForbidden() then return end
 
@@ -709,21 +660,104 @@ function S:HandleNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
     btn.__styled = true
 end
 
+-- Aurora ReskinArrow(button, direction): paging/scroll arrow with explicit dir
+function S:ReskinArrow(button, direction) return S:ReskinNextPrevButton(button, direction) end
+
+------------------------------------------------------------------------
+-- ReskinColorSwatch (Aurora)
+------------------------------------------------------------------------
+
+function S:ReskinColorSwatch(button)
+    if not button then return end
+    local name = button.GetName and button:GetName()
+    local swatchBg = name and _G[name .. "SwatchBg"]
+    if swatchBg then
+        swatchBg:SetColorTexture(0, 0, 0)
+        swatchBg:SetInside(nil, 2, 2)
+    end
+
+    button:SetNormalTexture(C.media.texture.blank)
+    button:GetNormalTexture():SetInside(button, 3, 3)
+end
+
+------------------------------------------------------------------------
+-- ReskinSmallRole / ReskinRole (Aurora group-role icons)
+------------------------------------------------------------------------
+
+local GroupRoleTex = {
+    TANK = "groupfinder-icon-role-micro-tank",
+    HEALER = "groupfinder-icon-role-micro-heal",
+    DAMAGER = "groupfinder-icon-role-micro-dps",
+    DPS = "groupfinder-icon-role-micro-dps",
+}
+
+function S:ReskinSmallRole(tex, role)
+    tex:SetTexCoord(0, 1, 0, 1)
+    tex:SetAtlas(GroupRoleTex[role])
+end
+
+function S:ReskinRole(frame)
+    if frame.background then frame.background:SetTexture("") end
+
+    local cover = frame.cover or frame.Cover
+    if cover then cover:SetTexture("") end
+
+    local checkButton = frame.checkButton or frame.CheckButton or frame.CheckBox or frame.Checkbox
+    if checkButton then
+        checkButton:SetFrameLevel(frame:GetFrameLevel() + 2)
+        checkButton:SetPoint("BOTTOMLEFT", -2, -2)
+        S:ReskinCheck(checkButton)
+    end
+end
+
+------------------------------------------------------------------------
+-- StyleSearchButton / AffixesSetup (Aurora)
+------------------------------------------------------------------------
+
+function S:StyleSearchButton(button)
+    if not button then return end
+    button:StripTextures()
+    local bg = button:CreateBackdrop()
+    bg:SetInside()
+
+    local icon = button.icon or button.Icon
+    if icon then S:ReskinIcon(icon) end
+
+    button:SetHighlightTexture(C.media.texture.blank)
+    local hl = button:GetHighlightTexture()
+    hl:SetVertexColor(r, g, b, 0.25)
+    hl:SetInside(bg)
+end
+
+function S:AffixesSetup(frame)
+    local list = (frame.AffixesContainer and frame.AffixesContainer.Affixes) or frame.Affixes
+    if not list then return end
+
+    for _, f in ipairs(list) do
+        f.Border:SetTexture(nil)
+        f.Portrait:SetTexture(nil)
+        if not f.bg then f.bg = S:ReskinIcon(f.Portrait) end
+
+        if f.info then
+            f.Portrait:SetTexture(CHALLENGE_MODE_EXTRA_AFFIX_INFO[f.info.key].texture)
+        elseif f.affixID then
+            local _, _, filedataid = C_ChallengeMode.GetAffixInfo(f.affixID)
+            f.Portrait:SetTexture(filedataid)
+        end
+    end
+end
+
 ------------------------------------------------------------------------
 -- HandleIconSelectionFrame — icon picker popup (icon grid + controls)
 ------------------------------------------------------------------------
 
--- Skin one icon-grid button (mirrors ElvUI Skins HandleButton). The icon lives
--- in a texture that StripTextures would wipe, so save it before the strip and
--- restore it after. StyleButton zeroes the NormalTexture so it can't cover the
--- icon — this is why HandleItemButton (gloss NormalTexture) blanked these.
 local function skinIconSelectorButton(button, i, buttonNameTemplate)
     local icon = button.Icon or (buttonNameTemplate and i and _G[buttonNameTemplate .. i .. "Icon"])
     local texture
     if icon then
         icon:SetTexCoords()
         icon:SetInside(button)
-        texture = icon:GetTexture() -- keep this before strip textures
+        texture = icon:GetTexture()
     end
 
     button:StripTextures()
@@ -733,11 +767,9 @@ local function skinIconSelectorButton(button, i, buttonNameTemplate)
     if texture then icon:SetTexture(texture) end
 end
 
--- On show, nudge the popup off to the side of its parent if it would otherwise
--- overlap (xOffset <= 0). MacroPopupFrame re-anchors to MacroFrame.
 local function selectionOffset(frame)
     local point, anchor, relativePoint, xOffset = frame:GetPoint()
-    if not point or xOffset > 0 then return end -- no anchor yet / already nudged aside
+    if not point or xOffset > 0 then return end
 
     local x = frame.BorderBox and 8 or 40
     local y = frame.BorderBox and 4 or -10
@@ -745,14 +777,12 @@ local function selectionOffset(frame)
     frame:Point(point, (frame == _G.MacroPopupFrame and _G.MacroFrame) or anchor, relativePoint, strfind(point, "LEFT") and x or -x, y)
 end
 
-function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
+function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     if not frame or frame.__styled then return end
 
-    if not dontOffset then -- place it off to the side of parent with correct offsets
+    if not dontOffset then
         frame:HookScript("OnShow", selectionOffset)
         frame:Height(frame:GetHeight() + 10)
-        -- We're called from the popup's own OnShow, so the hook above was added
-        -- mid-dispatch and won't fire for this first show — apply it directly.
         if frame:IsShown() then selectionOffset(frame) end
     end
 
@@ -763,18 +793,14 @@ function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     local okay = frame.OkayButton or (borderBox and borderBox.OkayButton) or (frameName and _G[frameName .. "Okay"])
 
     frame:StripTextures()
-    -- frame:SetTemplate("default")
     E:ReskinPanel(frame)
 
     if borderBox then
         borderBox:StripTextures()
 
         local dropdown = borderBox.IconTypeDropdown
-        if dropdown then S:HandleDropDownBox(dropdown) end
+        if dropdown then S:ReskinDropDown(dropdown) end
 
-        -- the selected-icon preview is an icon button, not an item slot: use the
-        -- blank-safe grid skin (strip + save/restore icon), not HandleItemButton
-        -- whose gloss NormalTexture would cover the preview icon.
         local button = borderBox.SelectedIconArea and borderBox.SelectedIconArea.SelectedIconButton
         if button then
             button:DisableDrawLayer("BACKGROUND")
@@ -785,28 +811,128 @@ function S:HandleIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     if cancel then
         cancel:ClearAllPoints()
         cancel:SetPoint("BOTTOMRIGHT", frame, -4, 4)
-        S:HandleButton(cancel)
+        S:Reskin(cancel)
     end
     if okay then
         okay:ClearAllPoints()
         okay:SetPoint("RIGHT", cancel or okay, "LEFT", -10, 0)
-        S:HandleButton(okay)
+        S:Reskin(okay)
     end
     if editBox then
         editBox:DisableDrawLayer("BACKGROUND")
-        S:HandleEditBox(editBox)
+        S:ReskinEditBox(editBox)
     end
 
-    -- icon grid (retail IconSelector ScrollBox). The ScrollBox reuses a fixed
-    -- frame pool — scrolling only swaps the icon textures, the frames persist —
-    -- so a one-shot ForEachFrame covers every button (mirrors ElvUI).
     local iconSelector = frame.IconSelector
     if iconSelector then
-        if iconSelector.ScrollBar then S:HandleTrimScrollBar(iconSelector.ScrollBar) end
+        if iconSelector.ScrollBar then S:ReskinTrimScroll(iconSelector.ScrollBar) end
         if iconSelector.ScrollBox then iconSelector.ScrollBox:ForEachFrame(skinIconSelectorButton) end
     end
 
     frame.__styled = true
+end
+
+------------------------------------------------------------------------
+-- OverlayButton — floating templated overlay over an un-templatable button
+------------------------------------------------------------------------
+
+do
+    local overlays = {}
+
+    local function overlayHide(button)
+        local overlay = overlays[button]
+        if overlay then overlay:Hide() end
+    end
+
+    local function overlayShow(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay:ClearAllPoints()
+        overlay:SetPoint(button:GetPoint())
+        overlay:Show()
+    end
+
+    local function overlayOnEnter(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay.text:SetTextColor(1, 1, 1)
+        overlay:SetBackdropBorderColor(r, g, b)
+    end
+
+    local function overlayOnLeave(button)
+        local overlay = overlays[button]
+        if not overlay then return end
+        overlay.text:SetTextColor(1, 0.81, 0)
+        overlay:SetBackdropBorderColor(unpack(C.media.border_color))
+    end
+
+    function S:OverlayButton(button, name, width, height, text, textLayer, level, strata)
+        if overlays[button] then return end
+
+        local overlay = CreateFrame("Frame", "DarkUI_OverlayButton_" .. name, _G.UIParent)
+        overlay:Size(width or 120, height or 22)
+        overlay:SetTemplate()
+        overlay:SetPoint(button:GetPoint())
+        overlay:SetFrameLevel(level or 10)
+        overlay:SetFrameStrata(strata or "MEDIUM")
+        overlay:Hide()
+
+        local txt = overlay:CreateFontString(nil, textLayer or "OVERLAY")
+        if txt then
+            txt:FontTemplate()
+            txt:SetPoint("CENTER")
+            txt:SetTextColor(1, 0.81, 0)
+            txt:SetText(text)
+            overlay.text = txt
+
+            button:HookScript("OnEnter", overlayOnEnter)
+            button:HookScript("OnLeave", overlayOnLeave)
+        end
+
+        button:HookScript("OnHide", overlayHide)
+        button:HookScript("OnShow", overlayShow)
+
+        overlays[button] = overlay
+    end
+end
+
+------------------------------------------------------------------------
+-- SkinReadyDialog — LFG / PVP ready-check dialog
+------------------------------------------------------------------------
+
+function S:SkinReadyDialog(dialog, bottom)
+    local background = dialog.background
+    if background then
+        background:ClearAllPoints()
+        background:Point("TOPLEFT", E.mult, -E.mult)
+        background:Point("BOTTOMRIGHT", -E.mult, bottom or 50)
+
+        dialog:CreateBackdrop("Transparent")
+        dialog.backdrop:SetOutside(background)
+    end
+
+    if dialog.bottomArt then dialog.bottomArt:SetAlpha(0) end
+
+    if dialog.Border then
+        dialog.Border:StripTextures()
+        dialog.Border:CreateBackdrop("Transparent")
+        dialog.Border.backdrop:SetAllPoints()
+    end
+
+    local instance = dialog.instanceInfo
+    if instance and instance.underline then instance.underline:SetAlpha(0) end
+
+    if dialog.enterButton then
+        S:Reskin(dialog.enterButton)
+        dialog.enterButton:ClearAllPoints()
+        dialog.enterButton:Point("BOTTOMRIGHT", dialog, "BOTTOM", -10, 15)
+    end
+
+    if dialog.leaveButton then
+        S:Reskin(dialog.leaveButton)
+        dialog.leaveButton:ClearAllPoints()
+        dialog.leaveButton:Point("BOTTOMLEFT", dialog, "BOTTOM", 10, 15)
+    end
 end
 
 ------------------------------------------------------------------------
@@ -830,10 +956,10 @@ function S:ClearHighlightTexture(texture)
 end
 
 ------------------------------------------------------------------------
--- HandleRotateButton — model rotate buttons (atlas arrows)
+-- ReskinRotateButton — model rotate buttons (atlas arrows)
 ------------------------------------------------------------------------
 
-function S:HandleRotateButton(button, width, height, noSize)
+function S:ReskinRotateButton(button, width, height, noSize)
     if not button or button.__styled then return end
     if button:IsForbidden() then return end
 
@@ -869,7 +995,7 @@ function S:HandleRotateButton(button, width, height, noSize)
 end
 
 ------------------------------------------------------------------------
--- HandleMaxMinFrame — maximize / minimize buttons (rotated arrows)
+-- ReskinMinMax — maximize / minimize buttons (rotated arrows)
 ------------------------------------------------------------------------
 
 do
@@ -887,7 +1013,7 @@ do
         if pt then pt:SetVertexColor(1, 1, 1) end
     end
 
-    function S:HandleMaxMinFrame(frame)
+    function S:ReskinMinMax(frame)
         if not frame or frame.__styled then return end
         if frame:IsForbidden() then return end
 
@@ -937,13 +1063,13 @@ do
 end
 
 ------------------------------------------------------------------------
--- HandleRadioButton — masked radio dot
+-- ReskinRadio — masked radio dot
 ------------------------------------------------------------------------
 
 do
     local maskBackground = [[Interface\Minimap\UI-Minimap-Background]]
 
-    function S:HandleRadioButton(button)
+    function S:ReskinRadio(button)
         if not button or button.__styled then return end
         if button:IsForbidden() then return end
 
@@ -996,10 +1122,10 @@ do
 end
 
 ------------------------------------------------------------------------
--- HandleStepSlider — stepped slider (e.g. quality / quantity)
+-- ReskinStepperSlider — stepped slider (e.g. quality / quantity)
 ------------------------------------------------------------------------
 
-function S:HandleStepSlider(frame, minimal)
+function S:ReskinStepperSlider(frame, minimal)
     if not frame or frame:IsForbidden() then return end
 
     frame:StripTextures()
@@ -1034,7 +1160,7 @@ function S:HandleStepSlider(frame, minimal)
 end
 
 ------------------------------------------------------------------------
--- HandleCollapseTexture — +/- collapse header buttons
+-- ReskinCollapse — +/- collapse header buttons (Aurora ReskinCollapse(isAtlas))
 ------------------------------------------------------------------------
 
 do
@@ -1057,6 +1183,16 @@ do
         end
     end
 
+    local function updateCollapseAtlas(button, atlas, skip)
+        if skip or not atlas then return end
+        if issecretvalue and issecretvalue(atlas) then return end
+        if strfind(atlas, "Plus") or strfind(atlas, "[cC]losed") or strfind(atlas, "[eE]xpand") then
+            button:SetNormalTexture(C.media.texture.plus, true)
+        elseif strfind(atlas, "Minus") or strfind(atlas, "[oO]pen") or strfind(atlas, "[cC]ollapse") then
+            button:SetNormalTexture(C.media.texture.minus, true)
+        end
+    end
+
     local function syncPushTexture(button, _, skip)
         if skip then return end
 
@@ -1065,7 +1201,7 @@ do
         if tex and not (issecretvalue and issecretvalue(tex)) then button:SetPushedTexture(tex, true) end
     end
 
-    function S:HandleCollapseTexture(button, syncPushed, ignorePushed)
+    function S:ReskinCollapse(button, isAtlas, syncPushed, ignorePushed)
         if not button or button.collapsedSkinned then return end
         if button:IsForbidden() then return end
         button.collapsedSkinned = true
@@ -1077,14 +1213,35 @@ do
             button:SetPushedTexture(E.ClearTexture)
         end
 
-        hooksecurefunc(button, "SetNormalTexture", updateCollapseTexture)
-        local normal = button:GetNormalTexture()
-        updateCollapseTexture(button, normal and normal:GetTexture())
+        if isAtlas then
+            hooksecurefunc(button, "SetNormalAtlas", updateCollapseAtlas)
+            local normal = button:GetNormalTexture()
+            updateCollapseAtlas(button, normal and normal:GetAtlas())
+        else
+            hooksecurefunc(button, "SetNormalTexture", updateCollapseTexture)
+            local normal = button:GetNormalTexture()
+            updateCollapseTexture(button, normal and normal:GetTexture())
+        end
     end
 end
 
 ------------------------------------------------------------------------
--- HandleModelSceneControlButtons — zoom/rotate/reset row
+-- ReskinModelControl — hide a ModelScene ControlFrame's button textures
+------------------------------------------------------------------------
+
+function S:ReskinModelControl(modelScene)
+    if not modelScene or not modelScene.ControlFrame then return end
+    for i = 1, 5 do
+        local button = select(i, modelScene.ControlFrame:GetChildren())
+        if button and button.NormalTexture then
+            button.NormalTexture:SetAlpha(0)
+            button.PushedTexture:SetAlpha(0)
+        end
+    end
+end
+
+------------------------------------------------------------------------
+-- ReskinModelSceneControlButtons — zoom/rotate/reset row (DarkUI extra)
 ------------------------------------------------------------------------
 
 do
@@ -1096,7 +1253,7 @@ do
             local button = frame[name]
             if button then
                 if not button.__styled then
-                    S:HandleButton(button)
+                    S:Reskin(button)
                     button:Size(22)
                     if button.Icon then button.Icon:SetInside(nil, 2, 2) end
                 end
@@ -1114,7 +1271,7 @@ do
         end
     end
 
-    function S:HandleModelSceneControlButtons(frame)
+    function S:ReskinModelSceneControlButtons(frame)
         if not frame or frame.__styled then return end
         if frame:IsForbidden() then return end
         frame.__styled = true
@@ -1124,7 +1281,7 @@ do
 end
 
 ------------------------------------------------------------------------
--- HandleGarrisonPortrait — follower / troop portrait puck
+-- ReskinGarrisonPortrait — follower / troop portrait puck
 ------------------------------------------------------------------------
 
 do
@@ -1141,7 +1298,7 @@ do
         if newAtlas then roleIcon:SetAtlas(newAtlas) end
     end
 
-    function S:HandleGarrisonPortrait(portrait, updateAtlas)
+    function S:ReskinGarrisonPortrait(portrait, updateAtlas)
         if not portrait or portrait:IsForbidden() then return end
 
         local main = portrait.Portrait

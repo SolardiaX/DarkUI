@@ -20,7 +20,7 @@ local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
 --
 -- Each E:Reskin* strips the native Blizzard art then delegates the look to an
 -- E:Style* builder. `frame.__styled` is the single canonical "already skinned"
--- flag, shared by E:Reskin*/E:Style* and the Skins module's S:Handle* layer
+-- flag, shared by E:Reskin*/E:Style* and the Skins module's S:Reskin* layer
 -- (which routes here) so no widget is skinned twice. Distinct one-shot
 -- sub-feature guards that may coexist with __styled keep their own names
 -- (e.g. __iconBorderHooked, collapsedSkinned).
@@ -278,26 +278,6 @@ function E:ReskinStatusBar(bar)
 
     bar.__styled = true
 end
-
-------------------------------------------------------------------------
--- E:RegisterStatusBar — ElvUI-compat no-op
---
--- ElvUI registers a status bar for live media hot-swap (re-textures it when the
--- user changes the statusbar media setting). DarkUI has no runtime media swap,
--- so ports that set the bar texture manually then call this just need it to exist.
-------------------------------------------------------------------------
-
-function E:RegisterStatusBar() end
-
-------------------------------------------------------------------------
--- E:RegisterCooldown — ElvUI-compat no-op
---
--- ElvUI registers a cooldown so it can restyle the spiral/edge and OnUpdate text.
--- DarkUI owns cooldown styling separately (CooldownManager module), so ports that
--- call this just need it to exist — the cooldown keeps DarkUI's own treatment.
-------------------------------------------------------------------------
-
-function E:RegisterCooldown() end
 
 ------------------------------------------------------------------------
 -- E:ReskinPortrait — portrait frame

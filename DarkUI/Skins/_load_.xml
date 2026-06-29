@@ -1,43 +1,10 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <!-- Skins module: S:Handle* dispatcher + compat layer (global engine E:Reskin* stays in Core/Skin.lua) -->
+    <!-- Skins engine: S:Reskin* (AuroraClassic-style) + per-addon dispatcher -->
     <Script file="Core.lua" />
-    <!-- per-frame skins -->
-    <Script file="Frames\Gossip.lua" />
-    <Script file="Frames\Merchant.lua" />
-    <Script file="Frames\Macro.lua" />
-    <Script file="Frames\Guild.lua" />
-    <Script file="Frames\Trade.lua" />
-    <Script file="Frames\Mail.lua" />
-    <Script file="Frames\Friends.lua" />
-    <Script file="Frames\Communities.lua" />
-    <!-- wave 1: small common panels -->
-    <Script file="Frames\WeeklyRewards.lua" />
-    <Script file="Frames\Inspect.lua" />
+    <!-- per-frame skins (rebuilt from AuroraClassic source) -->
     <Script file="Frames\Socket.lua" />
-    <Script file="Frames\Trainer.lua" />
-    <Script file="Frames\Barber.lua" />
-    <Script file="Frames\Stable.lua" />
-    <Script file="Frames\ItemUpgrade.lua" />
-    <Script file="Frames\TimeManager.lua" />
-    <Script file="Frames\Binding.lua" />
-    <Script file="Frames\DressingRoom.lua" />
-    <!-- wave 2: 12.0 content -->
-    <Script file="Frames\Delves.lua" />
-    <Script file="Frames\PlayerSpells.lua" />
-    <Script file="Frames\SpellBook.lua" />
-    <Script file="Frames\Menu.lua" />
-    <Script file="Frames\MajorFaction.lua" />
-    <!-- wave 3: calendar + transmog -->
-    <Script file="Frames\Calendar.lua" />
-    <Script file="Frames\Transmog.lua" />
-    <!-- wave 4: core large panels -->
-    <Script file="Frames\Character.lua" />
-    <Script file="Frames\AuctionHouse.lua" />
     <Script file="Frames\Collectables.lua" />
-    <Script file="Frames\Professions.lua" />
-    <Script file="Frames\EncounterJournal.lua" />
-    <Script file="Frames\LFG.lua" />
-    <Script file="Frames\PVP.lua" />
+
 </Ui>

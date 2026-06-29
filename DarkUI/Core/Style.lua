@@ -87,8 +87,9 @@ function E:StyleIcon(icon, shadow, parent)
 
     icon:SetTexCoord(unpack(C.media.texCoord))
 
-    local bg = parent:CreateBackdrop()
-    bg:SetOutside(icon)
+    local bg = parent:CreateBackdrop("default")
+    bg:SetBackdropEdge("round_white")
+    bg:SetOutside(icon, 2, 2)
 
     if shadow then bg:CreateShadow() end
 
