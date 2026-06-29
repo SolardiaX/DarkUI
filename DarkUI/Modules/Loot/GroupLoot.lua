@@ -371,7 +371,7 @@ local function startLootRoll(rollID, time)
     f.status:SetMinMaxValues(0, time)
     f.status:SetValue(time)
 
-    if f.button.__backdrop then f.button.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7) end
+    if f.button.backdrop then f.button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7) end
 
     f:SetPoint("CENTER", WorldFrame, "CENTER")
     f:Show()
@@ -421,7 +421,7 @@ function module:OnInit()
             f.status:SetValue(math.random(50, 90))
             f.status:SetStatusBarColor(r, g, b, 0.7)
 
-            if f.button.__backdrop then f.button.__backdrop:SetBackdropBorderColor(r, g, b, 0.7) end
+            if f.button.backdrop then f.button.backdrop:SetBackdropBorderColor(r, g, b, 0.7) end
 
             f.button.link = "item:" .. item .. ":0:0:0:0:0:0:0"
             local greed = math.random(0, 1)

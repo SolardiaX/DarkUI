@@ -98,7 +98,7 @@ local function styleTooltip(tip)
     tip:HookScript("OnShow", function(tt)
         if tt:IsForbidden() then return end
 
-        if not tt.styled then
+        if not tt.__styled then
             if tt.NineSlice then tt.NineSlice:SetAlpha(0) end
             if tt.SetBackdrop then tt:SetBackdrop(nil) end
             if tt.BackdropFrame then tt.BackdropFrame:SetBackdrop(nil) end
@@ -106,19 +106,19 @@ local function styleTooltip(tip)
             tt:DisableDrawLayer("BACKGROUND")
 
             tt:CreateBackdrop("default", 2, true)
-            -- tt.__backdrop:CreateGradient()
-            tt.__backdrop:CreateShadow()
-            tt.__backdrop:SetBackdropEdge("regular")
+            -- tt.backdrop:CreateGradient()
+            tt.backdrop:CreateShadow()
+            tt.backdrop:SetBackdropEdge("regular")
 
             local header = tt.CompareHeader
             if header then
                 header:StripTextures()
                 header:CreateBackdrop("default")
-                header.__backdrop:CreateGradient()
-                header.__backdrop:SetBackdropEdge("pixel", nil, 2)
+                header.backdrop:CreateGradient()
+                header.backdrop:SetBackdropEdge("pixel", nil, 2)
             end
 
-            tt.styled = true
+            tt.__styled = true
         end
     end)
 end
@@ -314,7 +314,7 @@ local function skinItemTooltips()
     GameTooltip.ItemTooltip.Icon:SetTexCoord(unpack(C.media.texCoord))
 
     GameTooltip.ItemTooltip.Icon:CreateBackdrop("default")
-    local itemBD = GameTooltip.ItemTooltip.Icon.__backdrop
+    local itemBD = GameTooltip.ItemTooltip.Icon.backdrop
     itemBD:SetPoint("TOPLEFT", GameTooltip.ItemTooltip.Icon, "TOPLEFT", -2, 2)
     itemBD:SetPoint("BOTTOMRIGHT", GameTooltip.ItemTooltip.Icon, "BOTTOMRIGHT", 2, -2)
 
@@ -335,7 +335,7 @@ local function skinItemTooltips()
     if icon then
         icon:SetTexCoord(unpack(C.media.texCoord))
         icon:CreateBackdrop("default")
-        local rewardBD = icon.__backdrop
+        local rewardBD = icon.backdrop
         rewardBD:SetPoint("TOPLEFT", icon, "TOPLEFT", -2, 2)
         rewardBD:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", 2, -2)
 
@@ -349,13 +349,13 @@ local function skinItemTooltips()
     hooksecurefunc("GameTooltip_ShowProgressBar", function(tt)
         if not tt or tt:IsForbidden() or not tt.progressBarPool then return end
         local frame = tt.progressBarPool:GetNextActive()
-        if (not frame or not frame.Bar) or frame.Bar.__backdrop then return end
+        if (not frame or not frame.Bar) or frame.Bar.backdrop then return end
         local bar = frame.Bar
         local label = bar.Label
         if bar then
             bar:StripTextures()
             bar:CreateBackdrop("transparent")
-            bar.__backdrop:SetBackdropColor(0.1, 0.1, 0.1, 1)
+            bar.backdrop:SetBackdropColor(0.1, 0.1, 0.1, 1)
             bar:SetStatusBarTexture(C.media.texture.status)
             label:ClearAllPoints()
             label:SetPoint("CENTER", bar, 0, 0)
@@ -490,7 +490,7 @@ function module:OnInit()
 
     -- Re-apply our backdrop after Blizzard sets Azerite/Corrupted item styles
     hooksecurefunc("SharedTooltip_SetBackdropStyle", function(tt)
-        if tt and not tt:IsForbidden() and tt.styled and tt.__backdrop then tt.__backdrop:Show() end
+        if tt and not tt:IsForbidden() and tt.__styled and tt.backdrop then tt.backdrop:Show() end
     end)
 
     -- Anchor
@@ -537,7 +537,7 @@ function module:OnInit()
         statusBar:SetHeight(5)
 
         statusBar:CreateBackdrop("default", 2)
-        statusBar.__backdrop:SetBackdropEdge("pixel")
+        statusBar.backdrop:SetBackdropEdge("pixel")
 
         if cfg.health_value then
             statusBar.text = statusBar:CreateFontString(nil, "OVERLAY")
@@ -575,23 +575,19 @@ function module:OnInit()
 
     -- Menu skin
     local menuManagerProxy = Menu.GetManager()
-    local menuBackdrops = {}
     local function skinMenu(menuFrame)
         menuFrame:DisableDrawLayer("BACKGROUND")
         menuFrame:StripTextures()
 
-        if menuBackdrops[menuFrame] then
-            menuFrame.__backdrop = menuBackdrops[menuFrame]
-        else
+        -- single-field .backdrop is its own created-once guard (survives pooling)
+        if not menuFrame.backdrop then
             menuFrame:CreateBackdrop("Default", 8, true)
-            menuFrame.__backdrop:CreateShadow()
-            menuFrame.__backdrop:SetBackdropEdge("regular")
-
-            menuBackdrops[menuFrame] = menuFrame.__backdrop
+            menuFrame.backdrop:CreateShadow()
+            menuFrame.backdrop:SetBackdropEdge("regular")
         end
 
         local lvl = menuFrame:GetFrameLevel() - 1
-        menuFrame.__backdrop:SetFrameLevel(lvl < 0 and 0 or lvl)
+        menuFrame.backdrop:SetFrameLevel(lvl < 0 and 0 or lvl)
     end
     local function setupMenu(manager, _, menuDescription)
         local menuFrame = manager:GetOpenMenu()

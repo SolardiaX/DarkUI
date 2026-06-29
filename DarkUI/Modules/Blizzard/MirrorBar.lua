@@ -21,7 +21,7 @@ function module:OnInit()
         local bar = container:GetAvailableTimer(timer)
         if not bar then return end
 
-        if not bar.styled then
+        if not bar.__styled then
             bar:SetSize(200, 16)
             bar:StripTextures()
             bar:ClearAllPoints()
@@ -45,15 +45,15 @@ function module:OnInit()
 
             -- bar:CreateBackdrop("Transparent")
             -- bar:CreateBorder()
-            bar.border = bar:CreateTexture(nil, "BORDER")
-            bar.border:SetTexture(bar_border)
-            bar.border:SetPoint("CENTER")
+            bar.borderTex = bar:CreateTexture(nil, "BORDER")
+            bar.borderTex:SetTexture(bar_border)
+            bar.borderTex:SetPoint("CENTER")
 
             local timerKey = string.lower(timer)
             local timerCfg = cfg.mirrorbar[timerKey]
             if timerCfg and timerCfg.pos then bar:SetPoint(unpack(timerCfg.pos)) end
 
-            bar.styled = true
+            bar.__styled = true
         end
 
         local timerKey = string.lower(timer)

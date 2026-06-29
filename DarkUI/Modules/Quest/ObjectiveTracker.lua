@@ -183,7 +183,7 @@ local function skinProgressBar(tracker, key)
     local label = bar and bar.Label
     local icon = bar and bar.Icon
 
-    if not progressBar.styled then
+    if not progressBar.__styled then
         bar:StripTextures()
         bar:SetSize(200, 16)
         bar:SetStatusBarTexture(C.media.texture.status)
@@ -209,7 +209,7 @@ local function skinProgressBar(tracker, key)
             if bar.AnimIn and bar.AnimIn.Play then hooksecurefunc(bar.AnimIn, "Play", function() bar.AnimIn:Stop() end) end
         end
 
-        progressBar.styled = true
+        progressBar.__styled = true
     end
 
     if bar.newIconBg then bar.newIconBg:SetShown(icon:IsShown()) end
@@ -223,7 +223,7 @@ local function skinTimerBar(tracker, key)
     local timerBar = tracker.usedTimerBars[key]
     local bar = timerBar and timerBar.Bar
 
-    if not timerBar.styled then
+    if not timerBar.__styled then
         if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
         if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
         if bar.BorderMid then bar.BorderMid:SetAlpha(0) end
@@ -233,7 +233,7 @@ local function skinTimerBar(tracker, key)
         bar:CreateBackdrop("transparent")
         bar:CreateBorder("thin")
 
-        timerBar.styled = true
+        timerBar.__styled = true
     end
 end
 
@@ -258,7 +258,7 @@ end
 local function skinStageBlock(block)
     if not block.backdrop then
         block:CreateBackdrop("transparent")
-        block.__backdrop:SetBackdropEdge("thin")
+        block.backdrop:SetBackdropEdge("thin")
 
         block.NormalBG:SetAlpha(0)
         block.FinalBG:SetAlpha(0)
@@ -273,21 +273,21 @@ local function skinStageWidgets(self)
             if widgetFrame.Frame then widgetFrame.Frame:SetAlpha(0) end
 
             local bar = widgetFrame.TimerBar
-            if bar and not bar.styled then
+            if bar and not bar.__styled then
                 bar:SetStatusBarTexture(C.media.texture.status)
                 bar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
                 bar:CreateBackdrop("transparent")
                 bar:CreateBorder("thin")
                 bar:SetFrameLevel(bar:GetFrameLevel() + 3)
-                bar.styled = true
+                bar.__styled = true
             end
 
             if widgetFrame.CurrencyContainer then
                 for currencyFrame in widgetFrame.currencyPool:EnumerateActive() do
-                    if not currencyFrame.styled then
+                    if not currencyFrame.__styled then
                         currencyFrame.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
                         currencyFrame.Icon:CreateBackdrop()
-                        currencyFrame.styled = true
+                        currencyFrame.__styled = true
                     end
                 end
             end
@@ -302,10 +302,10 @@ end
 local function skinChallengeBlock(block)
     if not block.__styled then
         block:CreateBackdrop("transparent")
-        block.__backdrop:SetBackdropEdge("thin")
-        block.__backdrop:SetPoint("TOPLEFT", block, 3, -3)
-        block.__backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
-        block.__backdrop.__overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
+        block.backdrop:SetBackdropEdge("thin")
+        block.backdrop:SetPoint("TOPLEFT", block, 3, -3)
+        block.backdrop:SetPoint("BOTTOMRIGHT", block, -6, 3)
+        block.backdrop.overlay:SetVertexColor(0.12, 0.12, 0.12, 1)
 
         local bg = select(3, block:GetRegions())
         if bg then bg:SetAlpha(0) end
@@ -316,8 +316,8 @@ local function skinChallengeBlock(block)
         block.StatusBar:SetStatusBarTexture(C.media.texture.status)
         block.StatusBar:SetStatusBarColor(E.myColor.r, E.myColor.g, E.myColor.b)
         block.StatusBar:CreateBackdrop("transparent")
-        block.StatusBar.__backdrop:SetBackdropEdge("thin")
-        block.StatusBar.__backdrop:SetFrameLevel(block.__backdrop:GetFrameLevel() + 1)
+        block.StatusBar.backdrop:SetBackdropEdge("thin")
+        block.StatusBar.backdrop:SetFrameLevel(block.backdrop:GetFrameLevel() + 1)
         block.StatusBar:SetStatusBarColor(0, 0.6, 1)
         block.StatusBar:SetFrameLevel(block.StatusBar:GetFrameLevel() + 3)
 
@@ -328,10 +328,10 @@ end
 local function skinAffixes(self)
     for frame in self.affixPool:EnumerateActive() do
         frame.Border:SetTexture(nil)
-        if not frame.styled then
+        if not frame.__styled then
             frame.Portrait:SetTexCoord(0.1, 0.9, 0.1, 0.9)
             frame.Portrait:CreateBackdrop()
-            frame.styled = true
+            frame.__styled = true
         end
 
         if frame.info then

@@ -199,7 +199,7 @@ local function createPortrait(self)
     overlay:SetPoint("BOTTOMRIGHT", overlayFrame, 10, -10)
     overlay:SetAlpha(1)
 
-    self.Portrait.overlay = overlay
+    self.Portrait.overlayTex = overlay
 end
 
 local function createTag(self)

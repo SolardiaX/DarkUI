@@ -35,7 +35,7 @@ local EDITBOX_BORDER_REGIONS = { "Left", "Middle", "Right", "Mid" }
 ------------------------------------------------------------------------
 
 -- shared by E:ReskinPanel (no-opts default) and E:ReskinPortrait
-E.HOUSE_PANEL_OPTS = { border = "regular", margin = 4, gradient = true }
+E.HOUSE_PANEL_OPTS = { border = "regular", margin = 4, gradient = true, wallpaper = true }
 
 function E:ReskinPanel(frame, opts)
     if not frame or frame.__styled then return end
@@ -134,10 +134,11 @@ function E:ReskinTab(tab)
     if tab.MiddleHighlight then tab.MiddleHighlight:SetAlpha(0) end
 
     -- inset pill backdrop (left/right 8, top 3) — NDui proportions
-    local bg = tab:CreateBackdrop("transparent")
+    local bg = tab:CreateBackdrop("default")
     bg:ClearAllPoints()
     bg:SetPoint("TOPLEFT", 8, -3)
     bg:SetPoint("BOTTOMRIGHT", -8, 0)
+    bg:SetBackdropEdge("regular")
 
     if tab.SetHighlightTexture then
         tab:SetHighlightTexture(C.media.texture.blank)
@@ -306,9 +307,23 @@ function E:ReskinPortrait(frame)
     if not frame or frame.__styled then return end
     if frame:IsForbidden() then return end
 
-    local portrait = frame.PortraitContainer or frame.portrait
+    -- Hide every portrait/overlay region variant Blizzard frames ship (mirrors
+    -- ElvUI HandlePortraitFrame): modern PortraitContainer, the legacy global
+    -- $parentPortrait (ProfessionsFrame uses this), the lowercase .portrait alt,
+    -- plus portrait/art overlays. Covered independently — a frame can carry more
+    -- than one (e.g. PortraitContainer + PortraitOverlay).
+    local name = frame.GetName and frame:GetName()
+    local portrait = (name and _G[name .. "Portrait"]) or frame.Portrait
     if portrait then portrait:SetAlpha(0) end
+    if frame.PortraitContainer then frame.PortraitContainer:SetAlpha(0) end
+    if frame.portrait then frame.portrait:SetAlpha(0) end
     if frame.PortraitFrame then frame.PortraitFrame:SetAlpha(0) end
+
+    local portraitOverlay = (name and _G[name .. "PortraitOverlay"]) or frame.PortraitOverlay
+    if portraitOverlay then portraitOverlay:SetAlpha(0) end
+
+    local artOverlay = (name and _G[name .. "ArtOverlayFrame"]) or frame.ArtOverlayFrame
+    if artOverlay then artOverlay:SetAlpha(0) end
 
     -- = ReskinPanel + hidden portrait region
     E:ReskinPanel(frame, E.HOUSE_PANEL_OPTS)

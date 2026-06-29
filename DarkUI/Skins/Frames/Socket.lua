@@ -47,7 +47,7 @@ function S:Blizzard_ItemSocketingUI()
         for _, button in next, SocketingContainer.SocketFrames do
             button:StripTextures()
             button:StyleButton()
-            button:SetTemplate(nil, true)
+            button:SetTemplate()
 
             if button.Shine then button.Shine:Kill() end
 

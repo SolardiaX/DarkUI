@@ -218,15 +218,15 @@ function module.PostCreateButton(element, button)
 end
 
 function module.PostUpdateGapButton(element, unit, button, position)
-    if button.__overlay then button.__overlay:Hide() end
-    if button.__shadow then button.__shadow:Hide() end
+    if button.overlay then button.overlay:Hide() end
+    if button.shadow then button.shadow:Hide() end
 end
 
 function module.PostUpdateButton(element, button, unit, data, position)
-    if button.__overlay then button.__overlay:Show() end
-    if button.__shadow then button.__shadow:Show() end
+    if button.overlay then button.overlay:Show() end
+    if button.shadow then button.shadow:Show() end
 
-    button.__shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
+    button.shadow:SetBackdropBorderColor(unpack(C.media.shadow_color))
     button.Icon:SetDesaturated(false)
 
     if data.isHarmfulAura then
@@ -234,10 +234,10 @@ function module.PostUpdateButton(element, button, unit, data, position)
             button.Icon:SetDesaturated(true)
         elseif element.dispelColorCurve then
             local color = C_UnitAuras.GetAuraDispelTypeColor(unit, data.auraInstanceID, element.dispelColorCurve)
-            if color then button.__shadow:SetBackdropBorderColor(color:GetRGBA()) end
+            if color then button.shadow:SetBackdropBorderColor(color:GetRGBA()) end
         end
     else
-        if type(data.dispelName) ~= "nil" and not UnitIsFriend("player", unit) then button.__shadow:SetBackdropBorderColor(1, 0.85, 0) end
+        if type(data.dispelName) ~= "nil" and not UnitIsFriend("player", unit) then button.shadow:SetBackdropBorderColor(1, 0.85, 0) end
     end
 end
 

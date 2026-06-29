@@ -33,7 +33,7 @@ local function Skin_OpenMail()
         local btn = _G["OpenMailAttachmentButton" .. i]
         if not btn.__template then
             btn:StripTextures()
-            btn:SetTemplate(nil, true)
+            btn:SetTemplate()
             btn:StyleButton()
 
             S:HandleIconBorder(btn.IconBorder)
@@ -55,7 +55,7 @@ local function Skin_InboxItems()
         local btn = item.Button
         if not btn.__template then
             btn:StripTextures()
-            btn:SetTemplate(nil, true)
+            btn:SetTemplate()
             btn:StyleButton()
 
             S:HandleIconBorder(btn.IconBorder)
@@ -89,7 +89,7 @@ function S:MailFrame()
     -- Reposition Tabs
     _G.MailFrameTab1:ClearAllPoints()
     _G.MailFrameTab2:ClearAllPoints()
-    _G.MailFrameTab1:Point("TOPLEFT", _G.MailFrame, "BOTTOMLEFT", -3, -4)
+    _G.MailFrameTab1:Point("TOPLEFT", _G.MailFrame, "BOTTOMLEFT", -3, 0)
     _G.MailFrameTab2:Point("TOPLEFT", _G.MailFrameTab1, "TOPRIGHT", 3, 0)
 
     -- send mail
@@ -161,13 +161,13 @@ function S:MailFrame()
     _G.OpenMailArithmeticLine:Kill()
 
     _G.OpenMailLetterButton:StripTextures()
-    _G.OpenMailLetterButton:SetTemplate(nil, true)
+    _G.OpenMailLetterButton:SetTemplate()
     _G.OpenMailLetterButton:StyleButton()
     _G.OpenMailLetterButtonIconTexture:SetTexCoords()
     _G.OpenMailLetterButtonIconTexture:SetInside()
 
     _G.OpenMailMoneyButton:StripTextures()
-    _G.OpenMailMoneyButton:SetTemplate(nil, true)
+    _G.OpenMailMoneyButton:SetTemplate()
     _G.OpenMailMoneyButton:StyleButton()
     _G.OpenMailMoneyButtonIconTexture:SetTexCoords()
     _G.OpenMailMoneyButtonIconTexture:SetInside()

@@ -9,22 +9,19 @@ local S = E:GetModule("Skins")
 local _G = _G
 local hooksecurefunc = hooksecurefunc
 
-local backdrops = {}
 local function SkinFrame(frame)
     frame:StripTextures()
 
-    if backdrops[frame] then
-        frame.backdrop = backdrops[frame] -- relink it back
-    else
+    -- Single-field .backdrop doubles as the created-once guard, so a pooled menu
+    -- frame keeps its backdrop on reuse — no external relink table needed.
+    if not frame.backdrop then
         frame:CreateBackdrop("Transparent") -- :SetTemplate errors out
         frame.backdrop:SetInside(nil, 1, 5)
-
-        backdrops[frame] = frame.backdrop -- keep below CreateBackdrop
 
         if frame.ScrollBar then S:HandleTrimScrollBar(frame.ScrollBar) end
     end
 
-    if frame.backdrop then frame.backdrop:OffsetFrameLevel(nil, frame) end
+    frame.backdrop:OffsetFrameLevel(nil, frame)
 end
 
 function S:SkinMenu(manager, ownerRegion, menuDescription, anchor)

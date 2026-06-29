@@ -44,9 +44,7 @@ function S:Blizzard_TimeManager()
 
     local StopwatchFrame = _G.StopwatchFrame
     StopwatchFrame:StripTextures()
-    StopwatchFrame:CreateBackdrop("Transparent")
-    StopwatchFrame.backdrop:Point("TOPLEFT", 0, -17)
-    StopwatchFrame.backdrop:Point("BOTTOMRIGHT", 0, 2)
+    E:ReskinPanel(StopwatchFrame)
 
     _G.StopwatchTabFrame:StripTextures()
     S:HandleCloseButton(_G.StopwatchCloseButton)
@@ -54,16 +52,19 @@ function S:Blizzard_TimeManager()
     --Play/Pause and Reset buttons
     local StopwatchPlayPauseButton = _G.StopwatchPlayPauseButton
     local StopwatchResetButton = _G.StopwatchResetButton
-    StopwatchPlayPauseButton:SetTemplate(nil, true)
-    StopwatchPlayPauseButton:Size(12)
+
+    S:HandleButton(StopwatchPlayPauseButton)
+    StopwatchPlayPauseButton:SetTemplate()
+    StopwatchPlayPauseButton:Size(14)
     StopwatchPlayPauseButton:SetNormalTexture(E.Media.Textures.Play)
     StopwatchPlayPauseButton:SetHighlightTexture(E.ClearTexture)
-    StopwatchPlayPauseButton:HookScript("OnEnter", S.SetModifiedBackdrop)
-    StopwatchPlayPauseButton:HookScript("OnLeave", S.SetOriginalBackdrop)
     StopwatchPlayPauseButton:Point("RIGHT", StopwatchResetButton, "LEFT", -4, 0)
+
     S:HandleButton(StopwatchResetButton)
-    StopwatchResetButton:Size(16)
+    StopwatchResetButton:Size(14)
+    StopwatchResetButton:SetTemplate()
     StopwatchResetButton:SetNormalTexture(E.Media.Textures.Reset)
+    StopwatchResetButton:SetHighlightTexture(E.ClearTexture)
     StopwatchResetButton:Point("BOTTOMRIGHT", StopwatchFrame, "BOTTOMRIGHT", -4, 6)
 
     hooksecurefunc("Stopwatch_Play", SetPauseTexture)

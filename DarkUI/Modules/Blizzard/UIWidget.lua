@@ -33,7 +33,7 @@ local function skinStatusBar(widget)
         bar:SetStatusBarColor(unpack(atlasColors[atlas]))
     end
 
-    if not bar.styled then
+    if not bar.__styled then
         if bar.BGLeft then bar.BGLeft:SetAlpha(0) end
         if bar.BGRight then bar.BGRight:SetAlpha(0) end
         if bar.BGCenter then bar.BGCenter:SetAlpha(0) end
@@ -54,7 +54,7 @@ local function skinStatusBar(widget)
             bar:CreateBackdrop("Transparent")
             bar:CreateBorder()
         end
-        bar.styled = true
+        bar.__styled = true
     end
 end
 
@@ -65,7 +65,7 @@ local function skinDoubleStatusBar(widget)
             bar:SetStatusBarTexture(C.media.texture.status_f)
             bar:SetStatusBarColor(unpack(atlasColors[atlas]))
         end
-        if not bar.styled then
+        if not bar.__styled then
             if bar.BG then bar.BG:SetAlpha(0) end
             if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
             if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
@@ -75,7 +75,7 @@ local function skinDoubleStatusBar(widget)
             bar:SetStatusBarTexture(C.media.texture.status_f)
             bar:CreateBackdrop("Transparent")
             bar:CreateBorder()
-            bar.styled = true
+            bar.__styled = true
         end
     end
 end
@@ -98,8 +98,8 @@ local function skinCaptureBar(_, widget)
         widget.RightBar:SetVertexColor(0.9, 0.2, 0.2)
 
         widget:CreateBackdrop("Default")
-        widget.__backdrop:SetPoint("TOPLEFT", widget.LeftBar, -2, 2)
-        widget.__backdrop:SetPoint("BOTTOMRIGHT", widget.RightBar, 2, -2)
+        widget.backdrop:SetPoint("TOPLEFT", widget.LeftBar, -2, 2)
+        widget.backdrop:SetPoint("BOTTOMRIGHT", widget.RightBar, 2, -2)
 
         widget.skinned = true
     end

@@ -484,16 +484,16 @@ function MyContainer:OnCreate(name, settings)
         self.DropTarget:SetSize(itemSlotSize, itemSlotSize)
 
         self.DropTarget:CreateBackdrop()
-        self.DropTarget.__backdrop:SetAllPoints()
-        self.DropTarget.__backdrop:SetBackdrop({
+        self.DropTarget.backdrop:SetAllPoints()
+        self.DropTarget.backdrop:SetBackdrop({
             bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
             edgeFile = "Interface\\Buttons\\WHITE8x8",
             tile = false,
             tileSize = 16,
             edgeSize = 1,
         })
-        self.DropTarget.__backdrop:SetBackdropColor(1, 1, 1, 0.1)
-        self.DropTarget.__backdrop:SetBackdropBorderColor(0, 0, 0, 1)
+        self.DropTarget.backdrop:SetBackdropColor(1, 1, 1, 0.1)
+        self.DropTarget.backdrop:SetBackdropBorderColor(0, 0, 0, 1)
 
         local freeSlot = self:SpawnPlugin("TagDisplay", "[space]", self.DropTarget)
         freeSlot.__type = (tBag and "Bag") or (tBank and "Bank") or (tReagent and "BankReagent") or (tAccount and "BankAccount")
@@ -553,20 +553,20 @@ function BagButton:OnCreate()
 
     self:SetSize(itemSlotSize, itemSlotSize)
     self:CreateBackdrop("default", 0)
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+    self.backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
 end
 
 function BagButton:OnUpdateButton()
-    self.__backdrop:SetBackdropBorderColor(0, 0, 0)
+    self.backdrop:SetBackdropBorderColor(0, 0, 0)
 
     local id = GetInventoryItemID("player", self.invID)
     if not id then return end
     local _, _, quality = C_Item.GetItemInfo(id)
     if not quality or quality <= 1 then return end
     local color = C.media.qualityColors[quality]
-    if not self.hidden and not self.notBought and color then self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b) end
+    if not self.hidden and not self.notBought and color then self.backdrop:SetBackdropBorderColor(color.r, color.g, color.b) end
 end
 
 ------------------------------------------------------------------------
@@ -595,7 +595,7 @@ function MyButton:OnCreate()
     self:GetHighlightTexture():SetInside()
     self:SetSize(itemSlotSize, itemSlotSize)
     self:CreateBackdrop("default", 0)
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+    self.backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
     self.Icon:SetInside()
     self.Icon:SetTexCoord(unpack(C.media.texCoord))
@@ -719,7 +719,7 @@ function MyButton:OnUpdateButton(item)
         self.durability:SetText("")
     end
 
-    self.__backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
+    self.backdrop:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
 
     if not item.texture and GameTooltip:GetOwner() == self then GameTooltip:Hide() end
 
@@ -749,11 +749,11 @@ function MyButton:OnUpdateQuest(item)
     end
 
     if item.questID or item.isQuestItem then
-        self.__backdrop:SetBackdropBorderColor(0.8, 0.8, 0)
+        self.backdrop:SetBackdropBorderColor(0.8, 0.8, 0)
     elseif item.quality and item.quality > -1 then
         local color = C.media.qualityColors[item.quality]
-        self.__backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
+        self.backdrop:SetBackdropBorderColor(color.r, color.g, color.b)
     else
-        self.__backdrop:SetBackdropBorderColor(0, 0, 0)
+        self.backdrop:SetBackdropBorderColor(0, 0, 0)
     end
 end

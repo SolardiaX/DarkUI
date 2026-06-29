@@ -169,7 +169,7 @@ local function createPortrait(self)
     overlay:SetPoint("BOTTOMRIGHT", overlayFrame, 4, -4)
     overlay:SetAlpha(1)
 
-    self.Portrait.overlay = overlay
+    self.Portrait.overlayTex = overlay
 end
 
 local function createTag(self)
@@ -264,10 +264,10 @@ local function createCastbar(self)
     cb.bg:SetAllPoints()
     cb.bg:SetColorTexture(0.1, 0.1, 0.1, 0.8)
 
-    cb.border = cb:CreateTexture(nil, "BACKGROUND")
-    cb.border:SetPoint("CENTER")
-    cb.border:SetSize(120, 48)
-    cb.border:SetTexture(barBorder)
+    cb.borderTex = cb:CreateTexture(nil, "BACKGROUND")
+    cb.borderTex:SetPoint("CENTER")
+    cb.borderTex:SetSize(120, 48)
+    cb.borderTex:SetTexture(barBorder)
 
     local spark = cb:CreateTexture(nil, "OVERLAY", nil, 7)
     spark:SetBlendMode("ADD")

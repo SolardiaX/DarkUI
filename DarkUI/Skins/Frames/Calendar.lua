@@ -80,7 +80,7 @@ function S:Blizzard_Calendar()
             bu:DisableDrawLayer("BACKGROUND") -- This would remove the 'Parchement'
         end
 
-        bu:SetTemplate(nil, nil, nil, true)
+        bu:SetTemplate()
         bu:SetBackdropColor(0, 0, 0, 0)
         bu:SetHighlightTexture(E.media.glossTex)
         bu:OffsetFrameLevel(1)

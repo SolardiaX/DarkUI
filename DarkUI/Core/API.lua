@@ -62,8 +62,8 @@ local BACKDROP = {
 }
 
 local EDGE = {
-    pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
-    blur = { edgeFile = C.media.texture.shadow, edgeSize = Mult, insets = Mult },
+    pixel = { edgeFile = C.media.texture.blank, edgeSize = 1, insets = 1 },
+    blur = { edgeFile = C.media.texture.shadow, edgeSize = 1, insets = 1 },
     thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, insets = 4 },
     thin_white = { edgeFile = C.media.texture.border_thin_white, edgeSize = 16, insets = 4 },
     line = { edgeFile = C.media.texture.border_line, edgeSize = 8, insets = 2 },
@@ -76,13 +76,13 @@ local EDGE = {
 }
 
 local EFFECT = {
-    pixel = { edgeFile = C.media.texture.blank, edgeSize = Mult, insets = Mult },
+    pixel = { edgeFile = C.media.texture.blank, edgeSize = 1, insets = 1 },
     shadow = { edgeFile = C.media.texture.shadow, edgeSize = 6, margin = 4, borderColor = C.media.shadow_color },
     thin = { edgeFile = C.media.texture.border_thin, edgeSize = 16, margin = 4 },
     thin_white = { edgeFile = C.media.texture.border_thin_white, edgeSize = 16, margin = 4 },
     line = { edgeFile = C.media.texture.border_line, edgeSize = 8, margin = 2 },
     line_white = { edgeFile = C.media.texture.border_line_white, edgeSize = 8, margin = 2 },
-    regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = Mult, borderColor = C.media.border_color },
+    regular = { edgeFile = C.media.texture.border_regular, edgeSize = 12, margin = 1, borderColor = C.media.border_color },
     round = { edgeFile = C.media.texture.border_round, edgeSize = 16, margin = 2 },
     round_white = { edgeFile = C.media.texture.border_round_white, edgeSize = 16, margin = 2 },
     bold = { edgeFile = C.media.texture.border_bold, edgeSize = 16, margin = 8 },
@@ -214,8 +214,8 @@ end
 ------------------------------------------------------------------------
 
 local function setOutside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or Mult
-    yOffset = yOffset or Mult
+    xOffset = xOffset or 1
+    yOffset = yOffset or 1
     anchor = anchor or obj:GetParent()
 
     disablePixelSnap(obj)
@@ -227,8 +227,8 @@ local function setOutside(obj, anchor, xOffset, yOffset)
 end
 
 local function setInside(obj, anchor, xOffset, yOffset)
-    xOffset = xOffset or Mult
-    yOffset = yOffset or Mult
+    xOffset = xOffset or 1
+    yOffset = yOffset or 1
     anchor = anchor or obj:GetParent()
 
     disablePixelSnap(obj)
@@ -327,10 +327,10 @@ end
 ------------------------------------------------------------------------
 
 local function createBackdrop(f, t, margin, tile, frameLevel)
-    if f.__backdrop then return f.__backdrop end
+    if f.backdrop then return f.backdrop end
 
     t = t or "Default"
-    margin = margin or Mult
+    margin = margin or 1
 
     local frame = f
     if f:IsObjectType("Texture") then frame = f:GetParent() end
@@ -343,13 +343,12 @@ local function createBackdrop(f, t, margin, tile, frameLevel)
 
     setTemplate(child, t, tile)
 
-    f.__backdrop = child
-    f.backdrop = child -- ElvUI-compat alias
+    f.backdrop = child
     return child
 end
 
 local function createShadow(f, margin, color, size)
-    if f.__shadow then return f.__shadow end
+    if f.shadow then return f.shadow end
 
     local cfg = EFFECT.shadow
     margin = margin or cfg.margin
@@ -365,12 +364,12 @@ local function createShadow(f, margin, color, size)
     local borderColor = color or cfg.borderColor
     if borderColor then child:SetBackdropBorderColor(unpack(borderColor)) end
 
-    f.__shadow = child
+    f.shadow = child
     return child
 end
 
 local function createBorder(f, t, margin, color)
-    if f.__border then return f.__border end
+    if f.border then return f.border end
 
     local cfg = EFFECT[t] or EFFECT.regular
     margin = margin or cfg.margin
@@ -393,7 +392,7 @@ local function createBorder(f, t, margin, color)
     local borderColor = color or cfg.borderColor
     if borderColor then child:SetBackdropBorderColor(unpack(borderColor)) end
 
-    f.__border = child
+    f.border = child
     return child
 end
 
@@ -402,7 +401,7 @@ end
 ------------------------------------------------------------------------
 
 local function createOverlay(f, margin)
-    if f.__overlay then return f.__overlay end
+    if f.overlay then return f.overlay end
 
     margin = margin or 2
 
@@ -412,7 +411,7 @@ local function createOverlay(f, margin)
     overlay:SetPoint("TOPRIGHT", f, margin, margin)
     overlay:SetPoint("BOTTOMLEFT", f, -margin, -margin)
 
-    f.__overlay = overlay
+    f.overlay = overlay
     return overlay
 end
 
@@ -421,14 +420,14 @@ end
 ------------------------------------------------------------------------
 
 local function createGradient(f, color)
-    if f.__gradient then return f.__gradient end
+    if f.gradient then return f.gradient end
 
     local gradient = f:CreateTexture(nil, "BORDER")
     gradient:SetInside(f)
     gradient:SetTexture(C.media.texture.gradient)
     gradient:SetVertexColor(unpack(color or C.media.gradient_color))
 
-    f.__gradient = gradient
+    f.gradient = gradient
     return gradient
 end
 

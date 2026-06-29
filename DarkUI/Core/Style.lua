@@ -14,13 +14,13 @@ local unpack = unpack
 local function onEnterHighlight(self)
     if self:IsEnabled() then
         self:SetBackdropBorderColor(r, g, b)
-        if self.__overlay then self.__overlay:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1) end
+        if self.overlay then self.overlay:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1) end
     end
 end
 
 local function onLeaveHighlight(self)
     self:SetBackdropBorderColor(unpack(self.__borderColor or C.media.border_color))
-    if self.__overlay then self.__overlay:SetVertexColor(0.1, 0.1, 0.1, 1) end
+    if self.overlay then self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1) end
 end
 
 E.onEnterHighlight = onEnterHighlight
@@ -42,6 +42,17 @@ function E:StyleContainer(frame, opts)
     if type(opts) ~= "table" then opts = { gradient = opts } end
 
     local bg = frame:CreateBackdrop(opts.backdrop, opts.margin)
+
+    -- optional wallpaper: drawn just above the solid backdrop fill (BACKGROUND
+    -- sublevel 1) and below the gradient sheen; panel content sits on higher
+    -- frame levels so it stays on top.
+    if opts.wallpaper then
+        local wp = bg:CreateTexture(nil, "BACKGROUND", nil, 1)
+        wp:SetInside(bg)
+        wp:SetTexture(C.media.texture.wallpaper)
+        bg.__wallpaper = wp
+    end
+
     if opts.gradient then bg:CreateGradient() end
 
     -- textured border is opt-in; otherwise the backdrop's pixel square edge stands
@@ -49,7 +60,7 @@ function E:StyleContainer(frame, opts)
 
     -- drop shadow on by default: on the border frame if present, else the backdrop
     if opts.shadow ~= false then
-        local shadowHost = bg.__border or bg
+        local shadowHost = bg.border or bg
         shadowHost:CreateShadow()
     end
 
@@ -102,8 +113,7 @@ function E:StyleCheckBox(frame)
     bg:SetFrameLevel(lvl == 0 and 1 or lvl - 1)
     bg:SetTemplate("Default")
     bg:SetBackdropEdge("blur")
-    frame.__bg = bg
-    frame.backdrop = bg -- ElvUI-compat alias (ports reference checkbox.backdrop)
+    frame.backdrop = bg
 
     frame.hl = frame:GetHighlightTexture()
     frame.hl:SetInside(bg)
@@ -132,7 +142,7 @@ function E:StyleIconButton(button, margin, skipOverlay)
         local overlay = button:CreateTexture(nil, "OVERLAY")
         overlay:SetOutside(button, margin, margin)
         overlay:SetTexture(C.media.texture.overlay)
-        button.__overlay = overlay
+        button.overlay = overlay
     end
 
     local icon = button.Icon or button.icon

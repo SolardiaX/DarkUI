@@ -162,16 +162,16 @@ local function setChatStyle(frame)
         if CombatLogQuickButtonFrame_Custom then
             CombatLogQuickButtonFrame_Custom:StripTextures()
             CombatLogQuickButtonFrame_Custom:CreateBackdrop()
-            CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("TOPLEFT", 1, -4)
-            CombatLogQuickButtonFrame_Custom.__backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
+            CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("TOPLEFT", 1, -4)
+            CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
 
-            E:StyleCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.__backdrop)
+            E:StyleCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.backdrop)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetSize(12, 12)
             CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetHitRectInsets(0, 0, 0, 0)
 
             CombatLogQuickButtonFrame_CustomProgressBar:ClearAllPoints()
-            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.__backdrop, 2, -2)
-            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.__backdrop, -2, 2)
+            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("TOPLEFT", CombatLogQuickButtonFrame_Custom.backdrop, 2, -2)
+            CombatLogQuickButtonFrame_CustomProgressBar:SetPoint("BOTTOMRIGHT", CombatLogQuickButtonFrame_Custom.backdrop, -2, 2)
             CombatLogQuickButtonFrame_CustomProgressBar:SetStatusBarTexture(C.media.texture.status_f)
 
             CombatLogQuickButtonFrameButton1:SetPoint("BOTTOM", 0, 0)

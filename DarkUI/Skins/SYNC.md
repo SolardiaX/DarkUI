@@ -52,7 +52,10 @@ These ElvUI-shaped APIs already exist so ported code needs no edit for them:
 - **ElvUI hover handlers** (Skins/Core.lua): `S.SetModifiedBackdrop` /
   `S.SetOriginalBackdrop` — recolor `self.backdrop or self`'s border to the theme
   gold on enter / resting color on leave. Ports hook them on OnEnter/OnLeave.
-- **Field / texture aliases:** `frame.backdrop` (alias of our `__backdrop`),
+- **Field / texture aliases:** `frame.backdrop` (DarkUI's canonical public field
+  for `CreateBackdrop`/`CreateShadow`/`CreateBorder`/`CreateOverlay`/`CreateGradient`
+  products — bare `.backdrop`/`.shadow`/`.border`/`.overlay`/`.gradient`, each its
+  own created-once guard; `__`-prefixed names are reserved for private state),
   `button.hover` (alias of our `button.highlight` set by `:StyleButton()`),
   `E.media`, `E.ClearTexture`, `config.normTex`, `config.bordercolor`,
   `E.PixelMode = true` (so PixelMode ternaries resolve to the pixel branch),

@@ -36,13 +36,13 @@ local arrow
 
 local function createBorderFrame(frame, point)
     if point == nil then point = frame end
-    if point.backdrop then return end
+    if point.backdropTex then return end
 
-    frame.backdrop = frame:CreateTexture(nil, "BORDER")
-    frame.backdrop:SetDrawLayer("BORDER", -8)
-    frame.backdrop:SetPoint("TOPLEFT", point, "TOPLEFT", -E.noscalemult * 2, E.noscalemult * 2)
-    frame.backdrop:SetPoint("BOTTOMRIGHT", point, "BOTTOMRIGHT", E.noscalemult * 2, -E.noscalemult * 2)
-    frame.backdrop:SetColorTexture(unpack(C.media.backdrop_color))
+    frame.backdropTex = frame:CreateTexture(nil, "BORDER")
+    frame.backdropTex:SetDrawLayer("BORDER", -8)
+    frame.backdropTex:SetPoint("TOPLEFT", point, "TOPLEFT", -E.noscalemult * 2, E.noscalemult * 2)
+    frame.backdropTex:SetPoint("BOTTOMRIGHT", point, "BOTTOMRIGHT", E.noscalemult * 2, -E.noscalemult * 2)
+    frame.backdropTex:SetColorTexture(unpack(C.media.backdrop_color))
 
     frame.bordertop = frame:CreateTexture(nil, "BORDER")
     frame.bordertop:SetPoint("TOPLEFT", point, "TOPLEFT", -E.noscalemult * 2, E.noscalemult * 2)
@@ -106,7 +106,7 @@ local function updateTarget(self)
         if self.arrow then self.arrow:Hide() end
     end
 
-    self.Health.border:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
+    self.Health.borderTex:SetSize(256 * self.Health:GetWidth() / 198, 64 * self.Health:GetHeight() / 12)
 end
 
 local function updateName(self)
@@ -416,9 +416,9 @@ local function style(self, unit)
     self.Health.bg:SetTexture(C.media.texture.status)
     self.Health.bg.multiplier = 0.2
 
-    self.Health.border = self.Health:CreateTexture(nil, "BORDER")
-    self.Health.border:SetTexture(bar_border)
-    self.Health.border:SetPoint("CENTER")
+    self.Health.borderTex = self.Health:CreateTexture(nil, "BORDER")
+    self.Health.borderTex:SetTexture(bar_border)
+    self.Health.borderTex:SetPoint("CENTER")
 
     -- Mouseover Highlight
     local highlight = CreateFrame("Frame", nil, self)

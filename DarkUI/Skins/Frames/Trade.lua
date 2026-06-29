@@ -53,7 +53,7 @@ function S:TradeFrame()
             end
 
             player:OffsetFrameLevel(-1)
-            player:SetTemplate(nil, true)
+            player:SetTemplate()
             player:StyleButton()
 
             player.bg = CreateFrame("Frame", nil, player)
@@ -63,7 +63,7 @@ function S:TradeFrame()
             player.bg:SetTemplate("Transparent")
 
             recipient:OffsetFrameLevel(-1)
-            recipient:SetTemplate(nil, true)
+            recipient:SetTemplate()
             recipient:StyleButton()
 
             recipient.bg = CreateFrame("Frame", nil, recipient)

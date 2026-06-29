@@ -145,7 +145,7 @@ Anchor.Create = function(self, frame, name, vkey, width, height)
     })
     overlay:SetBackdropColor(0.1, 0.6, 0.1, 0.55)
     overlay:SetBackdropBorderColor(0.2, 1, 0.2, 1)
-    holder.overlay = overlay
+    holder.overlayFrame = overlay
 
     holder.name = overlay:CreateFontText(13, name)
     holder.name:SetTextColor(unpack(Colors.highlight))
@@ -220,13 +220,13 @@ end
 
 Anchor.OnEnter = function(self)
     self:SetAlpha(1)
-    self.overlay:SetBackdropBorderColor(unpack(Colors.normal))
+    self.overlayFrame:SetBackdropBorderColor(unpack(Colors.normal))
     self:UpdateHint()
 end
 
 Anchor.OnLeave = function(self)
     self:SetAlpha(0.85)
-    self.overlay:SetBackdropBorderColor(0.2, 1, 0.2, 1)
+    self.overlayFrame:SetBackdropBorderColor(0.2, 1, 0.2, 1)
 end
 
 Anchor.OnUpdate = function(self, elapsed)
