@@ -311,7 +311,15 @@ function S:ReskinEditBox(frame)
     if frame then frame.__bg = frame.backdrop end
     return frame and frame.backdrop
 end
-S.ReskinInput = S.ReskinEditBox -- Aurora alias
+-- Aurora ReskinInput(editbox, height, width): ReskinEditBox + optional resize
+function S:ReskinInput(frame, height, width)
+    local backdrop = S:ReskinEditBox(frame)
+    if frame then
+        if height then frame:SetHeight(height) end
+        if width then frame:SetWidth(width) end
+    end
+    return backdrop
+end
 
 -- ElvUI-parity inset pieces hidden by portrait/frame skins
 local INSET_PIECES = {
