@@ -48,20 +48,37 @@ local function reskinSectionHeader()
     end
 end
 
+local function repositionTabs()
+    local previousTab
+    for i = 1, 7 do
+        local tab = _G.EncounterJournal.Tabs[i]
+        if tab and tab:IsShown() then
+            tab:ClearAllPoints()
+            if previousTab then
+                tab:SetPoint("TOPLEFT", previousTab, "TOPRIGHT", -5, 0)
+            else
+                tab:SetPoint("TOPLEFT", _G.EncounterJournal, "BOTTOMLEFT", -3, 0)
+            end
+            previousTab = tab
+        end
+    end
+end
+
 function S:EncounterJournal()
     if not (C.skins.enable and C.skins.encounterjournal) then return end
 
     -- Tabs
     for i = 1, 7 do
         local tab = _G.EncounterJournal.Tabs[i]
-        if tab then
-            S:ReskinTab(tab)
-            if i ~= 1 then
-                tab:ClearAllPoints()
-                tab:SetPoint("TOPLEFT", _G.EncounterJournal.Tabs[i - 1], "TOPRIGHT", -5, 0)
-            end
-        end
+        if tab then S:ReskinTab(tab) end
     end
+
+    -- Blizzard re-clears tab points when toggling the conditional tabs (trading
+    -- post / suggested) and on show; re-anchor the visible chain so it follows.
+    repositionTabs()
+    hooksecurefunc("EncounterJournal_OnShow", repositionTabs)
+    hooksecurefunc("EncounterJournal_CheckAndDisplayTradingPostTab", repositionTabs)
+    hooksecurefunc("EncounterJournal_CheckAndDisplaySuggestedContentTab", repositionTabs)
 
     -- Side tabs
     local tabs = { "overviewTab", "modelTab", "bossTab", "lootTab" }
@@ -422,7 +439,17 @@ function S:EncounterJournal()
     if tutorialFrame then
         tutorialFrame.Contents.Header:SetTextColor(1, 0.8, 0)
         tutorialFrame.Contents.Description:SetTextColor(1, 1, 1)
-        S:Reskin(tutorialFrame.Contents.StartButton)
+
+        -- Special-case: this button's body is its `Center` texture, which S:Reskin's
+        -- S:ReskinBlizzardRegions sweep hides (Center is in S.BlizzardRegions), leaving
+        -- the button see-through over the Contents parchment. Re-show Center, fit it to
+        -- the button, and push it to the back so the DarkUI Fill body + round border
+        -- (from S:Reskin) render above it.
+        local button = tutorialFrame.Contents.StartButton
+        S:Reskin(button, true)
+        button.Center:Show()
+        button.Center:SetInside(button, 0.5, 0)
+        button.Center:SetDrawLayer("BACKGROUND", -1)
     end
 
     -- Journeys
