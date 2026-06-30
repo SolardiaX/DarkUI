@@ -48,7 +48,7 @@ function S:PVPUI()
 
     -- Category buttons
 
-    local iconSize = 60 - 2 * E.mult
+    local iconSize = 56 - 2 * E.mult
     for i = 1, 4 do
         local bu = PVPQueueFrame["CategoryButton" .. i]
         if bu then
@@ -62,7 +62,7 @@ function S:PVPUI()
             bu.Background:SetColorTexture(cr, cg, cb, 0.25)
             bu.Background:SetAlpha(1)
 
-            icon:SetPoint("LEFT", bu, "LEFT")
+            icon:SetPoint("LEFT", bu, "LEFT", 2, 0)
             icon:SetSize(iconSize, iconSize)
             S:ReskinIcon(icon)
 

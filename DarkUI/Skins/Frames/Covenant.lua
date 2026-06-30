@@ -69,7 +69,7 @@ local function reskinTalentsList(self)
             frame.Icon:SetPoint("TOPLEFT", 7, -7)
 
             S:ReplaceIconString(frame.InfoText)
-            hooksecurefunc(frame.InfoText, "SetText", S.ReplaceIconString)
+            hooksecurefunc(frame.InfoText, "SetText", function(self) S:ReplaceIconString(self) end)
         end
     end
 end
@@ -78,7 +78,7 @@ local function replaceCurrencies(displayGroup)
     for frame in displayGroup.currencyFramePool:EnumerateActive() do
         if not frame.__styled then
             S:ReplaceIconString(frame.Text)
-            hooksecurefunc(frame.Text, "SetText", S.ReplaceIconString)
+            hooksecurefunc(frame.Text, "SetText", function(self) S:ReplaceIconString(self) end)
 
             frame.__styled = true
         end

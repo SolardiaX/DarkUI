@@ -31,7 +31,7 @@ function S:StableUI()
     local modelScene = _G.StableFrame.PetModelScene
     if modelScene then
         local petInfo = modelScene.PetInfo
-        if petInfo then hooksecurefunc(petInfo.Type, "SetText", S.ReplaceIconString) end
+        if petInfo then hooksecurefunc(petInfo.Type, "SetText", function(self) S:ReplaceIconString(self) end) end
 
         local list = modelScene.AbilitiesList
         if list then

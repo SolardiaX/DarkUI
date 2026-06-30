@@ -21,7 +21,7 @@ function S:GenericTrait()
     S:SetBD(frame)
 
     S:ReplaceIconString(frame.Currency.UnspentPointsCount)
-    hooksecurefunc(frame.Currency.UnspentPointsCount, "SetText", S.ReplaceIconString)
+    hooksecurefunc(frame.Currency.UnspentPointsCount, "SetText", function(self) S:ReplaceIconString(self) end)
 end
 
 S:AddCallbackForAddon("Blizzard_GenericTraitUI", "GenericTrait")
