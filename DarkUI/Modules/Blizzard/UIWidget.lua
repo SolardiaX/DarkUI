@@ -52,8 +52,8 @@ local function skinStatusBar(widget)
         else
             bar:SetStatusBarTexture(C.media.texture.status_f)
             bar:CreateBackdrop("Transparent")
-            bar:CreateBorder()
         end
+        bar:CreateBorder()
         bar.__styled = true
     end
 end
@@ -170,6 +170,7 @@ function module:OnInit()
     skinFrame:SetScript("OnEvent", updateWidgets)
 
     hooksecurefunc(UIWidgetTemplateStatusBarMixin, "Setup", function(widget) skinStatusBar(widget) end)
+    hooksecurefunc(UIWidgetTemplateDoubleStatusBarMixin, "Setup", function(widget) skinDoubleStatusBar(widget) end)
 
     hooksecurefunc(UIWidgetTemplateScenarioHeaderCurrenciesAndBackgroundMixin, "Setup", function(widgetInfo)
         widgetInfo.Frame:SetAlpha(0)
