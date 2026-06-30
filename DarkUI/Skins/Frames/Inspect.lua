@@ -72,7 +72,7 @@ function S:Inspect()
             S:ReskinTab(tab)
             if i ~= 1 then
                 tab:ClearAllPoints()
-                tab:SetPoint("LEFT", _G["InspectFrameTab" .. i - 1], "RIGHT", -15, 0)
+                tab:SetPoint("LEFT", _G["InspectFrameTab" .. i - 1], "RIGHT", -5, 0)
             end
         end
     end
