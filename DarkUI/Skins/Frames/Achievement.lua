@@ -19,7 +19,7 @@ local function setupButtonHighlight(button, bg)
     button:SetHighlightTexture(DB.bdTex)
     local hl = button:GetHighlightTexture()
     hl:SetVertexColor(cr, cg, cb, 0.25)
-    hl:SetInside(bg)
+    hl:SetInside(bg, 2, 2)
 end
 
 local function setupStatusbar(bar)
@@ -33,8 +33,7 @@ end
 function S:Achievement()
     if not (C.skins.enable and C.skins.achievement) then return end
 
-    _G.AchievementFrame:StripTextures()
-    S:SetBD(_G.AchievementFrame)
+    S:ReskinPortraitFrame(_G.AchievementFrame)
     _G.AchievementFrameWaterMark:SetAlpha(0)
     _G.AchievementFrame.Header:StripTextures()
     _G.AchievementFrame.Header.Title:Hide()
@@ -44,8 +43,10 @@ function S:Achievement()
         local tab = _G["AchievementFrameTab" .. i]
         if tab then
             S:ReskinTab(tab)
-            if i ~= 1 then
-                tab:ClearAllPoints()
+            tab:ClearAllPoints()
+            if i == 1 then
+                tab:SetPoint("TOPLEFT", _G.AchievementFrame, "BOTTOMLEFT", -3, 0)
+            else
                 tab:SetPoint("TOPLEFT", _G["AchievementFrameTab" .. (i - 1)], "TOPRIGHT", -5, 0)
             end
         end
@@ -59,8 +60,8 @@ function S:Achievement()
     -- Search box
     S:ReskinEditBox(_G.AchievementFrame.SearchBox)
     _G.AchievementFrame.SearchBox:ClearAllPoints()
-    _G.AchievementFrame.SearchBox:SetPoint("TOPRIGHT", _G.AchievementFrame, "TOPRIGHT", -25, -5)
-    _G.AchievementFrame.SearchBox:SetPoint("BOTTOMLEFT", _G.AchievementFrame, "TOPRIGHT", -130, -25)
+    _G.AchievementFrame.SearchBox:SetPoint("TOPRIGHT", _G.AchievementFrame, "TOPRIGHT", -40, -5)
+    _G.AchievementFrame.SearchBox:SetPoint("BOTTOMLEFT", _G.AchievementFrame, "TOPRIGHT", -160, -25)
 
     local previewContainer = _G.AchievementFrame.SearchPreviewContainer
     local showAllSearchResults = previewContainer.ShowAllSearchResults
@@ -92,6 +93,7 @@ function S:Achievement()
                 child:StripTextures(2)
                 S:ReskinIcon(child.Icon)
                 local bg = child:CreateBackdrop()
+                bg:SetBackdropEdge("round_white")
                 bg:SetBackdropColor(0, 0, 0, 0.25)
                 bg:SetInside()
                 setupButtonHighlight(child, bg)
@@ -111,6 +113,7 @@ function S:Achievement()
             if button and not button.__styled then
                 button.Background:Hide()
                 local bg = button:CreateBackdrop()
+                bg:SetBackdropEdge("round_white")
                 bg:SetBackdropColor(0, 0, 0, 0.25)
                 bg:SetPoint("TOPLEFT", 0, -1)
                 bg:SetPoint("BOTTOMRIGHT")
@@ -165,6 +168,7 @@ function S:Achievement()
                 child.Description.SetTextColor = E.Dummy
 
                 local bg = child:CreateBackdrop()
+                bg:SetBackdropEdge("round_white")
                 bg:SetBackdropColor(0, 0, 0, 0.25)
                 bg:SetPoint("TOPLEFT", 1, -1)
                 bg:SetPoint("BOTTOMRIGHT", 0, 2)
@@ -213,6 +217,7 @@ function S:Achievement()
                 -- backdrop slot freed so subsequent CreateBackdrop is independent
                 bu.backdrop = nil
                 local bg = bu:CreateBackdrop()
+                bg:SetBackdropEdge("round_white")
                 bg:SetBackdropColor(0, 0, 0, 0)
                 bg:SetPoint("TOPLEFT", 2, -2)
                 bg:SetPoint("BOTTOMRIGHT", -2, 2)
@@ -270,6 +275,7 @@ function S:Achievement()
             if not child.__styled then
                 child:StripTextures()
                 local bg = child:CreateBackdrop()
+                bg:SetBackdropEdge("round_white")
                 bg:SetBackdropColor(0, 0, 0, 0.25)
                 bg:SetPoint("TOPLEFT", 2, -E.mult)
                 bg:SetPoint("BOTTOMRIGHT", 4, E.mult)
@@ -309,6 +315,7 @@ function S:Achievement()
         button:HideBackdrop()
         button.Background:Hide()
         local bg = button:CreateBackdrop()
+        bg:SetBackdropEdge("round_white")
         bg:SetBackdropColor(0, 0, 0, 0.25)
         bg:SetInside(button, 2, 2)
 
