@@ -32,13 +32,13 @@ local function reskinSellPanel(frame)
     itemButton.bg = S:ReskinIcon(itemButton.Icon)
     S:ReskinIconBorder(itemButton.IconBorder)
 
-    S:ReskinInput(frame.QuantityInput.InputBox)
+    S:ReskinInput(frame.QuantityInput.InputBox, 24)
     S:Reskin(frame.QuantityInput.MaxButton)
-    S:ReskinInput(frame.PriceInput.MoneyInputFrame.GoldBox)
-    S:ReskinInput(frame.PriceInput.MoneyInputFrame.SilverBox)
+    S:ReskinInput(frame.PriceInput.MoneyInputFrame.GoldBox, 24)
+    S:ReskinInput(frame.PriceInput.MoneyInputFrame.SilverBox, 24)
     if frame.SecondaryPriceInput then
-        S:ReskinInput(frame.SecondaryPriceInput.MoneyInputFrame.GoldBox)
-        S:ReskinInput(frame.SecondaryPriceInput.MoneyInputFrame.SilverBox)
+        S:ReskinInput(frame.SecondaryPriceInput.MoneyInputFrame.GoldBox, 24)
+        S:ReskinInput(frame.SecondaryPriceInput.MoneyInputFrame.SilverBox, 24)
     end
     S:ReskinDropDown(frame.Duration.Dropdown)
     S:Reskin(frame.PostButton)
