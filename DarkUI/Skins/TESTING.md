@@ -25,9 +25,8 @@
 - [x] **公会与社区** `Communities.lua` — `J` — `communities`:成员列表、聊天框 inset、新建社区弹窗输入框、职业图标
 - [x] **PVE 面板(寻找团队/副本)** `PVEFrame.lua` + `LFG.lua` + `LFGList.lua` — `I` — `lfg`:角色定位图标、奖励按钮图标品质边、自定义查找列表输入框
 - [x] **PVP 面板** `PVP.lua` — `I` 内 PVP 页 — `pvp`:战场列表、荣誉/征服进度条
-- [ ] **大秘境记分板** `PVPMatch.lua` / `Challenges.lua` — 战场结束 / `M`→钥石 — `pvp` / `lfg`:记分行、词缀图标
-- [ ] **游戏菜单** `Menu.lua` — `Esc` — `misc`:菜单按钮底/边
-- [ ] **右键上下文菜单** (Menu.lua 同档) — 任意右键菜单 — `misc`
+- [x] **大秘境记分板** `PVPMatch.lua` / `Challenges.lua` — 战场结束 / `M`→钥石 — `pvp` / `lfg`:记分行、词缀图标
+- [x] **游戏菜单** `Menu.lua` — `Esc` — `misc`:菜单按钮底/边
 
 ## B. 主城 NPC / 容器交互
 
