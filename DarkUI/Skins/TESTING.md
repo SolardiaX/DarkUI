@@ -30,7 +30,7 @@
 
 ## B. 主城 NPC / 容器交互
 
-- [ ] **商人** `Merchant.lua` — 任意商人 — `merchant`:物品槽图标、回购/标签
+- [x] **商人** `Merchant.lua` — 任意商人 — `merchant`:物品槽图标、回购/标签
 - [ ] **邮箱** `Mail.lua` — 邮箱 — `mail`:收件箱列表、发信输入框(收件人/主题/金额)、附件槽
 - [ ] **交易** `Trade.lua` — 右键玩家→交易 — `trade`:交易槽图标、金额输入框
 - [ ] **拍卖行** `AuctionHouse.lua` — 拍卖师 — `auctionhouse`:数量/价格输入框、搜索栏、结果列表行、出价槽
