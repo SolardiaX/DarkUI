@@ -74,7 +74,8 @@ function S:Collectables()
             S:ReskinTab(tab)
             if i ~= 1 then
                 tab:ClearAllPoints()
-                tab:SetPoint("TOPLEFT", _G["CollectionsJournalTab" .. (i - 1)], "TOPRIGHT", -15, 0)
+                -- 8px pill inset + -11 overlap = 5px visible gap (matches the ElvUI build's tab density)
+                tab:SetPoint("TOPLEFT", _G["CollectionsJournalTab" .. (i - 1)], "TOPRIGHT", -11, 0)
             end
         end
     end
