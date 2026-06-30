@@ -476,10 +476,13 @@ function S:Communities()
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
             if not child.__styled then
+                local texture = child.Icon:GetTexture()
                 local iconbg = S:ReskinIcon(child.Icon)
                 child:StripTextures()
+                child.Icon:SetTexture(texture) -- StripTextures blanks every texture region incl. Icon; restore it
                 child.backdrop = nil
-                child.bg = child:CreateBackdrop()
+                child.bg = child:CreateBackdrop("transparent")
+                child.bg:SetBackdropEdge("round")
                 child.bg:ClearAllPoints()
                 child.bg:SetPoint("TOPLEFT", iconbg)
                 child.bg:SetPoint("BOTTOMLEFT", iconbg)
