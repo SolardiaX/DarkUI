@@ -31,9 +31,9 @@
 ## B. 主城 NPC / 容器交互
 
 - [x] **商人** `Merchant.lua` — 任意商人 — `merchant`:物品槽图标、回购/标签
-- [ ] **邮箱** `Mail.lua` — 邮箱 — `mail`:收件箱列表、发信输入框(收件人/主题/金额)、附件槽
-- [ ] **交易** `Trade.lua` — 右键玩家→交易 — `trade`:交易槽图标、金额输入框
-- [ ] **拍卖行** `AuctionHouse.lua` — 拍卖师 — `auctionhouse`:数量/价格输入框、搜索栏、结果列表行、出价槽
+- [x] **邮箱** `Mail.lua` — 邮箱 — `mail`:收件箱列表、发信输入框(收件人/主题/金额)、附件槽
+- [x] **交易** `Trade.lua` — 右键玩家→交易 — `trade`:交易槽图标、金额输入框
+- [x] **拍卖行** `AuctionHouse.lua` — 拍卖师 — `auctionhouse`:数量/价格输入框、搜索栏、结果列表行、出价槽
 - [ ] **公会银行** `GuildBank.lua` — 公会银行 — `guildBank`:物品格、标签页、**标签图标选择弹窗**(`S:ReskinIconSelectionFrame`)
 - [ ] **虚空仓库** `VoidStorage.lua` — 虚空仓库 NPC — `voidStorage`:存放/取出格、搜索框
 - [ ] **黑市** `BlackMarket.lua` — 黑市拍卖师 — `blackMarket`:竞拍列表、出价框
@@ -53,9 +53,9 @@
 
 ## C. 玩家 / 物品 / 情景交互
 
-- [ ] **观察** `Inspect.lua` — 右键其他玩家→观察 — `inspect`:装备槽图标品质边
-- [ ] **试衣间** `DressingRoom.lua` — `Ctrl`+点击装备 / 右键预览 — `dressingroom`:模型框、套装弹窗
-- [ ] **NPC 对话** `Gossip.lua` — 有对话选项的 NPC — `gossip`:对话选项底
+- [x] **观察** `Inspect.lua` — 右键其他玩家→观察 — `inspect`:装备槽图标品质边
+- [x] **试衣间** `DressingRoom.lua` — `Ctrl`+点击装备 / 右键预览 — `dressingroom`:模型框、套装弹窗
+- [x] **NPC 对话** `Gossip.lua` — 有对话选项的 NPC — `gossip`:对话选项底
 - [ ] **镶嵌宝石** `Socket.lua` — 右键带插槽装备 — `socket`:插槽图标(按宝石类型染边)、应用按钮
 - [ ] **公会邀请弹窗** `GuildInvite.lua` — 被邀请入公会 — `guild`
 - [ ] **公会注册** `GuildRegistrar.lua` — 公会管理员 — `guild`:输入框
