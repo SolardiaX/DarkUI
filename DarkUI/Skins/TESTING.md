@@ -22,7 +22,7 @@
 - [x] **冒险指南** `EncounterJournal.lua` — `Shift-J` — `encounterjournal`:难度下拉、首领列表、战利品图标品质边、模型框
 - [x] **成就** `Achievement.lua` — `Y` — `achievement`:分类侧栏、成就卡片、图标
 - [x] **好友列表** `Friends.lua` — `O` — `friends`:标签、列表项、添加好友输入框
-- [ ] **公会与社区** `Communities.lua` — `J` — `communities`:成员列表、聊天框 inset、新建社区弹窗输入框、职业图标
+- [x] **公会与社区** `Communities.lua` — `J` — `communities`:成员列表、聊天框 inset、新建社区弹窗输入框、职业图标
 - [ ] **PVE 面板(寻找团队/副本)** `PVEFrame.lua` + `LFG.lua` + `LFGList.lua` — `I` — `lfg`:角色定位图标、奖励按钮图标品质边、自定义查找列表输入框
 - [ ] **PVP 面板** `PVP.lua` — `I` 内 PVP 页 — `pvp`:战场列表、荣誉/征服进度条
 - [ ] **大秘境记分板** `PVPMatch.lua` / `Challenges.lua` — 战场结束 / `M`→钥石 — `pvp` / `lfg`:记分行、词缀图标

@@ -89,33 +89,36 @@ end
 local function reskinCommunitiesListButton(button)
     button.Background:Hide()
     button.CircleMask:Hide()
-    button.IconRing:SetAlpha(0) -- alpha (not Hide): the __iconBorder toggle reads IconRing:IsShown()
+    button.IconRing:Hide()
     if button.IconBorder then button.IconBorder:Hide() end
 
+    -- NOTE: do NOT skin the Icon via S:ReskinIcon here. S:ReskinIcon -> E:StyleIcon
+    -- creates its backdrop on the icon's PARENT (= this button) at button.backdrop,
+    -- which then dedups against the row backdrop below into a single frame.
     if not button.backdrop then
-        button.__iconBorder = S:ReskinIcon(button.Icon)
+        button:CreateBackdrop()
+        button.backdrop:SetBackdropEdge("round_white")
 
-        local bg = button:CreateBackdrop("Transparent")
-        bg:SetPoint("TOPLEFT", 5, -5)
-        bg:SetPoint("BOTTOMRIGHT", -10, 5)
+        button.backdrop:ClearAllPoints()
+        button.backdrop:SetPoint("TOPLEFT", 4, -8)
+        button.backdrop:SetPoint("BOTTOMRIGHT", -8, 8)
     end
 
-    -- re-texture every call (NOT one-shot): Set*Community resets Selection's atlas,
-    -- so the Highlight/Selection skin must re-apply each time to override it
+    button.Icon:ClearAllPoints()
+    button.Icon:SetPoint("TOPLEFT", 15, -18)
+
     local hl = button:GetHighlightTexture()
     hl:SetTexture(DB.bdTex)
-    hl:SetVertexColor(cr, cg, cb, 0.25)
-    hl:SetInside(button.backdrop)
+    hl:SetVertexColor(1, 1, 1, 0.3)
+    hl:SetInside(button.backdrop, 2, 2)
 
     button.Selection:SetAtlas(nil)
     button.Selection:SetTexture(DB.bdTex)
-    button.Selection:SetInside(button.backdrop)
+    button.Selection:SetInside(button.backdrop, 2, 2)
 
     -- green (guild) vs battlenet (community) selection tint, refreshed per call
     local color = (button.Background:GetAtlas() == "communities-nav-button-green-normal" and GREEN_FONT_COLOR) or BATTLENET_FONT_COLOR
     button.Selection:SetVertexColor(color.r, color.g, color.b, 0.2)
-
-    if button.__iconBorder then button.__iconBorder:SetShown(button.IconRing:IsShown()) end
 end
 
 local function updateMemberName(self, info)
@@ -192,8 +195,18 @@ function S:Communities()
                 hooksecurefunc(requestFrame, "Initialize", reskinRequestCheckbox)
             end
 
-            if frame.ClubFinderSearchTab then reskinCommunityTab(frame.ClubFinderSearchTab) end
-            if frame.ClubFinderPendingTab then reskinCommunityTab(frame.ClubFinderPendingTab) end
+            for _, tabName in next, { "ClubFinderSearchTab", "ClubFinderPendingTab" } do
+                local tab = frame[tabName]
+                if tab then
+                    reskinCommunityTab(tab)
+
+                    -- nudge right by 4px (shift the chain root; siblings follow)
+                    local point, relativeTo, relativePoint, x, y = tab:GetPoint()
+                    if point and relativeTo ~= frame.ClubFinderSearchTab and relativeTo ~= frame.ClubFinderPendingTab then
+                        tab:SetPoint(point, relativeTo, relativePoint, (x or 0) + 4, y or 0)
+                    end
+                end
+            end
             if frame.GuildCards then reskinGuildCards(frame.GuildCards) end
             if frame.PendingGuildCards then reskinGuildCards(frame.PendingGuildCards) end
             if frame.CommunityCards then
@@ -225,9 +238,21 @@ function S:Communities()
     hooksecurefunc(_G.CommunitiesListEntryMixin, "SetFindCommunity", reskinCommunitiesListButton)
     hooksecurefunc(_G.CommunitiesListEntryMixin, "SetGuildFinder", reskinCommunitiesListButton)
 
-    for _, name in next, { "ChatTab", "RosterTab", "GuildBenefitsTab", "GuildInfoTab" } do
+    local tabNames = { "ChatTab", "RosterTab", "GuildBenefitsTab", "GuildInfoTab" }
+    local isTab = {}
+    for _, name in next, tabNames do
+        isTab[CommunitiesFrame[name]] = true
+    end
+    for _, name in next, tabNames do
         local tab = CommunitiesFrame[name]
-        if tab then reskinCommunityTab(tab) end
+        if tab then
+            reskinCommunityTab(tab)
+
+            -- nudge the group right by 6px: shift only tabs anchored to a non-sibling
+            -- (the chain root); tabs anchored to another tab follow automatically
+            local point, relativeTo, relativePoint, x, y = tab:GetPoint()
+            if point and not isTab[relativeTo] then tab:SetPoint(point, relativeTo, relativePoint, (x or 0) + 4, y or 0) end
+        end
     end
 
     -- ChatTab
