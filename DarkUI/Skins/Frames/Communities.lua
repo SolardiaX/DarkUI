@@ -60,20 +60,6 @@ local function reskinRequestCheckbox(self)
     end
 end
 
-local function updateCommunitiesSelection(texture, show)
-    local button = texture:GetParent()
-    -- show is a plain boolean from IsShown-derived calls; no secret-value guard needed
-    if show then
-        if texture:GetTexCoord() == 0 then
-            button.bg:SetBackdropColor(0, 1, 0, 0.25)
-        else
-            button.bg:SetBackdropColor(0.51, 0.773, 1, 0.25)
-        end
-    else
-        button.bg:SetBackdropColor(0, 0, 0, 0)
-    end
-end
-
 local function updateNameFrame(self)
     if not self.expanded then return end
     if not self.bg then self.bg = self.Class:CreateBackdrop() end
@@ -98,6 +84,38 @@ local function UpdateRoleTexture(icon)
     if not icon then return end
     replacedRoleTex(icon, icon:GetTexCoord())
     hooksecurefunc(icon, "SetTexCoord", replacedRoleTex)
+end
+
+local function reskinCommunitiesListButton(button)
+    button.Background:Hide()
+    button.CircleMask:Hide()
+    button.IconRing:SetAlpha(0) -- alpha (not Hide): the __iconBorder toggle reads IconRing:IsShown()
+    if button.IconBorder then button.IconBorder:Hide() end
+
+    if not button.backdrop then
+        button.__iconBorder = S:ReskinIcon(button.Icon)
+
+        local bg = button:CreateBackdrop("Transparent")
+        bg:SetPoint("TOPLEFT", 5, -5)
+        bg:SetPoint("BOTTOMRIGHT", -10, 5)
+    end
+
+    -- re-texture every call (NOT one-shot): Set*Community resets Selection's atlas,
+    -- so the Highlight/Selection skin must re-apply each time to override it
+    local hl = button:GetHighlightTexture()
+    hl:SetTexture(DB.bdTex)
+    hl:SetVertexColor(cr, cg, cb, 0.25)
+    hl:SetInside(button.backdrop)
+
+    button.Selection:SetAtlas(nil)
+    button.Selection:SetTexture(DB.bdTex)
+    button.Selection:SetInside(button.backdrop)
+
+    -- green (guild) vs battlenet (community) selection tint, refreshed per call
+    local color = (button.Background:GetAtlas() == "communities-nav-button-green-normal" and GREEN_FONT_COLOR) or BATTLENET_FONT_COLOR
+    button.Selection:SetVertexColor(color.r, color.g, color.b, 0.2)
+
+    if button.__iconBorder then button.__iconBorder:SetShown(button.IconRing:IsShown()) end
 end
 
 local function updateMemberName(self, info)
@@ -197,25 +215,15 @@ function S:Communities()
 
     hooksecurefunc(_G.CommunitiesFrameCommunitiesList.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
-            local child = select(i, self.ScrollTarget:GetChildren())
-            if not child.bg then
-                child.bg = child:CreateBackdrop()
-                child.bg:SetPoint("TOPLEFT", 5, -5)
-                child.bg:SetPoint("BOTTOMRIGHT", -10, 5)
-
-                child:SetHighlightTexture(0)
-                child.IconRing:SetAlpha(0)
-                child.__iconBorder = S:ReskinIcon(child.Icon)
-                child.Background:Hide()
-                child.Selection:SetAlpha(0)
-                hooksecurefunc(child.Selection, "SetShown", updateCommunitiesSelection)
-            end
-
-            child.CircleMask:Hide()
-            local borderShown = child.IconRing:IsShown()
-            child.__iconBorder:SetShown(borderShown)
+            reskinCommunitiesListButton(select(i, self.ScrollTarget:GetChildren()))
         end
     end)
+
+    -- the Add / Find / Guild-finder entries reconfigure their art on Set*Community,
+    -- so re-skin on those too (not just the scroll Update)
+    hooksecurefunc(_G.CommunitiesListEntryMixin, "SetAddCommunity", reskinCommunitiesListButton)
+    hooksecurefunc(_G.CommunitiesListEntryMixin, "SetFindCommunity", reskinCommunitiesListButton)
+    hooksecurefunc(_G.CommunitiesListEntryMixin, "SetGuildFinder", reskinCommunitiesListButton)
 
     for _, name in next, { "ChatTab", "RosterTab", "GuildBenefitsTab", "GuildInfoTab" } do
         local tab = CommunitiesFrame[name]
@@ -561,7 +569,9 @@ function S:Communities()
         button:SetPoint("LEFT", listBG, E.mult, 0)
         button:SetPoint("RIGHT", listBG, -E.mult, 0)
         button:SetHighlightTexture(DB.bdTex)
-        button:GetHighlightTexture():SetVertexColor(cr, cg, cb, 0.25)
+        local hl = button:GetHighlightTexture()
+        hl:SetVertexColor(cr, cg, cb, 0.25)
+        hl:SetInside(button)
         button.InviteButton:SetSize(66, 18)
         button.CancelInvitationButton:SetSize(20, 18)
 
