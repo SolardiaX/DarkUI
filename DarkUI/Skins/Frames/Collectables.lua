@@ -62,6 +62,20 @@ local function reskinFrameButton(self)
     end
 end
 
+local function repositionCollectionsTabs()
+    local prev
+    for i = 1, 6 do
+        local tab = _G["CollectionsJournalTab" .. i]
+        if tab and tab:IsShown() then
+            if prev then
+                tab:ClearAllPoints()
+                tab:SetPoint("TOPLEFT", prev, "TOPRIGHT", -5, 0)
+            end
+            prev = tab
+        end
+    end
+end
+
 function S:Collectables()
     if not (C.skins.enable and C.skins.collections) then return end
 
@@ -70,15 +84,13 @@ function S:Collectables()
     CollectionsJournal.bg = S:ReskinPortraitFrame(CollectionsJournal) -- need this for Rematch skin
     for i = 1, 6 do
         local tab = _G["CollectionsJournalTab" .. i]
-        if tab then
-            S:ReskinTab(tab)
-            if i ~= 1 then
-                tab:ClearAllPoints()
-                -- 8px pill inset + -11 overlap = 5px visible gap (matches the ElvUI build's tab density)
-                tab:SetPoint("TOPLEFT", _G["CollectionsJournalTab" .. (i - 1)], "TOPRIGHT", -11, 0)
-            end
-        end
+        if tab then S:ReskinTab(tab) end
     end
+
+    -- Blizzard re-clears the wardrobe/heirloom tab points when toggling the
+    -- heirlooms tab; re-anchor the whole chain so it follows (5px gap at 5px inset).
+    repositionCollectionsTabs()
+    hooksecurefunc("CollectionsJournal_CheckAndDisplayHeirloomsTab", repositionCollectionsTabs)
 
     -- [[ Mounts and pets ]]
 

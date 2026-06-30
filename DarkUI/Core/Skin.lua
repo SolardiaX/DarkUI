@@ -133,11 +133,12 @@ function E:ReskinTab(tab)
     if tab.RightHighlight then tab.RightHighlight:SetAlpha(0) end
     if tab.MiddleHighlight then tab.MiddleHighlight:SetAlpha(0) end
 
-    -- inset pill backdrop (left/right 8, top 3) — NDui proportions
+    -- inset pill backdrop (left/right 5, top 3) — tightened from NDui's 8 so the
+    -- pill sits closer to the tab edges; panels chain tabs at -5 for a ~5px gap.
     local bg = tab:CreateBackdrop("default")
     bg:ClearAllPoints()
-    bg:SetPoint("TOPLEFT", 8, -3)
-    bg:SetPoint("BOTTOMRIGHT", -8, 0)
+    bg:SetPoint("TOPLEFT", 5, -3)
+    bg:SetPoint("BOTTOMRIGHT", -5, 0)
     bg:SetBackdropEdge("regular")
 
     if tab.SetHighlightTexture then

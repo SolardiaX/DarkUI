@@ -36,7 +36,7 @@ function S:Character()
             S:ReskinTab(tab)
             if i ~= 1 then
                 tab:ClearAllPoints()
-                tab:SetPoint("TOPLEFT", _G["CharacterFrameTab" .. (i - 1)], "TOPRIGHT", -15, 0)
+                tab:SetPoint("TOPLEFT", _G["CharacterFrameTab" .. (i - 1)], "TOPRIGHT", -5, 0)
             end
         end
     end

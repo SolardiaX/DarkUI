@@ -67,7 +67,7 @@ function S:Mail()
         S:ReskinTab(_G["MailFrameTab" .. i])
     end
     MailFrameTab2:ClearAllPoints()
-    MailFrameTab2:SetPoint("TOPLEFT", MailFrameTab1, "TOPRIGHT", -15, 0)
+    MailFrameTab2:SetPoint("TOPLEFT", MailFrameTab1, "TOPRIGHT", -5, 0)
 
     for _, button in pairs({ OpenMailLetterButton, OpenMailMoneyButton }) do
         button:StripTextures()

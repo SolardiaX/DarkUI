@@ -46,7 +46,7 @@ function S:Achievement()
             S:ReskinTab(tab)
             if i ~= 1 then
                 tab:ClearAllPoints()
-                tab:SetPoint("TOPLEFT", _G["AchievementFrameTab" .. (i - 1)], "TOPRIGHT", -15, 0)
+                tab:SetPoint("TOPLEFT", _G["AchievementFrameTab" .. (i - 1)], "TOPRIGHT", -5, 0)
             end
         end
     end
