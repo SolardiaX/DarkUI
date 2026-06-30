@@ -1,0 +1,105 @@
+local E, C, L = select(2, ...):unpack()
+local S = E:GetModule("Skins")
+local DB = S.DB
+
+------------------------------------------------------------------------
+-- Dressing Room / Transmog
+-- Ported from AuroraClassic FrameXML/DressUpFrames.lua (2026-06)
+-- Note: Aurora noise overlay dropped; DarkUI backdrop already carries texture.
+------------------------------------------------------------------------
+
+local _G = _G
+local hooksecurefunc = hooksecurefunc
+
+local function ResetToggleTexture(button, texture)
+    button:GetNormalTexture():SetTexCoord(unpack(DB.TexCoord))
+    button:GetNormalTexture():SetInside()
+    button:SetNormalTexture(texture)
+    button:GetPushedTexture():SetTexCoord(unpack(DB.TexCoord))
+    button:GetPushedTexture():SetInside()
+    button:SetPushedTexture(texture)
+end
+
+function S:DressingRoom()
+    if not (C.skins.enable and C.skins.dressingroom) then return end
+
+    -- Dressup Frame
+
+    S:ReskinPortraitFrame(DressUpFrame)
+    S:Reskin(DressUpFrameCancelButton)
+    S:Reskin(DressUpFrameResetButton)
+    S:ReskinMinMax(DressUpFrame.MaximizeMinimizeFrame)
+    DressUpFrameResetButton:SetPoint("RIGHT", DressUpFrameCancelButton, "LEFT", -1, 0)
+
+    S:Reskin(DressUpFrame.LinkButton)
+    S:Reskin(DressUpFrame.ToggleCustomSetDetailsButton)
+    ResetToggleTexture(DressUpFrame.ToggleCustomSetDetailsButton, 1392954) -- 70_professions_scroll_01
+
+    DressUpFrame.CustomSetDetailsPanel:StripTextures()
+    local bg = S:SetBD(DressUpFrame.CustomSetDetailsPanel)
+    bg:SetInside(nil, 11, 11)
+
+    hooksecurefunc(DressUpFrame.CustomSetDetailsPanel, "Refresh", function(self)
+        if self.slotPool then
+            for slot in self.slotPool:EnumerateActive() do
+                if not slot.bg then
+                    slot.bg = S:ReskinIcon(slot.Icon)
+                    S:ReskinIconBorder(slot.IconBorder, true, true)
+                end
+            end
+        end
+    end)
+
+    S:ReskinCheck(TransmogAndMountDressupFrame.ShowMountCheckButton)
+    S:ReskinModelControl(DressUpFrame.ModelScene)
+
+    local selectionPanel = DressUpFrame.SetSelectionPanel
+    if selectionPanel then
+        selectionPanel:StripTextures()
+        S:SetBD(selectionPanel):SetInside(nil, 9, 9)
+
+        local function SetupSetButton(button)
+            if button.__styled then return end
+            button.bg = S:ReskinIcon(button.Icon)
+            S:ReskinIconBorder(button.IconBorder, true, true)
+            button.BackgroundTexture:SetAlpha(0)
+            button.SelectedTexture:SetColorTexture(1, 0.8, 0, 0.25)
+            button.HighlightTexture:SetColorTexture(1, 1, 1, 0.25)
+            button.__styled = true
+        end
+
+        hooksecurefunc(selectionPanel.ScrollBox, "Update", function(self) self:ForEachFrame(SetupSetButton) end)
+    end
+
+    S:ReskinDropDown(DressUpFrameCustomSetDropdown)
+    S:Reskin(DressUpFrameCustomSetDropdown.SaveButton)
+
+    -- SideDressUp
+
+    SideDressUpFrame:StripTextures()
+    S:SetBD(SideDressUpFrame)
+    S:Reskin(SideDressUpFrame.ResetButton)
+    S:ReskinClose(SideDressUpFrameCloseButton)
+
+    SideDressUpFrame:HookScript("OnShow", function(self)
+        SideDressUpFrame:ClearAllPoints()
+        SideDressUpFrame:SetPoint("LEFT", self:GetParent(), "RIGHT", 3, 0)
+    end)
+
+    -- Outfit frame
+
+    local editFrame = WardrobeCustomSetEditFrame
+    if editFrame then
+        editFrame:StripTextures()
+        editFrame.EditBox:DisableDrawLayer("BACKGROUND")
+        S:SetBD(editFrame)
+        local editBg = editFrame.EditBox:CreateBackdrop()
+        editBg:SetPoint("TOPLEFT", -5, -3)
+        editBg:SetPoint("BOTTOMRIGHT", 5, 3)
+        S:Reskin(editFrame.AcceptButton)
+        S:Reskin(editFrame.CancelButton)
+        S:Reskin(editFrame.DeleteButton)
+    end
+end
+
+S:AddCallback("DressingRoom")

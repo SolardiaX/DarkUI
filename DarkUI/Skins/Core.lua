@@ -232,6 +232,10 @@ function S:Reskin(button, noHighlight, override)
         button:HookScript("OnEnter", S.SetModifiedBackdrop)
         button:HookScript("OnLeave", S.SetOriginalBackdrop)
     end
+
+    -- Aurora compat: B.Reskin created a button-sized child frame at self.__bg; DarkUI
+    -- templates the button in place, so the button itself is the backdrop anchor.
+    button.__bg = button
 end
 
 function S:ReskinClose(button, parent, xOffset, yOffset) return E:StyleCloseButton(button, parent or (button.GetParent and button:GetParent())) end
@@ -293,11 +297,20 @@ function S:ReskinScroll(frame) return E:ReskinScrollBar(frame) end
 function S:ReskinTrimScroll(frame) return E:ReskinTrimScrollBar(frame) end
 function S:ReskinStatusBar(bar) return E:ReskinStatusBar(bar) end
 function S:ReskinSlider(frame) return E:ReskinSlider(frame) end
-function S:ReskinCheck(frame) return E:StyleCheckBox(frame) end
+function S:ReskinCheck(frame)
+    E:StyleCheckBox(frame)
+    if frame then frame.bg = frame.backdrop end -- Aurora ports reference check.bg
+    return frame and frame.backdrop
+end
 function S:ReskinNavBar(navBar) return E:ReskinNavBar(navBar) end
 function S:ReskinDropDown(frame, width, template) return E:ReskinDropDown(frame, width or 155, template) end
 
-function S:ReskinEditBox(frame) return E:ReskinEditBox(frame) end
+function S:ReskinEditBox(frame)
+    E:ReskinEditBox(frame)
+    -- Aurora ports reposition the backdrop via editbox.__bg; DarkUI stores it at .backdrop
+    if frame then frame.__bg = frame.backdrop end
+    return frame and frame.backdrop
+end
 S.ReskinInput = S.ReskinEditBox -- Aurora alias
 
 -- ElvUI-parity inset pieces hidden by portrait/frame skins
@@ -826,7 +839,23 @@ function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     local iconSelector = frame.IconSelector
     if iconSelector then
         if iconSelector.ScrollBar then S:ReskinTrimScroll(iconSelector.ScrollBar) end
-        if iconSelector.ScrollBox then iconSelector.ScrollBox:ForEachFrame(skinIconSelectorButton) end
+        -- Skin grid buttons as the ScrollBox lays them out. A one-shot ForEachFrame
+        -- at load would crash on an un-populated box (ScrollBox has no view yet) and
+        -- also miss buttons realized later, so hook Update like Aurora does.
+        if iconSelector.ScrollBox then
+            hooksecurefunc(iconSelector.ScrollBox, "Update", function(box)
+                local target = box.ScrollTarget
+                if not target then return end
+                for i = 1, target:GetNumChildren() do
+                    local child = select(i, target:GetChildren())
+                    if child and child.Icon and not child.__styled then
+                        child:DisableDrawLayer("BACKGROUND")
+                        skinIconSelectorButton(child)
+                        child.__styled = true
+                    end
+                end
+            end)
+        end
     end
 
     frame.__styled = true

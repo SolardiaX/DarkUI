@@ -1,0 +1,27 @@
+local E, C, L = select(2, ...):unpack()
+local S = E:GetModule("Skins")
+local DB = S.DB
+
+------------------------------------------------------------------------
+-- Generic Trait UI
+-- Ported from AuroraClassic AddOns/Blizzard_GenericTraitUI.lua (2026-06)
+-- Aurora noise overlay dropped; DarkUI backdrop carries the texture.
+------------------------------------------------------------------------
+
+local _G = _G
+local hooksecurefunc = hooksecurefunc
+
+function S:GenericTrait()
+    if not (C.skins.enable and C.skins.talent) then return end
+
+    local frame = _G.GenericTraitFrame
+
+    frame:StripTextures()
+    S:ReskinClose(frame.CloseButton)
+    S:SetBD(frame)
+
+    S:ReplaceIconString(frame.Currency.UnspentPointsCount)
+    hooksecurefunc(frame.Currency.UnspentPointsCount, "SetText", S.ReplaceIconString)
+end
+
+S:AddCallbackForAddon("Blizzard_GenericTraitUI", "GenericTrait")

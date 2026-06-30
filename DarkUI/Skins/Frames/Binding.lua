@@ -1,0 +1,24 @@
+local E, C, L = select(2, ...):unpack()
+local S = E:GetModule("Skins")
+local DB = S.DB
+
+------------------------------------------------------------------------
+-- Quick Keybind Frame
+-- Ported from AuroraClassic FrameXML/QuickKeybind.lua (2026-06)
+------------------------------------------------------------------------
+
+function S:Binding()
+    if not (C.skins.enable and C.skins.binding) then return end
+
+    local frame = QuickKeybindFrame
+    frame:StripTextures()
+    frame.Header:StripTextures()
+    S:SetBD(frame)
+    S:ReskinCheck(frame.UseCharacterBindingsButton)
+    frame.UseCharacterBindingsButton:SetSize(24, 24)
+    S:Reskin(frame.OkayButton)
+    S:Reskin(frame.DefaultsButton)
+    S:Reskin(frame.CancelButton)
+end
+
+S:AddCallback("Binding")

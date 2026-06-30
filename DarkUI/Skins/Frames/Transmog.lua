@@ -1,0 +1,70 @@
+local E, C, L = select(2, ...):unpack()
+local S = E:GetModule("Skins")
+local DB = S.DB
+
+------------------------------------------------------------------------
+-- Transmogrification UI
+-- Ported from AuroraClassic AddOns/Blizzard_Transmog.lua (2026-06)
+------------------------------------------------------------------------
+
+local _G = _G
+local hooksecurefunc = hooksecurefunc
+local pairs = pairs
+
+function S:Transmog()
+    if not (C.skins.enable and C.skins.transmogrify) then return end
+
+    S:ReskinPortraitFrame(TransmogFrame)
+
+    TransmogFrame.OutfitCollection:StripTextures()
+    S:ReskinTrimScroll(TransmogFrame.OutfitCollection.OutfitList.ScrollBar)
+    S:Reskin(TransmogFrame.OutfitCollection.SaveOutfitButton)
+    S:Reskin(TransmogFrame.OutfitCollection.PurchaseOutfitButton)
+    TransmogFrame.OutfitCollection.MoneyFrame:StripTextures()
+    TransmogFrame.OutfitCollection.MoneyFrame:CreateBackdrop()
+
+    S:ReskinIconSelectionFrame(TransmogFrame.OutfitPopup)
+    TransmogFrame.CharacterPreview:StripTextures()
+    TransmogFrame.CharacterPreview:CreateBackdrop():SetInside()
+    TransmogFrame.CharacterPreview.Gradients:Hide()
+    S:ReskinCheck(TransmogFrame.CharacterPreview.ToggleOptions.HideIgnoredToggle.Checkbox)
+    S:ReskinCheck(TransmogFrame.CharacterPreview.ToggleOptions.SheatheWeaponToggle.Checkbox)
+    S:Reskin(TransmogFrame.CharacterPreview.ClearAllPendingButton)
+
+    TransmogFrame.WardrobeCollection:StripTextures()
+    for _, tab in pairs(TransmogFrame.WardrobeCollection.TabHeaders.tabs) do
+        if tab then S:ReskinTab(tab) end
+    end
+
+    local TabContent = TransmogFrame.WardrobeCollection.TabContent
+    if TabContent then
+        TabContent:StripTextures()
+        S:ReskinEditBox(TabContent.ItemsFrame.SearchBox)
+        S:ReskinFilterButton(TabContent.ItemsFrame.FilterButton)
+        S:ReskinDropDown(TabContent.ItemsFrame.WeaponDropdown)
+        S:ReskinEditBox(TabContent.SetsFrame.SearchBox)
+        S:ReskinFilterButton(TabContent.SetsFrame.FilterButton)
+        S:Reskin(TabContent.CustomSetsFrame.NewCustomSetButton)
+        S:Reskin(TabContent.SituationsFrame.DefaultsButton)
+        S:ReskinCheck(TabContent.SituationsFrame.EnabledToggle.Checkbox)
+        S:Reskin(TabContent.SituationsFrame.ApplyButton)
+
+        hooksecurefunc(TabContent.SituationsFrame, "Init", function()
+            for frame in TabContent.SituationsFrame.SituationFramePool:EnumerateActive() do
+                if not frame.__styled then
+                    if frame.Dropdown then S:ReskinDropDown(frame.Dropdown) end
+                    frame.__styled = true
+                end
+            end
+        end)
+
+        S:ReskinArrow(TabContent.ItemsFrame.PagedContent.PagingControls.PrevPageButton, "left")
+        S:ReskinArrow(TabContent.ItemsFrame.PagedContent.PagingControls.NextPageButton, "right")
+        S:ReskinArrow(TabContent.SetsFrame.PagedContent.PagingControls.PrevPageButton, "left")
+        S:ReskinArrow(TabContent.SetsFrame.PagedContent.PagingControls.NextPageButton, "right")
+        S:ReskinArrow(TabContent.CustomSetsFrame.PagedContent.PagingControls.PrevPageButton, "left")
+        S:ReskinArrow(TabContent.CustomSetsFrame.PagedContent.PagingControls.NextPageButton, "right")
+    end
+end
+
+S:AddCallbackForAddon("Blizzard_Transmog", "Transmog")

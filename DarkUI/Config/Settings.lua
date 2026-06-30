@@ -361,6 +361,29 @@ C.skins = {
     encounterjournal = true,
     pvp = true,
     tooltip = false, -- DarkUI owns tooltip skinning; skip in-port tooltip branches
+    -- batch 3 (new Aurora ports)
+    artifact = true, -- Blizzard_ArtifactUI
+    azerite = true, -- Blizzard_AzeriteUI / AzeriteEssenceUI / AzeriteRespecUI / ItemInteractionUI
+    archaeology = true, -- Blizzard_ArchaeologyUI
+    alliedRaces = true, -- Blizzard_AlliedRacesUI
+    chromieTime = true, -- Blizzard_ChromieTimeUI
+    expansionLanding = true, -- Blizzard_ExpansionLandingPage
+    perksProgram = true, -- Blizzard_PerksProgram (Trading Post)
+    deathRecap = true, -- Blizzard_DeathRecap
+    achievement = true, -- Blizzard_AchievementUI
+    -- misc already exists above; ClickBinding and LossOfControl gate on it
+    runeforge = true, -- Blizzard_RuneforgeUI
+    obliterum = true, -- Blizzard_ObliterumUI
+    -- batch 4 (garrison / SL / DF / classic content)
+    garrison = true, -- Blizzard_GarrisonUI + Blizzard_OrderHallUI
+    soulbinds = true, -- Blizzard_Soulbinds (Shadowlands)
+    covenant = true, -- Blizzard_CovenantPreviewUI / CovenantSanctum / CovenantRenown
+    -- batch 5 (vendor / social ports)
+    guildBank = true, -- Blizzard_GuildBankUI
+    voidStorage = true, -- Blizzard_VoidStorageUI
+    blackMarket = true, -- Blizzard_BlackMarketUI
+    scrapping = true, -- Blizzard_ScrappingMachineUI
+    petition = true, -- PetitionFrame
 }
 
 ----------------------------------------------------------------------------------------

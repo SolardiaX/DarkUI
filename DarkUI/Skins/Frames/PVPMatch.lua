@@ -1,0 +1,83 @@
+local E, C, L = select(2, ...):unpack()
+local S = E:GetModule("Skins")
+local DB = S.DB
+
+------------------------------------------------------------------------
+-- PVP Match Scoreboard / Ready Dialog / Results
+-- Ported from AuroraClassic FrameXML/PVPMatch.lua (2026-06)
+-- Note: Aurora noise overlay dropped; DarkUI backdrop already carries texture.
+------------------------------------------------------------------------
+
+local _G = _G
+local hooksecurefunc = hooksecurefunc
+
+function S:PVPMatch()
+    if not (C.skins.enable and C.skins.pvp) then return end
+
+    -- ready dialog
+    local PVPReadyDialog = _G.PVPReadyDialog
+
+    PVPReadyDialog:StripTextures()
+    _G.PVPReadyDialogBackground:Hide()
+    S:SetBD(PVPReadyDialog)
+
+    S:Reskin(PVPReadyDialog.enterButton)
+    S:Reskin(PVPReadyDialog.leaveButton)
+    S:ReskinClose(_G.PVPReadyDialogCloseButton)
+
+    local function stripBorders(self) self:StripTextures() end
+
+    _G.ReadyStatus.Border:SetAlpha(0)
+    S:SetBD(_G.ReadyStatus)
+    S:ReskinClose(_G.ReadyStatus.CloseButton)
+
+    -- match score
+    S:SetBD(_G.PVPMatchScoreboard)
+    _G.PVPMatchScoreboard:HookScript("OnShow", stripBorders)
+    S:ReskinClose(_G.PVPMatchScoreboard.CloseButton)
+
+    do
+        local content = _G.PVPMatchScoreboard.Content
+        local tabContainer = content.TabContainer
+
+        content:StripTextures()
+        local bg = content:CreateBackdrop()
+        bg:SetBackdropColor(0, 0, 0, 0.25)
+        bg:SetPoint("BOTTOMRIGHT", tabContainer.InsetBorderTop, 4, -1)
+        S:ReskinTrimScroll(content.ScrollBar)
+
+        tabContainer:StripTextures()
+        for i = 1, 3 do
+            tabContainer.TabGroup["Tab" .. i]:StripTextures() -- ReskinTab might taint the score board
+        end
+    end
+
+    -- match results
+    S:SetBD(_G.PVPMatchResults)
+    _G.PVPMatchResults:HookScript("OnShow", stripBorders)
+    S:ReskinClose(_G.PVPMatchResults.CloseButton)
+    _G.PVPMatchResults.overlay:StripTextures()
+
+    do
+        local content = _G.PVPMatchResults.content
+        local tabContainer = content.tabContainer
+
+        content:StripTextures()
+        local bg = content:CreateBackdrop()
+        bg:SetBackdropColor(0, 0, 0, 0.25)
+        bg:SetPoint("BOTTOMRIGHT", tabContainer.InsetBorderTop, 4, -1)
+        content.earningsArt:StripTextures()
+        S:ReskinTrimScroll(content.scrollBar)
+
+        tabContainer:StripTextures()
+        for i = 1, 3 do
+            S:ReskinTab(tabContainer.tabGroup["tab" .. i])
+        end
+
+        local buttonContainer = _G.PVPMatchResults.buttonContainer
+        S:Reskin(buttonContainer.leaveButton)
+        S:Reskin(buttonContainer.requeueButton)
+    end
+end
+
+S:AddCallback("PVPMatch")
