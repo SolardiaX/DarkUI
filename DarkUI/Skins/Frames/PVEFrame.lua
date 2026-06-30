@@ -22,7 +22,7 @@ function S:PVEFrame()
     _G.PVEFrameTab2:SetPoint("LEFT", _G.PVEFrameTab1, "RIGHT", -15, 0)
     _G.PVEFrameTab3:SetPoint("LEFT", _G.PVEFrameTab2, "RIGHT", -15, 0)
 
-    local iconSize = 60 - 2 * E.mult
+    local iconSize = 56 - 2 * E.mult
     for i = 1, 4 do
         local bu = _G.GroupFinderFrame["groupButton" .. i]
         if bu then
@@ -32,7 +32,7 @@ function S:PVEFrame()
             bu.bg:SetColorTexture(cr, cg, cb, 0.25)
             bu.bg:SetInside(bu.__bg)
 
-            bu.icon:SetPoint("LEFT", bu, "LEFT")
+            bu.icon:SetPoint("LEFT", bu, "LEFT", 2, 0)
             bu.icon:SetSize(iconSize, iconSize)
             S:ReskinIcon(bu.icon)
         end
