@@ -33,7 +33,7 @@ function S:GuildBank()
         local tab = _G["GuildBankFrameTab" .. i]
         S:ReskinTab(tab)
 
-        if i ~= 1 then tab:SetPoint("LEFT", _G["GuildBankFrameTab" .. (i - 1)], "RIGHT", -15, 0) end
+        if i ~= 1 then tab:SetPoint("LEFT", _G["GuildBankFrameTab" .. (i - 1)], "RIGHT", -5, 0) end
     end
 
     for i = 1, 7 do
@@ -47,6 +47,7 @@ function S:GuildBank()
             button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
             button.icon:SetTexCoord(unpack(DB.TexCoord))
             button.bg = button:CreateBackdrop()
+            button.bg:SetBackdropEdge("round")
             button.bg:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
             button.searchOverlay:SetOutside()
             S:ReskinIconBorder(button.IconBorder)
@@ -64,10 +65,12 @@ function S:GuildBank()
         button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
         button:SetCheckedTexture(DB.pushedTex)
         button:CreateBackdrop()
+        button:CreateBorder()
+        button.border:SetOutside(button, 2, 2)
         icon:SetTexCoord(unpack(DB.TexCoord))
 
         local a1, p, a2, x, y = button:GetPoint()
-        button:SetPoint(a1, p, a2, x + E.mult, y)
+        button:SetPoint(a1, p, a2, x + 4, y)
     end
 
     S:ReskinIconSelectionFrame(GuildBankPopupFrame)
