@@ -10,7 +10,7 @@ local cfg = C.quest
 local format = string.format
 local gsub = string.gsub
 
-local BUTTON_POS = { "CENTER", "UIParent", "CENTER", 0, -240 }
+local BUTTON_POS = { "CENTER", "UIParent", "CENTER", 0, -280 }
 
 ------------------------------------------------------------------------
 -- Lifecycle
