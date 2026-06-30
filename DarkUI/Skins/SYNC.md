@@ -57,7 +57,7 @@ Routing facades to the DarkUI engine: `Reskin`, `ReskinTab`, `ReskinScroll`,
 `SetBD`.
 
 DarkUI-engine equivalents with the qb look: `ReskinIcon` (→ bg), `ReskinIconBorder`
-(qb quality frame), `ReskinItemButton` (full item slot — DarkUI extra),
+(tints the bg edge by quality), `ReskinItemButton` (full item slot — DarkUI extra),
 `ReskinArrow`/`ReskinNextPrevButton`, `ReskinFilterButton`, `ReskinFilterReset`,
 `ReskinMenuButton`, `ReskinColorSwatch`, `ReskinRadio`, `ReskinStepperSlider`,
 `ReskinCollapse`, `ReskinMinMax`, `ReskinRotateButton`, `ReskinGarrisonPortrait`,
@@ -86,9 +86,10 @@ Metatable atoms (Core/API.lua) ports call directly: `:CreateBackdrop`, `:CreateS
   CooldownManager, Loot, Chat, Quest. These live under `Modules/`.
 - **Aurora media DarkUI lacks** (e.g. its noise `CreateTex` overlay): drop it —
   DarkUI's backdrop already carries the texture; note the drop in the port header.
-- **Quality borders:** Aurora `ReskinIconBorder` flat-colors a bg edge; our
-  `S:ReskinIconBorder` drives the qb textured frame instead. Use `S:ReskinIcon` +
-  `S:ReskinIconBorder` for slots, or `S:ReskinItemButton` for full item slots.
+- **Quality borders:** like Aurora, `S:ReskinIconBorder` flat-colors the icon's bg
+  edge (round_white) by quality — it hides the native border and hooks
+  SetAtlas/SetVertexColor. Use `S:ReskinIcon` + `S:ReskinIconBorder` for slots, or
+  `S:ReskinItemButton` for full item slots.
 
 ## Re-sync workflow
 

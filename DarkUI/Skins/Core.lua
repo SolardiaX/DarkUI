@@ -8,8 +8,9 @@ local E, C, L = select(2, ...):unpack()
 -- (Aurora's B:Reskin* set, self=S + explicit target frame) and the metatable
 -- atoms from Core/API.lua (frame:CreateBackdrop / :StripTextures / :SetInside …).
 -- The Aurora B:Reskin* primitives route to DarkUI's own engine (E:Reskin*/
--- E:Style*) + the qb quality-border system, so the look stays DarkUI (textured
--- backdrop + qb), not Aurora's flat fill. See Skins/SYNC.md for the recipe.
+-- E:Style*), so the look stays DarkUI (textured backdrop + shadow), not Aurora's
+-- flat fill. Quality borders tint the icon's own round_white bg edge, Aurora-style.
+-- See Skins/SYNC.md for the recipe.
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -420,7 +421,7 @@ function S:CreateAndUpdateBarTicks(bar, ticks, numTicks)
 end
 
 ------------------------------------------------------------------------
--- ReskinItemButton — item slot button (icon + backdrop + qb quality border)
+-- ReskinItemButton — item slot button (icon + backdrop whose edge ReskinIconBorder tints)
 -- DarkUI enhancement (no direct Aurora equivalent; Aurora uses ReskinIcon +
 -- ReskinIconBorder per slot). Use for full item slots that carry IconBorder.
 ------------------------------------------------------------------------
@@ -436,7 +437,7 @@ function S:ReskinItemButton(b, setInside, ignoreParent)
     if b.IconMask then b.IconMask:Hide() end
     if b.NewActionTexture then b.NewActionTexture:SetTexture("") end
 
-    -- backdrop: grey gloss base only (frameLevel -1, behind); qb covers the edge
+    -- backdrop: grey gloss base; ReskinIconBorder tints its edge by quality
     b:CreateBackdrop("Button", 1)
 
     if icon then
@@ -494,120 +495,83 @@ function S:ReskinItemButton(b, setInside, ignoreParent)
 end
 
 ------------------------------------------------------------------------
--- ReskinIconBorder — item-quality color onto a textured qb border frame drawn
--- above the icon. Pass needInit to color from the current atlas/vertex now.
--- (secret-safe: GetAtlas/GetVertexColor may return secrets on protected buttons)
+-- ReskinIconBorder — tint the icon's own backdrop edge (owner.bg, the
+-- round_white frame from ReskinIcon) with the item-quality color. Ported
+-- verbatim from AuroraClassic B:ReskinIconBorder (Core.lua, 2026-06); only
+-- leaves swapped: DB.QualityColors → C.media.qualityColors. Quality is matched
+-- by the atlas SUFFIX (…-green/-blue/-purple/…), not the full atlas name.
+--   ReskinIconBorder(border, needInit, useAtlas)
+--     needInit — re-fire the setter now so an already-colored border tints immediately
+--     useAtlas — track SetAtlas (suffix→quality); otherwise track SetVertexColor
+-- (secret-safe additions: GetAtlas/GetVertexColor may return secrets in combat)
 ------------------------------------------------------------------------
 
 do
-    local ITEMQUALITY = Enum.ItemQuality
-    local iconColors = {
-        ["auctionhouse-itemicon-border-gray"] = ITEMQUALITY.Poor,
-        ["auctionhouse-itemicon-border-white"] = ITEMQUALITY.Common,
-        ["auctionhouse-itemicon-border-green"] = ITEMQUALITY.Uncommon,
-        ["auctionhouse-itemicon-border-blue"] = ITEMQUALITY.Rare,
-        ["auctionhouse-itemicon-border-purple"] = ITEMQUALITY.Epic,
-        ["auctionhouse-itemicon-border-orange"] = ITEMQUALITY.Legendary,
-        ["auctionhouse-itemicon-border-artifact"] = ITEMQUALITY.Artifact,
-        ["auctionhouse-itemicon-border-account"] = ITEMQUALITY.Heirloom,
-        ["Professions-Slot-Frame"] = ITEMQUALITY.Common,
-        ["Professions-Slot-Frame-Green"] = ITEMQUALITY.Uncommon,
-        ["Professions-Slot-Frame-Blue"] = ITEMQUALITY.Rare,
-        ["Professions-Slot-Frame-Epic"] = ITEMQUALITY.Epic,
-        ["Professions-Slot-Frame-Legendary"] = ITEMQUALITY.Legendary,
+    local strmatch, strlower = strmatch, strlower
+
+    local AtlasToQuality = {
+        ["error"] = 99,
+        ["uncollected"] = Enum.ItemQuality.Poor,
+        ["gray"] = Enum.ItemQuality.Poor,
+        ["white"] = Enum.ItemQuality.Common,
+        ["green"] = Enum.ItemQuality.Uncommon,
+        ["blue"] = Enum.ItemQuality.Rare,
+        ["purple"] = Enum.ItemQuality.Epic,
+        ["orange"] = Enum.ItemQuality.Legendary,
+        ["artifact"] = Enum.ItemQuality.Artifact,
+        ["account"] = Enum.ItemQuality.Heirloom,
+        ["epic"] = Enum.ItemQuality.Epic,
+        ["legendary"] = Enum.ItemQuality.Legendary,
     }
 
-    local function atlasQuality(atlas)
-        if not atlas or (issecretvalue and issecretvalue(atlas)) then return nil end
-        return iconColors[atlas]
+    local function updateIconBorderColorByAtlas(border, atlas)
+        if atlas and issecretvalue and issecretvalue(atlas) then return end
+        local atlasAbbr = atlas and strmatch(atlas, "%-(%w+)$")
+        local quality = atlasAbbr and AtlasToQuality[strlower(atlasAbbr)]
+        local color = C.media.qualityColors[quality or 1]
+        border.__owner.bg:SetBackdropBorderColor(color.r, color.g, color.b)
     end
 
-    local function colorAtlas(border, atlas)
-        local quality = atlasQuality(atlas)
-        if not quality then return end
-
-        local backdrop = border.customBackdrop
-        if not backdrop then return end
-
-        local q = C.media.qualityColors[quality]
-        if q then backdrop:SetBackdropBorderColor(q.r, q.g, q.b, 1) end
-    end
-
-    local function colorVertex(border, r, g, b)
-        if atlasQuality(border.GetAtlas and border:GetAtlas()) then return end
-
-        local backdrop = border.customBackdrop
-        if not backdrop then return end
-
-        backdrop:SetBackdropBorderColor(r, g, b)
-    end
-
-    local function borderHide(border, value)
-        if value == 0 then return end
-
-        local backdrop = border.customBackdrop
-        if not backdrop then return end
-
-        backdrop:SetBackdropBorderColor(unpack(C.media.border_color))
-    end
-
-    local function borderShow(border) border:Hide(0) end
-
-    local function borderShown(border, show)
-        if show then
-            border:Hide(0)
-        else
-            borderHide(border)
+    local function updateIconBorderColor(border, r, g, b)
+        if r == nil or (issecretvalue and issecretvalue(r)) then return end
+        local greyRGB = C.media.qualityColors[0].r
+        if r == greyRGB or (r > 0.99 and g > 0.99 and b > 0.99) then
+            r, g, b = 0, 0, 0
         end
+        border.__owner.bg:SetBackdropBorderColor(r, g, b)
+        border:Hide(true) -- re-hide native border (true skips the Hide-hook reset)
     end
 
-    local function qualityBorder(border)
-        local parent = border:GetParent()
-        local qb = parent.__qualityBorder
-        if not qb then
-            qb = CreateFrame("Frame", nil, parent, "BackdropTemplate")
-            qb:SetOutside(parent, 2, 2)
-            qb:SetFrameLevel(parent:GetFrameLevel() + 1)
-            qb:SetBackdrop({ edgeFile = C.media.texture.border_thin_white, edgeSize = 8 })
-            parent.__qualityBorder = qb
-        end
-        return qb
+    local function resetIconBorderColor(border, texture)
+        if not texture then border.__owner.bg:SetBackdropBorderColor(0, 0, 0) end
     end
 
-    -- Aurora signature: ReskinIconBorder(border, needInit, useAtlas). needInit
-    -- forces an initial color now; useAtlas/backdrop kept for call-site parity.
-    function S:ReskinIconBorder(border, needInit, backdrop)
+    local function iconBorderShown(border, show)
+        if not show then resetIconBorderColor(border) end
+    end
+
+    function S:ReskinIconBorder(border, needInit, useAtlas)
         if not border or border:IsForbidden() then return end
 
-        local qb = qualityBorder(border)
-        if type(backdrop) == "table" and backdrop.SetBackdropBorderColor then qb:SetOutside(backdrop, 0, 0) end
-        border.customBackdrop = qb
+        border:SetAlpha(0)
+        border.__owner = border:GetParent()
+        if not border.__owner.bg then return end
 
-        local quality = atlasQuality(border.GetAtlas and border:GetAtlas())
-        local q = quality and C.media.qualityColors[quality]
-        if q then
-            qb:SetBackdropBorderColor(q.r, q.g, q.b, 1)
+        if useAtlas or border.__owner.useCircularIconBorder then -- for auction item display
+            hooksecurefunc(border, "SetAtlas", updateIconBorderColorByAtlas)
+            hooksecurefunc(border, "SetTexture", resetIconBorderColor)
+            if needInit then
+                border:SetAtlas(border:GetAtlas()) -- for border with color before hook
+            end
         else
-            local cr, cg, cb, ca = border:GetVertexColor()
-            if cr ~= nil and not (issecretvalue and issecretvalue(cr)) then
-                qb:SetBackdropBorderColor(cr, cg, cb, ca)
-            else
-                qb:SetBackdropBorderColor(unpack(C.media.border_color))
+            hooksecurefunc(border, "SetVertexColor", updateIconBorderColor)
+            if needInit then
+                border:SetVertexColor(border:GetVertexColor()) -- for border with color before hook
             end
         end
 
-        if not border.__iconBorderHooked then
-            border.__iconBorderHooked = true
-            border:Hide()
-
-            hooksecurefunc(border, "SetAtlas", colorAtlas)
-            hooksecurefunc(border, "SetVertexColor", colorVertex)
-            hooksecurefunc(border, "SetShown", borderShown)
-            hooksecurefunc(border, "Show", borderShow)
-            hooksecurefunc(border, "Hide", borderHide)
-        end
-
-        return qb
+        hooksecurefunc(border, "Hide", resetIconBorderColor)
+        hooksecurefunc(border, "SetShown", iconBorderShown)
     end
 end
 
