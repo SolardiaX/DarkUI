@@ -28,6 +28,7 @@ function S:ChallengesUI()
                 bu.Icon:SetTexCoord(unpack(DB.TexCoord))
                 bu.Icon:SetInside()
                 bu.Icon:CreateBackdrop()
+                bu.Icon:SetBackdropEdge("round")
                 bu.Icon.backdrop:SetBackdropColor(0, 0, 0, 0)
 
                 bu.__styled = true
@@ -44,6 +45,7 @@ function S:ChallengesUI()
             if scheduel then
                 scheduel:StripTextures()
                 scheduel:CreateBackdrop()
+                scheduel:SetBackdropEdge("round")
                 scheduel.backdrop:SetBackdropColor(0, 0, 0, 0.25)
                 if scheduel.Entries then
                     for i = 1, 3 do
@@ -54,6 +56,7 @@ function S:ChallengesUI()
                 local party = mod.PartyFrame
                 party:StripTextures()
                 party:CreateBackdrop()
+                party:SetBackdropEdge("round")
                 party.backdrop:SetBackdropColor(0, 0, 0, 0.25)
             end
 
