@@ -437,6 +437,9 @@ function S:EncounterJournal()
     -- Tutorials
     local tutorialFrame = _G.EncounterJournal.TutorialsFrame
     if tutorialFrame then
+        if not tutorialFrame.Contents.backdrop then tutorialFrame.Contents:CreateBackdrop() end
+
+        tutorialFrame.Contents:DisableDrawLayer("BACKGROUND")
         tutorialFrame.Contents.Header:SetTextColor(1, 0.8, 0)
         tutorialFrame.Contents.Description:SetTextColor(1, 1, 1)
 
@@ -447,9 +450,9 @@ function S:EncounterJournal()
         -- (from S:Reskin) render above it.
         local button = tutorialFrame.Contents.StartButton
         S:Reskin(button, true)
-        button.Center:Show()
-        button.Center:SetInside(button, 0.5, 0)
-        button.Center:SetDrawLayer("BACKGROUND", -1)
+        -- button.Center:Show()
+        -- button.Center:SetInside(button, 0.5, 0)
+        -- button.Center:SetDrawLayer("BACKGROUND", -1)
     end
 
     -- Journeys
