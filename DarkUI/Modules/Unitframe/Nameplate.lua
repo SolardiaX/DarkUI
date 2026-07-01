@@ -385,8 +385,20 @@ local function callback(self, event, unit)
             end
 
             local blizzPlate = self:GetParent().UnitFrame
-            self.widgetContainer = blizzPlate and blizzPlate.WidgetContainer
-            if self.widgetContainer then self.widgetContainer:SetParent(self) end
+            if blizzPlate then
+                if not blizzPlate.__darkuiHidden then
+                    blizzPlate:Hide()
+                    blizzPlate:UnregisterAllEvents()
+                    blizzPlate:SetScript("OnEvent", nil)
+                    blizzPlate:SetScript("OnUpdate", nil)
+                    hooksecurefunc(blizzPlate, "Show", blizzPlate.Hide)
+                    if blizzPlate.healthBar then blizzPlate.healthBar:UnregisterAllEvents() end
+                    if blizzPlate.castBar then blizzPlate.castBar:UnregisterAllEvents() end
+                    blizzPlate.__darkuiHidden = true
+                end
+                self.widgetContainer = blizzPlate.WidgetContainer
+                if self.widgetContainer then self.widgetContainer:SetParent(self) end
+            end
         end
     end
 end
