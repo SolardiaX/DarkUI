@@ -389,7 +389,7 @@ function S:Communities()
                 header:SetHighlightTexture(DB.bdTex)
                 header:GetHighlightTexture():SetVertexColor(cr, cg, cb, 0.25)
                 header:GetHighlightTexture():SetInside(header.bg)
-                header.Icon:CreateBackdrop()
+                header.Icon:CreateBackdrop():SetBackdropEdge("round")
                 header.__styled = true
             end
 

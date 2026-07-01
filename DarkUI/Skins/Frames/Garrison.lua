@@ -1146,7 +1146,7 @@ function S:Garrison()
                     local bg = widget:CreateBackdrop()
                     bg:SetPoint("TOPLEFT", -3, 1)
                     bg:SetPoint("BOTTOMRIGHT", 2, -2)
-                    widget.Icon:CreateBackdrop()
+                    widget.Icon:CreateBackdrop():SetBackdropEdge("round")
                 elseif otype == "IconButton" then
                     S:ReskinIcon(widget.Icon)
                     widget:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)

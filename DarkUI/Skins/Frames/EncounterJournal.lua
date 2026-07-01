@@ -269,7 +269,7 @@ function S:EncounterJournal()
         suggestion:CreateBackdrop()
         suggestion.backdrop:SetBackdropColor(0, 0, 0, 0.25)
         suggestion.icon:SetPoint("TOPLEFT", 135, -15)
-        suggestion.icon:CreateBackdrop()
+        suggestion.icon:CreateBackdrop():SetBackdropEdge("round")
 
         local centerDisplay = suggestion.centerDisplay
         centerDisplay.title.text:SetTextColor(1, 1, 1)
@@ -280,7 +280,9 @@ function S:EncounterJournal()
         reward.text:SetTextColor(0.9, 0.9, 0.9)
         reward.iconRing:Hide()
         reward.iconRingHighlight:SetTexture("")
-        reward.icon:CreateBackdrop():SetFrameLevel(3)
+        local rewardBg = reward.icon:CreateBackdrop()
+        rewardBg:SetFrameLevel(3)
+        rewardBg:SetBackdropEdge("round")
         S:ReskinArrow(suggestion.prevButton, "left")
         S:ReskinArrow(suggestion.nextButton, "right")
     end
@@ -293,7 +295,7 @@ function S:EncounterJournal()
         suggestion:CreateBackdrop()
         suggestion.backdrop:SetBackdropColor(0, 0, 0, 0.25)
         suggestion.icon:SetPoint("TOPLEFT", 10, -10)
-        suggestion.icon:CreateBackdrop()
+        suggestion.icon:CreateBackdrop():SetBackdropEdge("round")
 
         local centerDisplay = suggestion.centerDisplay
 
@@ -306,7 +308,9 @@ function S:EncounterJournal()
         local reward = suggestion.reward
         reward.iconRing:Hide()
         reward.iconRingHighlight:SetTexture("")
-        reward.icon:CreateBackdrop():SetFrameLevel(3)
+        local rewardBg = reward.icon:CreateBackdrop()
+        rewardBg:SetFrameLevel(3)
+        rewardBg:SetBackdropEdge("round")
     end
 
     -- Hook functions

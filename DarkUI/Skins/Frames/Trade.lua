@@ -51,6 +51,7 @@ function S:Trade()
         bu.IconOverlay:SetInside()
         bu.IconOverlay2:SetInside()
         bu.bg = bu.icon:CreateBackdrop()
+        bu.bg:SetBackdropEdge("round_white")
         S:ReskinIconBorder(bu.IconBorder)
     end
 

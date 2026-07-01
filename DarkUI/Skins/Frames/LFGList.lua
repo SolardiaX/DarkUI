@@ -44,7 +44,7 @@ function S:LFGList()
         if bu and not bu.__styled then
             bu.Cover:Hide()
             bu.Icon:SetTexCoord(0.01, 0.99, 0.01, 0.99)
-            bu.Icon:CreateBackdrop()
+            bu.Icon:CreateBackdrop():SetBackdropEdge("round")
 
             bu.__styled = true
         end
