@@ -22,6 +22,7 @@ function S:Trainer()
     _G.ClassTrainerStatusBarSkillRank:SetPoint("CENTER", _G.ClassTrainerStatusBar, "CENTER", 0, 0)
 
     local icbg = S:ReskinIcon(_G.ClassTrainerFrameSkillStepButtonIcon)
+    _G.ClassTrainerFrameSkillStepButton.backdrop = nil -- dedup: icon bg took .backdrop; free slot for row bg
     local bg = _G.ClassTrainerFrameSkillStepButton:CreateBackdrop()
     bg:SetBackdropColor(0, 0, 0, 0.25)
     bg:SetPoint("TOPLEFT", icbg, "TOPRIGHT", 1, 0)
@@ -47,6 +48,7 @@ function S:Trainer()
             local button = select(i, self.ScrollTarget:GetChildren())
             if not button.__styled then
                 local buttonIconBg = S:ReskinIcon(button.icon)
+                button.backdrop = nil -- dedup: icon bg took .backdrop; free slot for row bg
                 local buttonBg = button:CreateBackdrop()
                 buttonBg:SetBackdropColor(0, 0, 0, 0.25)
                 buttonBg:SetPoint("TOPLEFT", buttonIconBg, "TOPRIGHT", 1, 0)
