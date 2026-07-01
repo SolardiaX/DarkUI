@@ -562,6 +562,8 @@ end
 ------------------------------------------------------------------------
 
 local function addGameMenuButton()
+    ensureNamespace()
+
     local btn = CreateFrame("Button", "GameMenuButtonDarkUI", GameMenuFrame, "MainMenuFrameButtonTemplate")
     btn:SetSize(200, 35)
     btn:SetText("|cffFFCC99Dark|r|cffffffffUI|r")
@@ -569,6 +571,15 @@ local function addGameMenuButton()
         HideUIPanel(GameMenuFrame)
         addon:Toggle()
     end)
+    btn:DisableDrawLayer("BACKGROUND")
+    btn.backdrop = nil
+    btn.bg = btn:CreateBackdrop()
+    btn.bg:SetBackdropEdge("round")
+    btn.bg:SetInside()
+    btn.bg:CreateGradient()
+    local hl = btn:GetHighlightTexture()
+    hl:SetColorTexture(E.myColor.r, E.myColor.g, E.myColor.b, 0.25)
+    hl:SetInside(btn.bg)
     btn:Hide()
 
     local offset = btn:GetHeight()
