@@ -19,8 +19,8 @@ function S:PVEFrame()
     _G.PVEFrameBlueBg:SetAlpha(0)
     _G.PVEFrame.shadows:SetAlpha(0)
 
-    _G.PVEFrameTab2:SetPoint("LEFT", _G.PVEFrameTab1, "RIGHT", -15, 0)
-    _G.PVEFrameTab3:SetPoint("LEFT", _G.PVEFrameTab2, "RIGHT", -15, 0)
+    _G.PVEFrameTab2:SetPoint("LEFT", _G.PVEFrameTab1, "RIGHT", -5, 0)
+    _G.PVEFrameTab3:SetPoint("LEFT", _G.PVEFrameTab2, "RIGHT", -5, 0)
 
     local iconSize = 56 - 2 * E.mult
     for i = 1, 4 do

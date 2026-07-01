@@ -62,7 +62,7 @@ function S:Merchant()
 
     MerchantFrameTab1:ClearAllPoints()
     MerchantFrameTab1:SetPoint("CENTER", MerchantFrame, "BOTTOMLEFT", 50, -14)
-    MerchantFrameTab2:SetPoint("LEFT", MerchantFrameTab1, "RIGHT", -15, 0)
+    MerchantFrameTab2:SetPoint("LEFT", MerchantFrameTab1, "RIGHT", -5, 0)
 
     for i = 1, 2 do
         S:ReskinTab(_G["MerchantFrameTab" .. i])
