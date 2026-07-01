@@ -57,8 +57,10 @@ function E:Module(name)
     -- Mark module as containing secure frames
     function module:SetSecure() self._secure = true end
 
-    -- Set which config key controls this module's enable state
-    -- e.g. module:SetConfigKey("tooltip") → checks C.tooltip.enable
+    -- Set which config key controls this module's enable state. Accepts a dotted
+    -- path; the leaf may be a table (checks .enable) or a plain boolean toggle.
+    -- e.g. module:SetConfigKey("tooltip") → C.tooltip.enable
+    --      module:SetConfigKey("general.skins") → C.general.skins
     function module:SetConfigKey(key) self._configKey = key end
 
     -- Check if the module should be enabled based on config
@@ -70,6 +72,7 @@ function E:Module(name)
             cfg = cfg[segment]
         end
         if type(cfg) == "table" then return cfg.enable ~= false end
+        if type(cfg) == "boolean" then return cfg end
         return true
     end
 
