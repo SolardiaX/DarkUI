@@ -67,6 +67,9 @@
     <Script file="Frames\ScrappingMachine.lua" />
     <Script file="Frames\Friends.lua" />
     <Script file="Frames\Gossip.lua" />
+    <Script file="Frames\Quest.lua" />
+    <Script file="Frames\QuestInfo.lua" />
+    <Script file="Frames\QuestChoice.lua" />
     <Script file="Frames\Petition.lua" />
     <Script file="Frames\GuildInvite.lua" />
     <Script file="Frames\GuildRegistrar.lua" />

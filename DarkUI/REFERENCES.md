@@ -106,6 +106,14 @@ Used for finding original sources when iterating or fixing bugs.
 |------|-----------|-------|
 | `Modules/Bags/Core.lua` | NDui `Modules/Inventory/Core.lua` | All-in-one bag frame, filter system |
 
+## Skins
+
+| File | Reference | Notes |
+|------|-----------|-------|
+| `Skins/Frames/Quest.lua` | NDui `Skins/Blizzard/FrameXML/QuestFrame.lua`, ElvUI `Game/Mainline/Skins/Quest.lua` | QuestFrame portrait, panels, buttons, progress items, NPC model scene, text colors |
+| `Skins/Frames/QuestInfo.lua` | NDui `Skins/Blizzard/FrameXML/QuestInfo.lua`, ElvUI `Game/Mainline/Skins/Quest.lua` | Shared quest info: reward buttons, spell/follower/rep pools, objectives, seal text |
+| `Skins/Frames/QuestChoice.lua` | ElvUI `Game/Mainline/Skins/QuestChoice.lua` | QuestChoiceFrame option buttons, item/currency icons |
+
 ## Core
 
 | File | Reference | Notes |
