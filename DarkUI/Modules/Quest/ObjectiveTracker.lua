@@ -197,14 +197,11 @@ local function skinProgressBar(tracker, key)
         label:SetDrawLayer("OVERLAY")
 
         if icon then
-            icon:SetPoint("RIGHT", 26, 0)
-            icon:SetSize(20, 20)
             icon:SetMask("")
-
-            local border = CreateFrame("Frame", nil, bar, "BackdropTemplate")
-            border:SetAllPoints(icon)
-            border:SetTemplate("Default")
-            bar.newIconBg = border
+            icon.bg = E:StyleIcon(icon, true)
+            icon:ClearAllPoints()
+            icon:SetPoint("TOPLEFT", bar, "TOPRIGHT", 8, 2)
+            icon:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 30, -2)
 
             if bar.AnimIn and bar.AnimIn.Play then hooksecurefunc(bar.AnimIn, "Play", function() bar.AnimIn:Stop() end) end
         end
@@ -212,7 +209,7 @@ local function skinProgressBar(tracker, key)
         progressBar.__styled = true
     end
 
-    if bar.newIconBg then bar.newIconBg:SetShown(icon:IsShown()) end
+    if icon and icon.bg then icon.bg:SetShown(icon:IsShown() and icon:GetTexture() ~= nil) end
 end
 
 ------------------------------------------------------------------------
