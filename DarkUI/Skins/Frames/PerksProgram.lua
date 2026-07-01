@@ -13,7 +13,9 @@ local hooksecurefunc = hooksecurefunc
 
 local function ReskinCustomizeButton(button)
     S:Reskin(button)
-    button.bg:SetInside(nil, 5, 5)
+    if button.backdrop then button.backdrop:SetInside(nil, 5, 5) end
+    if button.gradient then button.gradient:SetInside(nil, 5, 5) end
+    button:GetHighlightTexture():SetInside(nil, 5, 5)
 end
 
 local function ReskinCartToggle(button)
