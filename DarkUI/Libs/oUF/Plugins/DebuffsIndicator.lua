@@ -71,7 +71,7 @@ local function Update(self, _, unit)
         if shown >= NUM_BUTTONS then break end
 
         local spellId = data.spellId
-        if spellId and FilterDebuff(spellId, data.isBossAura, data.sourceUnit) then
+        if spellId and not issecretvalue(spellId) and FilterDebuff(spellId, data.isBossAura, data.sourceUnit) then
             shown = shown + 1
             local button = element.buttons[shown]
             button.icon:SetTexture(data.icon)
