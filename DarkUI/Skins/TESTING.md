@@ -39,13 +39,13 @@
 - [ ] **黑市** `BlackMarket.lua` — 黑市拍卖师 — `blackMarket`:竞拍列表、出价框
 - [x] **理发店** `Barber.lua` — 理发师 — `barber`:外观自定义按钮、滑块
 - [ ] **物品升级** `ItemUpgrade.lua` — 升级 NPC — `itemUpgrade`:物品槽、升级条(预览 tooltip 保持原生外观,见已知项)
-- [ ] **幻化** `Transmog.lua` — 幻化师 — `transmogrify`(+`parchment_remover`):外观格图标品质边、套装、武器下拉
+- [x] **幻化** `Transmog.lua` — 幻化师 — `transmogrify`(+`parchment_remover`):外观格图标品质边、套装、武器下拉
 - [ ] **拆解机** `ScrappingMachine.lua` — 拆解机 — `scrapping`:放入格图标
-- [ ] **专业技能(操作台)** `Professions.lua` — 铁砧/炼金台 或 `P` — `tradeskill`(+`parchment_remover`):配方列表、配方图标、品质条、订单
-- [ ] **专业技能书** `ProfessionsBook.lua` — `P` — `tradeskill`:专业图标
+- [x] **专业技能(操作台)** `Professions.lua` — 铁砧/炼金台 或 `P` — `tradeskill`(+`parchment_remover`):配方列表、配方图标、品质条、订单
+- [x] **专业技能书** `ProfessionsBook.lua` — `P` — `tradeskill`:专业图标
 - [ ] **接单(公共订单)** `ProfessionsOrders.lua` — 制作订单台 — `tradeskill`:订单列表行
 - [ ] **职业训练师** `Trainer.lua` — 训练师 — `trainer`:技能列表、训练按钮
-- [ ] **兽栏(猎人)** `Stable.lua` — 兽栏管理员 — `stable`:宠物槽、模型控制
+- [x] **兽栏(猎人)** `Stable.lua` — 兽栏管理员 — `stable`:宠物槽、模型控制
 - [ ] **签名请愿(公会/竞技场)** `Petition.lua` — 请愿书道具 — `petition`
 - [ ] **出租车(飞行点)** `Taxi.lua` — 飞行管理员 — `misc`:飞行点底图
 - [ ] **职业护甲战袍** `Tabard.lua` — 战袍设计师 — `misc`:颜色选择、费用框
@@ -57,17 +57,17 @@
 - [x] **试衣间** `DressingRoom.lua` — `Ctrl`+点击装备 / 右键预览 — `dressingroom`:模型框、套装弹窗
 - [x] **NPC 对话** `Gossip.lua` — 有对话选项的 NPC — `gossip`:对话选项底
 - [ ] **镶嵌宝石** `Socket.lua` — 右键带插槽装备 — `socket`:插槽图标(按宝石类型染边)、应用按钮
-- [ ] **公会邀请弹窗** `GuildInvite.lua` — 被邀请入公会 — `guild`
-- [ ] **公会注册** `GuildRegistrar.lua` — 公会管理员 — `guild`:输入框
-- [ ] **公会控制** `GuildControl.lua` — 公会信息→公会控制 — `guild`:权限复选框、排名输入框
-- [ ] **点击施法绑定** `Binding.lua` — 快速键位绑定入口 — `binding`
-- [ ] **点击绑定 UI** `ClickBinding.lua` — 点击施法设置 — `misc`
-- [ ] **准备确认弹窗** `ReadyCheck.lua` — 队伍发起准备确认 — `misc`
+- [x] **公会邀请弹窗** `GuildInvite.lua` — 被邀请入公会 — `guild`
+- [x] **公会注册** `GuildRegistrar.lua` — 公会管理员 — `guild`:输入框
+- [x] **公会控制** `GuildControl.lua` — 公会信息→公会控制 — `guild`:权限复选框、排名输入框
+- [x] **点击施法绑定** `Binding.lua` — 快速键位绑定入口 — `binding`
+- [x] **点击绑定 UI** `ClickBinding.lua` — 点击施法设置 — `misc`
+- [x] **准备确认弹窗** `ReadyCheck.lua` — 队伍发起准备确认 — `misc`
 - [ ] **拾取掌控提示** `LossOfControl.lua` — 被眩晕/沉默时 — `misc`
 - [ ] **死亡回顾** `DeathRecap.lua` — 死亡后点击回放 — `deathRecap`
 - [ ] **鬼魂归位** `Ghost.lua` — 死亡为鬼魂时 — `misc`:渐变底
 - [ ] **取色器** `ColorPicker.lua` — 任意打开取色对话框处 — `misc`
-- [ ] **静态弹窗** `StaticPopup.lua` — 各类确认弹窗(删除物品/退组等)— `misc`:弹窗底/边、按钮、关闭 X、输入框
+- [x] **静态弹窗** `StaticPopup.lua` — 各类确认弹窗(删除物品/退组等)— `misc`:弹窗底/边、按钮、关闭 X、输入框
 
 ## D. 斜杠 / 小地图入口
 
