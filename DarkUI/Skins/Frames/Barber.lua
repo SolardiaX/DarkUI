@@ -13,6 +13,8 @@ local hooksecurefunc = hooksecurefunc
 local function reskinCustomizeButton(button)
     S:Reskin(button)
     if button.backdrop then button.backdrop:SetInside(nil, 5, 5) end
+    if button.gradient then button.gradient:SetInside(nil, 5, 5) end
+    button:GetHighlightTexture():SetInside(nil, 5, 5)
 end
 
 function S:Barber()

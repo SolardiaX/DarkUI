@@ -37,7 +37,7 @@
 - [x] **公会银行** `GuildBank.lua` — 公会银行 — `guildBank`:物品格、标签页、**标签图标选择弹窗**(`S:ReskinIconSelectionFrame`)
 - [ ] **虚空仓库** `VoidStorage.lua` — 虚空仓库 NPC — `voidStorage`:存放/取出格、搜索框
 - [ ] **黑市** `BlackMarket.lua` — 黑市拍卖师 — `blackMarket`:竞拍列表、出价框
-- [ ] **理发店** `Barber.lua` — 理发师 — `barber`:外观自定义按钮、滑块
+- [x] **理发店** `Barber.lua` — 理发师 — `barber`:外观自定义按钮、滑块
 - [ ] **物品升级** `ItemUpgrade.lua` — 升级 NPC — `itemUpgrade`:物品槽、升级条(预览 tooltip 保持原生外观,见已知项)
 - [ ] **幻化** `Transmog.lua` — 幻化师 — `transmogrify`(+`parchment_remover`):外观格图标品质边、套装、武器下拉
 - [ ] **拆解机** `ScrappingMachine.lua` — 拆解机 — `scrapping`:放入格图标
