@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- LFD / RaidFinder / Ready Dialogs / Role Buttons
@@ -41,7 +40,7 @@ local function reskinDialogReward(button)
     if button.__styled then return end
 
     local border = _G[button:GetName() .. "Border"]
-    button.texture:SetTexCoord(unpack(DB.TexCoord))
+    button.texture:SetTexCoord(unpack(C.media.texCoord))
     border:SetColorTexture(0, 0, 0)
     border:SetDrawLayer("BACKGROUND")
     border:SetOutside(button.texture)
@@ -72,17 +71,17 @@ function S:LFGFrame()
 
     _G.LFDParentFrame:StripTextures()
     _G.LFDQueueFrameBackground:Hide()
-    S:SetBD(_G.LFDRoleCheckPopup)
+    S:CreateBackground(_G.LFDRoleCheckPopup)
     _G.LFDRoleCheckPopup.Border:Hide()
-    S:Reskin(_G.LFDRoleCheckPopupAcceptButton)
-    S:Reskin(_G.LFDRoleCheckPopupDeclineButton)
-    S:ReskinTrimScroll(_G.LFDQueueFrameSpecific.ScrollBar)
-    S:ReskinTrimScroll(_G.LFDQueueFrameRandomScrollFrame.ScrollBar)
+    S:ReskinButton(_G.LFDRoleCheckPopupAcceptButton)
+    S:ReskinButton(_G.LFDRoleCheckPopupDeclineButton)
+    S:ReskinTrimScrollBar(_G.LFDQueueFrameSpecific.ScrollBar)
+    S:ReskinTrimScrollBar(_G.LFDQueueFrameRandomScrollFrame.ScrollBar)
     S:ReskinDropDown(_G.LFDQueueFrameTypeDropdown)
-    S:Reskin(_G.LFDQueueFrameFindGroupButton)
-    S:Reskin(_G.LFDQueueFramePartyBackfillBackfillButton)
-    S:Reskin(_G.LFDQueueFramePartyBackfillNoBackfillButton)
-    S:Reskin(_G.LFDQueueFrameNoLFDWhileLFRLeaveQueueButton)
+    S:ReskinButton(_G.LFDQueueFrameFindGroupButton)
+    S:ReskinButton(_G.LFDQueueFramePartyBackfillBackfillButton)
+    S:ReskinButton(_G.LFDQueueFramePartyBackfillNoBackfillButton)
+    S:ReskinButton(_G.LFDQueueFrameNoLFDWhileLFRLeaveQueueButton)
     styleRewardButton(_G.LFDQueueFrameRandomScrollFrameChildFrameMoneyReward)
 
     -- LFGFrame
@@ -113,16 +112,16 @@ function S:LFGFrame()
     end)
 
     _G.LFGDungeonReadyDialog:StripTextures(0)
-    S:SetBD(_G.LFGDungeonReadyDialog)
+    S:CreateBackground(_G.LFGDungeonReadyDialog)
     _G.LFGInvitePopup:StripTextures()
-    S:SetBD(_G.LFGInvitePopup)
+    S:CreateBackground(_G.LFGInvitePopup)
     _G.LFGDungeonReadyStatus:StripTextures()
-    S:SetBD(_G.LFGDungeonReadyStatus)
+    S:CreateBackground(_G.LFGDungeonReadyStatus)
 
-    S:Reskin(_G.LFGDungeonReadyDialogEnterDungeonButton)
-    S:Reskin(_G.LFGDungeonReadyDialogLeaveQueueButton)
-    S:Reskin(_G.LFGInvitePopupAcceptButton)
-    S:Reskin(_G.LFGInvitePopupDeclineButton)
+    S:ReskinButton(_G.LFGDungeonReadyDialogEnterDungeonButton)
+    S:ReskinButton(_G.LFGDungeonReadyDialogLeaveQueueButton)
+    S:ReskinButton(_G.LFGInvitePopupAcceptButton)
+    S:ReskinButton(_G.LFGInvitePopupDeclineButton)
     S:ReskinClose(_G.LFGDungeonReadyDialogCloseButton)
     S:ReskinClose(_G.LFGDungeonReadyStatusCloseButton)
 
@@ -159,7 +158,7 @@ function S:LFGFrame()
 
     hooksecurefunc("SetCheckButtonIsRadio", function(button)
         button:SetNormalTexture(0)
-        button:SetHighlightTexture(DB.bdTex)
+        button:SetHighlightTexture(C.media.texture.blank)
         button:SetCheckedTexture("Interface\\Buttons\\UI-CheckBox-Check")
         button:GetCheckedTexture():SetTexCoord(0, 1, 0, 1)
         button:SetPushedTexture(0)
@@ -175,12 +174,12 @@ function S:LFGFrame()
     -- this fixes right border of second reward being cut off
     _G.RaidFinderQueueFrameScrollFrame:SetWidth(_G.RaidFinderQueueFrameScrollFrame:GetWidth() + 1)
 
-    S:ReskinTrimScroll(_G.RaidFinderQueueFrameScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.RaidFinderQueueFrameScrollFrame.ScrollBar)
     S:ReskinDropDown(_G.RaidFinderQueueFrameSelectionDropdown)
-    S:Reskin(_G.RaidFinderFrameFindRaidButton)
-    S:Reskin(_G.RaidFinderQueueFrameIneligibleFrameLeaveQueueButton)
-    S:Reskin(_G.RaidFinderQueueFramePartyBackfillBackfillButton)
-    S:Reskin(_G.RaidFinderQueueFramePartyBackfillNoBackfillButton)
+    S:ReskinButton(_G.RaidFinderFrameFindRaidButton)
+    S:ReskinButton(_G.RaidFinderQueueFrameIneligibleFrameLeaveQueueButton)
+    S:ReskinButton(_G.RaidFinderQueueFramePartyBackfillBackfillButton)
+    S:ReskinButton(_G.RaidFinderQueueFramePartyBackfillNoBackfillButton)
     styleRewardButton(_G.RaidFinderQueueFrameScrollFrameChildFrameMoneyReward)
 end
 

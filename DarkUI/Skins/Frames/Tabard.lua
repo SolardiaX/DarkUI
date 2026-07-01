@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Tabard Customisation Frame
@@ -14,8 +13,8 @@ function S:Tabard()
     TabardFrameMoneyInset:Hide()
     TabardFrameMoneyBg:Hide()
     TabardFrameCostFrame:CreateBackdrop()
-    S:Reskin(TabardFrameAcceptButton)
-    S:Reskin(TabardFrameCancelButton)
+    S:ReskinButton(TabardFrameAcceptButton)
+    S:ReskinButton(TabardFrameCancelButton)
     S:ReskinArrow(TabardCharacterModelRotateLeftButton, "left")
     S:ReskinArrow(TabardCharacterModelRotateRightButton, "right")
     TabardCharacterModelRotateRightButton:SetPoint("TOPLEFT", TabardCharacterModelRotateLeftButton, "TOPRIGHT", 1, 0)

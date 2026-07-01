@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Item Upgrade UI
@@ -41,7 +40,7 @@ function S:ItemUpgrade()
     S:ReskinIconBorder(itemButton.IconBorder)
 
     S:ReskinDropDown(ItemUpgradeFrame.ItemInfo.Dropdown)
-    S:Reskin(ItemUpgradeFrame.UpgradeButton)
+    S:ReskinButton(ItemUpgradeFrame.UpgradeButton)
     ItemUpgradeFramePlayerCurrenciesBorder:Hide()
 
     ItemUpgradeFrameLeftItemPreviewFrame:CreateBackdrop()

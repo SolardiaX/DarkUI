@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Allied Races UI
@@ -18,7 +17,7 @@ function S:AlliedRacesUI()
     select(2, AlliedRacesFrame.ModelScene:GetRegions()):Hide()
 
     local scrollFrame = AlliedRacesFrame.RaceInfoFrame.ScrollFrame
-    S:ReskinTrimScroll(scrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(scrollFrame.ScrollBar)
     AlliedRacesFrame.RaceInfoFrame.AlliedRacesRaceName:SetTextColor(1, 0.8, 0)
     scrollFrame.Child.RaceDescriptionText:SetTextColor(1, 1, 1)
     scrollFrame.Child.RacialTraitsLabel:SetTextColor(1, 0.8, 0)

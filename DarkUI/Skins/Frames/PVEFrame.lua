@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- PVE Frame (Group Finder portal / Scenario queue)
@@ -28,9 +27,9 @@ function S:PVEFrame()
         if bu then
             bu.ring:Hide()
             if bu.CircleMask then bu.CircleMask:Hide() end
-            S:Reskin(bu, true)
+            S:ReskinButton(bu, true)
             bu.bg:SetColorTexture(cr, cg, cb, 0.25)
-            bu.bg:SetInside(bu.__bg)
+            bu.bg:SetInside(bu)
 
             bu.icon:SetPoint("LEFT", bu, "LEFT", 2, 0)
             bu.icon:SetSize(iconSize, iconSize)
@@ -66,8 +65,8 @@ function S:PVEFrame()
         _G.ScenarioFinderFrame:StripTextures()
         _G.ScenarioQueueFrameBackground:SetAlpha(0)
         S:ReskinDropDown(_G.ScenarioQueueFrameTypeDropdown)
-        S:Reskin(_G.ScenarioQueueFrameFindGroupButton)
-        S:ReskinTrimScroll(_G.ScenarioQueueFrameRandomScrollFrame.ScrollBar)
+        S:ReskinButton(_G.ScenarioQueueFrameFindGroupButton)
+        S:ReskinTrimScrollBar(_G.ScenarioQueueFrameRandomScrollFrame.ScrollBar)
         if _G.ScenarioQueueFrameRandomScrollFrameScrollBar then _G.ScenarioQueueFrameRandomScrollFrameScrollBar:SetAlpha(0) end
     end
 end

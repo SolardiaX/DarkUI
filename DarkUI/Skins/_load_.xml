@@ -1,9 +1,9 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/..\FrameXML\UI.xsd">
-    <!-- Skins engine: S:Reskin* (AuroraClassic-style) + per-addon dispatcher -->
+    <!-- Skins engine: S:Reskin* facade + per-addon dispatcher -->
     <Script file="Core.lua" />
-    <!-- per-frame skins (rebuilt from AuroraClassic source) -->
+    <!-- per-frame Blizzard panel skins -->
     <Script file="Frames\Socket.lua" />
     <Script file="Frames\Collectables.lua" />
     <Script file="Frames\Character.lua" />

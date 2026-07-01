@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Color Picker Frame
@@ -15,9 +14,9 @@ function S:ColorPicker()
     ColorPickerFrame.Header:SetPoint("TOP", ColorPickerFrame, 0, 10)
     ColorPickerFrame.Border:Hide()
 
-    S:SetBD(ColorPickerFrame)
-    S:Reskin(ColorPickerFrame.Footer.OkayButton)
-    S:Reskin(ColorPickerFrame.Footer.CancelButton)
+    S:CreateBackground(ColorPickerFrame)
+    S:ReskinButton(ColorPickerFrame.Footer.OkayButton)
+    S:ReskinButton(ColorPickerFrame.Footer.CancelButton)
 end
 
 S:AddCallback("ColorPicker")

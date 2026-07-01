@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Macro UI
@@ -28,7 +27,7 @@ function S:MacroUI()
     _G.MacroNewButton:ClearAllPoints()
     _G.MacroNewButton:SetPoint("RIGHT", _G.MacroExitButton, "LEFT", -1, 0)
 
-    S:ReskinTrimScroll(_G.MacroFrame.MacroSelector.ScrollBar)
+    S:ReskinTrimScrollBar(_G.MacroFrame.MacroSelector.ScrollBar)
 
     local function handleMacroButton(button)
         if button.__styled then return end
@@ -55,13 +54,13 @@ function S:MacroUI()
 
     S:ReskinPortraitFrame(_G.MacroFrame)
     _G.MacroFrameScrollFrame:CreateBackdrop()
-    S:ReskinTrimScroll(_G.MacroFrameScrollFrame.ScrollBar)
-    S:Reskin(_G.MacroDeleteButton)
-    S:Reskin(_G.MacroNewButton)
-    S:Reskin(_G.MacroExitButton)
-    S:Reskin(_G.MacroEditButton)
-    S:Reskin(_G.MacroSaveButton)
-    S:Reskin(_G.MacroCancelButton)
+    S:ReskinTrimScrollBar(_G.MacroFrameScrollFrame.ScrollBar)
+    S:ReskinButton(_G.MacroDeleteButton)
+    S:ReskinButton(_G.MacroNewButton)
+    S:ReskinButton(_G.MacroExitButton)
+    S:ReskinButton(_G.MacroEditButton)
+    S:ReskinButton(_G.MacroSaveButton)
+    S:ReskinButton(_G.MacroCancelButton)
 end
 
 S:AddCallbackForAddon("Blizzard_MacroUI", "MacroUI")

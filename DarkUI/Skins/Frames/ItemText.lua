@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Item Text Frame (readable items / books / letters)
@@ -21,7 +20,7 @@ function S:ItemText()
     ItemTextMaterialBotRight:SetAlpha(0)
 
     S:ReskinPortraitFrame(ItemTextFrame)
-    S:ReskinTrimScroll(ItemTextScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(ItemTextScrollFrame.ScrollBar)
     S:ReskinArrow(ItemTextPrevPageButton, "left")
     S:ReskinArrow(ItemTextNextPageButton, "right")
     ItemTextFramePageBg:SetAlpha(0)

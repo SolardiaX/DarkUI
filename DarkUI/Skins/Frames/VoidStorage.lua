@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Void Storage UI
@@ -14,7 +13,7 @@ local select, hooksecurefunc = select, hooksecurefunc
 function S:VoidStorage()
     if not (C.skins.enable and C.skins.voidStorage) then return end
 
-    S:SetBD(VoidStorageFrame, nil, 20, 0, 0, 20)
+    S:CreateBackground(VoidStorageFrame, nil, 20, 0, 0, 20)
     VoidStoragePurchaseFrame:CreateBackdrop()
     VoidStorageBorderFrame:StripTextures()
     VoidStorageDepositFrame:StripTextures()
@@ -34,11 +33,11 @@ function S:VoidStorage()
             bu.bg:SetBackdropColor(0.3, 0.3, 0.3, 0.3)
             local bg, icon, _, search = bu:GetRegions()
             bg:Hide()
-            icon:SetTexCoord(unpack(DB.TexCoord))
+            icon:SetTexCoord(unpack(C.media.texCoord))
             search:SetAllPoints(bu.bg)
         end
 
-        local color = DB.QualityColors[quality or 1]
+        local color = C.media.qualityColors[quality or 1]
         bu.bg:SetBackdropBorderColor(color.r, color.g, color.b)
     end
 
@@ -70,17 +69,17 @@ function S:VoidStorage()
     for i = 1, 2 do
         local tab = VoidStorageFrame["Page" .. i]
         tab:GetRegions():Hide()
-        tab:SetCheckedTexture(DB.pushedTex)
+        tab:SetCheckedTexture(C.media.button.glow)
         tab:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
-        tab:GetNormalTexture():SetTexCoord(unpack(DB.TexCoord))
+        tab:GetNormalTexture():SetTexCoord(unpack(C.media.texCoord))
         tab:CreateBackdrop()
     end
 
     VoidStorageFrame.Page1:ClearAllPoints()
     VoidStorageFrame.Page1:SetPoint("LEFT", VoidStorageFrame, "TOPRIGHT", 2, -60)
 
-    S:Reskin(VoidStoragePurchaseButton)
-    S:Reskin(VoidStorageTransferButton)
+    S:ReskinButton(VoidStoragePurchaseButton)
+    S:ReskinButton(VoidStorageTransferButton)
     S:ReskinClose(VoidStorageBorderFrame.CloseButton)
     S:ReskinInput(VoidItemSearchBox)
 end

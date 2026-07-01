@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Barber Shop / Character Customize UI
@@ -11,7 +10,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 local function reskinCustomizeButton(button)
-    S:Reskin(button)
+    S:ReskinButton(button)
     if button.backdrop then button.backdrop:SetInside(nil, 5, 5) end
     if button.gradient then button.gradient:SetInside(nil, 5, 5) end
     button:GetHighlightTexture():SetInside(nil, 5, 5)
@@ -22,9 +21,9 @@ function S:Barber()
 
     local frame = BarberShopFrame
 
-    S:Reskin(frame.AcceptButton)
-    S:Reskin(frame.CancelButton)
-    S:Reskin(frame.ResetButton)
+    S:ReskinButton(frame.AcceptButton)
+    S:ReskinButton(frame.CancelButton)
+    S:ReskinButton(frame.ResetButton)
 end
 
 function S:CharacterCustomize()
@@ -43,9 +42,9 @@ function S:CharacterCustomize()
         if self.dropdownPool then
             for option in self.dropdownPool:EnumerateActive() do
                 if not option.__styled then
-                    S:Reskin(option.Dropdown)
-                    S:Reskin(option.DecrementButton)
-                    S:Reskin(option.IncrementButton)
+                    S:ReskinButton(option.Dropdown)
+                    S:ReskinButton(option.DecrementButton)
+                    S:ReskinButton(option.IncrementButton)
                     option.__styled = true
                 end
             end

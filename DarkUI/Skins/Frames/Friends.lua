@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Friends Frame
@@ -28,7 +27,7 @@ local function reskinFriendButton(button)
         local gameIcon = button.gameIcon
         gameIcon:SetSize(22, 22)
         button.background:Hide()
-        button:SetHighlightTexture(DB.bdTex)
+        button:SetHighlightTexture(C.media.texture.blank)
         button:GetHighlightTexture():SetVertexColor(0.24, 0.56, 1, 0.2)
 
         local travelPass = button.travelPassButton
@@ -72,11 +71,11 @@ function S:Friends()
 
     local ignoreWin = _G.FriendsFrame.IgnoreListWindow
     ignoreWin:StripTextures()
-    S:SetBD(ignoreWin)
+    S:CreateBackground(ignoreWin)
     local closeButton = ignoreWin.CloseButton or select(4, ignoreWin:GetChildren())
     if closeButton then S:ReskinClose(closeButton) end
-    S:ReskinTrimScroll(ignoreWin.ScrollBar)
-    S:Reskin(ignoreWin.UnignorePlayerButton)
+    S:ReskinTrimScrollBar(ignoreWin.ScrollBar)
+    S:ReskinButton(ignoreWin.UnignorePlayerButton)
 
     local INVITE_RESTRICTION_NONE = 9
     hooksecurefunc("FriendsFrame_UpdateFriendButton", function(button)
@@ -93,8 +92,8 @@ function S:Friends()
 
     hooksecurefunc("FriendsFrame_UpdateFriendInviteButton", function(button)
         if not button.__styled then
-            S:Reskin(button.AcceptButton)
-            S:Reskin(button.DeclineButton)
+            S:ReskinButton(button.AcceptButton)
+            S:ReskinButton(button.DeclineButton)
 
             button.__styled = true
         end
@@ -129,45 +128,45 @@ function S:Friends()
 
     local broadcastFrame = _G.FriendsFrameBattlenetFrame.BroadcastFrame
     broadcastFrame:StripTextures()
-    S:SetBD(broadcastFrame, nil, 10, -10, -10, 10)
+    S:CreateBackground(broadcastFrame, nil, 10, -10, -10, 10)
     broadcastFrame.EditBox:DisableDrawLayer("BACKGROUND")
     _G.FriendsFrameBattlenetFrame.BroadcastFrame.EditBox.backdrop = nil
     local broadcastEditBg = broadcastFrame.EditBox:CreateBackdrop()
     broadcastEditBg:SetPoint("TOPLEFT", -2, -2)
     broadcastEditBg:SetPoint("BOTTOMRIGHT", 2, 2)
-    S:Reskin(broadcastFrame.UpdateButton)
-    S:Reskin(broadcastFrame.CancelButton)
+    S:ReskinButton(broadcastFrame.UpdateButton)
+    S:ReskinButton(broadcastFrame.CancelButton)
     broadcastFrame:ClearAllPoints()
     broadcastFrame:SetPoint("TOPLEFT", _G.FriendsFrame, "TOPRIGHT", 3, 0)
 
     local unavailableFrame = _G.FriendsFrameBattlenetFrame.UnavailableInfoFrame
     unavailableFrame:StripTextures()
-    S:SetBD(unavailableFrame)
+    S:CreateBackground(unavailableFrame)
     unavailableFrame:SetPoint("TOPLEFT", _G.FriendsFrame, "TOPRIGHT", 3, -18)
 
     S:ReskinPortraitFrame(_G.FriendsFrame)
-    S:Reskin(_G.FriendsFrameAddFriendButton)
-    S:Reskin(_G.FriendsFrameSendMessageButton)
-    S:ReskinTrimScroll(_G.FriendsListFrame.ScrollBar)
-    S:ReskinTrimScroll(_G.WhoFrame.ScrollBar)
-    S:ReskinTrimScroll(_G.FriendsFriendsFrame.ScrollBar)
+    S:ReskinButton(_G.FriendsFrameAddFriendButton)
+    S:ReskinButton(_G.FriendsFrameSendMessageButton)
+    S:ReskinTrimScrollBar(_G.FriendsListFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.WhoFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.FriendsFriendsFrame.ScrollBar)
     S:ReskinDropDown(_G.FriendsFrameStatusDropdown)
     S:ReskinDropDown(_G.WhoFrameDropdown)
     S:ReskinDropDown(_G.FriendsFriendsFrameDropdown)
     _G.FriendsFrameStatusDropdown:SetWidth(58)
-    S:Reskin(_G.FriendsListFrameContinueButton)
+    S:ReskinButton(_G.FriendsListFrameContinueButton)
     S:ReskinInput(_G.AddFriendNameEditBox)
     _G.AddFriendFrame:StripTextures()
-    S:SetBD(_G.AddFriendFrame)
+    S:CreateBackground(_G.AddFriendFrame)
     _G.FriendsFriendsFrame:StripTextures()
-    S:SetBD(_G.FriendsFriendsFrame)
-    S:Reskin(_G.FriendsFriendsFrame.SendRequestButton)
-    S:Reskin(_G.FriendsFriendsFrame.CloseButton)
-    S:Reskin(_G.WhoFrameWhoButton)
-    S:Reskin(_G.WhoFrameAddFriendButton)
-    S:Reskin(_G.WhoFrameGroupInviteButton)
-    S:Reskin(_G.AddFriendEntryFrameAcceptButton)
-    S:Reskin(_G.AddFriendEntryFrameCancelButton)
+    S:CreateBackground(_G.FriendsFriendsFrame)
+    S:ReskinButton(_G.FriendsFriendsFrame.SendRequestButton)
+    S:ReskinButton(_G.FriendsFriendsFrame.CloseButton)
+    S:ReskinButton(_G.WhoFrameWhoButton)
+    S:ReskinButton(_G.WhoFrameAddFriendButton)
+    S:ReskinButton(_G.WhoFrameGroupInviteButton)
+    S:ReskinButton(_G.AddFriendEntryFrameAcceptButton)
+    S:ReskinButton(_G.AddFriendEntryFrameCancelButton)
 
     for i = 1, 4 do
         _G["WhoFrameColumnHeader" .. i]:StripTextures()
@@ -186,32 +185,32 @@ function S:Friends()
 
     -- Recruit a Friend frame
     _G.RecruitAFriendFrame.SplashFrame.Description:SetTextColor(1, 1, 1)
-    S:Reskin(_G.RecruitAFriendFrame.SplashFrame.OKButton)
+    S:ReskinButton(_G.RecruitAFriendFrame.SplashFrame.OKButton)
     _G.RecruitAFriendFrame.RewardClaiming:StripTextures()
-    S:Reskin(_G.RecruitAFriendFrame.RewardClaiming.ClaimOrViewRewardButton)
-    S:Reskin(_G.RecruitAFriendFrame.RecruitmentButton)
+    S:ReskinButton(_G.RecruitAFriendFrame.RewardClaiming.ClaimOrViewRewardButton)
+    S:ReskinButton(_G.RecruitAFriendFrame.RecruitmentButton)
 
     local recruitList = _G.RecruitAFriendFrame.RecruitList
     recruitList.Header:StripTextures()
     recruitList.Header:CreateBackdrop()
     recruitList.ScrollFrameInset:Hide()
-    S:ReskinTrimScroll(recruitList.ScrollBar)
+    S:ReskinTrimScrollBar(recruitList.ScrollBar)
 
     local recruitmentFrame = _G.RecruitAFriendRecruitmentFrame
     recruitmentFrame:StripTextures()
     S:ReskinClose(recruitmentFrame.CloseButton)
-    S:SetBD(recruitmentFrame)
+    S:CreateBackground(recruitmentFrame)
     recruitmentFrame.EditBox:StripTextures()
     recruitmentFrame.EditBox.backdrop = nil
     local recruitEditBg = recruitmentFrame.EditBox:CreateBackdrop()
     recruitEditBg:SetPoint("TOPLEFT", -3, -3)
     recruitEditBg:SetPoint("BOTTOMRIGHT", 0, 3)
-    S:Reskin(recruitmentFrame.GenerateOrCopyLinkButton)
+    S:ReskinButton(recruitmentFrame.GenerateOrCopyLinkButton)
 
     local rewardsFrame = _G.RecruitAFriendRewardsFrame
     rewardsFrame:StripTextures()
     S:ReskinClose(rewardsFrame.CloseButton)
-    S:SetBD(rewardsFrame)
+    S:CreateBackground(rewardsFrame)
 
     rewardsFrame:HookScript("OnShow", function(self)
         for i = 1, self:GetNumChildren() do

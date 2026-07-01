@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Professions Customer Orders
@@ -64,8 +63,8 @@ end
 
 local function reskinMoneyInput(box)
     S:ReskinEditBox(box)
-    box.__bg:SetPoint("TOPLEFT", 0, -3)
-    box.__bg:SetPoint("BOTTOMRIGHT", 0, 3)
+    box.backdrop:SetPoint("TOPLEFT", 0, -3)
+    box.backdrop:SetPoint("BOTTOMRIGHT", 0, 3)
 end
 
 local function reskinContainer(container)
@@ -109,14 +108,14 @@ function S:ProfessionsOrders()
     frame.MoneyFrameInset:StripTextures()
 
     local searchBar = frame.BrowseOrders.SearchBar
-    S:Reskin(searchBar.FavoritesSearchButton)
+    S:ReskinButton(searchBar.FavoritesSearchButton)
     searchBar.FavoritesSearchButton:SetSize(22, 22)
     S:ReskinEditBox(searchBar.SearchBox)
-    S:Reskin(searchBar.SearchButton)
+    S:ReskinButton(searchBar.SearchButton)
     S:ReskinFilterButton(searchBar.FilterDropdown)
 
     frame.BrowseOrders.CategoryList:StripTextures()
-    S:ReskinTrimScroll(frame.BrowseOrders.CategoryList.ScrollBar)
+    S:ReskinTrimScrollBar(frame.BrowseOrders.CategoryList.ScrollBar)
 
     hooksecurefunc(frame.BrowseOrders.CategoryList.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -135,13 +134,13 @@ function S:ProfessionsOrders()
     local recipeScrollBg = recipeList.ScrollBox:CreateBackdrop()
     recipeScrollBg:SetBackdropColor(0, 0, 0, 0.25)
     recipeScrollBg:SetInside()
-    S:ReskinTrimScroll(recipeList.ScrollBar)
+    S:ReskinTrimScrollBar(recipeList.ScrollBar)
 
     hooksecurefunc(frame.BrowseOrders, "SetupTable", reskinBrowseOrders)
     hooksecurefunc(frame.BrowseOrders, "StartSearch", reskinListIcon)
 
     -- Form
-    S:Reskin(frame.Form.BackButton)
+    S:ReskinButton(frame.Form.BackButton)
     S:ReskinCheck(frame.Form.AllocateBestQualityCheckbox)
     S:ReskinCheck(frame.Form.TrackRecipeCheckbox.Checkbox)
 
@@ -161,8 +160,8 @@ function S:ProfessionsOrders()
     hl:SetInside(itemButton.bg)
 
     S:ReskinEditBox(frame.Form.OrderRecipientTarget)
-    frame.Form.OrderRecipientTarget.__bg:SetPoint("TOPLEFT", -8, -2)
-    frame.Form.OrderRecipientTarget.__bg:SetPoint("BOTTOMRIGHT", 0, 2)
+    frame.Form.OrderRecipientTarget.backdrop:SetPoint("TOPLEFT", -8, -2)
+    frame.Form.OrderRecipientTarget.backdrop:SetPoint("BOTTOMRIGHT", 0, 2)
     S:ReskinDropDown(frame.Form.OrderRecipientDropdown)
     S:ReskinDropDown(frame.Form.MinimumQuality.Dropdown)
 
@@ -176,8 +175,8 @@ function S:ProfessionsOrders()
     reskinMoneyInput(paymentContainer.TipMoneyInputFrame.GoldBox)
     reskinMoneyInput(paymentContainer.TipMoneyInputFrame.SilverBox)
     S:ReskinDropDown(paymentContainer.DurationDropdown)
-    S:Reskin(paymentContainer.ListOrderButton)
-    S:Reskin(paymentContainer.CancelOrderButton)
+    S:ReskinButton(paymentContainer.ListOrderButton)
+    S:ReskinButton(paymentContainer.CancelOrderButton)
 
     local viewButton = paymentContainer.ViewListingsButton
     viewButton:SetAlpha(0)
@@ -189,9 +188,9 @@ function S:ProfessionsOrders()
 
     local current = frame.Form.CurrentListings
     current:StripTextures()
-    S:SetBD(current)
-    S:Reskin(current.CloseButton)
-    S:ReskinTrimScroll(current.OrderList.ScrollBar)
+    S:CreateBackground(current)
+    S:ReskinButton(current.CloseButton)
+    S:ReskinTrimScrollBar(current.OrderList.ScrollBar)
     reskinListHeader(current.OrderList.HeaderContainer)
     current.OrderList:StripTextures()
     current:ClearAllPoints()
@@ -225,23 +224,23 @@ function S:ProfessionsOrders()
 
     local qualityDialog = frame.Form.QualityDialog
     qualityDialog:StripTextures()
-    S:SetBD(qualityDialog)
+    S:CreateBackground(qualityDialog)
     S:ReskinClose(qualityDialog.ClosePanelButton)
-    S:Reskin(qualityDialog.AcceptButton)
-    S:Reskin(qualityDialog.CancelButton)
+    S:ReskinButton(qualityDialog.AcceptButton)
+    S:ReskinButton(qualityDialog.CancelButton)
     for i = 1, 3 do
         reskinContainer(qualityDialog["Container" .. i])
     end
 
-    S:Reskin(frame.Form.OrderRecipientDisplay.SocialDropdown)
+    S:ReskinButton(frame.Form.OrderRecipientDisplay.SocialDropdown)
 
     -- Orders
-    S:Reskin(frame.MyOrdersPage.RefreshButton)
+    S:ReskinButton(frame.MyOrdersPage.RefreshButton)
     frame.MyOrdersPage.OrderList:StripTextures()
     local myOrdersBg = frame.MyOrdersPage.OrderList:CreateBackdrop()
     myOrdersBg:SetBackdropColor(0, 0, 0, 0.25)
     reskinListHeader(frame.MyOrdersPage.OrderList.HeaderContainer)
-    S:ReskinTrimScroll(frame.MyOrdersPage.OrderList.ScrollBar)
+    S:ReskinTrimScrollBar(frame.MyOrdersPage.OrderList.ScrollBar)
 
     hooksecurefunc(frame.MyOrdersPage.OrderList.ScrollBox, "Update", function(self) self:ForEachFrame(reskinOrderIcon) end)
 end

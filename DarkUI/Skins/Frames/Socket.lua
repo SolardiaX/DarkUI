@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Item Socketing UI
@@ -66,8 +65,8 @@ function S:ItemSocketingUI()
     S:ReskinPortraitFrame(frame)
     frame.BackgroundColor:SetAlpha(0)
     _G.ItemSocketingScrollFrame:CreateBackdrop()
-    S:Reskin(socketingContainer.ApplySocketsButton)
-    S:ReskinTrimScroll(_G.ItemSocketingScrollFrame.ScrollBar)
+    S:ReskinButton(socketingContainer.ApplySocketsButton)
+    S:ReskinTrimScrollBar(_G.ItemSocketingScrollFrame.ScrollBar)
 end
 
 S:AddCallbackForAddon("Blizzard_ItemSocketingUI", "ItemSocketingUI")

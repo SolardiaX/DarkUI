@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Static Popup Dialogs + Pet Battle Queue + Player Report Frame
@@ -62,16 +61,16 @@ function S:StaticPopup()
 
         frame:StripTextures()
         for j = 1, 4 do
-            S:Reskin(_G["StaticPopup" .. i .. "Button" .. j])
+            S:ReskinButton(_G["StaticPopup" .. i .. "Button" .. j])
         end
-        S:SetBD(frame)
+        S:CreateBackground(frame)
         S:ReskinClose(close)
 
         -- minimize line shown when closeButtonIsHide is set
         close.minimize = close:CreateTexture(nil, "OVERLAY")
         close.minimize:SetSize(9, E.mult)
         close.minimize:SetPoint("CENTER")
-        close.minimize:SetTexture(DB.bdTex)
+        close.minimize:SetTexture(C.media.texture.blank)
         close.minimize:SetVertexColor(1, 1, 1)
         close:HookScript("OnEnter", colorMinimize)
         close:HookScript("OnLeave", clearMinimize)
@@ -130,17 +129,17 @@ function S:StaticPopup()
     end)
 
     -- Pet battle queue popup
-    S:SetBD(PetBattleQueueReadyFrame)
+    S:CreateBackground(PetBattleQueueReadyFrame)
     PetBattleQueueReadyFrame.Art:CreateBackdrop()
     PetBattleQueueReadyFrame.Border:Hide()
-    S:Reskin(PetBattleQueueReadyFrame.AcceptButton)
-    S:Reskin(PetBattleQueueReadyFrame.DeclineButton)
+    S:ReskinButton(PetBattleQueueReadyFrame.AcceptButton)
+    S:ReskinButton(PetBattleQueueReadyFrame.DeclineButton)
 
     -- PlayerReportFrame
     ReportFrame:StripTextures()
-    S:SetBD(ReportFrame)
+    S:CreateBackground(ReportFrame)
     S:ReskinClose(ReportFrame.CloseButton)
-    S:Reskin(ReportFrame.ReportButton)
+    S:ReskinButton(ReportFrame.ReportButton)
     S:ReskinDropDown(ReportFrame.ReportingMajorCategoryDropdown)
     S:ReskinEditBox(ReportFrame.Comment)
 

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Weekly Rewards (Great Vault)
@@ -23,7 +22,7 @@ local function updateSelection(frame)
     end
 end
 
-local iconColor = DB.QualityColors[Enum.ItemQuality.Epic or 4]
+local iconColor = C.media.qualityColors[Enum.ItemQuality.Epic or 4]
 local function reskinRewardIcon(itemFrame)
     if not itemFrame.bg then
         itemFrame:DisableDrawLayer("BORDER")
@@ -74,10 +73,10 @@ function S:WeeklyRewards()
 
     local WeeklyRewardsFrame = _G.WeeklyRewardsFrame
 
-    local bg = S:SetBD(WeeklyRewardsFrame)
+    local bg = S:CreateBackground(WeeklyRewardsFrame)
     S:ReskinClose(WeeklyRewardsFrame.CloseButton)
     WeeklyRewardsFrame.SelectRewardButton:StripTextures()
-    S:Reskin(WeeklyRewardsFrame.SelectRewardButton)
+    S:ReskinButton(WeeklyRewardsFrame.SelectRewardButton)
 
     WeeklyRewardsFrame.BorderShadow:SetInside(bg)
     WeeklyRewardsFrame.BorderContainer:SetAlpha(0)
@@ -116,7 +115,7 @@ function S:WeeklyRewards()
     local dialog = _G.WeeklyRewardExpirationWarningDialog
     if dialog then
         dialog:StripTextures()
-        S:SetBD(dialog)
+        S:CreateBackground(dialog)
     end
 end
 

@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Ghost (Release Spirit) Frame
@@ -19,9 +18,9 @@ function S:Ghost()
     end
     S:ReskinIcon(GhostFrameContentsFrameIcon)
 
-    local bg = S:SetBD(GhostFrame, 0)
+    local bg = S:CreateBackground(GhostFrame, 0)
     bg:CreateGradient()
-    GhostFrame:SetHighlightTexture(DB.bdTex)
+    GhostFrame:SetHighlightTexture(C.media.texture.blank)
     GhostFrame:GetHighlightTexture():SetVertexColor(cr, cg, cb, 0.25)
 end
 

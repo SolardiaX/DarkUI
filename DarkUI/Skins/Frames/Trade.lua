@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Trade Frame
@@ -28,8 +27,8 @@ function S:Trade()
 
     S:ReskinPortraitFrame(TradeFrame)
     TradeFrame.RecipientOverlay:Hide()
-    S:Reskin(TradeFrameTradeButton)
-    S:Reskin(TradeFrameCancelButton)
+    S:ReskinButton(TradeFrameTradeButton)
+    S:ReskinButton(TradeFrameCancelButton)
 
     if not TradePlayerInputMoneyFrame:IsForbidden() then
         S:ReskinInput(TradePlayerInputMoneyFrameGold)
@@ -46,7 +45,7 @@ function S:Trade()
         local hl = bu:GetHighlightTexture()
         hl:SetColorTexture(1, 1, 1, 0.25)
         hl:SetInside()
-        bu.icon:SetTexCoord(unpack(DB.TexCoord))
+        bu.icon:SetTexCoord(unpack(C.media.texCoord))
         bu.icon:SetInside()
         bu.IconOverlay:SetInside()
         bu.IconOverlay2:SetInside()

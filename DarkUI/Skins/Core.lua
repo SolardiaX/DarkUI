@@ -1,16 +1,14 @@
 local E, C, L = select(2, ...):unpack()
 
 ------------------------------------------------------------------------
--- Skins Module — AuroraClassic-style per-frame skin engine
+-- Skins Module — per-frame skin engine for Blizzard UI panels
 --
--- Ports under Skins/Frames/ are near-verbatim translations of AuroraClassic
--- (AddOns/*.lua + FrameXML/*.lua). They call this module's S:Reskin* methods
--- (Aurora's B:Reskin* set, self=S + explicit target frame) and the metatable
--- atoms from Core/API.lua (frame:CreateBackdrop / :StripTextures / :SetInside …).
--- The Aurora B:Reskin* primitives route to DarkUI's own engine (E:Reskin*/
--- E:Style*), so the look stays DarkUI (textured backdrop + shadow), not Aurora's
--- flat fill. Quality borders tint the icon's own round_white bg edge, Aurora-style.
--- See Skins/SYNC.md for the recipe.
+-- Ports under Skins/Frames/ skin one Blizzard panel each. They call this
+-- module's S:Reskin* methods (self=S + explicit target frame) plus the
+-- metatable atoms from Core/API.lua (frame:CreateBackdrop / :StripTextures /
+-- :SetInside …). The S:Reskin* facade routes to DarkUI's own engine
+-- (E:Reskin*/E:Style*), so every panel gets the DarkUI look: textured backdrop
+-- + shadow, with round_white quality borders. See Skins/SYNC.md.
 ------------------------------------------------------------------------
 
 local _G = _G
@@ -34,28 +32,6 @@ S.initialized = false
 
 -- Arrow texture points up by default; rotate per direction (radians)
 S.ArrowRotation = { up = 0, down = 3.14, left = 1.57, right = -1.57 }
-
-------------------------------------------------------------------------
--- S.DB — AuroraClassic constant map (Aurora DB.* names → DarkUI values)
--- Ports keep `local DB = S.DB` and reference DB.x with no per-symbol rewrite.
-------------------------------------------------------------------------
-
-S.DB = {
-    bdTex = C.media.texture.blank,
-    bgTex = C.media.texture.blank,
-    normTex = C.media.texture.blank,
-    glowTex = C.media.texture.blank,
-    closeTex = C.media.texture.close,
-    ArrowUp = C.media.texture.arrow,
-    sparkTex = C.media.texture.spark,
-    pushedTex = C.media.button and C.media.button.glow,
-    TexCoord = C.media.texCoord,
-    QualityColors = C.media.qualityColors,
-    r = r,
-    g = g,
-    b = b,
-}
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Dispatch (per-addon callbacks fired on ADDON_LOADED; pcall-isolated)
@@ -115,7 +91,7 @@ end
 ------------------------------------------------------------------------
 
 -- hover handlers: recolor a control's backdrop border to theme gold on enter,
--- resting color on leave (ports hook these; Aurora's Texture_OnEnter/Leave).
+-- resting color on leave (ports hook these on OnEnter/OnLeave).
 function S.SetModifiedBackdrop(self)
     if self.IsEnabled and not self:IsEnabled() then return end
     local bd = self.backdrop or self
@@ -127,7 +103,7 @@ function S.SetOriginalBackdrop(self)
     if bd.SetBackdropBorderColor then bd:SetBackdropBorderColor(unpack(C.media.border_color)) end
 end
 
--- texture's arrow points up by default; rotate per direction (Aurora SetupArrow)
+-- texture's arrow points up by default; rotate per direction
 local ARROW_DEGREE = { up = 0, down = 180, left = 90, right = -90 }
 function S:SetupArrow(tex, direction)
     if not tex then return end
@@ -135,7 +111,7 @@ function S:SetupArrow(tex, direction)
     tex:SetRotation(rad(ARROW_DEGREE[direction] or 0))
 end
 
--- named Blizzard art regions, hidden in bulk (Aurora blizzRegions sweep)
+-- named Blizzard art regions, hidden in bulk
 S.BlizzardRegions = {
     "Left",
     "Middle",
@@ -202,12 +178,12 @@ function S:ReskinBlizzardRegions(frame, name, kill, zero)
 end
 
 ------------------------------------------------------------------------
--- Backdrop shorthand (Aurora SetBD/CreateBDFrame)
+-- Backdrop shorthand
 ------------------------------------------------------------------------
 
--- Aurora SetBD: a textured backdrop frame (+ shadow) on a frame, with optional
+-- S:CreateBackground: a textured backdrop frame (+ shadow) on a frame, with optional
 -- inset points. Routes to our CreateBackdrop atom (textured) + CreateShadow.
-function S:SetBD(frame, _, x, y, x2, y2)
+function S:CreateBackground(frame, _, x, y, x2, y2)
     local bg = frame:CreateBackdrop()
     if x then
         bg:ClearAllPoints()
@@ -219,10 +195,10 @@ function S:SetBD(frame, _, x, y, x2, y2)
 end
 
 ------------------------------------------------------------------------
--- Buttons (Aurora Reskin / ReskinFilterButton / ReskinMenuButton / ReskinClose)
+-- Buttons
 ------------------------------------------------------------------------
 
-function S:Reskin(button, noHighlight, override)
+function S:ReskinButton(button, noHighlight, override)
     if not button then return end
 
     E:ReskinUIPanelButton(button, override)
@@ -233,10 +209,6 @@ function S:Reskin(button, noHighlight, override)
         button:HookScript("OnEnter", S.SetModifiedBackdrop)
         button:HookScript("OnLeave", S.SetOriginalBackdrop)
     end
-
-    -- Aurora compat: B.Reskin created a button-sized child frame at self.__bg; DarkUI
-    -- templates the button in place, so the button itself is the backdrop anchor.
-    button.__bg = button
 end
 
 function S:ReskinClose(button, parent, xOffset, yOffset) return E:StyleCloseButton(button, parent or (button.GetParent and button:GetParent())) end
@@ -249,7 +221,7 @@ function S:ReskinMenuButton(button)
     button:HookScript("OnLeave", S.SetOriginalBackdrop)
 end
 
--- Aurora ReskinFilterReset: small red X on the reset sub-button
+-- ReskinFilterReset: small red X on the reset sub-button
 function S:ReskinFilterReset(button)
     if not button then return end
     button:StripTextures()
@@ -262,45 +234,43 @@ function S:ReskinFilterReset(button)
     tex:SetVertexColor(1, 0, 0)
 end
 
--- Aurora ReskinFilterButton: filter dropdown styled as a button + right arrow
+-- ReskinFilterButton: filter dropdown styled as a button + right arrow
 function S:ReskinFilterButton(button)
     if not button then return end
     button:StripTextures()
-    S:Reskin(button)
+    S:ReskinButton(button)
 
     if button.Text then button.Text:SetPoint("CENTER") end
     if button.Icon then
         S:SetupArrow(button.Icon, "right")
         button.Icon:SetPoint("RIGHT")
-        button.Icon:Size(14)
+        button.Icon:SetSize(14, 14)
     end
     if button.ResetButton then S:ReskinFilterReset(button.ResetButton) end
 
     if not button.__filterArrow then
         local tex = button:CreateTexture(nil, "ARTWORK")
         S:SetupArrow(tex, "right")
-        tex:Size(16)
-        tex:Point("RIGHT", -2, 0)
+        tex:SetSize(16, 16)
+        tex:SetPoint("RIGHT", -2, 0)
         button.__filterArrow = tex
     end
 end
 
 ------------------------------------------------------------------------
--- Routing facades (Aurora names → DarkUI engine)
+-- Routing facades (thin wrappers over the E:Reskin*/E:Style* engine)
 ------------------------------------------------------------------------
 
 function S:ReskinTab(tab)
     E:ReskinTab(tab)
-    if tab then tab.bg = tab.backdrop end -- Aurora ports reference tab.bg for active-tab tinting
     return tab and tab.backdrop
 end
-function S:ReskinScroll(frame) return E:ReskinScrollBar(frame) end
-function S:ReskinTrimScroll(frame) return E:ReskinTrimScrollBar(frame) end
+function S:ReskinScrollBar(frame) return E:ReskinScrollBar(frame) end
+function S:ReskinTrimScrollBar(frame) return E:ReskinTrimScrollBar(frame) end
 function S:ReskinStatusBar(bar) return E:ReskinStatusBar(bar) end
 function S:ReskinSlider(frame) return E:ReskinSlider(frame) end
 function S:ReskinCheck(frame)
     E:StyleCheckBox(frame)
-    if frame then frame.bg = frame.backdrop end -- Aurora ports reference check.bg
     return frame and frame.backdrop
 end
 function S:ReskinNavBar(navBar) return E:ReskinNavBar(navBar) end
@@ -308,11 +278,9 @@ function S:ReskinDropDown(frame, width, template) return E:ReskinDropDown(frame,
 
 function S:ReskinEditBox(frame)
     E:ReskinEditBox(frame)
-    -- Aurora ports reposition the backdrop via editbox.__bg; DarkUI stores it at .backdrop
-    if frame then frame.__bg = frame.backdrop end
     return frame and frame.backdrop
 end
--- Aurora ReskinInput(editbox, height, width): ReskinEditBox + optional resize
+-- ReskinInput: ReskinEditBox + optional resize
 function S:ReskinInput(frame, height, width)
     local backdrop = S:ReskinEditBox(frame)
     if frame then
@@ -322,7 +290,7 @@ function S:ReskinInput(frame, height, width)
     return backdrop
 end
 
--- ElvUI-parity inset pieces hidden by portrait/frame skins
+-- inset border pieces hidden by portrait/frame skins
 local INSET_PIECES = {
     "InsetBorderTop",
     "InsetBorderTopLeft",
@@ -383,7 +351,7 @@ function S:ReplaceIconString(fontString)
 end
 
 ------------------------------------------------------------------------
--- Icons (Aurora ReskinIcon / ClassIconTexCoord / CreateAndUpdateBarTicks)
+-- Icons
 ------------------------------------------------------------------------
 
 function S:ReskinIcon(icon, shadow)
@@ -422,8 +390,7 @@ end
 
 ------------------------------------------------------------------------
 -- ReskinItemButton — item slot button (icon + backdrop whose edge ReskinIconBorder tints)
--- DarkUI enhancement (no direct Aurora equivalent; Aurora uses ReskinIcon +
--- ReskinIconBorder per slot). Use for full item slots that carry IconBorder.
+-- Use for full item slots that carry an IconBorder region.
 ------------------------------------------------------------------------
 
 function S:ReskinItemButton(b, setInside, ignoreParent)
@@ -461,7 +428,7 @@ function S:ReskinItemButton(b, setInside, ignoreParent)
     end
 
     if b.SetPushedTexture and not b.pushed then
-        b:SetPushedTexture(C.media.button.glow)
+        b:SetPushedTexture(C.media.button.pushed)
         local pt = b:GetPushedTexture()
         if pt then
             pt:SetOutside(b, 2, 2)
@@ -496,14 +463,12 @@ end
 
 ------------------------------------------------------------------------
 -- ReskinIconBorder — tint the icon's own backdrop edge (owner.bg, the
--- round_white frame from ReskinIcon) with the item-quality color. Ported
--- verbatim from AuroraClassic B:ReskinIconBorder (Core.lua, 2026-06); only
--- leaves swapped: DB.QualityColors → C.media.qualityColors. Quality is matched
--- by the atlas SUFFIX (…-green/-blue/-purple/…), not the full atlas name.
+-- round_white frame from ReskinIcon) with the item-quality color. Quality is
+-- matched by the atlas SUFFIX (…-green/-blue/-purple/…), not the full atlas name.
 --   ReskinIconBorder(border, needInit, useAtlas)
 --     needInit — re-fire the setter now so an already-colored border tints immediately
 --     useAtlas — track SetAtlas (suffix→quality); otherwise track SetVertexColor
--- (secret-safe additions: GetAtlas/GetVertexColor may return secrets in combat)
+-- (secret-safe: GetAtlas/GetVertexColor may return secrets in combat)
 ------------------------------------------------------------------------
 
 do
@@ -613,7 +578,7 @@ function S:ReskinNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
 
     local Normal, Disabled, Pushed = btn:GetNormalTexture(), btn:GetDisabledTexture(), btn:GetPushedTexture()
 
-    btn:Size(noBackdrop and 20 or 18)
+    btn:SetSize(noBackdrop and 20 or 18, noBackdrop and 20 or 18)
 
     if noBackdrop then
         Disabled:SetVertexColor(0.5, 0.5, 0.5)
@@ -646,11 +611,11 @@ function S:ReskinNextPrevButton(btn, arrowDir, color, noBackdrop, stripTexts)
     btn.__styled = true
 end
 
--- Aurora ReskinArrow(button, direction): paging/scroll arrow with explicit dir
+-- ReskinArrow(button, direction): paging/scroll arrow with explicit dir
 function S:ReskinArrow(button, direction) return S:ReskinNextPrevButton(button, direction) end
 
 ------------------------------------------------------------------------
--- ReskinColorSwatch (Aurora)
+-- ReskinColorSwatch
 ------------------------------------------------------------------------
 
 function S:ReskinColorSwatch(button)
@@ -667,7 +632,7 @@ function S:ReskinColorSwatch(button)
 end
 
 ------------------------------------------------------------------------
--- ReskinSmallRole / ReskinRole (Aurora group-role icons)
+-- ReskinSmallRole / ReskinRole - group-role icons
 ------------------------------------------------------------------------
 
 local GroupRoleTex = {
@@ -697,7 +662,7 @@ function S:ReskinRole(frame)
 end
 
 ------------------------------------------------------------------------
--- StyleSearchButton / AffixesSetup (Aurora)
+-- StyleSearchButton / AffixesSetup
 ------------------------------------------------------------------------
 
 function S:StyleSearchButton(button)
@@ -748,7 +713,7 @@ local function skinIconSelectorButton(button, i, buttonNameTemplate)
 
     button:StripTextures()
     button:SetTemplate()
-    button:StyleButton(nil, true)
+    E:StyleIconButton(button, nil, true)
 
     if texture then icon:SetTexture(texture) end
 end
@@ -760,7 +725,7 @@ local function selectionOffset(frame)
     local x = frame.BorderBox and 8 or 40
     local y = frame.BorderBox and 4 or -10
     frame:ClearAllPoints()
-    frame:Point(point, (frame == _G.MacroPopupFrame and _G.MacroFrame) or anchor, relativePoint, strfind(point, "LEFT") and x or -x, y)
+    frame:SetPoint(point, (frame == _G.MacroPopupFrame and _G.MacroFrame) or anchor, relativePoint, strfind(point, "LEFT") and x or -x, y)
 end
 
 function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
@@ -768,7 +733,7 @@ function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
 
     if not dontOffset then
         frame:HookScript("OnShow", selectionOffset)
-        frame:Height(frame:GetHeight() + 10)
+        frame:SetHeight(frame:GetHeight() + 10)
         if frame:IsShown() then selectionOffset(frame) end
     end
 
@@ -797,12 +762,12 @@ function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
     if cancel then
         cancel:ClearAllPoints()
         cancel:SetPoint("BOTTOMRIGHT", frame, -4, 4)
-        S:Reskin(cancel)
+        S:ReskinButton(cancel)
     end
     if okay then
         okay:ClearAllPoints()
         okay:SetPoint("RIGHT", cancel or okay, "LEFT", -10, 0)
-        S:Reskin(okay)
+        S:ReskinButton(okay)
     end
     if editBox then
         editBox:DisableDrawLayer("BACKGROUND")
@@ -811,10 +776,10 @@ function S:ReskinIconSelectionFrame(frame, _, _, nameOverride, dontOffset)
 
     local iconSelector = frame.IconSelector
     if iconSelector then
-        if iconSelector.ScrollBar then S:ReskinTrimScroll(iconSelector.ScrollBar) end
+        if iconSelector.ScrollBar then S:ReskinTrimScrollBar(iconSelector.ScrollBar) end
         -- Skin grid buttons as the ScrollBox lays them out. A one-shot ForEachFrame
         -- at load would crash on an un-populated box (ScrollBox has no view yet) and
-        -- also miss buttons realized later, so hook Update like Aurora does.
+        -- also miss buttons realized later, so hook Update.
         if iconSelector.ScrollBox then
             hooksecurefunc(iconSelector.ScrollBox, "Update", function(box)
                 local target = box.ScrollTarget
@@ -872,7 +837,7 @@ do
         if overlays[button] then return end
 
         local overlay = CreateFrame("Frame", "DarkUI_OverlayButton_" .. name, _G.UIParent)
-        overlay:Size(width or 120, height or 22)
+        overlay:SetSize(width or 120, height or 22)
         overlay:SetTemplate()
         overlay:SetPoint(button:GetPoint())
         overlay:SetFrameLevel(level or 10)
@@ -906,8 +871,8 @@ function S:SkinReadyDialog(dialog, bottom)
     local background = dialog.background
     if background then
         background:ClearAllPoints()
-        background:Point("TOPLEFT", E.mult, -E.mult)
-        background:Point("BOTTOMRIGHT", -E.mult, bottom or 50)
+        background:SetPoint("TOPLEFT", E.mult, -E.mult)
+        background:SetPoint("BOTTOMRIGHT", -E.mult, bottom or 50)
 
         dialog:CreateBackdrop("Transparent")
         dialog.backdrop:SetOutside(background)
@@ -925,15 +890,15 @@ function S:SkinReadyDialog(dialog, bottom)
     if instance and instance.underline then instance.underline:SetAlpha(0) end
 
     if dialog.enterButton then
-        S:Reskin(dialog.enterButton)
+        S:ReskinButton(dialog.enterButton)
         dialog.enterButton:ClearAllPoints()
-        dialog.enterButton:Point("BOTTOMRIGHT", dialog, "BOTTOM", -10, 15)
+        dialog.enterButton:SetPoint("BOTTOMRIGHT", dialog, "BOTTOM", -10, 15)
     end
 
     if dialog.leaveButton then
-        S:Reskin(dialog.leaveButton)
+        S:ReskinButton(dialog.leaveButton)
         dialog.leaveButton:ClearAllPoints()
-        dialog.leaveButton:Point("BOTTOMLEFT", dialog, "BOTTOM", 10, 15)
+        dialog.leaveButton:SetPoint("BOTTOMLEFT", dialog, "BOTTOM", 10, 15)
     end
 end
 
@@ -965,7 +930,7 @@ function S:ReskinRotateButton(button, width, height, noSize)
     if not button or button.__styled then return end
     if button:IsForbidden() then return end
 
-    if not noSize then button:Size(width or 24, height or 24) end
+    if not noSize then button:SetSize(width or 24, height or 24) end
     button:SetTemplate("Fill")
 
     local left
@@ -1027,8 +992,8 @@ do
             if button then
                 button:SetHitRectInsets(1, 1, 1, 1)
                 button:ClearAllPoints()
-                button:Point("CENTER")
-                button:Size(14)
+                button:SetPoint("CENTER")
+                button:SetSize(14, 14)
 
                 local highlight = button:GetHighlightTexture()
                 if highlight then highlight:SetTexture("") end
@@ -1077,14 +1042,14 @@ do
 
         local insideMask = button:CreateMaskTexture()
         insideMask:SetTexture(maskBackground, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-        insideMask:Size(10)
-        insideMask:Point("CENTER")
+        insideMask:SetSize(10, 10)
+        insideMask:SetPoint("CENTER")
         button.InsideMask = insideMask
 
         local outsideMask = button:CreateMaskTexture()
         outsideMask:SetTexture(maskBackground, "CLAMPTOBLACKADDITIVE", "CLAMPTOBLACKADDITIVE")
-        outsideMask:Size(13)
-        outsideMask:Point("CENTER")
+        outsideMask:SetSize(13, 13)
+        outsideMask:SetPoint("CENTER")
         button.OutsideMask = outsideMask
 
         local blank = C.media.texture.blank
@@ -1141,6 +1106,7 @@ function S:ReskinStepperSlider(frame, minimal)
     if thumb then
         thumb:SetTexture(C.media.texture.spark)
         thumb:SetBlendMode("ADD")
+        thumb:SetVertexColor(r, g, b)
         thumb:SetSize(20, 30)
     end
 
@@ -1162,7 +1128,7 @@ function S:ReskinStepperSlider(frame, minimal)
 end
 
 ------------------------------------------------------------------------
--- ReskinCollapse — +/- collapse header buttons (Aurora ReskinCollapse(isAtlas))
+-- ReskinCollapse — +/- collapse header buttons
 ------------------------------------------------------------------------
 
 do
@@ -1255,17 +1221,17 @@ do
             local button = frame[name]
             if button then
                 if not button.__styled then
-                    S:Reskin(button)
-                    button:Size(22)
+                    S:ReskinButton(button)
+                    button:SetSize(22, 22)
                     if button.Icon then button.Icon:SetInside(nil, 2, 2) end
                 end
 
                 if button:IsShown() then
                     button:ClearAllPoints()
                     if last then
-                        button:Point("LEFT", last, "RIGHT", 1, 0)
+                        button:SetPoint("LEFT", last, "RIGHT", 1, 0)
                     else
-                        button:Point("LEFT", 6, 0)
+                        button:SetPoint("LEFT", 6, 0)
                     end
                     last = button
                 end
@@ -1311,7 +1277,7 @@ do
         local level = portrait.Level or portrait.LevelText
         if level then
             level:ClearAllPoints()
-            level:Point("BOTTOM", portrait, 0, 15)
+            level:SetPoint("BOTTOM", portrait, 0, 15)
             level:FontTemplate(nil, 14, "OUTLINE")
 
             if portrait.LevelCircle then portrait.LevelCircle:Hide() end
@@ -1340,7 +1306,7 @@ do
 
             local roleIcon = portrait.HealthBar.RoleIcon
             roleIcon:ClearAllPoints()
-            roleIcon:Point("CENTER", main.backdrop, "TOPRIGHT")
+            roleIcon:SetPoint("CENTER", main.backdrop, "TOPRIGHT")
 
             if updateAtlas then
                 handleFollowerRole(roleIcon, roleIcon:GetAtlas())
@@ -1351,7 +1317,7 @@ do
             local background = portrait.HealthBar.Background
             background:SetAlpha(0)
             background:SetInside(main.backdrop, 2, 1)
-            background:Point("TOPLEFT", main.backdrop, "BOTTOMLEFT", 2, 7)
+            background:SetPoint("TOPLEFT", main.backdrop, "BOTTOMLEFT", 2, 7)
             portrait.HealthBar.Health:SetTexture(C.media.texture.blank)
         end
     end

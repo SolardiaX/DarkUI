@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Achievement UI
@@ -16,7 +15,7 @@ local select = select
 local hooksecurefunc = hooksecurefunc
 
 local function setupButtonHighlight(button, bg)
-    button:SetHighlightTexture(DB.bdTex)
+    button:SetHighlightTexture(C.media.texture.blank)
     local hl = button:GetHighlightTexture()
     hl:SetVertexColor(cr, cg, cb, 0.25)
     hl:SetInside(bg, 2, 2)
@@ -24,7 +23,7 @@ end
 
 local function setupStatusbar(bar)
     bar:StripTextures()
-    bar:SetStatusBarTexture(DB.bdTex)
+    bar:SetStatusBarTexture(C.media.texture.status)
     bar:GetStatusBarTexture():SetGradient("VERTICAL", CreateColor(0, 0.4, 0, 1), CreateColor(0, 0.6, 0, 1))
     local barBg = bar:CreateBackdrop()
     barBg:SetBackdropColor(0, 0, 0, 0.25)
@@ -68,7 +67,7 @@ function S:Achievement()
     previewContainer:StripTextures()
     previewContainer:ClearAllPoints()
     previewContainer:SetPoint("TOPLEFT", _G.AchievementFrame, "TOPRIGHT", 7, -2)
-    local previewBg = S:SetBD(previewContainer)
+    local previewBg = S:CreateBackground(previewContainer)
     previewBg:SetPoint("TOPLEFT", -3, 3)
     previewBg:SetPoint("BOTTOMRIGHT", showAllSearchResults, 3, -3)
 
@@ -80,12 +79,12 @@ function S:Achievement()
     local result = _G.AchievementFrame.SearchResults
     result:SetPoint("BOTTOMLEFT", _G.AchievementFrame, "BOTTOMRIGHT", 15, -1)
     result:StripTextures()
-    local resultBg = S:SetBD(result)
+    local resultBg = S:CreateBackground(result)
     resultBg:SetPoint("TOPLEFT", -10, 0)
     resultBg:SetPoint("BOTTOMRIGHT")
 
     S:ReskinClose(result.CloseButton)
-    S:ReskinTrimScroll(result.ScrollBar)
+    S:ReskinTrimScrollBar(result.ScrollBar)
     hooksecurefunc(result.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
@@ -105,7 +104,7 @@ function S:Achievement()
 
     -- AchievementFrameCategories
     _G.AchievementFrameCategories:StripTextures()
-    S:ReskinTrimScroll(_G.AchievementFrameCategories.ScrollBar)
+    S:ReskinTrimScrollBar(_G.AchievementFrameCategories.ScrollBar)
     hooksecurefunc(_G.AchievementFrameCategories.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
@@ -125,7 +124,7 @@ function S:Achievement()
     end)
 
     _G.AchievementFrameAchievements:StripTextures()
-    S:ReskinTrimScroll(_G.AchievementFrameAchievements.ScrollBar)
+    S:ReskinTrimScrollBar(_G.AchievementFrameAchievements.ScrollBar)
     select(3, _G.AchievementFrameAchievements:GetChildren()):Hide()
 
     local function updateAccountString(button)
@@ -205,7 +204,7 @@ function S:Achievement()
                 bu:HideBackdrop()
 
                 local bd = bu.Background
-                bd:SetTexture(DB.bdTex)
+                bd:SetTexture(C.media.texture.blank)
                 bd:SetVertexColor(0, 0, 0, 0.25)
 
                 bu.TitleBar:Hide()
@@ -268,7 +267,7 @@ function S:Achievement()
     -- Stats
     _G.AchievementFrameStatsBG:Hide()
     select(4, _G.AchievementFrameStats:GetChildren()):Hide()
-    S:ReskinTrimScroll(_G.AchievementFrameStats.ScrollBar)
+    S:ReskinTrimScrollBar(_G.AchievementFrameStats.ScrollBar)
     hooksecurefunc(_G.AchievementFrameStats.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
@@ -291,13 +290,13 @@ function S:Achievement()
     _G.AchievementFrameComparisonHeaderPortrait:Hide()
     _G.AchievementFrameComparisonHeaderPortraitBg:Hide()
     _G.AchievementFrameComparisonHeader:SetPoint("BOTTOMRIGHT", _G.AchievementFrameComparison, "TOPRIGHT", 39, 26)
-    local headerbg = S:SetBD(_G.AchievementFrameComparisonHeader)
+    local headerbg = S:CreateBackground(_G.AchievementFrameComparisonHeader)
     headerbg:SetPoint("TOPLEFT", 20, -20)
     headerbg:SetPoint("BOTTOMRIGHT", -28, -5)
 
     _G.AchievementFrameComparison:StripTextures()
     select(5, _G.AchievementFrameComparison:GetChildren()):Hide()
-    S:ReskinTrimScroll(_G.AchievementFrameComparison.AchievementContainer.ScrollBar)
+    S:ReskinTrimScrollBar(_G.AchievementFrameComparison.AchievementContainer.ScrollBar)
 
     local function handleCompareSummary(frame)
         frame:StripTextures()

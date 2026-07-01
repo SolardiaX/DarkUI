@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Stable UI (Hunter / Warlock pet stable)
@@ -17,8 +16,8 @@ function S:StableUI()
     if not (C.skins.enable and C.skins.stable) then return end
 
     S:ReskinPortraitFrame(_G.StableFrame)
-    S:Reskin(_G.StableFrame.StableTogglePetButton)
-    S:Reskin(_G.StableFrame.ReleasePetButton)
+    S:ReskinButton(_G.StableFrame.StableTogglePetButton)
+    S:ReskinButton(_G.StableFrame.ReleasePetButton)
 
     local stabledPetList = _G.StableFrame.StabledPetList
     stabledPetList:StripTextures()
@@ -26,7 +25,7 @@ function S:StableUI()
     stabledPetList.ListCounter:CreateBackdrop()
     S:ReskinEditBox(stabledPetList.FilterBar.SearchBox)
     S:ReskinFilterButton(stabledPetList.FilterBar.FilterDropdown)
-    S:ReskinTrimScroll(stabledPetList.ScrollBar)
+    S:ReskinTrimScrollBar(stabledPetList.ScrollBar)
 
     local modelScene = _G.StableFrame.PetModelScene
     if modelScene then

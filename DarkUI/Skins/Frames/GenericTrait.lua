@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Generic Trait UI
@@ -18,7 +17,7 @@ function S:GenericTrait()
 
     frame:StripTextures()
     S:ReskinClose(frame.CloseButton)
-    S:SetBD(frame)
+    S:CreateBackground(frame)
 
     S:ReplaceIconString(frame.Currency.UnspentPointsCount)
     hooksecurefunc(frame.Currency.UnspentPointsCount, "SetText", function(self) S:ReplaceIconString(self) end)

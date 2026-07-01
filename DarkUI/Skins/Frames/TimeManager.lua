@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Time Manager / Stopwatch
@@ -15,9 +14,9 @@ function S:TimeManager()
     _G.TimeManagerGlobe:Hide()
 
     local stopwatchCheck = _G.TimeManagerStopwatchCheck
-    stopwatchCheck:GetNormalTexture():SetTexCoord(unpack(DB.TexCoord))
+    stopwatchCheck:GetNormalTexture():SetTexCoord(unpack(C.media.texCoord))
     stopwatchCheck:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
-    stopwatchCheck:SetCheckedTexture(DB.pushedTex)
+    stopwatchCheck:SetCheckedTexture(C.media.button.glow)
     stopwatchCheck:CreateBackdrop()
 
     S:ReskinDropDown(_G.TimeManagerAlarmTimeFrame.HourDropdown)
@@ -32,7 +31,7 @@ function S:TimeManager()
 
     _G.StopwatchFrame:StripTextures()
     _G.StopwatchTabFrame:StripTextures()
-    S:SetBD(_G.StopwatchFrame)
+    S:CreateBackground(_G.StopwatchFrame)
     S:ReskinClose(_G.StopwatchCloseButton, _G.StopwatchFrame, -2, -2)
 
     local reset = _G.StopwatchResetButton

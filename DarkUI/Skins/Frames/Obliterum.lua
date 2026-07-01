@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Obliterum Forge UI
@@ -15,7 +14,7 @@ function S:Obliterum()
     local obliterum = ObliterumForgeFrame
 
     S:ReskinPortraitFrame(obliterum)
-    S:Reskin(obliterum.ObliterateButton)
+    S:ReskinButton(obliterum.ObliterateButton)
     S:ReskinIcon(obliterum.ItemSlot.Icon)
 end
 

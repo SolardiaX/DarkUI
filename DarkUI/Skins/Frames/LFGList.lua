@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- LFG List (Activity Finder / Group Listing)
@@ -34,8 +33,8 @@ function S:LFGList()
 
     local categorySelection = LFGListFrame.CategorySelection
 
-    S:Reskin(categorySelection.FindGroupButton)
-    S:Reskin(categorySelection.StartGroupButton)
+    S:ReskinButton(categorySelection.FindGroupButton)
+    S:ReskinButton(categorySelection.StartGroupButton)
     categorySelection.Inset:Hide()
     categorySelection.CategoryButtons[1]:SetNormalFontObject(GameFontNormal)
 
@@ -53,7 +52,7 @@ function S:LFGList()
     hooksecurefunc("LFGListSearchEntry_Update", function(self)
         local cancelButton = self.CancelButton
         if not cancelButton.__styled then
-            S:Reskin(cancelButton)
+            S:ReskinButton(cancelButton)
             cancelButton.__styled = true
         end
     end)
@@ -70,10 +69,10 @@ function S:LFGList()
 
     local searchPanel = LFGListFrame.SearchPanel
 
-    S:Reskin(searchPanel.RefreshButton)
-    S:Reskin(searchPanel.BackButton)
-    S:Reskin(searchPanel.BackToGroupButton)
-    S:Reskin(searchPanel.SignUpButton)
+    S:ReskinButton(searchPanel.RefreshButton)
+    S:ReskinButton(searchPanel.BackButton)
+    S:ReskinButton(searchPanel.BackToGroupButton)
+    S:ReskinButton(searchPanel.SignUpButton)
     S:ReskinInput(searchPanel.SearchBox)
     searchPanel.SearchBox:SetHeight(22)
     S:ReskinFilterButton(searchPanel.FilterButton)
@@ -111,7 +110,7 @@ function S:LFGList()
             bg:SetBackdropColor(0, 0, 0, 0.5)
             local hl = result:CreateTexture(nil, "BACKGROUND")
             hl:SetInside(bg)
-            hl:SetTexture(DB.bdTex)
+            hl:SetTexture(C.media.texture.blank)
             hl:SetVertexColor(cr, cg, cb, 0.25)
             hl:Hide()
             result.hl = hl
@@ -126,7 +125,7 @@ function S:LFGList()
     local function skinCreateButton(button)
         local child = button:GetChildren()
         if not child.__styled and child:IsObjectType("Button") then
-            S:Reskin(child)
+            S:ReskinButton(child)
             child.__styled = true
         end
     end
@@ -134,8 +133,8 @@ function S:LFGList()
     local delayStyled -- otherwise it taints while listing
     hooksecurefunc(searchPanel.ScrollBox, "Update", function(self)
         if not delayStyled then
-            S:Reskin(self.StartGroupButton)
-            S:ReskinTrimScroll(searchPanel.ScrollBar)
+            S:ReskinButton(self.StartGroupButton)
+            S:ReskinTrimScrollBar(searchPanel.ScrollBar)
             delayStyled = true
         end
         self:ForEachFrame(skinCreateButton)
@@ -160,7 +159,7 @@ function S:LFGList()
         bg:SetBackdropColor(0, 0, 0, 0.25)
         local hl = header:CreateTexture(nil, "BACKGROUND")
         hl:SetInside(bg)
-        hl:SetTexture(DB.bdTex)
+        hl:SetTexture(C.media.texture.blank)
         hl:SetVertexColor(cr, cg, cb, 0.25)
         hl:Hide()
         header.hl = hl
@@ -172,21 +171,21 @@ function S:LFGList()
         prevHeader = header
     end
 
-    S:Reskin(applicationViewer.RefreshButton)
-    S:Reskin(applicationViewer.RemoveEntryButton)
-    S:Reskin(applicationViewer.EditButton)
-    S:Reskin(applicationViewer.BrowseGroupsButton)
+    S:ReskinButton(applicationViewer.RefreshButton)
+    S:ReskinButton(applicationViewer.RemoveEntryButton)
+    S:ReskinButton(applicationViewer.EditButton)
+    S:ReskinButton(applicationViewer.BrowseGroupsButton)
     S:ReskinCheck(applicationViewer.AutoAcceptButton)
-    S:ReskinTrimScroll(applicationViewer.ScrollBar)
+    S:ReskinTrimScrollBar(applicationViewer.ScrollBar)
 
     applicationViewer.RefreshButton:SetSize(24, 24)
     applicationViewer.RefreshButton.Icon:SetPoint("CENTER")
 
     hooksecurefunc("LFGListApplicationViewer_UpdateApplicant", function(button)
         if not button.__styled then
-            S:Reskin(button.DeclineButton)
-            S:Reskin(button.InviteButton)
-            S:Reskin(button.InviteButtonSmall)
+            S:ReskinButton(button.DeclineButton)
+            S:ReskinButton(button.InviteButton)
+            S:ReskinButton(button.InviteButtonSmall)
 
             button.__styled = true
         end
@@ -197,8 +196,8 @@ function S:LFGList()
     local entryCreation = LFGListFrame.EntryCreation
     entryCreation.Inset:Hide()
     entryCreation.Description:StripTextures()
-    S:Reskin(entryCreation.ListGroupButton)
-    S:Reskin(entryCreation.CancelButton)
+    S:ReskinButton(entryCreation.ListGroupButton)
+    S:ReskinButton(entryCreation.CancelButton)
     S:ReskinInput(entryCreation.Description)
     S:ReskinInput(entryCreation.Name)
     S:ReskinInput(entryCreation.ItemLevel.EditBox)
@@ -256,33 +255,33 @@ function S:LFGList()
 
     local finderDialog = activityFinder.Dialog
     finderDialog:StripTextures()
-    S:SetBD(finderDialog)
-    S:Reskin(finderDialog.SelectButton)
-    S:Reskin(finderDialog.CancelButton)
+    S:CreateBackground(finderDialog)
+    S:ReskinButton(finderDialog.SelectButton)
+    S:ReskinButton(finderDialog.CancelButton)
     S:ReskinInput(finderDialog.EntryBox)
-    S:ReskinTrimScroll(finderDialog.ScrollBar)
+    S:ReskinTrimScrollBar(finderDialog.ScrollBar)
 
     -- [[ Application dialog ]]
 
     local LFGListApplicationDialog = _G.LFGListApplicationDialog
 
     LFGListApplicationDialog:StripTextures()
-    S:SetBD(LFGListApplicationDialog)
+    S:CreateBackground(LFGListApplicationDialog)
     LFGListApplicationDialog.Description:StripTextures()
     LFGListApplicationDialog.Description:CreateBackdrop()
     LFGListApplicationDialog.Description.backdrop:SetBackdropColor(0, 0, 0, 0.25)
-    S:Reskin(LFGListApplicationDialog.SignUpButton)
-    S:Reskin(LFGListApplicationDialog.CancelButton)
+    S:ReskinButton(LFGListApplicationDialog.SignUpButton)
+    S:ReskinButton(LFGListApplicationDialog.CancelButton)
 
     -- [[ Invite dialog ]]
 
     local LFGListInviteDialog = _G.LFGListInviteDialog
 
     LFGListInviteDialog:StripTextures()
-    S:SetBD(LFGListInviteDialog)
-    S:Reskin(LFGListInviteDialog.AcceptButton)
-    S:Reskin(LFGListInviteDialog.DeclineButton)
-    S:Reskin(LFGListInviteDialog.AcknowledgeButton)
+    S:CreateBackground(LFGListInviteDialog)
+    S:ReskinButton(LFGListInviteDialog.AcceptButton)
+    S:ReskinButton(LFGListInviteDialog.DeclineButton)
+    S:ReskinButton(LFGListInviteDialog.AcknowledgeButton)
 end
 
 S:AddCallback("LFGList")

@@ -12,10 +12,10 @@ function S:Petition()
     if not (C.skins.enable and C.skins.petition) then return end
 
     S:ReskinPortraitFrame(_G.PetitionFrame)
-    S:Reskin(_G.PetitionFrameSignButton)
-    S:Reskin(_G.PetitionFrameRequestButton)
-    S:Reskin(_G.PetitionFrameRenameButton)
-    S:Reskin(_G.PetitionFrameCancelButton)
+    S:ReskinButton(_G.PetitionFrameSignButton)
+    S:ReskinButton(_G.PetitionFrameRequestButton)
+    S:ReskinButton(_G.PetitionFrameRenameButton)
+    S:ReskinButton(_G.PetitionFrameCancelButton)
 
     _G.PetitionFrameCharterTitle:SetTextColor(1, 0.8, 0)
     _G.PetitionFrameCharterTitle:SetShadowColor(0, 0, 0)

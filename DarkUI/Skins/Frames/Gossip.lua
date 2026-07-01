@@ -44,8 +44,8 @@ function S:Gossip()
 
     _G.QuestFont:SetTextColor(1, 1, 1)
 
-    S:Reskin(_G.GossipFrame.GreetingPanel.GoodbyeButton)
-    S:ReskinTrimScroll(_G.GossipFrame.GreetingPanel.ScrollBar)
+    S:ReskinButton(_G.GossipFrame.GreetingPanel.GoodbyeButton)
+    S:ReskinTrimScrollBar(_G.GossipFrame.GreetingPanel.ScrollBar)
 
     hooksecurefunc(_G.GossipFrame.GreetingPanel.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Ready Check + Role Poll Popup
@@ -12,16 +11,16 @@ function S:ReadyCheck()
 
     -- Ready check
     ReadyCheckListenerFrame:StripTextures()
-    S:SetBD(ReadyCheckListenerFrame, nil, 30, -1, 1, -1)
+    S:CreateBackground(ReadyCheckListenerFrame, nil, 30, -1, 1, -1)
     ReadyCheckPortrait:SetAlpha(0)
 
-    S:Reskin(ReadyCheckFrameYesButton)
-    S:Reskin(ReadyCheckFrameNoButton)
+    S:ReskinButton(ReadyCheckFrameYesButton)
+    S:ReskinButton(ReadyCheckFrameNoButton)
 
     -- Role poll
     RolePollPopup:StripTextures()
-    S:SetBD(RolePollPopup)
-    S:Reskin(RolePollPopupAcceptButton)
+    S:CreateBackground(RolePollPopup)
+    S:ReskinButton(RolePollPopupAcceptButton)
     S:ReskinClose(RolePollPopupCloseButton)
 
     S:ReskinRole(RolePollPopupRoleButtonTank)

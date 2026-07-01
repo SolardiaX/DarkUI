@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Inspect UI
@@ -15,11 +14,11 @@ function S:Inspect()
 
     InspectModelFrame:StripTextures()
     InspectGuildFrameBG:Hide()
-    S:Reskin(InspectPaperDollFrame.ViewButton)
+    S:ReskinButton(InspectPaperDollFrame.ViewButton)
     InspectPaperDollFrame.ViewButton:ClearAllPoints()
     InspectPaperDollFrame.ViewButton:SetPoint("TOP", InspectFrame, 0, -45)
     InspectPVPFrame.BG:Hide()
-    S:Reskin(InspectPaperDollItemsFrame.InspectTalents)
+    S:ReskinButton(InspectPaperDollItemsFrame.InspectTalents)
 
     -- Character
     local slots = {

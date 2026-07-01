@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Character Frame
@@ -118,7 +117,7 @@ function S:Character()
         local cooldown = _G["Character" .. slots[i] .. "SlotCooldown"]
 
         slot:StripTextures()
-        slot.icon:SetTexCoord(unpack(DB.TexCoord))
+        slot.icon:SetTexCoord(unpack(C.media.texCoord))
         slot.icon:SetInside()
         slot.bg = S:ReskinIcon(slot.icon)
         slot.bg:SetFrameLevel(3) -- higher than portrait
@@ -206,9 +205,9 @@ function S:Character()
     end
 
     -- [[ Equipment manager ]]
-    S:Reskin(PaperDollFrameEquipSet)
-    S:Reskin(PaperDollFrameSaveSet)
-    S:ReskinTrimScroll(PaperDollFrame.EquipmentManagerPane.ScrollBar)
+    S:ReskinButton(PaperDollFrameEquipSet)
+    S:ReskinButton(PaperDollFrameSaveSet)
+    S:ReskinTrimScrollBar(PaperDollFrame.EquipmentManagerPane.ScrollBar)
 
     hooksecurefunc(PaperDollFrame.EquipmentManagerPane.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -234,7 +233,7 @@ function S:Character()
     S:ReskinIconSelectionFrame(GearManagerPopupFrame)
 
     -- TitlePane
-    S:ReskinTrimScroll(PaperDollFrame.TitleManagerPane.ScrollBar)
+    S:ReskinTrimScrollBar(PaperDollFrame.TitleManagerPane.ScrollBar)
 
     hooksecurefunc(PaperDollFrame.TitleManagerPane.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -286,7 +285,7 @@ function S:Character()
                 local repbar = child.Content and child.Content.ReputationBar
                 if repbar then
                     repbar:StripTextures()
-                    repbar:SetStatusBarTexture(DB.bdTex)
+                    repbar:SetStatusBarTexture(C.media.texture.status)
                     repbar:CreateBackdrop()
                 end
                 if child.ToggleCollapseButton then
@@ -302,20 +301,20 @@ function S:Character()
     end
     hooksecurefunc(ReputationFrame.ScrollBox, "Update", updateReputationBars)
 
-    S:ReskinTrimScroll(ReputationFrame.ScrollBar)
+    S:ReskinTrimScrollBar(ReputationFrame.ScrollBar)
     S:ReskinDropDown(ReputationFrame.filterDropdown)
 
     local detailFrame = ReputationFrame.ReputationDetailFrame
     detailFrame:StripTextures()
-    S:SetBD(detailFrame)
+    S:CreateBackground(detailFrame)
     S:ReskinClose(detailFrame.CloseButton)
     S:ReskinCheck(detailFrame.AtWarCheckbox)
     S:ReskinCheck(detailFrame.MakeInactiveCheckbox)
     S:ReskinCheck(detailFrame.WatchFactionCheckbox)
-    S:Reskin(detailFrame.ViewRenownButton)
+    S:ReskinButton(detailFrame.ViewRenownButton)
 
     -- Token frame
-    S:ReskinTrimScroll(TokenFrame.ScrollBar) -- taint if touching thumb, needs review
+    S:ReskinTrimScrollBar(TokenFrame.ScrollBar) -- taint if touching thumb, needs review
     S:ReskinDropDown(TokenFrame.filterDropdown)
     if TokenFramePopup.CloseButton then -- blizz typo by parentKey "CloseButton" into "$parent.CloseButton"
         S:ReskinClose(TokenFramePopup.CloseButton)
@@ -323,13 +322,13 @@ function S:Character()
         S:ReskinClose((select(5, TokenFramePopup:GetChildren())))
     end
 
-    S:Reskin(TokenFramePopup.CurrencyTransferToggleButton)
+    S:ReskinButton(TokenFramePopup.CurrencyTransferToggleButton)
     S:ReskinCheck(TokenFramePopup.InactiveCheckbox)
     S:ReskinCheck(TokenFramePopup.BackpackCheckbox)
 
     NoTaintArrow(TokenFrame.CurrencyTransferLogToggleButton, "right") -- taint control, needs review
     S:ReskinPortraitFrame(CurrencyTransferLog)
-    S:ReskinTrimScroll(CurrencyTransferLog.ScrollBar)
+    S:ReskinTrimScrollBar(CurrencyTransferLog.ScrollBar)
 
     local function handleCurrencyIcon(button)
         local icon = button.CurrencyIcon
@@ -346,13 +345,13 @@ function S:Character()
         S:ReskinDropDown(transferMenu.SourceSelector.Dropdown)
         S:ReskinIcon(transferMenu.SourceBalancePreview.BalanceInfo.CurrencyIcon)
         S:ReskinIcon(transferMenu.PlayerBalancePreview.BalanceInfo.CurrencyIcon)
-        S:Reskin(transferMenu.ConfirmButton)
-        S:Reskin(transferMenu.CancelButton)
+        S:ReskinButton(transferMenu.ConfirmButton)
+        S:ReskinButton(transferMenu.CancelButton)
 
         local amountSelector = transferMenu.AmountSelector
         if amountSelector then
             amountSelector:CreateBackdrop()
-            S:Reskin(amountSelector.MaxQuantityButton)
+            S:ReskinButton(amountSelector.MaxQuantityButton)
             S:ReskinEditBox(amountSelector.InputBox)
             amountSelector.InputBox.backdrop:SetInside(nil, 3, 3)
         end
@@ -385,15 +384,15 @@ function S:Character()
     end)
 
     TokenFramePopup:StripTextures()
-    S:SetBD(TokenFramePopup)
+    S:CreateBackground(TokenFramePopup)
 
     -- Quick Join
-    S:ReskinTrimScroll(QuickJoinFrame.ScrollBar)
-    S:Reskin(QuickJoinFrame.JoinQueueButton)
+    S:ReskinTrimScrollBar(QuickJoinFrame.ScrollBar)
+    S:ReskinButton(QuickJoinFrame.JoinQueueButton)
 
-    S:SetBD(QuickJoinRoleSelectionFrame)
-    S:Reskin(QuickJoinRoleSelectionFrame.AcceptButton)
-    S:Reskin(QuickJoinRoleSelectionFrame.CancelButton)
+    S:CreateBackground(QuickJoinRoleSelectionFrame)
+    S:ReskinButton(QuickJoinRoleSelectionFrame.AcceptButton)
+    S:ReskinButton(QuickJoinRoleSelectionFrame.CancelButton)
     S:ReskinClose(QuickJoinRoleSelectionFrame.CloseButton)
     QuickJoinRoleSelectionFrame:StripTextures()
 

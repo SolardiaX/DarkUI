@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Collections (Mounts / Pets / Toys / Heirlooms / Wardrobe / Warband)
@@ -117,11 +116,11 @@ function S:Collectables()
     S:ReskinIcon(MountJournal.MountDisplay.InfoButton.Icon)
     S:ReskinModelControl(MountJournal.MountDisplay.ModelScene)
 
-    S:Reskin(MountJournalMountButton)
-    S:Reskin(PetJournalSummonButton)
-    S:Reskin(PetJournalFindBattle)
+    S:ReskinButton(MountJournalMountButton)
+    S:ReskinButton(PetJournalSummonButton)
+    S:ReskinButton(PetJournalFindBattle)
 
-    S:ReskinTrimScroll(MountJournal.ScrollBar)
+    S:ReskinTrimScrollBar(MountJournal.ScrollBar)
     hooksecurefunc(MountJournal.ScrollBox, "Update", reskinFrameButton)
     hooksecurefunc("MountJournal_InitMountButton", function(button)
         if not button.bg then return end
@@ -137,7 +136,7 @@ function S:Collectables()
         end
     end)
 
-    S:ReskinTrimScroll(PetJournal.ScrollBar)
+    S:ReskinTrimScrollBar(PetJournal.ScrollBar)
     hooksecurefunc(PetJournal.ScrollBox, "Update", reskinFrameButton)
     hooksecurefunc("PetJournal_InitPetButton", function(button)
         if not button.bg then return end
@@ -233,7 +232,7 @@ function S:Collectables()
         select(i, card.xpBar:GetRegions()):Hide()
     end
 
-    card.xpBar:SetStatusBarTexture(DB.bdTex)
+    card.xpBar:SetStatusBarTexture(C.media.texture.status)
     card.xpBar:CreateBackdrop()
 
     PetJournalPetCardHealthFramehealthStatusBarLeft:Hide()
@@ -241,7 +240,7 @@ function S:Collectables()
     PetJournalPetCardHealthFramehealthStatusBarMiddle:Hide()
     PetJournalPetCardHealthFramehealthStatusBarBGMiddle:Hide()
 
-    card.HealthFrame.healthBar:SetStatusBarTexture(DB.bdTex)
+    card.HealthFrame.healthBar:SetStatusBarTexture(C.media.texture.status)
     card.HealthFrame.healthBar:CreateBackdrop()
 
     for i = 1, 6 do
@@ -289,11 +288,11 @@ function S:Collectables()
             select(j, bu.xpBar:GetRegions()):Hide()
         end
 
-        bu.xpBar:SetStatusBarTexture(DB.bdTex)
+        bu.xpBar:SetStatusBarTexture(C.media.texture.status)
         bu.xpBar:CreateBackdrop()
 
         bu.healthFrame.healthBar:StripTextures()
-        bu.healthFrame.healthBar:SetStatusBarTexture(DB.bdTex)
+        bu.healthFrame.healthBar:SetStatusBarTexture(C.media.texture.status)
         bu.healthFrame.healthBar:CreateBackdrop()
 
         for j = 1, 3 do
@@ -301,7 +300,7 @@ function S:Collectables()
 
             spell:SetPushedTexture(0)
             spell:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
-            spell.selected:SetTexture(DB.pushedTex)
+            spell.selected:SetTexture(C.media.button.glow)
             spell:GetRegions():Hide()
 
             local flyoutArrow = spell.FlyoutArrow
@@ -330,7 +329,7 @@ function S:Collectables()
     for i = 1, 2 do
         local bu = PetJournal.SpellSelect["Spell" .. i]
 
-        bu:SetCheckedTexture(DB.pushedTex)
+        bu:SetCheckedTexture(C.media.button.glow)
         bu:SetPushedTexture(0)
         bu:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
 
@@ -355,7 +354,7 @@ function S:Collectables()
     toyProgress:DisableDrawLayer("BACKGROUND")
 
     toyProgress.text:SetPoint("CENTER", 0, 1)
-    toyProgress:SetStatusBarTexture(DB.bdTex)
+    toyProgress:SetStatusBarTexture(C.media.texture.status)
 
     toyProgress:CreateBackdrop()
 
@@ -425,7 +424,7 @@ function S:Collectables()
     heirloomProgress:DisableDrawLayer("BACKGROUND")
 
     heirloomProgress.text:SetPoint("CENTER", 0, 1)
-    heirloomProgress:SetStatusBarTexture(DB.bdTex)
+    heirloomProgress:SetStatusBarTexture(C.media.texture.status)
 
     heirloomProgress:CreateBackdrop()
 
@@ -444,7 +443,7 @@ function S:Collectables()
             button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
             button:GetHighlightTexture():SetAllPoints(ic)
 
-            button.iconTextureUncollected:SetTexCoord(unpack(DB.TexCoord))
+            button.iconTextureUncollected:SetTexCoord(unpack(C.media.texCoord))
             button.bg = S:ReskinIcon(ic)
 
             button.level:ClearAllPoints()
@@ -511,11 +510,11 @@ function S:Collectables()
     hooksecurefunc(WardrobeCollectionFrame, "SetTab", function(self, tabID)
         for index = 1, 2 do
             local tab = self.Tabs[index]
-            if not tab.bg then S:ReskinTab(tab) end
+            if not tab.backdrop then S:ReskinTab(tab) end
             if tabID == index then
-                tab.bg:SetBackdropColor(cr, cg, cb, 0.25)
+                tab.backdrop:SetBackdropColor(cr, cg, cb, 0.25)
             else
-                tab.bg:SetBackdropColor(0, 0, 0, 0.25)
+                tab.backdrop:SetBackdropColor(0, 0, 0, 0.25)
             end
         end
     end)
@@ -529,7 +528,7 @@ function S:Collectables()
     wardrobeProgress:DisableDrawLayer("BACKGROUND")
     select(2, wardrobeProgress:GetRegions()):Hide()
     wardrobeProgress.text:SetPoint("CENTER", 0, 1)
-    wardrobeProgress:SetStatusBarTexture(DB.bdTex)
+    wardrobeProgress:SetStatusBarTexture(C.media.texture.status)
     wardrobeProgress:CreateBackdrop()
 
     -- ItemSetsCollection
@@ -539,7 +538,7 @@ function S:Collectables()
     SetsCollectionFrame.RightInset:Hide()
     SetsCollectionFrame.Model:CreateBackdrop()
 
-    S:ReskinTrimScroll(SetsCollectionFrame.ListContainer.ScrollBar)
+    S:ReskinTrimScrollBar(SetsCollectionFrame.ListContainer.ScrollBar)
     hooksecurefunc(SetsCollectionFrame.ListContainer.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
@@ -578,7 +577,7 @@ function S:Collectables()
 
         if itemFrame.collected then
             local quality = C_TransmogCollection.GetSourceInfo(itemFrame.sourceID).quality
-            local color = DB.QualityColors[quality or 1]
+            local color = C.media.qualityColors[quality or 1]
             ic.bg:SetBackdropBorderColor(color.r, color.g, color.b)
         else
             ic.bg:SetBackdropBorderColor(0, 0, 0)
@@ -590,10 +589,10 @@ function S:Collectables()
     CollectionsJournal:HookScript("OnShow", function()
         if not C_AddOns.IsAddOnLoaded("HPetBattleAny") then return end
         if not reskinHPet then
-            if HPetInitOpenButton then S:Reskin(HPetInitOpenButton) end
+            if HPetInitOpenButton then S:ReskinButton(HPetInitOpenButton) end
             if HPetAllInfoButton then
                 HPetAllInfoButton:StripTextures()
-                S:Reskin(HPetAllInfoButton)
+                S:ReskinButton(HPetAllInfoButton)
             end
 
             if PetJournalBandageButton then

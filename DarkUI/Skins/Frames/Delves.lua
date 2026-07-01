@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Delves (Companion Config / Dashboard / Difficulty Picker)
@@ -24,7 +23,7 @@ local function updateButton(self) self:ForEachFrame(reskinButton) end
 local function reskinOptionSlot(frame, skip)
     local option = frame.OptionsList
     option:StripTextures()
-    local bg = S:SetBD(option, nil, -5, 5, 5, -5)
+    local bg = S:CreateBackground(option, nil, -5, 5, 5, -5)
     bg:SetFrameLevel(3)
     if not skip then hooksecurefunc(option.ScrollBox, "Update", updateButton) end
 end
@@ -33,7 +32,7 @@ function S:DelvesCompanionConfiguration()
     if not (C.skins.enable and C.skins.lfg) then return end
 
     S:ReskinPortraitFrame(_G.DelvesCompanionConfigurationFrame)
-    S:Reskin(_G.DelvesCompanionConfigurationFrame.CompanionConfigShowAbilitiesButton)
+    S:ReskinButton(_G.DelvesCompanionConfigurationFrame.CompanionConfigShowAbilitiesButton)
 
     reskinOptionSlot(_G.DelvesCompanionConfigurationFrame.CompanionCombatRoleSlot, true)
     reskinOptionSlot(_G.DelvesCompanionConfigurationFrame.CompanionUtilityTrinketSlot)
@@ -61,7 +60,7 @@ function S:DelvesDashboardUI()
     if not (C.skins.enable and C.skins.lfg) then return end
 
     _G.DelvesDashboardFrame.DashboardBackground:SetAlpha(0)
-    S:Reskin(_G.DelvesDashboardFrame.ButtonPanelLayoutFrame.CompanionConfigButtonPanel.CompanionConfigButton)
+    S:ReskinButton(_G.DelvesDashboardFrame.ButtonPanelLayoutFrame.CompanionConfigButtonPanel.CompanionConfigButton)
 end
 
 S:AddCallbackForAddon("Blizzard_DelvesDashboardUI", "DelvesDashboardUI")
@@ -81,7 +80,7 @@ function S:DelvesDifficultyPicker()
 
     S:ReskinPortraitFrame(_G.DelvesDifficultyPickerFrame)
     S:ReskinDropDown(_G.DelvesDifficultyPickerFrame.Dropdown)
-    S:Reskin(_G.DelvesDifficultyPickerFrame.EnterDelveButton)
+    S:ReskinButton(_G.DelvesDifficultyPickerFrame.EnterDelveButton)
 
     hooksecurefunc(_G.DelvesDifficultyPickerFrame.DelveRewardsContainerFrame.ScrollBox, "Update", function(self) self:ForEachFrame(handleReward) end)
 end

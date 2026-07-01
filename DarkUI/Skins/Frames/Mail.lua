@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Mail Frame
@@ -14,7 +13,7 @@ local hooksecurefunc = hooksecurefunc
 function S:Mail()
     if not (C.skins.enable and C.skins.mail) then return end
 
-    local texL, texR, texT, texB = unpack(DB.TexCoord)
+    local texL, texR, texT, texB = unpack(C.media.texCoord)
 
     SendMailMoneyInset:DisableDrawLayer("BORDER")
     InboxFrame:GetRegions():Hide()
@@ -31,20 +30,20 @@ function S:Mail()
 
     S:ReskinPortraitFrame(MailFrame)
     S:ReskinPortraitFrame(OpenMailFrame)
-    S:Reskin(SendMailMailButton)
-    S:Reskin(SendMailCancelButton)
-    S:Reskin(OpenMailReplyButton)
-    S:Reskin(OpenMailDeleteButton)
-    S:Reskin(OpenMailCancelButton)
-    S:Reskin(OpenMailReportSpamButton)
-    S:Reskin(OpenAllMail)
+    S:ReskinButton(SendMailMailButton)
+    S:ReskinButton(SendMailCancelButton)
+    S:ReskinButton(OpenMailReplyButton)
+    S:ReskinButton(OpenMailDeleteButton)
+    S:ReskinButton(OpenMailCancelButton)
+    S:ReskinButton(OpenMailReportSpamButton)
+    S:ReskinButton(OpenAllMail)
     S:ReskinInput(SendMailNameEditBox, 20, 85)
     S:ReskinInput(SendMailSubjectEditBox, nil, 200)
     S:ReskinInput(SendMailMoneyGold)
     S:ReskinInput(SendMailMoneySilver)
     S:ReskinInput(SendMailMoneyCopper)
-    S:ReskinTrimScroll(SendMailScrollFrame.ScrollBar)
-    S:ReskinTrimScroll(OpenMailScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(SendMailScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(OpenMailScrollFrame.ScrollBar)
     S:ReskinRadio(SendMailSendMoneyButton)
     S:ReskinRadio(SendMailCODButton)
     S:ReskinArrow(InboxPrevPageButton, "left")
@@ -81,7 +80,7 @@ function S:Mail()
         local button = _G["MailItem" .. i .. "Button"]
         item:StripTextures()
         button:StripTextures()
-        button:SetCheckedTexture(DB.pushedTex)
+        button:SetCheckedTexture(C.media.button.glow)
         button:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
         button.Icon:SetTexCoord(texL, texR, texT, texB)
         button.IconBorder:SetAlpha(0)

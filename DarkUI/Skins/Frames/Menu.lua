@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Game Menu (Esc menu)
@@ -19,7 +18,7 @@ function S:Menu()
     GameMenuFrame.Header:StripTextures()
     GameMenuFrame.Header:ClearAllPoints()
     GameMenuFrame.Header:SetPoint("TOP", GameMenuFrame, 0, 7)
-    S:SetBD(GameMenuFrame)
+    S:CreateBackground(GameMenuFrame)
     GameMenuFrame.Border:Hide()
     GameMenuFrame.Header.Text:SetFontObject(Game16Font)
 
@@ -42,7 +41,7 @@ function S:Menu()
     }
     for _, buttonName in next, buttons do
         local button = _G[buttonName]
-        if button then S:Reskin(button) end
+        if button then S:ReskinButton(button) end
     end
 
     hooksecurefunc(GameMenuFrame, "InitButtons", function(self)

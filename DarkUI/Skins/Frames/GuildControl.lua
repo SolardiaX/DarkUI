@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Guild Control UI
@@ -33,7 +32,7 @@ end
 function S:GuildControl()
     if not (C.skins.enable and C.skins.guild) then return end
 
-    S:SetBD(_G.GuildControlUI)
+    S:CreateBackground(_G.GuildControlUI)
 
     for i = 1, 9 do
         select(i, _G.GuildControlUI:GetRegions()):Hide()
@@ -67,14 +66,14 @@ function S:GuildControl()
                 _G[tab .. "Bg"]:Hide()
                 S:ReskinIcon(ownedTab.tabIcon)
                 bu:CreateBackdrop()
-                S:Reskin(bu.buy.button)
+                S:ReskinButton(bu.buy.button)
                 S:ReskinInput(ownedTab.editBox)
 
                 for _, name in pairs(checkboxes) do
                     local box = ownedTab[name]
                     box:SetNormalTexture(0)
                     box:SetPushedTexture(0)
-                    box:SetHighlightTexture(DB.bdTex)
+                    box:SetHighlightTexture(C.media.texture.blank)
 
                     local check = box:GetCheckedTexture()
                     check:SetDesaturated(true)
@@ -100,9 +99,9 @@ function S:GuildControl()
         if checkbox then S:ReskinCheck(checkbox) end
     end
 
-    S:Reskin(_G.GuildControlUIRankOrderFrameNewButton)
+    S:ReskinButton(_G.GuildControlUIRankOrderFrameNewButton)
     S:ReskinClose(_G.GuildControlUICloseButton)
-    S:ReskinTrimScroll(_G.GuildControlUIRankBankFrameInsetScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.GuildControlUIRankBankFrameInsetScrollFrame.ScrollBar)
     S:ReskinDropDown(_G.GuildControlUINavigationDropdown)
     S:ReskinDropDown(_G.GuildControlUIRankSettingsFrameRankDropdown)
     S:ReskinDropDown(_G.GuildControlUIRankBankFrameRankDropdown)

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Merchant Frame
@@ -106,9 +105,9 @@ function S:Merchant()
 
     local StackSplitFrame = StackSplitFrame
     StackSplitFrame:StripTextures()
-    S:SetBD(StackSplitFrame)
-    S:Reskin(StackSplitFrame.OkayButton)
-    S:Reskin(StackSplitFrame.CancelButton)
+    S:CreateBackground(StackSplitFrame)
+    S:ReskinButton(StackSplitFrame.OkayButton)
+    S:ReskinButton(StackSplitFrame.CancelButton)
     S:ReskinArrow(StackSplitFrame.LeftButton, "left")
     S:ReskinArrow(StackSplitFrame.RightButton, "right")
 end

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Dressing Room / Transmog
@@ -12,10 +11,10 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 local function ResetToggleTexture(button, texture)
-    button:GetNormalTexture():SetTexCoord(unpack(DB.TexCoord))
+    button:GetNormalTexture():SetTexCoord(unpack(C.media.texCoord))
     button:GetNormalTexture():SetInside()
     button:SetNormalTexture(texture)
-    button:GetPushedTexture():SetTexCoord(unpack(DB.TexCoord))
+    button:GetPushedTexture():SetTexCoord(unpack(C.media.texCoord))
     button:GetPushedTexture():SetInside()
     button:SetPushedTexture(texture)
 end
@@ -26,17 +25,17 @@ function S:DressingRoom()
     -- Dressup Frame
 
     S:ReskinPortraitFrame(DressUpFrame)
-    S:Reskin(DressUpFrameCancelButton)
-    S:Reskin(DressUpFrameResetButton)
+    S:ReskinButton(DressUpFrameCancelButton)
+    S:ReskinButton(DressUpFrameResetButton)
     S:ReskinMinMax(DressUpFrame.MaximizeMinimizeFrame)
     DressUpFrameResetButton:SetPoint("RIGHT", DressUpFrameCancelButton, "LEFT", -1, 0)
 
-    S:Reskin(DressUpFrame.LinkButton)
-    S:Reskin(DressUpFrame.ToggleCustomSetDetailsButton)
+    S:ReskinButton(DressUpFrame.LinkButton)
+    S:ReskinButton(DressUpFrame.ToggleCustomSetDetailsButton)
     ResetToggleTexture(DressUpFrame.ToggleCustomSetDetailsButton, 1392954) -- 70_professions_scroll_01
 
     DressUpFrame.CustomSetDetailsPanel:StripTextures()
-    local bg = S:SetBD(DressUpFrame.CustomSetDetailsPanel)
+    local bg = S:CreateBackground(DressUpFrame.CustomSetDetailsPanel)
     bg:SetInside(nil, 11, 11)
 
     hooksecurefunc(DressUpFrame.CustomSetDetailsPanel, "Refresh", function(self)
@@ -56,7 +55,7 @@ function S:DressingRoom()
     local selectionPanel = DressUpFrame.SetSelectionPanel
     if selectionPanel then
         selectionPanel:StripTextures()
-        S:SetBD(selectionPanel):SetInside(nil, 9, 9)
+        S:CreateBackground(selectionPanel):SetInside(nil, 9, 9)
 
         local function SetupSetButton(button)
             if button.__styled then return end
@@ -72,13 +71,13 @@ function S:DressingRoom()
     end
 
     S:ReskinDropDown(DressUpFrameCustomSetDropdown)
-    S:Reskin(DressUpFrameCustomSetDropdown.SaveButton)
+    S:ReskinButton(DressUpFrameCustomSetDropdown.SaveButton)
 
     -- SideDressUp
 
     SideDressUpFrame:StripTextures()
-    S:SetBD(SideDressUpFrame)
-    S:Reskin(SideDressUpFrame.ResetButton)
+    S:CreateBackground(SideDressUpFrame)
+    S:ReskinButton(SideDressUpFrame.ResetButton)
     S:ReskinClose(SideDressUpFrameCloseButton)
 
     SideDressUpFrame:HookScript("OnShow", function(self)
@@ -92,13 +91,13 @@ function S:DressingRoom()
     if editFrame then
         editFrame:StripTextures()
         editFrame.EditBox:DisableDrawLayer("BACKGROUND")
-        S:SetBD(editFrame)
+        S:CreateBackground(editFrame)
         local editBg = editFrame.EditBox:CreateBackdrop()
         editBg:SetPoint("TOPLEFT", -5, -3)
         editBg:SetPoint("BOTTOMRIGHT", 5, 3)
-        S:Reskin(editFrame.AcceptButton)
-        S:Reskin(editFrame.CancelButton)
-        S:Reskin(editFrame.DeleteButton)
+        S:ReskinButton(editFrame.AcceptButton)
+        S:ReskinButton(editFrame.CancelButton)
+        S:ReskinButton(editFrame.DeleteButton)
     end
 end
 

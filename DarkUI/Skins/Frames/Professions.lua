@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Professions (Crafting UI)
@@ -45,11 +44,11 @@ local function reskinProfessionsFlyout(_, parent)
             flyoutFrame = child
 
             flyoutFrame:StripTextures()
-            flyoutFrame.bg = S:SetBD(flyoutFrame)
+            flyoutFrame.bg = S:CreateBackground(flyoutFrame)
             hooksecurefunc(flyoutFrame, "SetParent", resetFrameStrata)
             S:ReskinCheck(checkbox)
-            checkbox.bg:SetInside(nil, 6, 6)
-            S:ReskinTrimScroll(flyoutFrame.ScrollBar)
+            checkbox.backdrop:SetInside(nil, 6, 6)
+            S:ReskinTrimScrollBar(flyoutFrame.ScrollBar)
             reskinFlyoutButton(flyoutFrame.UndoItem)
             hooksecurefunc(flyoutFrame.ScrollBox, "Update", refreshFlyoutButtons)
 
@@ -121,10 +120,10 @@ local function reskinProfessionForm(form)
     local qDialog = form.QualityDialog
     if qDialog then
         qDialog:StripTextures()
-        S:SetBD(qDialog)
+        S:CreateBackground(qDialog)
         S:ReskinClose(qDialog.ClosePanelButton)
-        S:Reskin(qDialog.AcceptButton)
-        S:Reskin(qDialog.CancelButton)
+        S:ReskinButton(qDialog.AcceptButton)
+        S:ReskinButton(qDialog.CancelButton)
 
         reskinQualityContainer(qDialog.Container1)
         reskinQualityContainer(qDialog.Container2)
@@ -195,9 +194,9 @@ end
 
 local function reskinOutputLog(outputLog)
     outputLog:StripTextures()
-    S:SetBD(outputLog)
+    S:CreateBackground(outputLog)
     S:ReskinClose(outputLog.ClosePanelButton)
-    S:ReskinTrimScroll(outputLog.ScrollBar)
+    S:ReskinTrimScrollBar(outputLog.ScrollBar)
     hooksecurefunc(outputLog.ScrollBox, "Update", reskinOutputButtons)
 end
 
@@ -221,9 +220,9 @@ function S:Professions()
 
     S:ReskinPortraitFrame(frame)
     craftingPage.TutorialButton.Ring:Hide()
-    S:Reskin(craftingPage.CreateButton)
-    S:Reskin(craftingPage.CreateAllButton)
-    S:Reskin(craftingPage.ViewGuildCraftersButton)
+    S:ReskinButton(craftingPage.CreateButton)
+    S:ReskinButton(craftingPage.CreateAllButton)
+    S:ReskinButton(craftingPage.ViewGuildCraftersButton)
     reskinArrowInput(craftingPage.CreateMultipleInputBox)
     S:ReskinMinMax(frame.MaximizeMinimize)
     S:ReskinEditBox(craftingPage.MinimizedSearchBox)
@@ -236,7 +235,7 @@ function S:Professions()
     guildFrame.Container:StripTextures()
     local guildContBg = guildFrame.Container:CreateBackdrop()
     guildContBg:SetBackdropColor(0, 0, 0, 0.25)
-    S:ReskinTrimScroll(guildFrame.Container.ScrollBar)
+    S:ReskinTrimScrollBar(guildFrame.Container.ScrollBar)
 
     for i = 1, 3 do
         local tab = select(i, frame.TabSystem:GetChildren())
@@ -269,7 +268,7 @@ function S:Professions()
 
     local recipeList = craftingPage.RecipeList
     recipeList:StripTextures()
-    S:ReskinTrimScroll(recipeList.ScrollBar)
+    S:ReskinTrimScrollBar(recipeList.ScrollBar)
     if recipeList.BackgroundNineSlice then recipeList.BackgroundNineSlice:Hide() end
     local recipeListBg = recipeList:CreateBackdrop()
     recipeListBg:SetBackdropColor(0, 0, 0, 0.25)
@@ -294,12 +293,12 @@ function S:Professions()
     craftingPage.LinkButton:SetPoint("LEFT", rankBar.Fill, "RIGHT", 3, 0)
 
     local specPage = frame.SpecPage
-    S:Reskin(specPage.UnlockTabButton)
-    S:Reskin(specPage.ApplyButton)
-    S:Reskin(specPage.ViewTreeButton)
-    S:Reskin(specPage.BackToFullTreeButton)
-    S:Reskin(specPage.ViewPreviewButton)
-    S:Reskin(specPage.BackToPreviewButton)
+    S:ReskinButton(specPage.UnlockTabButton)
+    S:ReskinButton(specPage.ApplyButton)
+    S:ReskinButton(specPage.ViewTreeButton)
+    S:ReskinButton(specPage.BackToFullTreeButton)
+    S:ReskinButton(specPage.ViewPreviewButton)
+    S:ReskinButton(specPage.BackToPreviewButton)
     specPage.TopDivider:Hide()
     specPage.VerticalDivider:Hide()
     specPage.PanelFooter:Hide()
@@ -323,8 +322,8 @@ function S:Professions()
     local detailedViewBG = view:CreateBackdrop()
     detailedViewBG:SetBackdropColor(0, 0, 0, 0.25)
     detailedViewBG:SetInside()
-    S:Reskin(view.UnlockPathButton)
-    S:Reskin(view.SpendPointsButton)
+    S:ReskinButton(view.UnlockPathButton)
+    S:ReskinButton(view.SpendPointsButton)
     S:ReskinIcon(view.UnspentPoints.Icon)
 
     treeViewBG:SetPoint("BOTTOMRIGHT", detailedViewBG, "BOTTOMLEFT", -3, 0)
@@ -336,13 +335,13 @@ function S:Professions()
     if not frame.OrdersPage then return end
 
     local browseFrame = frame.OrdersPage.BrowseFrame
-    S:Reskin(browseFrame.SearchButton)
-    S:Reskin(browseFrame.FavoritesSearchButton)
+    S:ReskinButton(browseFrame.SearchButton)
+    S:ReskinButton(browseFrame.FavoritesSearchButton)
     browseFrame.FavoritesSearchButton:SetSize(22, 22)
 
     local browseRecipeList = browseFrame.RecipeList
     browseRecipeList:StripTextures()
-    S:ReskinTrimScroll(browseRecipeList.ScrollBar)
+    S:ReskinTrimScrollBar(browseRecipeList.ScrollBar)
     if browseRecipeList.BackgroundNineSlice then browseRecipeList.BackgroundNineSlice:Hide() end
     local browseListBg = browseRecipeList:CreateBackdrop()
     browseListBg:SetBackdropColor(0, 0, 0, 0.25)
@@ -364,7 +363,7 @@ function S:Professions()
     local orderListBg = orderList:CreateBackdrop()
     orderListBg:SetBackdropColor(0, 0, 0, 0.25)
     orderListBg:SetInside()
-    S:ReskinTrimScroll(orderList.ScrollBar)
+    S:ReskinTrimScrollBar(orderList.ScrollBar)
 
     hooksecurefunc(frame.OrdersPage, "SetupTable", function()
         local maxHeaders = orderList.HeaderContainer:GetNumChildren()
@@ -387,10 +386,10 @@ function S:Professions()
     frame.OrdersPage:SetupTable()
 
     local orderView = frame.OrdersPage.OrderView
-    S:Reskin(orderView.CreateButton)
-    S:Reskin(orderView.StartRecraftButton)
-    S:Reskin(orderView.StopRecraftButton)
-    S:Reskin(orderView.CompleteOrderButton)
+    S:ReskinButton(orderView.CreateButton)
+    S:ReskinButton(orderView.StartRecraftButton)
+    S:ReskinButton(orderView.StopRecraftButton)
+    S:ReskinButton(orderView.CompleteOrderButton)
     reskinOutputLog(orderView.CraftingOutputLog)
     reskinRankBar(orderView.RankBar)
 
@@ -399,14 +398,14 @@ function S:Professions()
     local orderInfoBg = orderInfo:CreateBackdrop()
     orderInfoBg:SetBackdropColor(0, 0, 0, 0.25)
     orderInfoBg:SetInside()
-    S:Reskin(orderInfo.BackButton)
-    S:Reskin(orderInfo.StartOrderButton)
-    S:Reskin(orderInfo.DeclineOrderButton)
-    S:Reskin(orderInfo.ReleaseOrderButton)
+    S:ReskinButton(orderInfo.BackButton)
+    S:ReskinButton(orderInfo.StartOrderButton)
+    S:ReskinButton(orderInfo.DeclineOrderButton)
+    S:ReskinButton(orderInfo.ReleaseOrderButton)
     orderInfo.NoteBox:StripTextures()
     local noteBoxBg = orderInfo.NoteBox:CreateBackdrop()
     noteBoxBg:SetBackdropColor(0, 0, 0, 0.25)
-    S:Reskin(orderInfo.SocialDropdown)
+    S:ReskinButton(orderInfo.SocialDropdown)
 
     local orderDetails = orderView.OrderDetails
     orderDetails:StripTextures()

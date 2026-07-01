@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Click Binding UI
@@ -36,7 +35,7 @@ local function reskinScrollChild(self)
             child.Background:Hide()
             child.bg = child.Background:CreateBackdrop()
 
-            S:Reskin(child.DeleteButton)
+            S:ReskinButton(child.DeleteButton)
             child.DeleteButton:SetSize(20, 20)
             child.FrameHighlight:SetInside(child.bg)
             child.FrameHighlight:SetColorTexture(1, 1, 1, 0.15)
@@ -62,16 +61,16 @@ function S:ClickBindingUI()
     frame.TutorialButton.Ring:Hide()
     frame.TutorialButton:SetPoint("TOPLEFT", frame, "TOPLEFT", -12, 12)
 
-    S:Reskin(frame.ResetButton)
-    S:Reskin(frame.AddBindingButton)
-    S:Reskin(frame.SaveButton)
-    S:ReskinTrimScroll(frame.ScrollBar)
+    S:ReskinButton(frame.ResetButton)
+    S:ReskinButton(frame.AddBindingButton)
+    S:ReskinButton(frame.SaveButton)
+    S:ReskinTrimScrollBar(frame.ScrollBar)
 
     frame.ScrollBoxBackground:Hide()
     hooksecurefunc(frame.ScrollBox, "Update", reskinScrollChild)
 
     frame.TutorialFrame.NineSlice:Hide()
-    S:SetBD(frame.TutorialFrame)
+    S:CreateBackground(frame.TutorialFrame)
 
     if frame.EnableMouseoverCastCheckbox then S:ReskinCheck(frame.EnableMouseoverCastCheckbox) end
 end

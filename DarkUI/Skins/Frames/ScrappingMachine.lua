@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Scrapping Machine UI
@@ -14,7 +13,7 @@ function S:ScrappingMachine()
     if not (C.skins.enable and C.skins.scrapping) then return end
 
     S:ReskinPortraitFrame(ScrappingMachineFrame)
-    S:Reskin(ScrappingMachineFrame.ScrapButton)
+    S:ReskinButton(ScrappingMachineFrame.ScrapButton)
 
     local ItemSlots = ScrappingMachineFrame.ItemSlots
     ItemSlots:StripTextures()
@@ -23,7 +22,7 @@ function S:ScrappingMachine()
         for button in self.ItemSlots.scrapButtons:EnumerateActive() do
             if not button.bg then
                 button:StripTextures()
-                button.Icon:SetTexCoord(unpack(DB.TexCoord))
+                button.Icon:SetTexCoord(unpack(C.media.texCoord))
                 button.bg = button.Icon:CreateBackdrop()
                 button.bg:SetBackdropEdge("round_white")
                 S:ReskinIconBorder(button.IconBorder)

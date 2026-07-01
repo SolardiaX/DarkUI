@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Trading Post (Perks Program) UI
@@ -12,7 +11,7 @@ local DB = S.DB
 local hooksecurefunc = hooksecurefunc
 
 local function ReskinCustomizeButton(button)
-    S:Reskin(button)
+    S:ReskinButton(button)
     if button.backdrop then button.backdrop:SetInside(nil, 5, 5) end
     if button.gradient then button.gradient:SetInside(nil, 5, 5) end
     button:GetHighlightTexture():SetInside(nil, 5, 5)
@@ -67,7 +66,7 @@ local function SetupSetButton(button)
 end
 
 local function SetupFramBG(frame)
-    local bg = S:SetBD(frame)
+    local bg = S:CreateBackground(frame)
     bg:SetFrameLevel(0)
     if bg.shadow then bg.shadow:SetFrameLevel(0) end
 end
@@ -117,7 +116,7 @@ function S:PerksProgram()
         S:ReskinIcon(productsFrame.PerksProgramCurrencyFrame.Icon)
         productsFrame.PerksProgramProductDetailsContainerFrame:StripTextures()
         SetupFramBG(productsFrame.PerksProgramProductDetailsContainerFrame)
-        S:ReskinTrimScroll(productsFrame.PerksProgramProductDetailsContainerFrame.SetDetailsScrollBoxContainer.ScrollBar)
+        S:ReskinTrimScrollBar(productsFrame.PerksProgramProductDetailsContainerFrame.SetDetailsScrollBoxContainer.ScrollBar)
 
         hooksecurefunc(
             productsFrame.PerksProgramProductDetailsContainerFrame.SetDetailsScrollBoxContainer.ScrollBox,
@@ -128,7 +127,7 @@ function S:PerksProgram()
         local productsContainer = productsFrame.ProductsScrollBoxContainer
         productsContainer:StripTextures()
         SetupFramBG(productsContainer)
-        S:ReskinTrimScroll(productsContainer.ScrollBar)
+        S:ReskinTrimScrollBar(productsContainer.ScrollBar)
         productsContainer.PerksProgramHoldFrame:StripTextures()
         local holdBg = productsContainer.PerksProgramHoldFrame:CreateBackdrop()
         holdBg:SetInside(nil, 3, 3)
@@ -139,7 +138,7 @@ function S:PerksProgram()
         if cartFrame then
             cartFrame:StripTextures()
             SetupFramBG(cartFrame)
-            S:ReskinTrimScroll(cartFrame.ItemList.ScrollBar)
+            S:ReskinTrimScrollBar(cartFrame.ItemList.ScrollBar)
             S:ReskinClose(cartFrame.CloseButton)
             ReskinCustomizeButton(cartFrame.PurchaseCartButton)
 

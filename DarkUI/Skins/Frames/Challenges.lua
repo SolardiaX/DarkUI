@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Mythic+ Challenges UI
@@ -25,7 +24,7 @@ function S:ChallengesUI()
             local bu = self.DungeonIcons[i]
             if bu and not bu.__styled then
                 bu:GetRegions():SetAlpha(0)
-                bu.Icon:SetTexCoord(unpack(DB.TexCoord))
+                bu.Icon:SetTexCoord(unpack(C.media.texCoord))
                 bu.Icon:SetInside()
                 bu.Icon:CreateBackdrop()
                 bu.Icon:SetBackdropEdge("round")
@@ -71,9 +70,9 @@ function S:ChallengesUI()
     end)
 
     local keystone = _G.ChallengesKeystoneFrame
-    S:SetBD(keystone)
+    S:CreateBackground(keystone)
     S:ReskinClose(keystone.CloseButton)
-    S:Reskin(keystone.StartButton)
+    S:ReskinButton(keystone.StartButton)
 
     hooksecurefunc(keystone, "Reset", function(self)
         self:GetRegions():SetAlpha(0)
@@ -84,8 +83,8 @@ function S:ChallengesUI()
 
     -- New season
     local noticeFrame = _G.ChallengesFrame.SeasonChangeNoticeFrame
-    S:Reskin(noticeFrame.Leave)
-    noticeFrame.Leave.__bg:SetFrameLevel(noticeFrame:GetFrameLevel() + 1)
+    S:ReskinButton(noticeFrame.Leave)
+    noticeFrame.Leave:SetFrameLevel(noticeFrame:GetFrameLevel() + 1)
     noticeFrame.NewSeason:SetTextColor(1, 0.8, 0)
     noticeFrame.SeasonDescription:SetTextColor(1, 1, 1)
     noticeFrame.SeasonDescription2:SetTextColor(1, 1, 1)

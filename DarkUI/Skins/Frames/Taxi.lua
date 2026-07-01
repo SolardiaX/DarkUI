@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Taxi / Flight Map Frame
@@ -16,7 +15,7 @@ function S:Taxi()
     TaxiFrame.TitleBg:Hide()
     TaxiFrame.TopTileStreaks:Hide()
 
-    S:SetBD(TaxiFrame, nil, 3, -23, -5, 3)
+    S:CreateBackground(TaxiFrame, nil, 3, -23, -5, 3)
     S:ReskinClose(TaxiFrame.CloseButton, TaxiRouteMap)
 end
 

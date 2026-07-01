@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Professions Book (secondary profession panel)
@@ -49,7 +48,7 @@ function S:ProfessionsBook()
 
         bu.statusBar:StripTextures()
         bu.statusBar:SetHeight(10)
-        bu.statusBar:SetStatusBarTexture(DB.bdTex)
+        bu.statusBar:SetStatusBarTexture(C.media.texture.status)
         bu.statusBar:GetStatusBarTexture():SetGradient("VERTICAL", CreateColor(0, 0.6, 0, 1), CreateColor(0, 0.8, 0, 1))
         bu.statusBar.rankText:SetPoint("CENTER")
         local statusBg = bu.statusBar:CreateBackdrop()

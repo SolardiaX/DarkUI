@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Soulbinds Viewer (Shadowlands)
@@ -41,10 +40,10 @@ function S:Soulbinds()
 
     SoulbindViewer:StripTextures()
     SoulbindViewer.Background:SetAlpha(0)
-    S:SetBD(SoulbindViewer)
+    S:CreateBackground(SoulbindViewer)
     S:ReskinClose(SoulbindViewer.CloseButton)
-    S:Reskin(SoulbindViewer.CommitConduitsButton)
-    S:Reskin(SoulbindViewer.ActivateSoulbindButton)
+    S:ReskinButton(SoulbindViewer.CommitConduitsButton)
+    S:ReskinButton(SoulbindViewer.ActivateSoulbindButton)
 
     local numChildrenStyled = 0
     hooksecurefunc(SoulbindViewer.ConduitList.ScrollBox, "Update", function(self)

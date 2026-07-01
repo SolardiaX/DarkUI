@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Azerite Empowered / Essence / Respec / Item Interaction UIs
@@ -44,7 +43,7 @@ end
 local function reskinReforgeUI(frame, index)
     frame:StripTextures(index)
     frame.Background:CreateBackdrop()
-    S:SetBD(frame)
+    S:CreateBackground(frame)
     S:ReskinClose(frame.CloseButton)
     S:ReskinIcon(frame.ItemSlot.Icon)
 
@@ -54,8 +53,8 @@ local function reskinReforgeUI(frame, index)
     local bg = buttonFrame:CreateBackdrop()
     bg:SetPoint("TOPLEFT", buttonFrame.MoneyFrameEdge, "TOPLEFT", 3, 0)
     bg:SetPoint("BOTTOMRIGHT", buttonFrame.MoneyFrameEdge, "BOTTOMRIGHT", 0, 2)
-    if buttonFrame.AzeriteRespecButton then S:Reskin(buttonFrame.AzeriteRespecButton) end
-    if buttonFrame.ActionButton then S:Reskin(buttonFrame.ActionButton) end
+    if buttonFrame.AzeriteRespecButton then S:ReskinButton(buttonFrame.AzeriteRespecButton) end
+    if buttonFrame.ActionButton then S:ReskinButton(buttonFrame.ActionButton) end
     if buttonFrame.Currency then S:ReskinIcon(buttonFrame.Currency.Icon) end
 
     -- TODO: frame.DescriptionCurrencies SetCurrencies hook — B.SetCurrenciesHook has no S: equivalent
@@ -76,7 +75,7 @@ function S:AzeriteEssenceUI()
 
     S:ReskinPortraitFrame(AzeriteEssenceUI)
     AzeriteEssenceUI.PowerLevelBadgeFrame:StripTextures()
-    S:ReskinTrimScroll(AzeriteEssenceUI.EssenceList.ScrollBar)
+    S:ReskinTrimScrollBar(AzeriteEssenceUI.EssenceList.ScrollBar)
 
     for _, milestoneFrame in pairs(AzeriteEssenceUI.Milestones) do
         if milestoneFrame.LockedState then

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Chromie Time UI
@@ -14,9 +13,9 @@ function S:ChromieTimeUI()
     local frame = ChromieTimeFrame
 
     frame:StripTextures()
-    S:SetBD(frame)
+    S:CreateBackground(frame)
     S:ReskinClose(frame.CloseButton)
-    S:Reskin(frame.SelectButton)
+    S:ReskinButton(frame.SelectButton)
 
     local header = frame.Title
     header:DisableDrawLayer("BACKGROUND")

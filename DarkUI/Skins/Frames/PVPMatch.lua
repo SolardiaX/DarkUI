@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- PVP Match Scoreboard / Ready Dialog / Results
@@ -19,20 +18,20 @@ function S:PVPMatch()
 
     PVPReadyDialog:StripTextures()
     _G.PVPReadyDialogBackground:Hide()
-    S:SetBD(PVPReadyDialog)
+    S:CreateBackground(PVPReadyDialog)
 
-    S:Reskin(PVPReadyDialog.enterButton)
-    S:Reskin(PVPReadyDialog.leaveButton)
+    S:ReskinButton(PVPReadyDialog.enterButton)
+    S:ReskinButton(PVPReadyDialog.leaveButton)
     S:ReskinClose(_G.PVPReadyDialogCloseButton)
 
     local function stripBorders(self) self:StripTextures() end
 
     _G.ReadyStatus.Border:SetAlpha(0)
-    S:SetBD(_G.ReadyStatus)
+    S:CreateBackground(_G.ReadyStatus)
     S:ReskinClose(_G.ReadyStatus.CloseButton)
 
     -- match score
-    S:SetBD(_G.PVPMatchScoreboard)
+    S:CreateBackground(_G.PVPMatchScoreboard)
     _G.PVPMatchScoreboard:HookScript("OnShow", stripBorders)
     S:ReskinClose(_G.PVPMatchScoreboard.CloseButton)
 
@@ -44,7 +43,7 @@ function S:PVPMatch()
         local bg = content:CreateBackdrop()
         bg:SetBackdropColor(0, 0, 0, 0.25)
         bg:SetPoint("BOTTOMRIGHT", tabContainer.InsetBorderTop, 4, -1)
-        S:ReskinTrimScroll(content.ScrollBar)
+        S:ReskinTrimScrollBar(content.ScrollBar)
 
         tabContainer:StripTextures()
         for i = 1, 3 do
@@ -53,7 +52,7 @@ function S:PVPMatch()
     end
 
     -- match results
-    S:SetBD(_G.PVPMatchResults)
+    S:CreateBackground(_G.PVPMatchResults)
     _G.PVPMatchResults:HookScript("OnShow", stripBorders)
     S:ReskinClose(_G.PVPMatchResults.CloseButton)
     _G.PVPMatchResults.overlay:StripTextures()
@@ -67,7 +66,7 @@ function S:PVPMatch()
         bg:SetBackdropColor(0, 0, 0, 0.25)
         bg:SetPoint("BOTTOMRIGHT", tabContainer.InsetBorderTop, 4, -1)
         content.earningsArt:StripTextures()
-        S:ReskinTrimScroll(content.scrollBar)
+        S:ReskinTrimScrollBar(content.scrollBar)
 
         tabContainer:StripTextures()
         for i = 1, 3 do
@@ -75,8 +74,8 @@ function S:PVPMatch()
         end
 
         local buttonContainer = _G.PVPMatchResults.buttonContainer
-        S:Reskin(buttonContainer.leaveButton)
-        S:Reskin(buttonContainer.requeueButton)
+        S:ReskinButton(buttonContainer.leaveButton)
+        S:ReskinButton(buttonContainer.requeueButton)
     end
 end
 

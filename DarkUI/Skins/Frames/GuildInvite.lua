@@ -12,12 +12,12 @@ local select = select
 function S:GuildInvite()
     if not (C.skins.enable and C.skins.guild) then return end
 
-    S:SetBD(_G.GuildInviteFrame)
+    S:CreateBackground(_G.GuildInviteFrame)
     for i = 1, 10 do
         select(i, _G.GuildInviteFrame:GetRegions()):Hide()
     end
-    S:Reskin(_G.GuildInviteFrameJoinButton)
-    S:Reskin(_G.GuildInviteFrameDeclineButton)
+    S:ReskinButton(_G.GuildInviteFrameJoinButton)
+    S:ReskinButton(_G.GuildInviteFrameDeclineButton)
 end
 
 S:AddCallback("GuildInvite")

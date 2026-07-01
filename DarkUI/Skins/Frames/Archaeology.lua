@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Archaeology UI
@@ -15,8 +14,8 @@ function S:ArchaeologyUI()
 
     S:ReskinPortraitFrame(ArchaeologyFrame)
     ArchaeologyFrame:DisableDrawLayer("BACKGROUND")
-    S:Reskin(ArchaeologyFrameArtifactPageSolveFrameSolveButton)
-    S:Reskin(ArchaeologyFrameArtifactPageBackButton)
+    S:ReskinButton(ArchaeologyFrameArtifactPageSolveFrameSolveButton)
+    S:ReskinButton(ArchaeologyFrameArtifactPageBackButton)
 
     ArchaeologyFrameSummaryPageTitle:SetTextColor(1, 1, 1)
     ArchaeologyFrameArtifactPageHistoryTitle:SetTextColor(1, 0.8, 0)
@@ -57,7 +56,7 @@ function S:ArchaeologyUI()
     ArchaeologyFrameCompletedButton:SetFrameLevel(ArchaeologyFrame:GetFrameLevel() - 1)
 
     S:ReskinDropDown(ArchaeologyFrameRaceFilter)
-    S:ReskinTrimScroll(ArchaeologyFrameArtifactPageHistoryScroll.ScrollBar)
+    S:ReskinTrimScrollBar(ArchaeologyFrameArtifactPageHistoryScroll.ScrollBar)
     S:ReskinArrow(ArchaeologyFrameCompletedPagePrevPageButton, "left")
     S:ReskinArrow(ArchaeologyFrameCompletedPageNextPageButton, "right")
     ArchaeologyFrameCompletedPagePrevPageButtonIcon:Hide()
@@ -68,7 +67,7 @@ function S:ArchaeologyUI()
     ArchaeologyFrameSummaryPageNextPageButtonIcon:Hide()
 
     ArchaeologyFrameRankBar:StripTextures()
-    ArchaeologyFrameRankBarBar:SetTexture(DB.bdTex)
+    ArchaeologyFrameRankBarBar:SetTexture(C.media.texture.blank)
     ArchaeologyFrameRankBarBar:SetGradient("VERTICAL", CreateColor(0, 0.65, 0, 1), CreateColor(0, 0.75, 0, 1))
     ArchaeologyFrameRankBar:SetHeight(14)
     ArchaeologyFrameRankBar:CreateBackdrop()
@@ -77,14 +76,14 @@ function S:ArchaeologyUI()
     ArchaeologyFrameArtifactPageSolveFrameStatusBar:StripTextures()
     ArchaeologyFrameArtifactPageSolveFrameStatusBar:CreateBackdrop()
     local barTexture = ArchaeologyFrameArtifactPageSolveFrameStatusBar:GetStatusBarTexture()
-    barTexture:SetTexture(DB.bdTex)
+    barTexture:SetTexture(C.media.texture.blank)
     barTexture:SetGradient("VERTICAL", CreateColor(0.65, 0.25, 0, 1), CreateColor(0.75, 0.35, 0.1, 1))
 
     -- ArcheologyDigsiteProgressBar
 
     ArcheologyDigsiteProgressBar:StripTextures()
-    S:SetBD(ArcheologyDigsiteProgressBar.FillBar)
-    ArcheologyDigsiteProgressBar.FillBar:SetStatusBarTexture(DB.bdTex)
+    S:CreateBackground(ArcheologyDigsiteProgressBar.FillBar)
+    ArcheologyDigsiteProgressBar.FillBar:SetStatusBarTexture(C.media.texture.status)
     ArcheologyDigsiteProgressBar.FillBar:SetStatusBarColor(0.7, 0.3, 0.2)
 
     local ticks = {}

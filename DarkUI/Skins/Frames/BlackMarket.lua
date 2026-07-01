@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Black Market UI
@@ -19,7 +18,7 @@ function S:BlackMarket()
     BlackMarketFrame.MoneyFrameBorder:SetAlpha(0)
     BlackMarketFrame.HotDeal:StripTextures()
     BlackMarketFrame.HotDeal.Item:CreateBackdrop()
-    BlackMarketFrame.HotDeal.Item.IconTexture:SetTexCoord(unpack(DB.TexCoord))
+    BlackMarketFrame.HotDeal.Item.IconTexture:SetTexCoord(unpack(C.media.texCoord))
 
     local headers = { "ColumnName", "ColumnLevel", "ColumnType", "ColumnDuration", "ColumnHighBidder", "ColumnCurrentBid" }
     for _, header in pairs(headers) do
@@ -30,18 +29,18 @@ function S:BlackMarket()
         bg:SetPoint("BOTTOMRIGHT", -1, 0)
     end
 
-    S:SetBD(BlackMarketFrame)
+    S:CreateBackground(BlackMarketFrame)
     BlackMarketFrame.HotDeal:CreateBackdrop()
-    S:Reskin(BlackMarketFrame.BidButton)
+    S:ReskinButton(BlackMarketFrame.BidButton)
     S:ReskinClose(BlackMarketFrame.CloseButton)
     S:ReskinInput(BlackMarketBidPriceGold)
-    S:ReskinTrimScroll(BlackMarketFrame.ScrollBar)
+    S:ReskinTrimScrollBar(BlackMarketFrame.ScrollBar)
 
     hooksecurefunc(BlackMarketFrame.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local bu = select(i, self.ScrollTarget:GetChildren())
 
-            bu.Item.IconTexture:SetTexCoord(unpack(DB.TexCoord))
+            bu.Item.IconTexture:SetTexCoord(unpack(C.media.texCoord))
             if not bu.reskinned then
                 bu:StripTextures()
 
@@ -55,7 +54,7 @@ function S:BlackMarket()
                 bg:SetPoint("TOPLEFT", bu.Item, "TOPRIGHT", 3, E.mult)
                 bg:SetPoint("BOTTOMRIGHT", 0, 4)
 
-                bu:SetHighlightTexture(DB.bdTex)
+                bu:SetHighlightTexture(C.media.texture.blank)
                 local hl = bu:GetHighlightTexture()
                 hl:SetVertexColor(cr, cg, cb, 0.2)
                 hl.SetAlpha = E.Dummy
@@ -64,7 +63,7 @@ function S:BlackMarket()
 
                 bu.Selection:ClearAllPoints()
                 bu.Selection:SetAllPoints(bg)
-                bu.Selection:SetTexture(DB.bdTex)
+                bu.Selection:SetTexture(C.media.texture.blank)
                 bu.Selection:SetVertexColor(cr, cg, cb, 0.1)
 
                 bu.reskinned = true

@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Class Trainer UI
@@ -36,12 +35,12 @@ function S:Trainer()
 
     _G.ClassTrainerStatusBar:StripTextures()
     _G.ClassTrainerStatusBar:SetPoint("TOPLEFT", _G.ClassTrainerFrame, "TOPLEFT", 64, -35)
-    _G.ClassTrainerStatusBar:SetStatusBarTexture(DB.bdTex)
+    _G.ClassTrainerStatusBar:SetStatusBarTexture(C.media.texture.status)
     local statusBg = _G.ClassTrainerStatusBar:CreateBackdrop()
     statusBg:SetBackdropColor(0, 0, 0, 0.25)
 
     _G.ClassTrainerStatusBar:GetStatusBarTexture():SetGradient("VERTICAL", CreateColor(0.1, 0.3, 0.9, 1), CreateColor(0.2, 0.4, 1, 1))
-    S:ReskinTrimScroll(_G.ClassTrainerFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.ClassTrainerFrame.ScrollBar)
 
     hooksecurefunc(_G.ClassTrainerFrame.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -70,7 +69,7 @@ function S:Trainer()
         end
     end)
 
-    S:Reskin(_G.ClassTrainerTrainButton)
+    S:ReskinButton(_G.ClassTrainerTrainButton)
     S:ReskinFilterButton(_G.ClassTrainerFrame.FilterDropdown)
 end
 

@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Artifact Forge UI
@@ -12,7 +11,7 @@ function S:ArtifactUI()
     if not (C.skins.enable and C.skins.artifact) then return end
 
     ArtifactFrame:StripTextures()
-    S:SetBD(ArtifactFrame)
+    S:CreateBackground(ArtifactFrame)
     S:ReskinTab(ArtifactFrameTab1)
     S:ReskinTab(ArtifactFrameTab2)
     ArtifactFrameTab1:ClearAllPoints()
@@ -50,7 +49,7 @@ function S:ArtifactUI()
             slot.HighlightTexture:SetAllPoints()
 
             slot.Selected:SetDrawLayer("BACKGROUND")
-            slot.Selected:SetTexture(DB.bdTex)
+            slot.Selected:SetTexture(C.media.texture.blank)
             slot.Selected:SetVertexColor(1, 1, 0)
             slot.Selected:SetOutside()
         end

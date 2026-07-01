@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Death Recap UI
@@ -20,8 +19,8 @@ function S:DeathRecap()
     DeathRecapFrame.BackgroundInnerGlow:Hide()
     DeathRecapFrame.Divider:Hide()
 
-    S:SetBD(DeathRecapFrame)
-    S:Reskin(DeathRecapFrame.CloseButton)
+    S:CreateBackground(DeathRecapFrame)
+    S:ReskinButton(DeathRecapFrame.CloseButton)
     S:ReskinClose(DeathRecapFrame.CloseXButton)
 
     local function updateEntry(button)
@@ -33,7 +32,7 @@ function S:DeathRecap()
         recap.__styled = true
     end
 
-    S:ReskinTrimScroll(DeathRecapFrame.ScrollBar)
+    S:ReskinTrimScrollBar(DeathRecapFrame.ScrollBar)
     hooksecurefunc(DeathRecapFrame.ScrollBox, "Update", function(self) self:ForEachFrame(updateEntry) end)
 end
 

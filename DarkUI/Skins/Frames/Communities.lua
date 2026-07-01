@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Communities Frame
@@ -18,7 +17,7 @@ local hooksecurefunc = hooksecurefunc
 local function reskinCommunityTab(tab)
     tab:GetRegions():Hide()
     S:ReskinIcon(tab.Icon)
-    tab:SetCheckedTexture(DB.pushedTex)
+    tab:SetCheckedTexture(C.media.button.glow)
     local hl = tab:GetHighlightTexture()
     hl:SetColorTexture(1, 1, 1, 0.25)
     hl:SetAllPoints(tab.Icon)
@@ -30,7 +29,7 @@ local function reskinGuildCards(cards)
         local guildCard = cards[name .. "Card"]
         guildCard:StripTextures()
         guildCard:CreateBackdrop()
-        S:Reskin(guildCard.RequestJoin)
+        S:ReskinButton(guildCard.RequestJoin)
     end
     S:ReskinArrow(cards.PreviousPage, "left")
     S:ReskinArrow(cards.NextPage, "right")
@@ -44,7 +43,7 @@ local function reskinCommunityCard(self)
             child.LogoBorder:Hide()
             child.Background:Hide()
             S:ReskinIcon(child.CommunityLogo)
-            S:Reskin(child)
+            S:ReskinButton(child)
 
             child.__styled = true
         end
@@ -108,12 +107,12 @@ local function reskinCommunitiesListButton(button)
     button.Icon:SetPoint("TOPLEFT", 15, -18)
 
     local hl = button:GetHighlightTexture()
-    hl:SetTexture(DB.bdTex)
+    hl:SetTexture(C.media.texture.blank)
     hl:SetVertexColor(1, 1, 1, 0.3)
     hl:SetInside(button.backdrop, 2, 2)
 
     button.Selection:SetAtlas(nil)
-    button.Selection:SetTexture(DB.bdTex)
+    button.Selection:SetTexture(C.media.texture.blank)
     button.Selection:SetInside(button.backdrop, 2, 2)
 
     -- green (guild) vs battlenet (community) selection tint, refreshed per call
@@ -149,7 +148,7 @@ function S:Communities()
     calendarButton:SetSize(24, 24)
     calendarButton:SetNormalTexture(1103070)
     calendarButton:SetPushedTexture(1103070)
-    calendarButton:GetPushedTexture():SetTexCoord(unpack(DB.TexCoord))
+    calendarButton:GetPushedTexture():SetTexCoord(unpack(C.media.texCoord))
     calendarButton:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.25)
     S:ReskinIcon(calendarButton:GetNormalTexture())
 
@@ -163,10 +162,10 @@ function S:Communities()
                 frame.IconRing:Hide()
                 S:ReskinIcon(frame.Icon)
             end
-            if frame.FindAGuildButton then S:Reskin(frame.FindAGuildButton) end
-            if frame.AcceptButton then S:Reskin(frame.AcceptButton) end
-            if frame.DeclineButton then S:Reskin(frame.DeclineButton) end
-            if frame.ApplyButton then S:Reskin(frame.ApplyButton) end
+            if frame.FindAGuildButton then S:ReskinButton(frame.FindAGuildButton) end
+            if frame.AcceptButton then S:ReskinButton(frame.AcceptButton) end
+            if frame.DeclineButton then S:ReskinButton(frame.DeclineButton) end
+            if frame.ApplyButton then S:ReskinButton(frame.ApplyButton) end
 
             local optionsList = frame.OptionsList
             if optionsList then
@@ -178,7 +177,7 @@ function S:Communities()
                 S:ReskinRole(optionsList.DpsRoleFrame, "DPS")
                 S:ReskinInput(optionsList.SearchBox)
                 optionsList.SearchBox:SetSize(118, 22)
-                S:Reskin(optionsList.Search)
+                S:ReskinButton(optionsList.Search)
                 optionsList.Search:ClearAllPoints()
                 optionsList.Search:SetPoint("TOPRIGHT", optionsList.SearchBox, "BOTTOMRIGHT", 0, -2)
             end
@@ -186,12 +185,12 @@ function S:Communities()
             local requestFrame = frame.RequestToJoinFrame
             if requestFrame then
                 requestFrame:StripTextures()
-                S:SetBD(requestFrame)
+                S:CreateBackground(requestFrame)
                 requestFrame.MessageFrame:StripTextures()
                 requestFrame.MessageFrame.MessageScroll:StripTextures()
                 requestFrame.MessageFrame.MessageScroll:CreateBackdrop()
-                S:Reskin(requestFrame.Apply)
-                S:Reskin(requestFrame.Cancel)
+                S:ReskinButton(requestFrame.Apply)
+                S:ReskinButton(requestFrame.Cancel)
                 hooksecurefunc(requestFrame, "Initialize", reskinRequestCheckbox)
             end
 
@@ -210,11 +209,11 @@ function S:Communities()
             if frame.GuildCards then reskinGuildCards(frame.GuildCards) end
             if frame.PendingGuildCards then reskinGuildCards(frame.PendingGuildCards) end
             if frame.CommunityCards then
-                S:ReskinTrimScroll(frame.CommunityCards.ScrollBar)
+                S:ReskinTrimScrollBar(frame.CommunityCards.ScrollBar)
                 hooksecurefunc(frame.CommunityCards.ScrollBox, "Update", reskinCommunityCard)
             end
             if frame.PendingCommunityCards then
-                S:ReskinTrimScroll(frame.PendingCommunityCards.ScrollBar)
+                S:ReskinTrimScrollBar(frame.PendingCommunityCards.ScrollBar)
                 hooksecurefunc(frame.PendingCommunityCards.ScrollBox, "Update", reskinCommunityCard)
             end
         end
@@ -224,7 +223,7 @@ function S:Communities()
     _G.CommunitiesFrameCommunitiesList.InsetFrame:Hide()
     _G.CommunitiesFrameCommunitiesList.FilligreeOverlay:Hide()
     _G.CommunitiesFrameCommunitiesList.ScrollBar:GetChildren():Hide()
-    S:ReskinTrimScroll(_G.CommunitiesFrameCommunitiesList.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesFrameCommunitiesList.ScrollBar)
 
     hooksecurefunc(_G.CommunitiesFrameCommunitiesList.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -256,9 +255,9 @@ function S:Communities()
     end
 
     -- ChatTab
-    S:Reskin(CommunitiesFrame.InviteButton)
+    S:ReskinButton(CommunitiesFrame.InviteButton)
     CommunitiesFrame.Chat:StripTextures()
-    S:ReskinTrimScroll(CommunitiesFrame.Chat.ScrollBar)
+    S:ReskinTrimScrollBar(CommunitiesFrame.Chat.ScrollBar)
     CommunitiesFrame.ChatEditBox:DisableDrawLayer("BACKGROUND")
     -- dedup: Chat.InsetFrame backdrop separate from ChatEditBox backdrop
     local bg1 = CommunitiesFrame.Chat.InsetFrame:CreateBackdrop()
@@ -273,18 +272,18 @@ function S:Communities()
     do
         local dialog = CommunitiesFrame.NotificationSettingsDialog
         dialog:StripTextures()
-        S:SetBD(dialog)
+        S:CreateBackground(dialog)
         S:ReskinDropDown(dialog.CommunitiesListDropdown)
         if dialog.Selector then
             dialog.Selector:StripTextures()
-            S:Reskin(dialog.Selector.OkayButton)
-            S:Reskin(dialog.Selector.CancelButton)
+            S:ReskinButton(dialog.Selector.OkayButton)
+            S:ReskinButton(dialog.Selector.CancelButton)
         end
         S:ReskinCheck(dialog.ScrollFrame.Child.QuickJoinButton)
         dialog.ScrollFrame.Child.QuickJoinButton:SetSize(25, 25)
-        S:Reskin(dialog.ScrollFrame.Child.AllButton)
-        S:Reskin(dialog.ScrollFrame.Child.NoneButton)
-        S:ReskinTrimScroll(dialog.ScrollFrame.ScrollBar)
+        S:ReskinButton(dialog.ScrollFrame.Child.AllButton)
+        S:ReskinButton(dialog.ScrollFrame.Child.NoneButton)
+        S:ReskinTrimScrollBar(dialog.ScrollFrame.ScrollBar)
 
         hooksecurefunc(dialog, "Refresh", function(self)
             local frame = self.ScrollFrame.Child
@@ -303,7 +302,7 @@ function S:Communities()
     do
         local dialog = CommunitiesFrame.EditStreamDialog
         dialog:StripTextures()
-        S:SetBD(dialog)
+        S:CreateBackground(dialog)
         dialog.NameEdit:DisableDrawLayer("BACKGROUND")
         local bg = dialog.NameEdit:CreateBackdrop()
         bg:SetPoint("TOPLEFT", -3, -3)
@@ -311,28 +310,28 @@ function S:Communities()
         dialog.Description:StripTextures()
         dialog.Description:CreateBackdrop()
         S:ReskinCheck(dialog.TypeCheckbox)
-        S:Reskin(dialog.Accept)
-        S:Reskin(dialog.Delete)
-        S:Reskin(dialog.Cancel)
+        S:ReskinButton(dialog.Accept)
+        S:ReskinButton(dialog.Delete)
+        S:ReskinButton(dialog.Cancel)
     end
 
     do
         local dialog = _G.CommunitiesTicketManagerDialog
         dialog:StripTextures()
-        S:SetBD(dialog)
+        S:CreateBackground(dialog)
         dialog.Background:Hide()
-        S:Reskin(dialog.LinkToChat)
-        S:Reskin(dialog.Copy)
-        S:Reskin(dialog.Close)
+        S:ReskinButton(dialog.LinkToChat)
+        S:ReskinButton(dialog.Copy)
+        S:ReskinButton(dialog.Close)
         S:ReskinArrow(dialog.MaximizeButton, "down")
         S:ReskinDropDown(dialog.ExpiresDropdown)
         S:ReskinDropDown(dialog.UsesDropdown)
-        S:Reskin(dialog.GenerateLinkButton)
+        S:ReskinButton(dialog.GenerateLinkButton)
 
         dialog.InviteManager.ArtOverlay:Hide()
         dialog.InviteManager.ColumnDisplay:StripTextures()
         dialog.InviteManager.ScrollBar:GetChildren():Hide()
-        S:ReskinTrimScroll(dialog.InviteManager.ScrollBar)
+        S:ReskinTrimScrollBar(dialog.InviteManager.ScrollBar)
 
         hooksecurefunc(dialog, "Update", function(self)
             local column = self.InviteManager.ColumnDisplay
@@ -353,9 +352,9 @@ function S:Communities()
             for i = 1, self.ScrollTarget:GetNumChildren() do
                 local button = select(i, self.ScrollTarget:GetChildren())
                 if not button.__styled then
-                    S:Reskin(button.CopyLinkButton)
+                    S:ReskinButton(button.CopyLinkButton)
                     button.CopyLinkButton.Background:Hide()
-                    S:Reskin(button.RevokeButton)
+                    S:ReskinButton(button.RevokeButton)
                     button.RevokeButton:SetSize(18, 18)
 
                     button.__styled = true
@@ -369,7 +368,7 @@ function S:Communities()
     CommunitiesFrame.MemberList.ColumnDisplay:StripTextures()
     S:ReskinDropDown(CommunitiesFrame.GuildMemberListDropdown)
     CommunitiesFrame.MemberList.ScrollBar:GetChildren():Hide()
-    S:ReskinTrimScroll(CommunitiesFrame.MemberList.ScrollBar)
+    S:ReskinTrimScrollBar(CommunitiesFrame.MemberList.ScrollBar)
 
     hooksecurefunc(CommunitiesFrame.MemberList.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -386,7 +385,7 @@ function S:Communities()
                 end
                 header.bg = header:CreateBackdrop()
                 header.bg:SetInside()
-                header:SetHighlightTexture(DB.bdTex)
+                header:SetHighlightTexture(C.media.texture.blank)
                 header:GetHighlightTexture():SetVertexColor(cr, cg, cb, 0.25)
                 header:GetHighlightTexture():SetInside(header.bg)
                 header.Icon:CreateBackdrop():SetBackdropEdge("round")
@@ -399,17 +398,17 @@ function S:Communities()
 
     S:ReskinCheck(CommunitiesFrame.MemberList.ShowOfflineButton)
     CommunitiesFrame.MemberList.ShowOfflineButton:SetSize(25, 25)
-    S:Reskin(CommunitiesFrame.CommunitiesControlFrame.GuildControlButton)
-    S:Reskin(CommunitiesFrame.CommunitiesControlFrame.GuildRecruitmentButton)
-    S:Reskin(CommunitiesFrame.CommunitiesControlFrame.CommunitiesSettingsButton)
+    S:ReskinButton(CommunitiesFrame.CommunitiesControlFrame.GuildControlButton)
+    S:ReskinButton(CommunitiesFrame.CommunitiesControlFrame.GuildRecruitmentButton)
+    S:ReskinButton(CommunitiesFrame.CommunitiesControlFrame.CommunitiesSettingsButton)
     S:ReskinDropDown(CommunitiesFrame.CommunityMemberListDropdown)
 
     local detailFrame = CommunitiesFrame.GuildMemberDetailFrame
     detailFrame:StripTextures()
-    S:SetBD(detailFrame)
+    S:CreateBackground(detailFrame)
     S:ReskinClose(detailFrame.CloseButton)
-    S:Reskin(detailFrame.RemoveButton)
-    S:Reskin(detailFrame.GroupInviteButton)
+    S:ReskinButton(detailFrame.RemoveButton)
+    S:ReskinButton(detailFrame.GroupInviteButton)
     S:ReskinDropDown(detailFrame.RankDropdown)
     detailFrame.NoteBackground:StripTextures()
     detailFrame.NoteBackground:CreateBackdrop()
@@ -421,11 +420,11 @@ function S:Communities()
     do
         local dialog = _G.CommunitiesSettingsDialog
         dialog.BG:Hide()
-        S:SetBD(dialog)
-        S:Reskin(dialog.ChangeAvatarButton)
-        S:Reskin(dialog.Accept)
-        S:Reskin(dialog.Delete)
-        S:Reskin(dialog.Cancel)
+        S:CreateBackground(dialog)
+        S:ReskinButton(dialog.ChangeAvatarButton)
+        S:ReskinButton(dialog.Accept)
+        S:ReskinButton(dialog.Delete)
+        S:ReskinButton(dialog.Cancel)
         S:ReskinInput(dialog.NameEdit)
         S:ReskinInput(dialog.ShortNameEdit)
         dialog.Description:StripTextures()
@@ -445,12 +444,12 @@ function S:Communities()
     do
         local dialog = _G.CommunitiesAvatarPickerDialog
         dialog:StripTextures()
-        S:SetBD(dialog)
-        S:ReskinTrimScroll(_G.CommunitiesAvatarPickerDialog.ScrollBar)
+        S:CreateBackground(dialog)
+        S:ReskinTrimScrollBar(_G.CommunitiesAvatarPickerDialog.ScrollBar)
         if dialog.Selector then
             dialog.Selector:StripTextures()
-            S:Reskin(dialog.Selector.OkayButton)
-            S:Reskin(dialog.Selector.CancelButton)
+            S:ReskinButton(dialog.Selector.OkayButton)
+            S:ReskinButton(dialog.Selector.CancelButton)
         end
     end
 
@@ -470,7 +469,7 @@ function S:Communities()
     CommunitiesFrame.GuildBenefitsFrame.Perks:GetRegions():SetAlpha(0)
     CommunitiesFrame.GuildBenefitsFrame.Rewards.Bg:SetAlpha(0)
     CommunitiesFrame.GuildBenefitsFrame:StripTextures()
-    S:ReskinTrimScroll(CommunitiesFrame.GuildBenefitsFrame.Rewards.ScrollBar)
+    S:ReskinTrimScrollBar(CommunitiesFrame.GuildBenefitsFrame.Rewards.ScrollBar)
 
     local function handleRewardButton(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -498,33 +497,33 @@ function S:Communities()
     local factionFrameBar = CommunitiesFrame.GuildBenefitsFrame.FactionFrame.Bar
     factionFrameBar:StripTextures()
     local factionBg = factionFrameBar:CreateBackdrop()
-    factionFrameBar.Progress:SetTexture(DB.bdTex)
+    factionFrameBar.Progress:SetTexture(C.media.texture.blank)
     factionBg:SetOutside(factionFrameBar.Progress)
 
     -- Guild Info
-    S:Reskin(CommunitiesFrame.GuildLogButton)
+    S:ReskinButton(CommunitiesFrame.GuildLogButton)
     _G.CommunitiesFrameGuildDetailsFrameInfo:StripTextures()
     _G.CommunitiesFrameGuildDetailsFrameNews:StripTextures()
-    S:ReskinTrimScroll(_G.CommunitiesFrameGuildDetailsFrameInfoMOTDScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesFrameGuildDetailsFrameInfoMOTDScrollFrame.ScrollBar)
     local motdBg = _G.CommunitiesFrameGuildDetailsFrameInfoMOTDScrollFrame:CreateBackdrop()
     motdBg:SetPoint("TOPLEFT", 0, 3)
     motdBg:SetPoint("BOTTOMRIGHT", -5, -4)
 
     _G.CommunitiesGuildTextEditFrame:StripTextures()
-    S:SetBD(_G.CommunitiesGuildTextEditFrame)
+    S:CreateBackground(_G.CommunitiesGuildTextEditFrame)
     _G.CommunitiesGuildTextEditFrameBg:Hide()
     _G.CommunitiesGuildTextEditFrame.Container:StripTextures()
     _G.CommunitiesGuildTextEditFrame.Container:CreateBackdrop()
-    S:ReskinTrimScroll(_G.CommunitiesGuildTextEditFrame.Container.ScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesGuildTextEditFrame.Container.ScrollFrame.ScrollBar)
     S:ReskinClose(_G.CommunitiesGuildTextEditFrameCloseButton)
-    S:Reskin(_G.CommunitiesGuildTextEditFrameAcceptButton)
+    S:ReskinButton(_G.CommunitiesGuildTextEditFrameAcceptButton)
     local guildTextClose = select(4, _G.CommunitiesGuildTextEditFrame:GetChildren())
-    S:Reskin(guildTextClose)
+    S:ReskinButton(guildTextClose)
 
-    S:ReskinTrimScroll(_G.CommunitiesFrameGuildDetailsFrameInfo.DetailsFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesFrameGuildDetailsFrameInfo.DetailsFrame.ScrollBar)
     _G.CommunitiesFrameGuildDetailsFrameInfo.DetailsFrame:CreateBackdrop()
     _G.CommunitiesFrameGuildDetailsFrameNews.ScrollBar:GetChildren():Hide()
-    S:ReskinTrimScroll(_G.CommunitiesFrameGuildDetailsFrameNews.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesFrameGuildDetailsFrameNews.ScrollBar)
     _G.CommunitiesFrameGuildDetailsFrame:StripTextures()
 
     hooksecurefunc("GuildNewsButton_SetNews", function(button)
@@ -533,7 +532,7 @@ function S:Communities()
 
     _G.CommunitiesGuildNewsFiltersFrame:StripTextures()
     _G.CommunitiesGuildNewsFiltersFrameBg:Hide()
-    S:SetBD(_G.CommunitiesGuildNewsFiltersFrame)
+    S:CreateBackground(_G.CommunitiesGuildNewsFiltersFrame)
     S:ReskinClose(_G.CommunitiesGuildNewsFiltersFrame.CloseButton)
     for _, name in
         next,
@@ -545,13 +544,13 @@ function S:Communities()
 
     _G.CommunitiesGuildLogFrame:StripTextures()
     _G.CommunitiesGuildLogFrameBg:Hide()
-    S:SetBD(_G.CommunitiesGuildLogFrame)
+    S:CreateBackground(_G.CommunitiesGuildLogFrame)
     S:ReskinClose(_G.CommunitiesGuildLogFrameCloseButton)
-    S:ReskinTrimScroll(_G.CommunitiesGuildLogFrame.Container.ScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.CommunitiesGuildLogFrame.Container.ScrollFrame.ScrollBar)
     _G.CommunitiesGuildLogFrame.Container:StripTextures()
     _G.CommunitiesGuildLogFrame.Container:CreateBackdrop()
     local guildLogClose = select(3, _G.CommunitiesGuildLogFrame:GetChildren())
-    S:Reskin(guildLogClose)
+    S:ReskinButton(guildLogClose)
 
     local bossModel = _G.CommunitiesFrameGuildDetailsFrameNews.BossModel
     bossModel:StripTextures()
@@ -559,14 +558,14 @@ function S:Communities()
     bossModel:SetPoint("LEFT", CommunitiesFrame, "RIGHT", 40, 0)
     local textFrame = bossModel.TextFrame
     textFrame:StripTextures()
-    local bossBg = S:SetBD(bossModel)
+    local bossBg = S:CreateBackground(bossModel)
     if bossBg then bossBg:SetOutside(bossModel, nil, nil, textFrame) end
 
     -- Recruitment dialog
     do
         local dialog = CommunitiesFrame.RecruitmentDialog
         dialog:StripTextures()
-        S:SetBD(dialog)
+        S:CreateBackground(dialog)
         S:ReskinCheck(dialog.ShouldListClub.Button)
         S:ReskinCheck(dialog.MaxLevelOnly.Button)
         S:ReskinCheck(dialog.MinIlvlOnly.Button)
@@ -575,11 +574,11 @@ function S:Communities()
         S:ReskinDropDown(dialog.LanguageDropdown)
         dialog.RecruitmentMessageFrame:StripTextures()
         dialog.RecruitmentMessageFrame.RecruitmentMessageInput:StripTextures()
-        S:ReskinTrimScroll(dialog.RecruitmentMessageFrame.RecruitmentMessageInput.ScrollBar)
+        S:ReskinTrimScrollBar(dialog.RecruitmentMessageFrame.RecruitmentMessageInput.ScrollBar)
         S:ReskinInput(dialog.RecruitmentMessageFrame)
         S:ReskinInput(dialog.MinIlvlOnly.EditBox)
-        S:Reskin(dialog.Accept)
-        S:Reskin(dialog.Cancel)
+        S:ReskinButton(dialog.Accept)
+        S:ReskinButton(dialog.Cancel)
     end
 
     -- ApplicantList
@@ -596,15 +595,15 @@ function S:Communities()
 
         button:SetPoint("LEFT", listBG, E.mult, 0)
         button:SetPoint("RIGHT", listBG, -E.mult, 0)
-        button:SetHighlightTexture(DB.bdTex)
+        button:SetHighlightTexture(C.media.texture.blank)
         local hl = button:GetHighlightTexture()
         hl:SetVertexColor(cr, cg, cb, 0.25)
         hl:SetInside(button)
         button.InviteButton:SetSize(66, 18)
         button.CancelInvitationButton:SetSize(20, 18)
 
-        S:Reskin(button.InviteButton)
-        S:Reskin(button.CancelInvitationButton)
+        S:ReskinButton(button.InviteButton)
+        S:ReskinButton(button.CancelInvitationButton)
         hooksecurefunc(button, "UpdateMemberInfo", updateMemberName)
 
         UpdateRoleTexture(button.RoleIcon1)
@@ -624,7 +623,7 @@ function S:Communities()
                 bg:SetPoint("TOPLEFT", 4, -2)
                 bg:SetPoint("BOTTOMRIGHT", 0, 2)
 
-                child:SetHighlightTexture(DB.bdTex)
+                child:SetHighlightTexture(C.media.texture.blank)
                 local hl = child:GetHighlightTexture()
                 hl:SetVertexColor(cr, cg, cb, 0.25)
                 hl:SetInside(bg)
@@ -635,7 +634,7 @@ function S:Communities()
     end)
 
     applicantList.ScrollBar:GetChildren():Hide()
-    S:ReskinTrimScroll(applicantList.ScrollBar)
+    S:ReskinTrimScrollBar(applicantList.ScrollBar)
 
     hooksecurefunc(applicantList.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do

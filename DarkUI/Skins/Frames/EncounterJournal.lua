@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Encounter Journal (Lore / Boss / Loot / LootJournal / Suggest / Journeys)
@@ -19,7 +18,7 @@ local function reskinHeader(header)
     for i = 4, 18 do
         select(i, header.button:GetRegions()):SetTexture("")
     end
-    S:Reskin(header.button)
+    S:ReskinButton(header.button)
     header.descriptionBG:SetAlpha(0)
     header.descriptionBGBottom:SetAlpha(0)
     header.description:SetTextColor(1, 1, 1)
@@ -84,7 +83,7 @@ function S:EncounterJournal()
     local tabs = { "overviewTab", "modelTab", "bossTab", "lootTab" }
     for _, name in pairs(tabs) do
         local tab = _G.EncounterJournal.encounter.info[name]
-        local bg = S:SetBD(tab)
+        local bg = S:CreateBackground(tab)
         bg:SetInside(tab, 2, 2)
 
         tab:SetNormalTexture(0)
@@ -100,7 +99,7 @@ function S:EncounterJournal()
     -- Instance select
     _G.EncounterJournalInstanceSelectBG:SetAlpha(0)
     S:ReskinDropDown(_G.EncounterJournal.instanceSelect.ExpansionDropdown)
-    S:ReskinTrimScroll(_G.EncounterJournal.instanceSelect.ScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.instanceSelect.ScrollBar)
     _G.EncounterJournal.instanceSelect.evergreenBg:SetAlpha(0)
 
     hooksecurefunc(_G.EncounterJournal.instanceSelect.ScrollBox, "Update", function(self)
@@ -143,10 +142,10 @@ function S:EncounterJournal()
         for i = 1, self.ScrollTarget:GetNumChildren() do
             local child = select(i, self.ScrollTarget:GetChildren())
             if not child.__styled then
-                S:Reskin(child, true)
+                S:ReskinButton(child, true)
                 local hl = child:GetHighlightTexture()
                 hl:SetColorTexture(cr, cg, cb, 0.25)
-                hl:SetInside(child.__bg)
+                hl:SetInside(child)
 
                 child.text:SetTextColor(1, 1, 1)
                 child.creature:SetPoint("TOPLEFT", 0, -4)
@@ -205,7 +204,7 @@ function S:EncounterJournal()
     local showAllResults = _G.EncounterJournalSearchBox.showAllResults
     local previewContainer = _G.EncounterJournalSearchBox.searchPreviewContainer
     previewContainer:StripTextures()
-    local bg = S:SetBD(previewContainer)
+    local bg = S:CreateBackground(previewContainer)
     bg:SetPoint("TOPLEFT", -3, 3)
     bg:SetPoint("BOTTOMRIGHT", showAllResults, 3, -3)
 
@@ -219,12 +218,12 @@ function S:EncounterJournal()
         local result = _G.EncounterJournalSearchResults
         result:SetPoint("BOTTOMLEFT", _G.EncounterJournal, "BOTTOMRIGHT", 15, -1)
         result:StripTextures()
-        local bg = S:SetBD(result)
+        local bg = S:CreateBackground(result)
         bg:SetPoint("TOPLEFT", -10, 0)
         bg:SetPoint("BOTTOMRIGHT")
 
         S:ReskinClose(_G.EncounterJournalSearchResultsCloseButton)
-        S:ReskinTrimScroll(result.ScrollBar)
+        S:ReskinTrimScrollBar(result.ScrollBar)
 
         hooksecurefunc(result.ScrollBox, "Update", function(self)
             for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -236,7 +235,7 @@ function S:EncounterJournal()
                     bg:SetBackdropColor(0, 0, 0, 0.25)
                     bg:SetInside()
 
-                    child:SetHighlightTexture(DB.bdTex)
+                    child:SetHighlightTexture(C.media.texture.blank)
                     local hl = child:GetHighlightTexture()
                     hl:SetVertexColor(cr, cg, cb, 0.25)
                     hl:SetInside(bg)
@@ -250,11 +249,11 @@ function S:EncounterJournal()
     -- Various controls
     S:ReskinPortraitFrame(_G.EncounterJournal)
     S:ReskinInput(_G.EncounterJournalSearchBox)
-    S:ReskinTrimScroll(_G.EncounterJournal.encounter.instance.LoreScrollBar)
-    S:ReskinTrimScroll(_G.EncounterJournal.encounter.info.BossesScrollBar)
-    S:ReskinTrimScroll(_G.EncounterJournal.encounter.info.LootContainer.ScrollBar)
-    S:ReskinTrimScroll(_G.EncounterJournal.encounter.info.overviewScroll.ScrollBar)
-    S:ReskinTrimScroll(_G.EncounterJournal.encounter.info.detailsScroll.ScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.encounter.instance.LoreScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.encounter.info.BossesScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.encounter.info.LootContainer.ScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.encounter.info.overviewScroll.ScrollBar)
+    S:ReskinTrimScrollBar(_G.EncounterJournal.encounter.info.detailsScroll.ScrollBar)
     S:ReskinDropDown(_G.EncounterJournal.encounter.info.LootContainer.filter)
     S:ReskinDropDown(_G.EncounterJournal.encounter.info.LootContainer.slotFilter)
     S:ReskinDropDown(_G.EncounterJournalEncounterFrameInfoDifficulty)
@@ -274,7 +273,7 @@ function S:EncounterJournal()
         local centerDisplay = suggestion.centerDisplay
         centerDisplay.title.text:SetTextColor(1, 1, 1)
         centerDisplay.description.text:SetTextColor(0.9, 0.9, 0.9)
-        S:Reskin(suggestion.button)
+        S:ReskinButton(suggestion.button)
 
         local reward = suggestion.reward
         reward.text:SetTextColor(0.9, 0.9, 0.9)
@@ -303,7 +302,7 @@ function S:EncounterJournal()
         centerDisplay:SetPoint("TOPLEFT", 85, -10)
         centerDisplay.title.text:SetTextColor(1, 1, 1)
         centerDisplay.description.text:SetTextColor(0.9, 0.9, 0.9)
-        S:Reskin(centerDisplay.button)
+        S:ReskinButton(centerDisplay.button)
 
         local reward = suggestion.reward
         reward.iconRing:Hide()
@@ -324,7 +323,7 @@ function S:EncounterJournal()
 
             if data.iconPath then
                 suggestion.icon:SetMask("")
-                suggestion.icon:SetTexCoord(unpack(DB.TexCoord))
+                suggestion.icon:SetTexCoord(unpack(C.media.texCoord))
             end
         end
 
@@ -338,7 +337,7 @@ function S:EncounterJournal()
 
                 if data.iconPath then
                     suggestion.icon:SetMask("")
-                    suggestion.icon:SetTexCoord(unpack(DB.TexCoord))
+                    suggestion.icon:SetTexCoord(unpack(C.media.texCoord))
                 end
             end
         end
@@ -348,7 +347,7 @@ function S:EncounterJournal()
         local rewardData = suggestion.reward.data
         if rewardData then
             suggestion.reward.icon:SetMask("")
-            suggestion.reward.icon:SetTexCoord(unpack(DB.TexCoord))
+            suggestion.reward.icon:SetTexCoord(unpack(C.media.texCoord))
         end
     end)
 
@@ -357,8 +356,8 @@ function S:EncounterJournal()
     local lootJournal = _G.EncounterJournal.LootJournal
     lootJournal:StripTextures()
 
-    local iconColor = DB.QualityColors[Enum.ItemQuality.Legendary or 5] -- legendary color
-    S:ReskinTrimScroll(lootJournal.ScrollBar)
+    local iconColor = C.media.qualityColors[Enum.ItemQuality.Legendary or 5] -- legendary color
+    S:ReskinTrimScrollBar(lootJournal.ScrollBar)
 
     hooksecurefunc(lootJournal.ScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -408,7 +407,7 @@ function S:EncounterJournal()
         end
 
         local itemSetsFrame = _G.EncounterJournal.LootJournalItems.ItemSetsFrame
-        S:ReskinTrimScroll(itemSetsFrame.ScrollBar)
+        S:ReskinTrimScrollBar(itemSetsFrame.ScrollBar)
 
         hooksecurefunc(itemSetsFrame.ScrollBox, "Update", function(self) self:ForEachFrame(reskinBar) end)
         S:ReskinDropDown(itemSetsFrame.ClassDropdown)
@@ -418,8 +417,8 @@ function S:EncounterJournal()
     local monthlyFrame = _G.EncounterJournalMonthlyActivitiesFrame
     if monthlyFrame then
         monthlyFrame:StripTextures()
-        S:ReskinTrimScroll(monthlyFrame.FilterList.ScrollBar)
-        S:ReskinTrimScroll(monthlyFrame.ScrollBar)
+        S:ReskinTrimScrollBar(monthlyFrame.FilterList.ScrollBar)
+        S:ReskinTrimScrollBar(monthlyFrame.ScrollBar)
         if monthlyFrame.ThemeContainer then monthlyFrame.ThemeContainer:SetAlpha(0) end
 
         local function replaceBlackColor(text, r, g, b)
@@ -453,7 +452,7 @@ function S:EncounterJournal()
         -- the button, and push it to the back so the DarkUI Fill body + round border
         -- (from S:Reskin) render above it.
         local button = tutorialFrame.Contents.StartButton
-        S:Reskin(button, true)
+        S:ReskinButton(button, true)
         -- button.Center:Show()
         -- button.Center:SetInside(button, 0.5, 0)
         -- button.Center:SetDrawLayer("BACKGROUND", -1)
@@ -462,10 +461,10 @@ function S:EncounterJournal()
     -- Journeys
     local journeysFrame = _G.EncounterJournal.JourneysFrame
     if journeysFrame then
-        S:ReskinTrimScroll(journeysFrame.ScrollBar)
-        S:Reskin(journeysFrame.JourneyProgress.OverviewBtn)
-        S:Reskin(journeysFrame.JourneyProgress.LevelSkipButton)
-        S:Reskin(journeysFrame.JourneyOverview.OverviewBtn)
+        S:ReskinTrimScrollBar(journeysFrame.ScrollBar)
+        S:ReskinButton(journeysFrame.JourneyProgress.OverviewBtn)
+        S:ReskinButton(journeysFrame.JourneyProgress.LevelSkipButton)
+        S:ReskinButton(journeysFrame.JourneyOverview.OverviewBtn)
     end
 end
 

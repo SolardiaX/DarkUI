@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Quick Keybind Frame
@@ -13,12 +12,12 @@ function S:Binding()
     local frame = QuickKeybindFrame
     frame:StripTextures()
     frame.Header:StripTextures()
-    S:SetBD(frame)
+    S:CreateBackground(frame)
     S:ReskinCheck(frame.UseCharacterBindingsButton)
     frame.UseCharacterBindingsButton:SetSize(24, 24)
-    S:Reskin(frame.OkayButton)
-    S:Reskin(frame.DefaultsButton)
-    S:Reskin(frame.CancelButton)
+    S:ReskinButton(frame.OkayButton)
+    S:ReskinButton(frame.DefaultsButton)
+    S:ReskinButton(frame.CancelButton)
 end
 
 S:AddCallback("Binding")

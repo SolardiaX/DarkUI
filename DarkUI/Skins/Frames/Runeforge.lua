@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Runeforge UI
@@ -46,14 +45,14 @@ function S:Runeforge()
     S:ReskinClose(frame.CloseButton, nil, -70, -70)
 
     local createFrame = frame.CreateFrame
-    S:Reskin(createFrame.CraftItemButton)
+    S:ReskinButton(createFrame.CraftItemButton)
 
     hooksecurefunc(frame.CurrencyDisplay, "SetCurrencies", SetCurrenciesHook)
     hooksecurefunc(createFrame.Cost.Currencies, "SetCurrencies", SetCurrenciesHook)
 
     local powerFrame = frame.CraftingFrame.PowerFrame
     powerFrame:StripTextures()
-    S:SetBD(powerFrame)
+    S:CreateBackground(powerFrame)
 
     hooksecurefunc(powerFrame.PowerList, "RefreshListDisplay", function(self)
         if not self.elements then return end

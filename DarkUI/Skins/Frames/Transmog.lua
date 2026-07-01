@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Transmogrification UI
@@ -17,9 +16,9 @@ function S:Transmog()
     S:ReskinPortraitFrame(TransmogFrame)
 
     TransmogFrame.OutfitCollection:StripTextures()
-    S:ReskinTrimScroll(TransmogFrame.OutfitCollection.OutfitList.ScrollBar)
-    S:Reskin(TransmogFrame.OutfitCollection.SaveOutfitButton)
-    S:Reskin(TransmogFrame.OutfitCollection.PurchaseOutfitButton)
+    S:ReskinTrimScrollBar(TransmogFrame.OutfitCollection.OutfitList.ScrollBar)
+    S:ReskinButton(TransmogFrame.OutfitCollection.SaveOutfitButton)
+    S:ReskinButton(TransmogFrame.OutfitCollection.PurchaseOutfitButton)
     TransmogFrame.OutfitCollection.MoneyFrame:StripTextures()
     TransmogFrame.OutfitCollection.MoneyFrame:CreateBackdrop()
 
@@ -29,7 +28,7 @@ function S:Transmog()
     TransmogFrame.CharacterPreview.Gradients:Hide()
     S:ReskinCheck(TransmogFrame.CharacterPreview.ToggleOptions.HideIgnoredToggle.Checkbox)
     S:ReskinCheck(TransmogFrame.CharacterPreview.ToggleOptions.SheatheWeaponToggle.Checkbox)
-    S:Reskin(TransmogFrame.CharacterPreview.ClearAllPendingButton)
+    S:ReskinButton(TransmogFrame.CharacterPreview.ClearAllPendingButton)
 
     TransmogFrame.WardrobeCollection:StripTextures()
     for _, tab in pairs(TransmogFrame.WardrobeCollection.TabHeaders.tabs) do
@@ -44,10 +43,10 @@ function S:Transmog()
         S:ReskinDropDown(TabContent.ItemsFrame.WeaponDropdown)
         S:ReskinEditBox(TabContent.SetsFrame.SearchBox)
         S:ReskinFilterButton(TabContent.SetsFrame.FilterButton)
-        S:Reskin(TabContent.CustomSetsFrame.NewCustomSetButton)
-        S:Reskin(TabContent.SituationsFrame.DefaultsButton)
+        S:ReskinButton(TabContent.CustomSetsFrame.NewCustomSetButton)
+        S:ReskinButton(TabContent.SituationsFrame.DefaultsButton)
         S:ReskinCheck(TabContent.SituationsFrame.EnabledToggle.Checkbox)
-        S:Reskin(TabContent.SituationsFrame.ApplyButton)
+        S:ReskinButton(TabContent.SituationsFrame.ApplyButton)
 
         hooksecurefunc(TabContent.SituationsFrame, "Init", function()
             for frame in TabContent.SituationsFrame.SituationFramePool:EnumerateActive() do

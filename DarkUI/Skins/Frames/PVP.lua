@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- PVP UI (Queue / Honor / Conquest)
@@ -24,7 +23,7 @@ local function reskinPvPFrame(frame)
     bar:StripTextures()
     bar:CreateBackdrop()
     bar.backdrop:SetBackdropColor(0, 0, 0, 0.25)
-    bar:SetStatusBarTexture(DB.bdTex)
+    bar:SetStatusBarTexture(C.media.texture.status)
     bar:GetStatusBarTexture():SetGradient("VERTICAL", CreateColor(1, 0.8, 0, 1), CreateColor(0.6, 0.4, 0, 1))
 
     local reward = bar.Reward
@@ -57,8 +56,8 @@ function S:PVPUI()
 
             bu.Ring:Hide()
             if bu.CircleMask then bu.CircleMask:Hide() end
-            S:Reskin(bu, true)
-            bu.Background:SetInside(bu.__bg)
+            S:ReskinButton(bu, true)
+            bu.Background:SetInside(bu)
             bu.Background:SetColorTexture(cr, cg, cb, 0.25)
             bu.Background:SetAlpha(1)
 
@@ -97,8 +96,8 @@ function S:PVPUI()
     PVPQueueFrame.HonorInset.Background:Hide()
 
     local popup = PVPQueueFrame.NewSeasonPopup
-    S:Reskin(popup.Leave)
-    popup.Leave.__bg:SetFrameLevel(popup:GetFrameLevel() + 1)
+    S:ReskinButton(popup.Leave)
+    popup.Leave:SetFrameLevel(popup:GetFrameLevel() + 1)
     popup.NewSeason:SetTextColor(1, 0.8, 0)
     popup.SeasonRewardText:SetTextColor(1, 0.8, 0)
     popup.SeasonDescriptionHeader:SetTextColor(1, 1, 1)
@@ -124,9 +123,9 @@ function S:PVPUI()
 
     HonorFrame.Inset:Hide()
     reskinPvPFrame(HonorFrame)
-    S:Reskin(HonorFrame.QueueButton)
+    S:ReskinButton(HonorFrame.QueueButton)
     S:ReskinDropDown(_G.HonorFrameTypeDropdown)
-    S:ReskinTrimScroll(HonorFrame.SpecificScrollBar)
+    S:ReskinTrimScrollBar(HonorFrame.SpecificScrollBar)
 
     hooksecurefunc(HonorFrame.SpecificScrollBox, "Update", function(self)
         for i = 1, self.ScrollTarget:GetNumChildren() do
@@ -160,10 +159,10 @@ function S:PVPUI()
 
     for _, bonusButton in pairs({ "RandomBGButton", "RandomEpicBGButton", "Arena1Button", "BrawlButton", "BrawlButton2" }) do
         local bu = bonusFrame[bonusButton]
-        S:Reskin(bu, true)
+        S:ReskinButton(bu, true)
         bu.SelectedTexture:SetDrawLayer("BACKGROUND")
         bu.SelectedTexture:SetColorTexture(cr, cg, cb, 0.25)
-        bu.SelectedTexture:SetInside(bu.__bg)
+        bu.SelectedTexture:SetInside(bu)
 
         local reward = bu.Reward
         if reward then
@@ -182,13 +181,13 @@ function S:PVPUI()
     ConquestFrame.Arena2v2:HookScript("OnEnter", conquestFrameButton_OnEnter)
     ConquestFrame.Arena3v3:HookScript("OnEnter", conquestFrameButton_OnEnter)
     ConquestFrame.RatedBG:HookScript("OnEnter", conquestFrameButton_OnEnter)
-    S:Reskin(ConquestFrame.JoinButton)
+    S:ReskinButton(ConquestFrame.JoinButton)
 
     local names = { "RatedSoloShuffle", "RatedBGBlitz", "Arena2v2", "Arena3v3", "RatedBG" }
     for _, name in pairs(names) do
         local bu = ConquestFrame[name]
         if bu then
-            S:Reskin(bu, true)
+            S:ReskinButton(bu, true)
             local reward = bu.Reward
             if reward then
                 reward.Border:Hide()
@@ -198,7 +197,7 @@ function S:PVPUI()
 
             bu.SelectedTexture:SetDrawLayer("BACKGROUND")
             bu.SelectedTexture:SetColorTexture(cr, cg, cb, 0.25)
-            bu.SelectedTexture:SetInside(bu.__bg)
+            bu.SelectedTexture:SetInside(bu)
         end
     end
 
@@ -228,7 +227,7 @@ function S:PVPUI()
             local icon = rewardFrame.Icon
             icon:SetTexture(rewardTexture)
             if icon.bg then
-                local color = DB.QualityColors[rewardQuality]
+                local color = C.media.qualityColors[rewardQuality]
                 icon.bg:SetBackdropBorderColor(color.r, color.g, color.b)
             end
         end
@@ -237,11 +236,11 @@ function S:PVPUI()
     -- PlunderstormFrame
     if _G.PlunderstormFrame then
         _G.PlunderstormFrame.Inset:Hide()
-        S:Reskin(_G.PlunderstormFrame.StartQueue)
+        S:ReskinButton(_G.PlunderstormFrame.StartQueue)
 
         local panel = PVPQueueFrame.HonorInset.PlunderstormPanel
         if panel then
-            S:Reskin(panel.PlunderstoreButton)
+            S:ReskinButton(panel.PlunderstoreButton)
             S:ReplaceIconString(panel.PlunderDisplay)
             hooksecurefunc(panel.PlunderDisplay, "SetText", function(self) S:ReplaceIconString(self) end)
         end
@@ -249,9 +248,9 @@ function S:PVPUI()
         local plunderPopup = _G.PlunderstormFramePopup
         if plunderPopup then
             plunderPopup:StripTextures()
-            S:SetBD(plunderPopup)
-            S:Reskin(plunderPopup.AcceptButton)
-            S:Reskin(plunderPopup.DeclineButton)
+            S:CreateBackground(plunderPopup)
+            S:ReskinButton(plunderPopup.AcceptButton)
+            S:ReskinButton(plunderPopup.DeclineButton)
         end
     end
 
@@ -259,7 +258,7 @@ function S:PVPUI()
     if _G.TrainingGroundsFrame then
         reskinPvPFrame(_G.TrainingGroundsFrame)
         S:ReskinDropDown(_G.TrainingGroundsFrameTypeDropdown)
-        S:Reskin(_G.TrainingGroundsFrame.QueueButton)
+        S:ReskinButton(_G.TrainingGroundsFrame.QueueButton)
         _G.TrainingGroundsFrame.Inset:StripTextures()
         _G.TrainingGroundsFrame.BonusTrainingGroundList:StripTextures()
         _G.TrainingGroundsFrame.BonusTrainingGroundList.ShadowOverlay:Hide()
@@ -267,7 +266,7 @@ function S:PVPUI()
         for _, name in pairs({ "RandomTrainingGroundButton" }) do
             local bu = _G.TrainingGroundsFrame.BonusTrainingGroundList[name]
             if bu then
-                S:Reskin(bu, true)
+                S:ReskinButton(bu, true)
                 local reward = bu.Reward
                 if reward then
                     reward.Border:Hide()
@@ -277,7 +276,7 @@ function S:PVPUI()
 
                 bu.SelectedTexture:SetDrawLayer("BACKGROUND")
                 bu.SelectedTexture:SetColorTexture(cr, cg, cb, 0.25)
-                bu.SelectedTexture:SetInside(bu.__bg)
+                bu.SelectedTexture:SetInside(bu)
             end
         end
     end

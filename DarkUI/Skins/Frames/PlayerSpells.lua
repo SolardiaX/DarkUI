@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Player Spells (Talents + Spellbook)
@@ -14,14 +13,14 @@ local hooksecurefunc = hooksecurefunc
 
 local function reskinTalentFrameDialog(dialog)
     dialog:StripTextures()
-    S:SetBD(dialog)
-    if dialog.AcceptButton then S:Reskin(dialog.AcceptButton) end
-    if dialog.CancelButton then S:Reskin(dialog.CancelButton) end
-    if dialog.DeleteButton then S:Reskin(dialog.DeleteButton) end
+    S:CreateBackground(dialog)
+    if dialog.AcceptButton then S:ReskinButton(dialog.AcceptButton) end
+    if dialog.CancelButton then S:ReskinButton(dialog.CancelButton) end
+    if dialog.DeleteButton then S:ReskinButton(dialog.DeleteButton) end
 
     S:ReskinEditBox(dialog.NameControl.EditBox)
-    dialog.NameControl.EditBox.__bg:SetPoint("TOPLEFT", -5, -10)
-    dialog.NameControl.EditBox.__bg:SetPoint("BOTTOMRIGHT", 5, 10)
+    dialog.NameControl.EditBox.backdrop:SetPoint("TOPLEFT", -5, -10)
+    dialog.NameControl.EditBox.backdrop:SetPoint("BOTTOMRIGHT", 5, 10)
 end
 
 function S:PlayerSpells()
@@ -30,9 +29,9 @@ function S:PlayerSpells()
     local frame = _G.PlayerSpellsFrame
 
     S:ReskinPortraitFrame(frame)
-    S:Reskin(frame.TalentsFrame.ApplyButton)
+    S:ReskinButton(frame.TalentsFrame.ApplyButton)
     S:ReskinDropDown(frame.TalentsFrame.LoadSystem.Dropdown)
-    S:Reskin(frame.TalentsFrame.InspectCopyButton)
+    S:ReskinButton(frame.TalentsFrame.InspectCopyButton)
     S:ReskinMinMax(frame.MaximizeMinimizeButton)
 
     frame.TalentsFrame.BlackBG:SetAlpha(0.5)
@@ -40,8 +39,8 @@ function S:PlayerSpells()
     frame.TalentsFrame.BottomBar:SetAlpha(0.5)
 
     S:ReskinEditBox(frame.TalentsFrame.SearchBox)
-    frame.TalentsFrame.SearchBox.__bg:SetPoint("TOPLEFT", -4, -5)
-    frame.TalentsFrame.SearchBox.__bg:SetPoint("BOTTOMRIGHT", 0, 5)
+    frame.TalentsFrame.SearchBox.backdrop:SetPoint("TOPLEFT", -4, -5)
+    frame.TalentsFrame.SearchBox.backdrop:SetPoint("BOTTOMRIGHT", 0, 5)
 
     for i = 1, 3 do
         local tab = select(i, frame.TabSystem:GetChildren())
@@ -51,7 +50,7 @@ function S:PlayerSpells()
     hooksecurefunc(frame.SpecFrame, "UpdateSpecFrame", function(self)
         for specContentFrame in self.SpecContentFramePool:EnumerateActive() do
             if not specContentFrame.__styled then
-                S:Reskin(specContentFrame.ActivateButton)
+                S:ReskinButton(specContentFrame.ActivateButton)
 
                 local role = GetSpecializationRole(specContentFrame.specIndex)
                 if role then S:ReskinSmallRole(specContentFrame.RoleIcon, role) end
@@ -89,28 +88,28 @@ function S:PlayerSpells()
         local editbox = editDialog.LoadoutName
         if editbox then
             S:ReskinEditBox(editbox)
-            editbox.__bg:SetPoint("TOPLEFT", -5, -5)
-            editbox.__bg:SetPoint("BOTTOMRIGHT", 5, 5)
+            editbox.backdrop:SetPoint("TOPLEFT", -5, -5)
+            editbox.backdrop:SetPoint("BOTTOMRIGHT", 5, 5)
         end
 
         local check = editDialog.UsesSharedActionBars
         if check then
             S:ReskinCheck(check.CheckButton)
-            check.CheckButton.bg:SetInside(nil, 6, 6)
+            check.CheckButton.backdrop:SetInside(nil, 6, 6)
         end
     end
 
     local heroDialog = _G.HeroTalentsSelectionDialog
     if heroDialog then
         heroDialog:StripTextures()
-        S:SetBD(heroDialog, 1)
+        S:CreateBackground(heroDialog, 1)
         S:ReskinClose(heroDialog.CloseButton)
 
         hooksecurefunc(heroDialog, "ShowDialog", function(self)
             for specFrame in self.SpecContentFramePool:EnumerateActive() do
                 if not specFrame.__styled then
-                    S:Reskin(specFrame.ActivateButton)
-                    S:Reskin(specFrame.ApplyChangesButton)
+                    S:ReskinButton(specFrame.ActivateButton)
+                    S:ReskinButton(specFrame.ApplyChangesButton)
                     specFrame.__styled = true
                 end
             end
@@ -133,8 +132,8 @@ function S:PlayerSpells()
         S:ReskinArrow(spellBook.PagedSpellsFrame.PagingControls.NextPageButton, "right")
         spellBook.PagedSpellsFrame.PagingControls.PageText:SetTextColor(1, 1, 1)
         S:ReskinEditBox(spellBook.SearchBox)
-        spellBook.SearchBox.__bg:SetPoint("TOPLEFT", -5, -3)
-        spellBook.SearchBox.__bg:SetPoint("BOTTOMRIGHT", 2, 3)
+        spellBook.SearchBox.backdrop:SetPoint("TOPLEFT", -5, -3)
+        spellBook.SearchBox.backdrop:SetPoint("BOTTOMRIGHT", 2, 3)
 
         hooksecurefunc(spellBook.PagedSpellsFrame, "DisplayViewsForCurrentPage", function(self)
             for _, frame in self:EnumerateFrames() do

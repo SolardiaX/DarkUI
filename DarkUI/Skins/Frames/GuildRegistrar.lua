@@ -18,9 +18,9 @@ function S:GuildRegistrar()
     S:ReskinPortraitFrame(_G.GuildRegistrarFrame)
     _G.GuildRegistrarFrameEditBox:DisableDrawLayer("BACKGROUND")
     _G.GuildRegistrarFrameEditBox:CreateBackdrop()
-    S:Reskin(_G.GuildRegistrarFrameGoodbyeButton)
-    S:Reskin(_G.GuildRegistrarFramePurchaseButton)
-    S:Reskin(_G.GuildRegistrarFrameCancelButton)
+    S:ReskinButton(_G.GuildRegistrarFrameGoodbyeButton)
+    S:ReskinButton(_G.GuildRegistrarFramePurchaseButton)
+    S:ReskinButton(_G.GuildRegistrarFrameCancelButton)
 end
 
 S:AddCallback("GuildRegistrar")

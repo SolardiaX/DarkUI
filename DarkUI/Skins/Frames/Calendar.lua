@@ -1,7 +1,6 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
-local cr, cg, cb = DB.r, DB.g, DB.b
+local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 
 ------------------------------------------------------------------------
 -- Calendar
@@ -21,14 +20,14 @@ local function noop() end
 local function reskinEventList(frame)
     frame:StripTextures()
     frame:CreateBackdrop()
-    if frame.ScrollBar then S:ReskinTrimScroll(frame.ScrollBar) end
+    if frame.ScrollBar then S:ReskinTrimScrollBar(frame.ScrollBar) end
 end
 
 local function reskinCalendarPage(frame)
     frame:StripTextures()
-    S:SetBD(frame)
+    S:CreateBackground(frame)
     frame.Header:StripTextures()
-    if frame.ScrollBar then S:ReskinTrimScroll(frame.ScrollBar) end
+    if frame.ScrollBar then S:ReskinTrimScrollBar(frame.ScrollBar) end
 end
 
 function S:Calendar()
@@ -38,7 +37,7 @@ function S:Calendar()
         local dayButtonName = "CalendarDayButton" .. i
         local bu = _G[dayButtonName]
         bu:DisableDrawLayer("BACKGROUND")
-        bu:SetHighlightTexture(DB.bdTex)
+        bu:SetHighlightTexture(C.media.texture.blank)
         local bg = bu:CreateBackdrop()
         bg:SetInside()
         local hl = bu:GetHighlightTexture()
@@ -83,7 +82,7 @@ function S:Calendar()
     _G.CalendarClassTotalsButton:StripTextures()
 
     _G.CalendarFrame:StripTextures()
-    S:SetBD(_G.CalendarFrame, nil, 9, 0, -7, 1)
+    S:CreateBackground(_G.CalendarFrame, nil, 9, 0, -7, 1)
     _G.CalendarClassTotalsButton:CreateBackdrop()
 
     reskinEventList(_G.CalendarViewEventInviteList)
@@ -110,7 +109,7 @@ function S:Calendar()
         titleFrame:StripTextures()
         local parent = titleFrame:GetParent()
         parent:StripTextures()
-        S:SetBD(parent)
+        S:CreateBackground(parent)
     end
 
     _G.CalendarWeekdaySelectedTexture:SetDesaturated(true)
@@ -144,7 +143,7 @@ function S:Calendar()
     local line = _G.CalendarMassInviteFrame:CreateTexture(nil, "BACKGROUND")
     line:SetSize(240, E.mult)
     line:SetPoint("TOP", _G.CalendarMassInviteFrame, "TOP", 0, -150)
-    line:SetTexture(DB.bdTex)
+    line:SetTexture(C.media.texture.blank)
     line:SetVertexColor(0, 0, 0)
 
     _G.CalendarMassInviteFrame:ClearAllPoints()
@@ -168,7 +167,7 @@ function S:Calendar()
     }
     for i = 1, #cbuttons do
         local cbutton = _G[cbuttons[i]]
-        if cbutton then S:Reskin(cbutton) end
+        if cbutton then S:ReskinButton(cbutton) end
     end
 
     _G.CalendarViewEventAcceptButton.flashTexture:SetTexture("")

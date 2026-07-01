@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Covenant Preview, Sanctum, and Renown frames (Shadowlands)
@@ -23,7 +22,7 @@ function S:CovenantPreviewUI()
     if not (C.skins.enable and C.skins.covenant) then return end
 
     local CovenantPreviewFrame = _G.CovenantPreviewFrame
-    S:Reskin(CovenantPreviewFrame.SelectButton)
+    S:ReskinButton(CovenantPreviewFrame.SelectButton)
 
     local infoPanel = CovenantPreviewFrame.InfoPanel
     infoPanel.Name:SetTextColor(1, 0.8, 0)
@@ -43,7 +42,7 @@ function S:CovenantPreviewUI()
             self.ModelSceneContainer.ModelSceneBorder:SetAlpha(0)
             self.Title:CreateBackdrop()
             S:ReskinClose(self.CloseButton)
-            self.bg = S:SetBD(self)
+            self.bg = S:CreateBackground(self)
         end
     end)
 end
@@ -92,7 +91,7 @@ function S:CovenantSanctum()
 
     CovenantSanctumFrame:HookScript("OnShow", function(self)
         if not self.bg then
-            self.bg = S:SetBD(self)
+            self.bg = S:CreateBackground(self)
             self.NineSlice:SetAlpha(0)
             self.LevelFrame.Background:SetAlpha(0)
             S:ReskinClose(self.CloseButton)
@@ -102,7 +101,7 @@ function S:CovenantSanctum()
     local upgradesTab = CovenantSanctumFrame.UpgradesTab
     upgradesTab.Background:SetAlpha(0)
     upgradesTab.Background:CreateBackdrop()
-    S:Reskin(upgradesTab.DepositButton)
+    S:ReskinButton(upgradesTab.DepositButton)
     for _, frame in ipairs(upgradesTab.Upgrades) do
         if frame.TierBorder then frame.TierBorder:SetAlpha(0) end
     end
@@ -114,7 +113,7 @@ function S:CovenantSanctum()
     talentsList:CreateBackdrop()
     talentsList.BackgroundTile:SetAlpha(0)
     talentsList.IntroBox.Background:Hide()
-    S:Reskin(talentsList.UpgradeButton)
+    S:ReskinButton(talentsList.UpgradeButton)
     hooksecurefunc(talentsList, "Refresh", reskinTalentsList)
 end
 
@@ -131,7 +130,7 @@ function S:CovenantRenown()
         self:StripTextures()
 
         if not self.__styled then
-            S:SetBD(self)
+            S:CreateBackground(self)
             S:ReskinClose(self.CloseButton)
 
             self.__styled = true

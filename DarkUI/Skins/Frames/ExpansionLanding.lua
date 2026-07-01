@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Expansion Landing Page (Dragon Isles / War Within overlay panel)
@@ -41,12 +40,12 @@ function S:ExpansionLandingPage()
         if panel and not panel.__styled then
             panel.NineSlice:SetAlpha(0)
             panel.Background:SetAlpha(0)
-            S:SetBD(panel)
+            S:CreateBackground(panel)
 
-            if panel.DragonridingPanel then S:Reskin(panel.DragonridingPanel.SkillsButton) end
+            if panel.DragonridingPanel then S:ReskinButton(panel.DragonridingPanel.SkillsButton) end
             if panel.CloseButton then S:ReskinClose(panel.CloseButton) end
             if panel.MajorFactionList then
-                S:ReskinTrimScroll(panel.MajorFactionList.ScrollBar)
+                S:ReskinTrimScrollBar(panel.MajorFactionList.ScrollBar)
                 panel.MajorFactionList.ScrollBox:ForEachFrame(SkinFactionCategory)
                 hooksecurefunc(panel.MajorFactionList.ScrollBox, "Update", function(self) self:ForEachFrame(SkinFactionCategory) end)
             end

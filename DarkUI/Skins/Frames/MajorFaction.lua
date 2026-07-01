@@ -1,6 +1,5 @@
 local E, C, L = select(2, ...):unpack()
 local S = E:GetModule("Skins")
-local DB = S.DB
 
 ------------------------------------------------------------------------
 -- Major Factions / Renown frame (Dragonflight)
@@ -19,11 +18,11 @@ function S:MajorFactions()
     if not frame then return end
 
     frame:StripTextures()
-    S:SetBD(frame)
+    S:CreateBackground(frame)
     S:ReskinClose(frame.CloseButton)
     frame.NineSlice:SetAlpha(0)
     frame.Background:SetAlpha(0)
-    S:Reskin(frame.LevelSkipButton)
+    S:ReskinButton(frame.LevelSkipButton)
 end
 
 S:AddCallbackForAddon("Blizzard_MajorFactions", "MajorFactions")
