@@ -124,7 +124,8 @@ end
 
 local function setupItemLevel(level)
     if not GameTooltip:IsShown() then return end
-    if not currentGUID or UnitGUID("mouseover") ~= currentGUID then return end
+    local mouseGUID = UnitGUID("mouseover")
+    if not currentGUID or not canaccessvalue(mouseGUID) or mouseGUID ~= currentGUID then return end
 
     local levelLine
     for i = 2, GameTooltip:NumLines() do
@@ -172,7 +173,8 @@ end
 
 local function setupSpec(name, icon)
     if not GameTooltip:IsShown() then return end
-    if not currentGUID or UnitGUID("mouseover") ~= currentGUID then return end
+    local mouseGUID = UnitGUID("mouseover")
+    if not currentGUID or not canaccessvalue(mouseGUID) or mouseGUID ~= currentGUID then return end
 
     local specLine
     for i = 2, GameTooltip:NumLines() do

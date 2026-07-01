@@ -45,7 +45,7 @@ end
 
 local function FilterDebuff(spellId, isBossAura, caster)
     if blacklist[spellId] then return false end
-    if isBossAura then return true end
+    if not issecretvalue(isBossAura) and isBossAura then return true end
     if AuraUtil.ShouldDisplayDebuff(caster, spellId) then return true end
     return false
 end
