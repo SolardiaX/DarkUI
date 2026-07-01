@@ -71,7 +71,7 @@ local config = {
         pause = path .. "tex_pause",
         reset = path .. "tex_reset",
         copy = path .. "tex_copy",
-        wallpaper = path .. "pngs\\prototype\\bgFile.png", -- prototype panel background (explicit .png)
+        wallpaper = path .. "tex_wallpaper_1",
     },
 }
 
