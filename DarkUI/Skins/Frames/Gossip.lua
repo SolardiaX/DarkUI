@@ -84,8 +84,8 @@ function S:Gossip()
     S:ReskinPortraitFrame(_G.GossipFrame)
 
     -- Text on QuestFrame
-    _G.QuestFrameGreetingPanel:HookScript("OnShow", function(self)
-        for button in self.titleButtonPool:EnumerateActive() do
+    local function styleGreetingButtons(frame)
+        for button in frame.titleButtonPool:EnumerateActive() do
             if not button.__styled then
                 replaceGossipText(button, button:GetText())
                 hooksecurefunc(button, "SetFormattedText", replaceGossipFormat)
@@ -93,7 +93,10 @@ function S:Gossip()
                 button.__styled = true
             end
         end
-    end)
+    end
+
+    _G.QuestFrameGreetingPanel:HookScript("OnShow", styleGreetingButtons)
+    hooksecurefunc("QuestFrameGreetingPanel_OnShow", styleGreetingButtons)
 end
 
 S:AddCallback("Gossip")

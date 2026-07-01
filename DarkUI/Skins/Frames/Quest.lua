@@ -40,6 +40,30 @@ function S:QuestFrame()
     _G.QuestFrameProgressPanel:StripTextures()
     _G.QuestFrameGreetingPanel:StripTextures()
 
+    _G.QuestDetailScrollFrame:StripTextures()
+    _G.QuestProgressScrollFrame:StripTextures()
+    _G.QuestGreetingScrollFrame:StripTextures()
+    _G.QuestRewardScrollFrame:StripTextures()
+    _G.QuestLogPopupDetailFrameScrollFrame:StripTextures()
+    _G.QuestDetailScrollChildFrame:StripTextures()
+    _G.QuestRewardScrollChildFrame:StripTextures()
+
+    _G.QuestFrameDetailPanel.SealMaterialBG:SetAlpha(0)
+    _G.QuestFrameRewardPanel.SealMaterialBG:SetAlpha(0)
+    _G.QuestFrameProgressPanel.SealMaterialBG:SetAlpha(0)
+    _G.QuestFrameGreetingPanel.SealMaterialBG:SetAlpha(0)
+
+    if _G.QuestFrameDetailPanelBg then 
+        _G.QuestFrameDetailPanelBg:SetAlpha(0)
+        local bg = _G.QuestFrameDetailPanelBg:CreateBackdrop()
+        bg:SetAlpha(1)
+    end
+    if _G.QuestFrameRewardPanelBg then 
+        _G.QuestFrameRewardPanelBg:SetAlpha(0)
+        local bg = _G.QuestFrameRewardPanelBg:CreateBackdrop()
+        bg:SetAlpha(1)
+    end
+
     -- Greeting break line
     local line = _G.QuestFrameGreetingPanel:CreateTexture()
     line:SetColorTexture(1, 1, 1, 0.25)
@@ -91,6 +115,7 @@ function S:QuestFrame()
     S:ReskinTrimScrollBar(_G.QuestRewardScrollFrame.ScrollBar)
     S:ReskinTrimScrollBar(_G.QuestDetailScrollFrame.ScrollBar)
     S:ReskinTrimScrollBar(_G.QuestGreetingScrollFrame.ScrollBar)
+    S:ReskinTrimScrollBar(_G.QuestLogPopupDetailFrameScrollFrame.ScrollBar)
 
     -- Text colors
     _G.QuestProgressRequiredItemsText:SetTextColor(1, 0.8, 0)
@@ -116,6 +141,8 @@ function S:QuestFrame()
     _G.QuestModelScene.ModelTextFrame:StripTextures()
     bg:SetPoint("BOTTOMRIGHT", _G.QuestModelScene.ModelTextFrame, "BOTTOMRIGHT")
 
+    _G.QuestNPCModelText:SetTextColor(1, 1, 1)
+
     if _G.QuestNPCModelTextScrollFrame then
         S:ReskinTrimScrollBar(_G.QuestNPCModelTextScrollFrame.ScrollBar)
     end
@@ -137,6 +164,20 @@ function S:QuestFrame()
         end
         _G.QuestFrame.FriendshipStatusBar.BarBorder:Hide()
     end
+
+    -- QuestLogPopupDetailFrame
+    local QuestLogPopupDetailFrame = _G.QuestLogPopupDetailFrame
+    S:ReskinPortraitFrame(QuestLogPopupDetailFrame)
+    S:ReskinButton(_G.QuestLogPopupDetailFrameAbandonButton)
+    S:ReskinButton(_G.QuestLogPopupDetailFrameShareButton)
+    S:ReskinButton(_G.QuestLogPopupDetailFrameTrackButton)
+
+    local showMapButton = QuestLogPopupDetailFrame.ShowMapButton
+    showMapButton:StripTextures()
+    S:ReskinButton(showMapButton)
+    showMapButton.Text:ClearAllPoints()
+    showMapButton.Text:SetPoint("CENTER")
+    showMapButton:SetSize(showMapButton:GetWidth() - 30, showMapButton:GetHeight() - 40)
 end
 
 S:AddCallback("QuestFrame")

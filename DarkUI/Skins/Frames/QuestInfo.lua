@@ -62,6 +62,7 @@ local function restyleSpellButton(bu)
     end
 
     local bg = bu:CreateBackdrop()
+    bg:SetBackdropEdge("round_white")
     bg:SetBackdropColor(0, 0, 0, 0.25)
     bg:SetPoint("TOPLEFT", 2, -1)
     bg:SetPoint("BOTTOMRIGHT", 0, 14)
@@ -75,6 +76,7 @@ local function reskinRewardButton(bu)
 
     bu.backdrop = nil
     local bg = bu:CreateBackdrop()
+    bg:SetBackdropEdge("round_white")
     bg:SetBackdropColor(0, 0, 0, 0.25)
     bg:SetPoint("TOPLEFT", bu.bg, "TOPRIGHT", 2, 0)
     bg:SetPoint("BOTTOMRIGHT", bu.bg, 100, 0)
@@ -130,6 +132,21 @@ function S:QuestInfo()
     -- Spell objective frame
     restyleSpellButton(_G.QuestInfoSpellObjectiveFrame)
 
+    -- Skill point reward frame
+    local skillPointFrame = _G.QuestInfoSkillPointFrame
+    if skillPointFrame then
+        skillPointFrame:StripTextures()
+        local icon = _G.QuestInfoSkillPointFrameIconTexture
+        if icon then
+            icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+            icon:SetDrawLayer("OVERLAY")
+            icon:SetPoint("TOPLEFT", 2, -2)
+            icon:SetSize(icon:GetWidth() - 2, icon:GetHeight() - 2)
+        end
+        skillPointFrame:CreateBackdrop()
+        _G.QuestInfoSkillPointFrameCount:SetDrawLayer("OVERLAY")
+    end
+
     -- Dynamic reward buttons
     hooksecurefunc("QuestInfo_GetRewardButton", function(rewardsFrame, index)
         local bu = rewardsFrame.RewardButtons[index]
@@ -162,6 +179,7 @@ function S:QuestInfo()
             if region then region:Hide() end
         end
         local bg = titleFrame:CreateBackdrop()
+        bg:SetBackdropEdge("round_white")
         bg:SetBackdropColor(0, 0, 0, 0.25)
         bg:SetPoint("TOPLEFT", icon, "TOPRIGHT", 0, 2)
         bg:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", 220, -1)
@@ -194,6 +212,7 @@ function S:QuestInfo()
                 if not reward.__styled then
                     reward.BG:Hide()
                     local bg = reward:CreateBackdrop()
+                    bg:SetBackdropEdge("round_white")
                     bg:SetBackdropColor(0, 0, 0, 0.25)
                     reward.__styled = true
                 end
