@@ -35,18 +35,14 @@ local function getFactionStanding(factionData)
     local factionID = factionData.factionID
     local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
     if repInfo and repInfo.friendshipFactionID > 0 then
-        if repInfo.nextThreshold then
-            return repInfo.standing
-        end
+        if repInfo.nextThreshold then return repInfo.standing end
     elseif C_Reputation.IsMajorFaction(factionID) then
         if not C_MajorFactions.HasMaximumRenown(factionID) then
             local majorData = C_MajorFactions.GetMajorFactionData(factionID)
             if majorData then return majorData.renownReputationEarned end
         end
     else
-        if factionData.reaction ~= MAX_REPUTATION_REACTION then
-            return factionData.currentStanding
-        end
+        if factionData.reaction ~= MAX_REPUTATION_REACTION then return factionData.currentStanding end
     end
     return nil
 end
@@ -86,9 +82,7 @@ local function switcherOnEvent(_, event, ...)
                     changedIndex = i
                 end
                 if factionName and not foundIndex and factionData.name == factionName then
-                    if C_Reputation.IsFactionActive(i) then
-                        foundIndex = i
-                    end
+                    if C_Reputation.IsFactionActive(i) then foundIndex = i end
                 end
             end
         end
