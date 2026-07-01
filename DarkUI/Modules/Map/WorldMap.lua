@@ -239,7 +239,9 @@ local function setupMapScale()
     WorldMapFrame.BlackoutFrame:EnableMouse(false)
 
     hooksecurefunc(WorldMapFrame, "SynchronizeDisplayState", applyMapLayout)
-    WorldMapFrame:HookScript("OnShow", applyMapLayout)
+    WorldMapFrame:HookScript("OnShow", function(self)
+        C_Timer.After(0, function() applyMapLayout(self) end)
+    end)
 end
 
 local function setupCoords()
