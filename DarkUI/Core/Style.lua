@@ -13,13 +13,21 @@ local unpack = unpack
 
 local function onEnterHighlight(self)
     if self:IsEnabled() then
-        self:SetBackdropBorderColor(r, g, b)
+        if self.backdrop then
+            self.backdrop:SetBackdropBorderColor(r, g, b)
+        else
+            self:SetBackdropBorderColor(r, g, b)
+        end
         if self.overlay then self.overlay:SetVertexColor(r * 0.3, g * 0.3, b * 0.3, 1) end
     end
 end
 
 local function onLeaveHighlight(self)
-    self:SetBackdropBorderColor(unpack(self.__borderColor or C.media.border_color))
+    if self.backdrop then
+        self.backdrop:SetBackdropBorderColor(unpack(self.__borderColor or C.media.border_color))
+    else
+        self:SetBackdropBorderColor(unpack(self.__borderColor or C.media.border_color))
+    end
     if self.overlay then self.overlay:SetVertexColor(0.1, 0.1, 0.1, 1) end
 end
 

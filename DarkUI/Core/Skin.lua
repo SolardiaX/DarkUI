@@ -82,13 +82,13 @@ function E:ReskinUIPanelButton(button, strip)
     if button.BottomMiddle then button.BottomMiddle:Hide() end
     if button.MiddleMiddle then button.MiddleMiddle:Hide() end
 
-    button:SetTemplate("Fill")
+    button:CreateBackdrop("Fill")
     button:CreateGradient(C.media.gradient_color_light)
 
     -- white edge tinted to the resting border color; hover recolors it to the theme gold.
     -- __borderColor is what onLeaveHighlight restores to after a hover.
     button.__borderColor = C.media.button_border_color
-    button:SetBackdropEdge("round_white", C.media.button_border_color)
+    button.backdrop:SetBackdropEdge("round_white", C.media.button_border_color)
 
     -- mouseover highlight fill (ADD-blend glow, visible regardless of border color)
     if button.SetHighlightTexture then
