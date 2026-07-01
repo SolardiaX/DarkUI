@@ -53,7 +53,10 @@ function S:Menu()
                 button:DisableDrawLayer("BACKGROUND")
                 button.backdrop = nil
                 button.bg = button:CreateBackdrop()
+                button.bg:SetBackdropEdge("round")
                 button.bg:SetInside()
+                button.bg:CreateGradient()
+
                 local hl = button:GetHighlightTexture()
                 hl:SetColorTexture(cr, cg, cb, 0.25)
                 hl:SetInside(button.bg)
