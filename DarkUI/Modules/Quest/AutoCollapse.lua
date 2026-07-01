@@ -15,7 +15,7 @@ local collapsible = {
     AchievementObjectiveTracker,
     MonthlyActivitiesObjectiveTracker,
     ProfessionsRecipeTracker,
-    WorldQuestObjectiveTracker,
+    -- WorldQuestObjectiveTracker, -- SetCollapsed taints map system (quest pin passthrough)
 }
 
 ------------------------------------------------------------------------
