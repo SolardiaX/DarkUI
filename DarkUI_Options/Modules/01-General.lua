@@ -33,6 +33,7 @@ addon.OptionList["general"] = {
     },
     { CHECK, "general.useLocalNumberFormat", L_OPT_GENERAL_LOCALE_VALUEFORMAT },
     { HEADER, nil, "Blizzard" },
+    { CHECK, "general.skins", L_OPT_GENERAL_SKINS },
     { CHECK, "blizzard.custom_position", L_OPT_GENERAL_BLIZZARD_CUSTOM_POSITION },
     { CHECK, "blizzard.slot_durability", L_OPT_GENERAL_SLOT_DURABILITY },
     { CHECK, "blizzard.shift_mark", L_OPT_GENERAL_SHIFT_MARK },

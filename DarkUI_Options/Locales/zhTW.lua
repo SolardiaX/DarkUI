@@ -30,6 +30,7 @@ L_OPT_GENERAL_UISCALE = "縮放比例"
 L_OPT_GENERAL_LOCALE_VALUEFORMAT = "啟用本地化數字單位（需要語言包提供對應支持）"
 L_OPT_GENERAL_SLOT_DURABILITY = "人物面板顯示裝備耐久度"
 L_OPT_GENERAL_SHIFT_MARK = "開啟 SHIFT 快速標記"
+L_OPT_GENERAL_SKINS = "美化暴雪介面面板"
 
 -- Actionbar
 L_OPT_BARS_ENABLE = "啟用動作條模塊"

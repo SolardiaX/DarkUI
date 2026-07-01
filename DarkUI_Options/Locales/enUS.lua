@@ -30,6 +30,7 @@ L_OPT_GENERAL_UISCALE = "UI Scale"
 L_OPT_GENERAL_LOCALE_VALUEFORMAT = "Enable localized value units (requires language pack support)"
 L_OPT_GENERAL_SLOT_DURABILITY = "Durability on character slot buttons"
 L_OPT_GENERAL_SHIFT_MARK = "Marks mouseover target when you push Shift (only in group)"
+L_OPT_GENERAL_SKINS = "Skin Blizzard UI panels"
 
 -- Actionbar
 L_OPT_BARS_ENABLE = "Enable module"

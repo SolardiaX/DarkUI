@@ -31,6 +31,7 @@ L_OPT_GENERAL_UISCALE = "Масштаб интерфейса"
 L_OPT_GENERAL_LOCALE_VALUEFORMAT = "Включить локализованные единицы (требуется языковой пакет)"
 L_OPT_GENERAL_SLOT_DURABILITY = "Прочность на слотах персонажа"
 L_OPT_GENERAL_SHIFT_MARK = "Shift-метка наведением (только в группе)"
+L_OPT_GENERAL_SKINS = "Оформление панелей интерфейса Blizzard"
 
 -- Actionbar
 L_OPT_BARS_ENABLE = "Включить модуль"

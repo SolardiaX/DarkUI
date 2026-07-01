@@ -30,6 +30,7 @@ L_OPT_GENERAL_UISCALE = "缩放比例"
 L_OPT_GENERAL_LOCALE_VALUEFORMAT = "启用本地化数字单位（需要语言包提供对应支持）"
 L_OPT_GENERAL_SLOT_DURABILITY = "人物面板显示装备耐久度"
 L_OPT_GENERAL_SHIFT_MARK = "开启 SHIFT 快速标记"
+L_OPT_GENERAL_SKINS = "美化暴雪界面面板"
 
 -- Actionbar
 L_OPT_BARS_ENABLE = "启用动作条模块"
