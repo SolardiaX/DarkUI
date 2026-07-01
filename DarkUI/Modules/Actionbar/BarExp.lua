@@ -10,23 +10,54 @@ local floor = math.floor
 
 local cfg = C.actionbar.bars.exp
 
-local faction_standing_msg = {
-    gsub(FACTION_STANDING_INCREASED, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_INCREASED_GENERIC, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_DECREASED, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_DECREASED_GENERIC, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_INCREASED_ACH_BONUS, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_INCREASED_BONUS, "%%s", "(.+)"),
-    gsub(FACTION_STANDING_INCREASED_DOUBLE_BONUS, "%%s", "(.+)"),
+local factionStandings = {}
+
+local function buildPattern(str)
+    local pattern = gsub(str, "[%^%$%(%)%.%[%]%*%+%-%?]", "%%%0")
+    pattern = gsub(pattern, "%%%%d", "%%d+")
+    pattern = gsub(pattern, "%%%%%%%%%%%.1f", "%%d+%%.%%d")
+    pattern = gsub(pattern, "%%%%s", "(.+)")
+    return pattern
+end
+
+local factionIncreasePatterns = {
+    buildPattern(FACTION_STANDING_INCREASED),
+    buildPattern(FACTION_STANDING_INCREASED_GENERIC),
+    buildPattern(FACTION_STANDING_INCREASED_ACH_BONUS),
+    buildPattern(FACTION_STANDING_INCREASED_BONUS),
+    buildPattern(FACTION_STANDING_INCREASED_DOUBLE_BONUS),
+    FACTION_STANDING_INCREASED_ACCOUNT_WIDE and buildPattern(FACTION_STANDING_INCREASED_ACCOUNT_WIDE),
+    FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE and buildPattern(FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE),
+    FACTION_STANDING_INCREASED_GENERIC_ACCOUNT_WIDE and buildPattern(FACTION_STANDING_INCREASED_GENERIC_ACCOUNT_WIDE),
 }
 
-local function switcherSetFactionByName(faction_name)
-    if faction_name == "Guild" then faction_name = GetGuildInfo("player") end
+local function getFactionStanding(factionData)
+    local factionID = factionData.factionID
+    local repInfo = C_GossipInfo.GetFriendshipReputation(factionID)
+    if repInfo and repInfo.friendshipFactionID > 0 then
+        if repInfo.nextThreshold then
+            return repInfo.standing
+        end
+    elseif C_Reputation.IsMajorFaction(factionID) then
+        if not C_MajorFactions.HasMaximumRenown(factionID) then
+            local majorData = C_MajorFactions.GetMajorFactionData(factionID)
+            if majorData then return majorData.renownReputationEarned end
+        end
+    else
+        if factionData.reaction ~= MAX_REPUTATION_REACTION then
+            return factionData.currentStanding
+        end
+    end
+    return nil
+end
 
+local function initFactionStandings()
+    C_Reputation.ExpandAllFactionHeaders()
     for i = 1, C_Reputation.GetNumFactions() do
-        local factionInfo = C_Reputation.GetFactionDataByIndex(i)
-        if factionInfo and factionInfo.name == faction_name then
-            if C_Reputation.IsFactionActive(i) then C_Reputation.SetWatchedFactionByIndex(i) end
+        local factionData = C_Reputation.GetFactionDataByIndex(i)
+        if factionData and factionData.factionID then
+            local standing = getFactionStanding(factionData)
+            if standing then factionStandings[factionData.factionID] = standing end
         end
     end
 end
@@ -34,15 +65,38 @@ end
 local function switcherOnEvent(_, event, ...)
     if cfg.autoswitch ~= true then return end
 
-    local arg1 = ...
+    local message = ...
     if event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
-        local faction_name
-        local i = 1
-        while (faction_name == nil) and (i < #faction_standing_msg) do
-            faction_name = smatch(arg1, faction_standing_msg[i])
-            i = i + 1
+        if not canaccessvalue(message) then return end
+
+        local factionName
+        for _, pattern in ipairs(factionIncreasePatterns) do
+            factionName = smatch(message, pattern)
+            if factionName then break end
         end
-        if faction_name ~= nil then switcherSetFactionByName(faction_name) end
+        if factionName == GUILD then factionName = GetGuildInfo("player") end
+
+        local foundIndex, changedIndex
+        for i = 1, C_Reputation.GetNumFactions() do
+            local factionData = C_Reputation.GetFactionDataByIndex(i)
+            if factionData and factionData.factionID then
+                local standing = getFactionStanding(factionData)
+                if standing and standing ~= factionStandings[factionData.factionID] then
+                    factionStandings[factionData.factionID] = standing
+                    changedIndex = i
+                end
+                if factionName and not foundIndex and factionData.name == factionName then
+                    if C_Reputation.IsFactionActive(i) then
+                        foundIndex = i
+                    end
+                end
+            end
+        end
+
+        local index = foundIndex or changedIndex
+        if index then C_Reputation.SetWatchedFactionByIndex(index) end
+    elseif event == "VARIABLES_LOADED" then
+        C_Timer.After(1, initFactionStandings)
     end
 end
 
@@ -324,4 +378,5 @@ function module:OnInit()
     statusbar:RegisterEvent("MODIFIER_STATE_CHANGED")
 
     self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE", switcherOnEvent)
+    self:RegisterEvent("VARIABLES_LOADED", switcherOnEvent)
 end
