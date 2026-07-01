@@ -150,7 +150,7 @@ local function createAuraIcon(self)
     buffs.num = 6
     buffs.showStealableBuffs = cfg.boss.aura.show_Stealable_buffs
     buffs:SetSize((buffs.size + buffs.spacing) * buffs.num, buffs.size)
-    buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 8)
+    buffs:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 16)
     buffs.PostCreateButton = core.PostCreateButton
     buffs.PostUpdateButton = core.PostUpdateButton
     buffs.PostUpdateGapButton = core.PostUpdateGapButton
@@ -170,7 +170,7 @@ local function createAuraIcon(self)
     debuffs.num = 6
     debuffs.onlyShowPlayer = cfg.boss.aura.player_aura_only
     debuffs:SetSize((debuffs.size + debuffs.spacing) * debuffs.num, debuffs.size)
-    debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -8)
+    debuffs:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, -16)
     debuffs.PostCreateButton = core.PostCreateButton
     debuffs.PostUpdateButton = core.PostUpdateButton
     debuffs.PostUpdateGapButton = core.PostUpdateGapButton
