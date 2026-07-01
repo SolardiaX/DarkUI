@@ -28,7 +28,7 @@ local function handleSkillButton(button)
 end
 
 function S:ProfessionsBook()
-    if not (C.skins.enable and C.skins.tradeskill) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.ProfessionsBookFrame)
 

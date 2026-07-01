@@ -7,7 +7,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:ReadyCheck()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     -- Ready check
     ReadyCheckListenerFrame:StripTextures()

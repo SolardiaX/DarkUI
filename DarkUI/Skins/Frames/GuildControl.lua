@@ -30,7 +30,7 @@ local function updateGuildRanks()
 end
 
 function S:GuildControl()
-    if not (C.skins.enable and C.skins.guild) then return end
+    if not C.general.skins then return end
 
     S:CreateBackground(_G.GuildControlUI)
 

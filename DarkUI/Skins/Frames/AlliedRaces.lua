@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local select = select
 
 function S:AlliedRacesUI()
-    if not (C.skins.enable and C.skins.alliedRaces) then return end
+    if not C.general.skins then return end
 
     local AlliedRacesFrame = AlliedRacesFrame
     S:ReskinPortraitFrame(AlliedRacesFrame)

@@ -131,7 +131,7 @@ local function updateMemberName(self, info)
 end
 
 function S:Communities()
-    if not (C.skins.enable and C.skins.communities) then return end
+    if not C.general.skins then return end
 
     local CommunitiesFrame = _G.CommunitiesFrame
 

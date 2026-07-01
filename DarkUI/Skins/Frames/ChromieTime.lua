@@ -8,7 +8,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:ChromieTimeUI()
-    if not (C.skins.enable and C.skins.chromieTime) then return end
+    if not C.general.skins then return end
 
     local frame = ChromieTimeFrame
 

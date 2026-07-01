@@ -34,7 +34,7 @@ local function reskinConduitList(frame)
 end
 
 function S:Soulbinds()
-    if not (C.skins.enable and C.skins.soulbinds) then return end
+    if not C.general.skins then return end
 
     local SoulbindViewer = _G.SoulbindViewer
 

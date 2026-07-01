@@ -53,7 +53,7 @@ local function reskinFriendButton(button)
 end
 
 function S:Friends()
-    if not (C.skins.enable and C.skins.friends) then return end
+    if not C.general.skins then return end
 
     for i = 1, 4 do
         local tab = _G["FriendsFrameTab" .. i]

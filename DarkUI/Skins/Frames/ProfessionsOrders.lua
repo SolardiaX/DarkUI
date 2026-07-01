@@ -94,7 +94,7 @@ local function reskinOrderIcon(child)
 end
 
 function S:ProfessionsOrders()
-    if not (C.skins.enable and C.skins.tradeskill) then return end
+    if not C.general.skins then return end
 
     local frame = _G.ProfessionsCustomerOrdersFrame
 

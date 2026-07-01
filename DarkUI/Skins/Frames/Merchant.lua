@@ -45,7 +45,7 @@ local function reskinMerchantInteract(button)
 end
 
 function S:Merchant()
-    if not (C.skins.enable and C.skins.merchant) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(MerchantFrame)
     S:ReskinDropDown(MerchantFrame.FilterDropdown)

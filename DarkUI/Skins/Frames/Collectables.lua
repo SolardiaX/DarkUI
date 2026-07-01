@@ -76,7 +76,7 @@ local function repositionCollectionsTabs()
 end
 
 function S:Collectables()
-    if not (C.skins.enable and C.skins.collections) then return end
+    if not C.general.skins then return end
 
     -- [[ General ]]
 

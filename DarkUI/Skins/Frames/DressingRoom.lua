@@ -20,7 +20,7 @@ local function ResetToggleTexture(button, texture)
 end
 
 function S:DressingRoom()
-    if not (C.skins.enable and C.skins.dressingroom) then return end
+    if not C.general.skins then return end
 
     -- Dressup Frame
 

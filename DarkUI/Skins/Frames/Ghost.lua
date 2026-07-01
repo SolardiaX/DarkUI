@@ -11,7 +11,7 @@ local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 local select = select
 
 function S:Ghost()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     for i = 1, 6 do
         select(i, GhostFrame:GetRegions()):Hide()

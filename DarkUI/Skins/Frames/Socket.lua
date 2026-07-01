@@ -33,7 +33,7 @@ local GemTypeInfo = {
 }
 
 function S:ItemSocketingUI()
-    if not (C.skins.enable and C.skins.socket) then return end
+    if not C.general.skins then return end
 
     local frame = _G.ItemSocketingFrame
     local socketingContainer = frame.SocketingContainer

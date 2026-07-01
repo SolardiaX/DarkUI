@@ -52,7 +52,7 @@ local function styleRewardRole(roleIcon)
 end
 
 function S:LFGFrame()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     -- LFDFrame
     hooksecurefunc("LFGDungeonListButton_SetDungeon", function(button)

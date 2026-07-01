@@ -40,7 +40,7 @@ local function replaceTextColor(text, r)
 end
 
 function S:Gossip()
-    if not (C.skins.enable and C.skins.gossip) then return end
+    if not C.general.skins then return end
 
     _G.QuestFont:SetTextColor(1, 1, 1)
 

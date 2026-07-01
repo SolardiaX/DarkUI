@@ -9,7 +9,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:Obliterum()
-    if not (C.skins.enable and C.skins.obliterum) then return end
+    if not C.general.skins then return end
 
     local obliterum = ObliterumForgeFrame
 

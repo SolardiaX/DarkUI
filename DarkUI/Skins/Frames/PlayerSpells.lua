@@ -24,7 +24,7 @@ local function reskinTalentFrameDialog(dialog)
 end
 
 function S:PlayerSpells()
-    if not (C.skins.enable and C.skins.talent) then return end
+    if not C.general.skins then return end
 
     local frame = _G.PlayerSpellsFrame
 

@@ -12,7 +12,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:MajorFactions()
-    if not (C.skins.enable and C.skins.majorFactions) then return end
+    if not C.general.skins then return end
 
     local frame = _G.MajorFactionRenownFrame
     if not frame then return end

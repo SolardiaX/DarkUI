@@ -2,7 +2,7 @@
 
 `DarkUI/Skins/Frames/` 下现有 **68 个换肤文件**(从 AuroraClassic 移植),本表是逐面板的游戏内验证清单。
 
-> **总开关**:`C.skins.enable` 必须为真。每个面板另有独立子开关(下表「开关」列,均在 `Config/Settings.lua` 的 `C.skins` 表)。`parchment_remover` 是共享的羊皮纸移除子开关。
+> **总开关**:`C.general.skins` 必须为真(全局单开关,无每面板子开关)。下表「开关」列仅作面板→功能标识,历史遗留,现已统一由总开关控制。
 
 ## 如何测试
 

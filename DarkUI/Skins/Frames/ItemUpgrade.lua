@@ -20,7 +20,7 @@ local function reskinCurrencyIcon(self)
 end
 
 function S:ItemUpgrade()
-    if not (C.skins.enable and C.skins.itemUpgrade) then return end
+    if not C.general.skins then return end
 
     local ItemUpgradeFrame = ItemUpgradeFrame
     S:ReskinPortraitFrame(ItemUpgradeFrame)

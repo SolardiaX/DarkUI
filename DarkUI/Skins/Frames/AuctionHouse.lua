@@ -141,7 +141,7 @@ local function reskinItemList(frame, hasHeader)
 end
 
 function S:AuctionHouse()
-    if not (C.skins.enable and C.skins.auctionhouse) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(AuctionHouseFrame)
     AuctionHouseFrame.MoneyFrameBorder:StripTextures()

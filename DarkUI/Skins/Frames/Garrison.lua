@@ -389,7 +389,7 @@ local function reskinMissionBoards(self)
 end
 
 function S:Garrison()
-    if not (C.skins.enable and C.skins.garrison) then return end
+    if not C.general.skins then return end
 
     -- Tooltips (inline-expanded from Aurora's B:ReskinGarrisonTooltip)
     reskinGarrisonTooltip(_G.GarrisonFollowerAbilityWithoutCountersTooltip)
@@ -1268,7 +1268,7 @@ local function updateTalentBorder(bu, atlas)
 end
 
 function S:OrderHallUI()
-    if not (C.skins.enable and C.skins.garrison) then return end
+    if not C.general.skins then return end
 
     local OrderHallTalentFrame = _G.OrderHallTalentFrame
 

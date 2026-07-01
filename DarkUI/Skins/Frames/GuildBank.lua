@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:GuildBank()
-    if not (C.skins.enable and C.skins.guildBank) then return end
+    if not C.general.skins then return end
 
     GuildBankFrame:StripTextures()
     S:ReskinPortraitFrame(GuildBankFrame)

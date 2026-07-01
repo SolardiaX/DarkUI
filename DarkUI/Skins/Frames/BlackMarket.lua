@@ -12,7 +12,7 @@ local _G = _G
 local select, hooksecurefunc = select, hooksecurefunc
 
 function S:BlackMarket()
-    if not (C.skins.enable and C.skins.blackMarket) then return end
+    if not C.general.skins then return end
 
     BlackMarketFrame:StripTextures()
     BlackMarketFrame.MoneyFrameBorder:SetAlpha(0)

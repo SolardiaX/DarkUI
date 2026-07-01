@@ -27,7 +27,7 @@ local function updateMinorButtonState(button)
 end
 
 function S:StaticPopup()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     for i = 1, 4 do
         local frame = _G["StaticPopup" .. i]

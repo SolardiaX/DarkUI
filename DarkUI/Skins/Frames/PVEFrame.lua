@@ -12,7 +12,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:PVEFrame()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     _G.PVEFrameLeftInset:SetAlpha(0)
     _G.PVEFrameBlueBg:SetAlpha(0)

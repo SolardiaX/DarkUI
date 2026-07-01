@@ -13,7 +13,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:StableUI()
-    if not (C.skins.enable and C.skins.stable) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.StableFrame)
     S:ReskinButton(_G.StableFrame.StableTogglePetButton)

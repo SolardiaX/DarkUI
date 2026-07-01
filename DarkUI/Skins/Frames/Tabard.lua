@@ -7,7 +7,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:Tabard()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(TabardFrame)
     TabardFrameMoneyInset:Hide()

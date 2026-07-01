@@ -11,7 +11,7 @@ local hooksecurefunc = hooksecurefunc
 local pairs = pairs
 
 function S:Transmog()
-    if not (C.skins.enable and C.skins.transmogrify) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(TransmogFrame)
 

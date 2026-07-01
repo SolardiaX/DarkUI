@@ -11,7 +11,7 @@ local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b
 local _G = _G
 
 function S:Menu()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     local GameMenuFrame = _G.GameMenuFrame
 

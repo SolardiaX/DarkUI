@@ -9,7 +9,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:GuildRegistrar()
-    if not (C.skins.enable and C.skins.guild) then return end
+    if not C.general.skins then return end
 
     _G.GuildRegistrarFrameEditBox:SetHeight(20)
     _G.AvailableServicesText:SetTextColor(1, 1, 1)

@@ -27,7 +27,7 @@ local S = E:GetModule("Skins")
 local cr, cg, cb = E.myColor.r, E.myColor.g, E.myColor.b  -- only if the port uses them
 
 function S:SomePanel()
-    if not (C.skins.enable and C.skins.<key>) then return end
+    if not C.general.skins then return end
     -- … panel body …
 end
 S:AddCallbackForAddon("Blizzard_SomePanel", "SomePanel")  -- on-demand addon
@@ -49,7 +49,7 @@ S:AddCallbackForAddon("Blizzard_SomePanel", "SomePanel")  -- on-demand addon
 | `B.HideObject(f)` | `f:Kill()` |
 | `f.styled` guard | `f.__styled` |
 | `DB.bdTex` / `DB.QualityColors` / `C.mult` | `C.media.texture.blank` / `C.media.qualityColors` / `E.mult` (see table below) |
-| (Aurora has no per-panel switch) | first line: `if not (C.skins.enable and C.skins.<key>) then return end` |
+| (Aurora has no per-panel switch) | first line: `if not C.general.skins then return end` |
 
 ## S:Reskin* facade methods
 
@@ -83,8 +83,8 @@ WoW widget API (`:SetPoint`, `:SetSize`, …), not shorthands.
 
 ## Manual-judgment items (not mechanical)
 
-- **Config keys:** add/confirm a real `C.skins.<key>` in `Config/Settings.lua` for
-  each panel; gate every `S:X()` on it.
+- **Gating:** every `S:X()` starts with `if not C.general.skins then return end` — one
+  global skins switch, no per-panel keys.
 - **Frames DarkUI already owns — do NOT port** (would double-skin / conflict):
   Bags, Tooltip, WorldMap, ObjectiveTracker, Alerts, TalkingHead, MirrorTimers,
   CooldownManager, Loot, Chat, Quest. These live under `Modules/`.

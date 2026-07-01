@@ -13,7 +13,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:MacroUI()
-    if not (C.skins.enable and C.skins.macro) then return end
+    if not C.general.skins then return end
 
     _G.MacroHorizontalBarLeft:Hide()
     _G.MacroFrameTab1:StripTextures()

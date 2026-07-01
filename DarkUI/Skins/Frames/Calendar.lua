@@ -31,7 +31,7 @@ local function reskinCalendarPage(frame)
 end
 
 function S:Calendar()
-    if not (C.skins.enable and C.skins.calendar) then return end
+    if not C.general.skins then return end
 
     for i = 1, 42 do
         local dayButtonName = "CalendarDayButton" .. i

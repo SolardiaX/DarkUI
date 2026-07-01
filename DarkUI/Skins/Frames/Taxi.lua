@@ -7,7 +7,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:Taxi()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     TaxiFrame:DisableDrawLayer("BORDER")
     TaxiFrame:DisableDrawLayer("OVERLAY")

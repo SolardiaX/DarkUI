@@ -24,7 +24,7 @@ local function handleRoleAnchor(self, role)
 end
 
 function S:LFGList()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     local LFGListFrame = _G.LFGListFrame
     LFGListFrame.NothingAvailable.Inset:Hide()

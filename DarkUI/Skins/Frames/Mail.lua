@@ -11,7 +11,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:Mail()
-    if not (C.skins.enable and C.skins.mail) then return end
+    if not C.general.skins then return end
 
     local texL, texR, texT, texB = unpack(C.media.texCoord)
 

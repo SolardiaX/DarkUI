@@ -24,7 +24,7 @@ local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 local r, g, b = E.myColor.r, E.myColor.g, E.myColor.b
 
 local S = E:Module("Skins")
-S:SetConfigKey("skins")
+S:SetConfigKey("general.skins")
 
 S.addonsToLoad = {}
 S.nonAddonsToLoad = {}

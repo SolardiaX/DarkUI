@@ -24,7 +24,7 @@ local function NoTaintArrow(self, direction) -- needs review
 end
 
 function S:Character()
-    if not (C.skins.enable and C.skins.character) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(CharacterFrame)
     CharacterFrameInsetRight:StripTextures()

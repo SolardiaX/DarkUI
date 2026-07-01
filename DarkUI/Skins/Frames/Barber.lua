@@ -17,7 +17,7 @@ local function reskinCustomizeButton(button)
 end
 
 function S:Barber()
-    if not (C.skins.enable and C.skins.barber) then return end
+    if not C.general.skins then return end
 
     local frame = BarberShopFrame
 
@@ -27,7 +27,7 @@ function S:Barber()
 end
 
 function S:CharacterCustomize()
-    if not (C.skins.enable and C.skins.barber) then return end
+    if not C.general.skins then return end
 
     local frame = CharCustomizeFrame
 

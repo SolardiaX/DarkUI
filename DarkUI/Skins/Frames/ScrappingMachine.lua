@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local hooksecurefunc = hooksecurefunc
 
 function S:ScrappingMachine()
-    if not (C.skins.enable and C.skins.scrapping) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(ScrappingMachineFrame)
     S:ReskinButton(ScrappingMachineFrame.ScrapButton)

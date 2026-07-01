@@ -19,7 +19,7 @@ local function SkinFactionCategory(button)
 end
 
 function S:ExpansionLandingPage()
-    if not (C.skins.enable and C.skins.expansionLanding) then return end
+    if not C.general.skins then return end
 
     local frame = _G.ExpansionLandingPage
     local panel

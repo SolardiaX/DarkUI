@@ -80,7 +80,7 @@ local function SetupCartItem(button)
 end
 
 function S:PerksProgram()
-    if not (C.skins.enable and C.skins.perksProgram) then return end
+    if not C.general.skins then return end
 
     local frame = PerksProgramFrame
     if not frame then return end

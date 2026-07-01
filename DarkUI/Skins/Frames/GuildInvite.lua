@@ -10,7 +10,7 @@ local _G = _G
 local select = select
 
 function S:GuildInvite()
-    if not (C.skins.enable and C.skins.guild) then return end
+    if not C.general.skins then return end
 
     S:CreateBackground(_G.GuildInviteFrame)
     for i = 1, 10 do

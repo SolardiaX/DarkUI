@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:ArchaeologyUI()
-    if not (C.skins.enable and C.skins.archaeology) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(ArchaeologyFrame)
     ArchaeologyFrame:DisableDrawLayer("BACKGROUND")

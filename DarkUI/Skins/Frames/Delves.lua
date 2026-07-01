@@ -29,7 +29,7 @@ local function reskinOptionSlot(frame, skip)
 end
 
 function S:DelvesCompanionConfiguration()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.DelvesCompanionConfigurationFrame)
     S:ReskinButton(_G.DelvesCompanionConfigurationFrame.CompanionConfigShowAbilitiesButton)
@@ -57,7 +57,7 @@ end
 S:AddCallbackForAddon("Blizzard_DelvesCompanionConfiguration", "DelvesCompanionConfiguration")
 
 function S:DelvesDashboardUI()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     _G.DelvesDashboardFrame.DashboardBackground:SetAlpha(0)
     S:ReskinButton(_G.DelvesDashboardFrame.ButtonPanelLayoutFrame.CompanionConfigButtonPanel.CompanionConfigButton)
@@ -76,7 +76,7 @@ local function handleReward(rewardFrame)
 end
 
 function S:DelvesDifficultyPicker()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.DelvesDifficultyPickerFrame)
     S:ReskinDropDown(_G.DelvesDifficultyPickerFrame.Dropdown)

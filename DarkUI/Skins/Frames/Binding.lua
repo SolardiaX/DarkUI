@@ -7,7 +7,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:Binding()
-    if not (C.skins.enable and C.skins.binding) then return end
+    if not C.general.skins then return end
 
     local frame = QuickKeybindFrame
     frame:StripTextures()

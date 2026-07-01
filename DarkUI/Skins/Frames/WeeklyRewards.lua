@@ -69,7 +69,7 @@ local function reskinConfirmIcon(frame)
 end
 
 function S:WeeklyRewards()
-    if not (C.skins.enable and C.skins.weeklyRewards) then return end
+    if not C.general.skins then return end
 
     local WeeklyRewardsFrame = _G.WeeklyRewardsFrame
 

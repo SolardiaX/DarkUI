@@ -11,7 +11,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:GenericTrait()
-    if not (C.skins.enable and C.skins.talent) then return end
+    if not C.general.skins then return end
 
     local frame = _G.GenericTraitFrame
 

@@ -6,7 +6,7 @@ local S = E:GetModule("Skins")
 -- Ported from AuroraClassic AddOns/Blizzard_Covenant.lua (2026-06)
 -- Notes:
 --   * Three separate addon registrations: CovenantPreviewUI, CovenantSanctum,
---     CovenantRenown — each gated on C.skins.covenant.
+--     CovenantRenown.
 --   * Aurora noise overlay dropped; DarkUI backdrop supplies texture.
 ------------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ local hooksecurefunc = hooksecurefunc
 ------------------------------------------------------------------------
 
 function S:CovenantPreviewUI()
-    if not (C.skins.enable and C.skins.covenant) then return end
+    if not C.general.skins then return end
 
     local CovenantPreviewFrame = _G.CovenantPreviewFrame
     S:ReskinButton(CovenantPreviewFrame.SelectButton)
@@ -85,7 +85,7 @@ local function replaceCurrencies(displayGroup)
 end
 
 function S:CovenantSanctum()
-    if not (C.skins.enable and C.skins.covenant) then return end
+    if not C.general.skins then return end
 
     local CovenantSanctumFrame = _G.CovenantSanctumFrame
 
@@ -124,7 +124,7 @@ S:AddCallbackForAddon("Blizzard_CovenantSanctum", "CovenantSanctum")
 ------------------------------------------------------------------------
 
 function S:CovenantRenown()
-    if not (C.skins.enable and C.skins.covenant) then return end
+    if not C.general.skins then return end
 
     hooksecurefunc(_G.CovenantRenownFrame, "SetUpCovenantData", function(self)
         self:StripTextures()

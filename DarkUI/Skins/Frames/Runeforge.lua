@@ -39,7 +39,7 @@ local function SetCurrenciesHook(self)
 end
 
 function S:Runeforge()
-    if not (C.skins.enable and C.skins.runeforge) then return end
+    if not C.general.skins then return end
 
     local frame = RuneforgeFrame
     S:ReskinClose(frame.CloseButton, nil, -70, -70)

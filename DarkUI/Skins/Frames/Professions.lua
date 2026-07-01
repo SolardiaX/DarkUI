@@ -210,7 +210,7 @@ local function reskinRankBar(rankBar)
 end
 
 function S:Professions()
-    if not (C.skins.enable and C.skins.tradeskill) then return end
+    if not C.general.skins then return end
 
     -- Flyout is loaded with ProfessionsTemplates (FrameXML), hook once
     if _G.OpenProfessionsItemFlyout then hooksecurefunc("OpenProfessionsItemFlyout", reskinProfessionsFlyout) end

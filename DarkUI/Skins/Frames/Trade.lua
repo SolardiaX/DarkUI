@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:Trade()
-    if not (C.skins.enable and C.skins.trade) then return end
+    if not C.general.skins then return end
 
     TradePlayerEnchantInset:Hide()
     TradePlayerItemsInset:Hide()

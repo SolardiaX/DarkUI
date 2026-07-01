@@ -11,7 +11,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:ChallengesUI()
-    if not (C.skins.enable and C.skins.lfg) then return end
+    if not C.general.skins then return end
 
     _G.ChallengesFrameInset:Hide()
     for i = 1, 2 do

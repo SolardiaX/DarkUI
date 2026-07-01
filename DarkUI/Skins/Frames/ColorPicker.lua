@@ -7,7 +7,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:ColorPicker()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     ColorPickerFrame.Header:StripTextures()
     ColorPickerFrame.Header:ClearAllPoints()

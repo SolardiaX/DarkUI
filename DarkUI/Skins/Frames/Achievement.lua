@@ -30,7 +30,7 @@ local function setupStatusbar(bar)
 end
 
 function S:Achievement()
-    if not (C.skins.enable and C.skins.achievement) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.AchievementFrame)
     _G.AchievementFrameWaterMark:SetAlpha(0)

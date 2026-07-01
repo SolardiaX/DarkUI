@@ -11,7 +11,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:PVPMatch()
-    if not (C.skins.enable and C.skins.pvp) then return end
+    if not C.general.skins then return end
 
     -- ready dialog
     local PVPReadyDialog = _G.PVPReadyDialog

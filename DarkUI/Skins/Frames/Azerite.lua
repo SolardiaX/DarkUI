@@ -61,7 +61,7 @@ local function reskinReforgeUI(frame, index)
 end
 
 function S:AzeriteUI()
-    if not (C.skins.enable and C.skins.azerite) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(AzeriteEmpoweredItemUI)
     AzeriteEmpoweredItemUIBg:Hide()
@@ -71,7 +71,7 @@ end
 S:AddCallbackForAddon("Blizzard_AzeriteUI", "AzeriteUI")
 
 function S:AzeriteEssenceUI()
-    if not (C.skins.enable and C.skins.azerite) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(AzeriteEssenceUI)
     AzeriteEssenceUI.PowerLevelBadgeFrame:StripTextures()
@@ -90,7 +90,7 @@ end
 S:AddCallbackForAddon("Blizzard_AzeriteEssenceUI", "AzeriteEssenceUI")
 
 function S:AzeriteRespecUI()
-    if not (C.skins.enable and C.skins.azerite) then return end
+    if not C.general.skins then return end
 
     reskinReforgeUI(AzeriteRespecFrame, 15)
 end
@@ -98,7 +98,7 @@ end
 S:AddCallbackForAddon("Blizzard_AzeriteRespecUI", "AzeriteRespecUI")
 
 function S:ItemInteractionUI()
-    if not (C.skins.enable and C.skins.azerite) then return end
+    if not C.general.skins then return end
 
     reskinReforgeUI(ItemInteractionFrame)
 end

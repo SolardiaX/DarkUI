@@ -8,7 +8,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:LossOfControl()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     local styled
     hooksecurefunc(LossOfControlFrame, "SetUpDisplay", function(self)

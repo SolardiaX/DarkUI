@@ -11,7 +11,7 @@ local _G = _G
 local select, hooksecurefunc = select, hooksecurefunc
 
 function S:VoidStorage()
-    if not (C.skins.enable and C.skins.voidStorage) then return end
+    if not C.general.skins then return end
 
     S:CreateBackground(VoidStorageFrame, nil, 20, 0, 0, 20)
     VoidStoragePurchaseFrame:CreateBackdrop()

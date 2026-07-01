@@ -8,7 +8,7 @@ local S = E:GetModule("Skins")
 ------------------------------------------------------------------------
 
 function S:ArtifactUI()
-    if not (C.skins.enable and C.skins.artifact) then return end
+    if not C.general.skins then return end
 
     ArtifactFrame:StripTextures()
     S:CreateBackground(ArtifactFrame)

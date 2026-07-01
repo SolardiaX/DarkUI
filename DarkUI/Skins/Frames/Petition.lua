@@ -9,7 +9,7 @@ local S = E:GetModule("Skins")
 local _G = _G
 
 function S:Petition()
-    if not (C.skins.enable and C.skins.petition) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.PetitionFrame)
     S:ReskinButton(_G.PetitionFrameSignButton)

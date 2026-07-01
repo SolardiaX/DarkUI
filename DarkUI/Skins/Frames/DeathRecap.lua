@@ -10,7 +10,7 @@ local S = E:GetModule("Skins")
 local hooksecurefunc = hooksecurefunc
 
 function S:DeathRecap()
-    if not (C.skins.enable and C.skins.deathRecap) then return end
+    if not C.general.skins then return end
 
     local DeathRecapFrame = DeathRecapFrame
 

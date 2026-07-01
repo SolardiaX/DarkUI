@@ -53,7 +53,7 @@ local function reskinScrollChild(self)
 end
 
 function S:ClickBindingUI()
-    if not (C.skins.enable and C.skins.misc) then return end
+    if not C.general.skins then return end
 
     local frame = _G.ClickBindingFrame
 

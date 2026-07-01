@@ -10,7 +10,7 @@ local _G = _G
 local hooksecurefunc = hooksecurefunc
 
 function S:Inspect()
-    if not (C.skins.enable and C.skins.inspect) then return end
+    if not C.general.skins then return end
 
     InspectModelFrame:StripTextures()
     InspectGuildFrameBG:Hide()

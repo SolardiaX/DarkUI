@@ -39,7 +39,7 @@ local function conquestFrameButton_OnEnter(self)
 end
 
 function S:PVPUI()
-    if not (C.skins.enable and C.skins.pvp) then return end
+    if not C.general.skins then return end
 
     local PVPQueueFrame = _G.PVPQueueFrame
     local HonorFrame = _G.HonorFrame

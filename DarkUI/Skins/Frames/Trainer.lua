@@ -14,7 +14,7 @@ local select = select
 local hooksecurefunc = hooksecurefunc
 
 function S:Trainer()
-    if not (C.skins.enable and C.skins.trainer) then return end
+    if not C.general.skins then return end
 
     S:ReskinPortraitFrame(_G.ClassTrainerFrame)
     _G.ClassTrainerStatusBarSkillRank:ClearAllPoints()

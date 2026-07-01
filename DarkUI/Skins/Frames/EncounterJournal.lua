@@ -64,7 +64,7 @@ local function repositionTabs()
 end
 
 function S:EncounterJournal()
-    if not (C.skins.enable and C.skins.encounterjournal) then return end
+    if not C.general.skins then return end
 
     -- Tabs
     for i = 1, 7 do
