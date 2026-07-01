@@ -1,11 +1,11 @@
-## Interface: 120005
+## Interface: 120007
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - Options
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R - 配置管理
 ## Notes: DarkUI Configuration GUI
 ## Notes-zhCN: DarkUI - 配置管理
 ## Notes-ruRU: DarkUI - Управление конфигурацией
 ## Author: SolardiaX
-## Version: 12.0.7-b1.2.0
+## Version: 12.0.7-b1.3.0
 ## Dependencies: DarkUI
 ## Category-enUS: UI Overhaul
 ## Category-ruRU: Переработка интерфейса

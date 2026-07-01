@@ -1,11 +1,11 @@
-## Interface: 120005
+## Interface: 120007
 ## Title: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Title-zhCN: |CFFFFCC99Dark|R|CFFFFFFFFUI|R
 ## Notes: DarkUI for World of Warcraft
 ## Notes-zhCN: DarkUI 整合插件
 ## Notes-ruRU: DarkUI Интеграционные плагины
 ## Author: SolardiaX
-## Version: 12.0.7-b1.2.0
+## Version: 12.0.7-b1.3.0
 ## OptionalDeps: DarkUI_Options
 ## SavedVariables: SavedConfig, SavedStats
 ## SavedVariablesPerCharacter: SavedConfigPerChar, SavedStatsPerChar
