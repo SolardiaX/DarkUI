@@ -55,7 +55,7 @@ function E:ReskinUIPanelButton(button, strip)
 
     -- Clear the button's own art (named textures). Only StripTextures when
     -- explicitly asked: a blanket strip also wipes unnamed icon regions
-    -- (e.g. MerchantSellAllJunkButton's coin icon). Mirrors ElvUI HandleButton.
+    -- (e.g. MerchantSellAllJunkButton's coin icon).
     -- Overwrite with a transparent texture (E.ClearTexture) rather than "": an
     -- empty path does not reliably blank atlas-based art (e.g. the gold NormalTexture
     -- on FriendsFrame ContactsMenuButton).
@@ -108,7 +108,7 @@ function E:ReskinUIPanelButton(button, strip)
 end
 
 ------------------------------------------------------------------------
--- E:ReskinTab — tab button (NDui-style: drop atlas art + dark pill + gold hover)
+-- E:ReskinTab — tab button: drop atlas art + dark pill + gold hover
 --
 -- DisableDrawLayer("BACKGROUND") removes the Blizzard tab art but KEEPS the text
 -- layer, so the native selected/deselected text brightness still carries the
@@ -133,8 +133,8 @@ function E:ReskinTab(tab)
     if tab.RightHighlight then tab.RightHighlight:SetAlpha(0) end
     if tab.MiddleHighlight then tab.MiddleHighlight:SetAlpha(0) end
 
-    -- inset pill backdrop (left/right 5, top 3) — tightened from NDui's 8 so the
-    -- pill sits closer to the tab edges; panels chain tabs at -5 for a ~5px gap.
+    -- inset pill backdrop (left/right 5, top 3) — sits close to the tab edges so
+    -- panels chain tabs at -5 for a ~5px gap.
     local bg = tab:CreateBackdrop("default")
     bg:ClearAllPoints()
     bg:SetPoint("TOPLEFT", 5, -3)
@@ -189,7 +189,7 @@ function E:ReskinEditBox(editbox)
 
     -- Hide native border art WITHOUT a blanket StripTextures: that also blanks
     -- the region the caret renders against, so a focused box shows no cursor.
-    -- Mirror ElvUI HandleEditBox — hide named border pieces + the NineSlice.
+    -- Hide the named border pieces + the NineSlice individually.
     local name = editbox.GetName and editbox:GetName()
     for _, area in ipairs(EDITBOX_BORDER_REGIONS) do
         local region = (name and _G[name .. area]) or editbox[area]
@@ -200,7 +200,7 @@ function E:ReskinEditBox(editbox)
     local bg = E:StyleInput(editbox)
 
     -- modest left clearance so the border line doesn't sit on the caret's home
-    -- position (editbox x=0); ElvUI/NDui extend the editbox backdrop the same way.
+    -- position (editbox x=0); extend the editbox backdrop past it on both sides.
     bg:SetPoint("TOPLEFT", editbox, "TOPLEFT", -3, 0)
     bg:SetPoint("BOTTOMRIGHT", editbox, "BOTTOMRIGHT", 3, 0)
 
@@ -243,7 +243,7 @@ function E:ReskinDropDown(dropdown, width, template)
 
     dropdown:StripTextures(true)
     local bg = E:StyleInput(dropdown, template)
-    dropdown:OffsetFrameLevel(2)
+    dropdown:SetFrameLevel(dropdown:GetFrameLevel() + 2)
 
     -- modern WowStyle dropdowns expose Arrow; legacy ones a Button child
     if dropdown.Arrow then dropdown.Arrow:SetAlpha(0) end
@@ -288,11 +288,11 @@ function E:ReskinPortrait(frame)
     if not frame or frame.__styled then return end
     if frame:IsForbidden() then return end
 
-    -- Hide every portrait/overlay region variant Blizzard frames ship (mirrors
-    -- ElvUI HandlePortraitFrame): modern PortraitContainer, the legacy global
-    -- $parentPortrait (ProfessionsFrame uses this), the lowercase .portrait alt,
-    -- plus portrait/art overlays. Covered independently — a frame can carry more
-    -- than one (e.g. PortraitContainer + PortraitOverlay).
+    -- Hide every portrait/overlay region variant Blizzard frames ship: modern
+    -- PortraitContainer, the legacy global $parentPortrait (ProfessionsFrame uses
+    -- this), the lowercase .portrait alt, plus portrait/art overlays. Covered
+    -- independently — a frame can carry more than one (e.g. PortraitContainer +
+    -- PortraitOverlay).
     local name = frame.GetName and frame:GetName()
     local portrait = (name and _G[name .. "Portrait"]) or frame.Portrait
     if portrait then portrait:SetAlpha(0) end

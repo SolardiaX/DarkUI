@@ -115,7 +115,7 @@ function E:StyleCheckBox(frame)
 
     frame:SetNormalTexture("")
     frame:SetPushedTexture("")
-    frame:SetHighlightTexture(C.media.texture.status)
+    frame:SetHighlightTexture(C.media.texture.blank)
 
     local bg = CreateFrame("Frame", nil, frame)
     bg:SetInside(frame, 4, 4)
@@ -140,8 +140,7 @@ end
 ------------------------------------------------------------------------
 -- E:StyleIconButton — icon button look (square button with a swappable Icon):
 -- overlay border + highlight/pushed/checked state textures + icon texCoord.
--- Distinct from E:ReskinUIPanelButton (text/push buttons). The ElvUI-compat
--- method form button:StyleButton() routes here (see Core/API.lua).
+-- Distinct from E:ReskinUIPanelButton (text/push buttons).
 ------------------------------------------------------------------------
 
 function E:StyleIconButton(button, margin, skipOverlay)
@@ -167,7 +166,7 @@ function E:StyleIconButton(button, margin, skipOverlay)
         highlight:SetTexture(C.media.button.hover)
         highlight:SetInside(button, margin, margin)
         button.highlight = highlight
-        button.hover = highlight -- ElvUI-compat alias (ports reference button.hover)
+        button.hover = highlight -- alias some ports reference
         button:SetHighlightTexture(highlight)
     end
 

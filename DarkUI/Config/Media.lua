@@ -86,4 +86,3 @@ config.qualityColors[Enum.ItemQuality.Common] = { r = 0, g = 0, b = 0 }
 config.qualityColors[99] = { r = 1, g = 0, b = 0 }
 
 C.media = config
-E.media = config

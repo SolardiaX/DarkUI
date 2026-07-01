@@ -95,7 +95,7 @@ local EFFECT = {
 
 E.Dummy = function() return end
 
--- Transparent texture used to "clear" Normal/Pushed/Highlight textures (ElvUI compat)
+-- Transparent texture used to "clear" Normal/Pushed/Highlight textures
 E.ClearTexture = C.media.texture.empty
 
 E.FrameHider = CreateFrame("Frame")
@@ -313,7 +313,7 @@ local function setBackdropEdge(f, t, color, size)
     if f.__bgColor then
         f:SetBackdropColor(unpack(f.__bgColor))
     else
-        f:SetBackdropColor(unpack(E.media.backdrop_color))
+        f:SetBackdropColor(unpack(C.media.backdrop_color))
     end
 
     -- explicit color overrides the cfg/__borderColor fallback chain
@@ -324,7 +324,7 @@ local function setBackdropEdge(f, t, color, size)
     elseif f.__borderColor then
         f:SetBackdropBorderColor(unpack(f.__borderColor))
     else
-        f:SetBackdropBorderColor(unpack(E.media.backdrop_color))
+        f:SetBackdropBorderColor(unpack(C.media.backdrop_color))
     end
 end
 
@@ -473,14 +473,8 @@ local function setGhost(f)
 end
 
 ------------------------------------------------------------------------
--- ElvUI-compat atoms (for near-verbatim Skins/Frames ports)
+-- FontString / Texture utilities
 ------------------------------------------------------------------------
-
--- Geometry shorthands (ElvUI single-arg Size = square)
-local function point(obj, ...) obj:SetPoint(...) end
-local function size(obj, w, h, ...) obj:SetSize(w, h or w, ...) end
-local function width(obj, w) obj:SetWidth(w) end
-local function height(obj, h) obj:SetHeight(h) end
 
 -- Crop a texture to DarkUI's standard texCoord (or explicit coords)
 local function setTexCoords(tex, x1, x2, y1, y2)
@@ -514,62 +508,6 @@ local function fontTemplate(fs, font, fontSize, fontStyle)
     fs:SetShadowOffset(0.85, -0.85)
 end
 
--- Method-form of E:StyleIconButton: button:StyleButton() routes here (used by the
--- icon-selector grid skin). Skips DarkUI's outer vignette overlay for item buttons.
-local function styleButton(button) return E:StyleIconButton(button, nil, true) end
-
--- Set frame level relative to another frame's level (default self)
-local function offsetFrameLevel(frame, offset, secondary)
-    secondary = secondary or frame
-    frame:SetFrameLevel(secondary:GetFrameLevel() + (offset or 0))
-end
-
--- Nudge a frame's existing anchor by (x, y) without changing its point/relative.
--- ElvUI scales the nudge; DarkUI keeps raw offsets to match our Point convention.
-local function nudgePoint(obj, x, y)
-    local point, relativeTo, relativePoint, xOfs, yOfs = obj:GetPoint()
-    if not point then return end
-    obj:ClearAllPoints()
-    obj:SetPoint(point, relativeTo, relativePoint, xOfs + (x or 0), yOfs + (y or 0))
-end
-
--- r, g, b for an item quality (ElvUI E:GetItemQualityColor compat). Reads our
--- C.media.qualityColors table; falls back to the standard border color.
-function E:GetItemQualityColor(quality)
-    if issecretvalue and issecretvalue(quality) then return unpack(C.media.border_color) end
-
-    local color = quality and C.media.qualityColors[quality]
-    if color then return color.r, color.g, color.b end
-
-    return unpack(C.media.border_color)
-end
-
--- Class icon texcoords (ElvUI E:GetClassCoords compat). Reads CLASS_ICON_TCOORDS.
-function E:GetClassCoords(classFile, crop, get)
-    local t = _G.CLASS_ICON_TCOORDS[classFile]
-    if not t then return 0, 1, 0, 1 end
-
-    if get then
-        return t
-    elseif type(crop) == "number" then
-        return t[1] + crop, t[2] - crop, t[3] + crop, t[4] - crop
-    elseif crop then
-        return t[1] + 0.022, t[2] - 0.025, t[3] + 0.022, t[4] - 0.025
-    else
-        return t[1], t[2], t[3], t[4]
-    end
-end
-
--- Run func after `delay` seconds (ElvUI E:Delay compat). C_Timer.After wrapper.
-function E:Delay(delay, func, ...)
-    if type(delay) ~= "number" or type(func) ~= "function" then return false end
-
-    local args = { ... }
-    C_Timer.After(delay < 0.01 and 0.01 or delay, #args > 0 and function() func(unpack(args)) end or func)
-
-    return true
-end
-
 ------------------------------------------------------------------------
 -- Metatable Injection
 ------------------------------------------------------------------------
@@ -592,17 +530,10 @@ local function addapi(object)
     mt.CreateGradient = createGradient
     mt.CreateFontText = createFontText
 
-    -- Geometry / text / style atoms
-    mt.Point = point
-    mt.Size = size
-    mt.Width = width
-    mt.Height = height
+    -- FontString / texture utilities
     mt.SetTexCoords = setTexCoords
     mt.StripTexts = stripTexts
     mt.FontTemplate = fontTemplate
-    mt.StyleButton = styleButton
-    mt.OffsetFrameLevel = offsetFrameLevel
-    mt.NudgePoint = nudgePoint
 
     if not mt.FadeIn then mt.FadeIn = fadeIn end
     if not mt.FadeOut then mt.FadeOut = fadeOut end
