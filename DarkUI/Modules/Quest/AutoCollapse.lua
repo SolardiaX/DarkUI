@@ -8,12 +8,9 @@ local module = E:Module("Quest"):Sub("AutoCollapse")
 
 local cfg = C.quest
 
-local headers = {
-    ScenarioObjectiveTracker,
-    BonusObjectiveTracker,
-    UIWidgetObjectiveTracker,
+local collapsible = {
     CampaignQuestObjectiveTracker,
-    QuestObjectiveTracker,
+    -- QuestObjectiveTracker, -- SetCollapsed taints widget pool when quests contain UIWidget content
     AdventureObjectiveTracker,
     AchievementObjectiveTracker,
     MonthlyActivitiesObjectiveTracker,
@@ -37,29 +34,29 @@ function module:OnInit()
 
         if mode == "RAID" or mode == true then
             if inInstance then
-                C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
+                C_Timer.After(1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
             elseif not InCombatLockdown() then
                 if ObjectiveTrackerFrame.isCollapsed then ObjectiveTrackerFrame:SetCollapsed(false) end
             end
         elseif mode == "SCENARIO" then
             if inInstance then
                 if instanceType == "party" or instanceType == "scenario" then
-                    C_Timer.After(0.1, function()
-                        for i = 1, #headers do
-                            if headers[i] and headers[i].SetCollapsed then headers[i]:SetCollapsed(true) end
+                    C_Timer.After(1, function()
+                        for i = 1, #collapsible do
+                            if collapsible[i] and collapsible[i].SetCollapsed then collapsible[i]:SetCollapsed(true) end
                         end
                     end)
                 else
-                    C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
+                    C_Timer.After(1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
                 end
             elseif not InCombatLockdown() then
-                for i = 1, #headers do
-                    if headers[i] and headers[i].isCollapsed then headers[i]:SetCollapsed(false) end
+                for i = 1, #collapsible do
+                    if collapsible[i] and collapsible[i].isCollapsed then collapsible[i]:SetCollapsed(false) end
                 end
                 if ObjectiveTrackerFrame.isCollapsed then ObjectiveTrackerFrame:SetCollapsed(false) end
             end
         elseif mode == "RELOAD" then
-            C_Timer.After(0.1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
+            C_Timer.After(1, function() ObjectiveTrackerFrame:SetCollapsed(true) end)
         end
     end)
 
