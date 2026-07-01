@@ -168,10 +168,17 @@ local function Update(self, _, unit)
     local i = 0
     while true do
         i = i + 1
-        local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff =
-            AuraUtil.UnpackAuraData(C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL"))
+        local data = C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL")
+        if not data then break end
+        if issecrettable(data) then break end
+
+        local name, icon, count, debuffType, duration, expirationTime, spellId, isBossDebuff =
+            data.name, data.icon, data.applications, data.dispelName, data.duration, data.expirationTime, data.spellId, data.isBossAura
 
         if not name then break end
+        if issecretvalue(spellId) then spellId = nil end
+        if issecretvalue(isBossDebuff) then isBossDebuff = nil end
+        if issecretvalue(debuffType) then debuffType = nil end
 
         if rd.ShowBossDebuff and isBossDebuff then
             prio = rd.BossDebuffPriority or bossDebuffPrio

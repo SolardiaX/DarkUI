@@ -37,7 +37,7 @@ local function CreateButton(element, index)
 end
 
 local function FilterBuff(spellId, isPlayerAura, isBossAura, canApply)
-    if isBossAura then return true end
+    if not issecretvalue(isBossAura) and isBossAura then return true end
 
     local whitelist = C.aura.raidbuffs and C.aura.raidbuffs["ALL"]
     if whitelist and whitelist[spellId] then
@@ -68,7 +68,7 @@ local function Update(self, _, unit)
         if shown >= NUM_BUTTONS then break end
 
         local spellId = data.spellId
-        if spellId and FilterBuff(spellId, data.isFromPlayerOrPlayerPet, data.isBossAura, data.canApplyAura) then
+        if spellId and not issecretvalue(spellId) and FilterBuff(spellId, data.isFromPlayerOrPlayerPet, data.isBossAura, data.canApplyAura) then
             shown = shown + 1
             local button = element.buttons[shown]
             button.icon:SetTexture(data.icon)

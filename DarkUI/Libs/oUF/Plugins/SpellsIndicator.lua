@@ -42,7 +42,7 @@ local function Update(self, _, unit)
         if not data then break end
 
         local spellId = data.spellId
-        if spellId then
+        if spellId and not issecretvalue(spellId) then
             local info = cornerBuffs[spellId]
             if info then
                 local anchor = info[1]
