@@ -90,6 +90,11 @@ function S:ChallengesUI()
     noticeFrame.SeasonDescription2:SetTextColor(1, 1, 1)
     noticeFrame.SeasonDescription3:SetTextColor(1, 0.8, 0)
 
+    noticeFrame:StripTextures()
+    noticeFrame:SetTemplate()
+    noticeFrame.Center:SetInside()
+    noticeFrame.Center:SetDrawLayer('ARTWORK', 2)
+
     local affix = noticeFrame.Affix
     affix:StripTextures()
     local bg = S:ReskinIcon(affix.Portrait)
