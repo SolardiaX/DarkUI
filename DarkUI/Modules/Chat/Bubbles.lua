@@ -146,7 +146,7 @@ local function updateBubble(container, guid, sender)
     if sender then
         local displayName = Ambiguate(sender, "short")
         local color
-        if guid and guid ~= "" then
+        if guid and not issecretvalue(guid) and guid ~= "" then
             local _, class = GetPlayerInfoByGUID(guid)
             if class then color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class] end
         end
