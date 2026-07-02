@@ -721,14 +721,11 @@ function module:PLAYER_ENTERING_WORLD()
 end
 
 function module:PLAYER_LOGIN()
-    C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
-    C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
-
     SetCVar("ShowClassColorInNameplate", 1)
     SetCVar("nameplateShowSelf", 0)
     SetCVar("nameplateResourceOnTarget", 0)
     SetCVar("nameplateMotion", 1)
-    SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnitNames", 0)
+    SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits", cfg.friendly.nameOnly and 1 or 0)
 
     if cfg.enhance_threat == true then SetCVar("threatWarning", 3) end
     SetCVar("nameplateGlobalScale", 1)
@@ -777,6 +774,9 @@ function module:PLAYER_LOGIN()
         end
     end
 
+    C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
+    C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
+
     local function changeFont(self)
         self:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
         self:SetShadowOffset(1, -1)
@@ -807,5 +807,13 @@ function module:OnInit()
 
     local driver = oUF:SpawnNamePlates("DarkUINameplates")
     driver:SetSize(cfg.width, cfg.height)
+    driver:SetCVars({
+        nameplateShowOnlyNameForFriendlyPlayerUnits = cfg.friendly.nameOnly and 1 or 0,
+        nameplateGlobalScale = 1,
+        namePlateMinScale = 1,
+        namePlateMaxScale = 1,
+        nameplateMinAlpha = 1,
+        nameplateMaxAlpha = 1,
+    })
     driver:SetAddedCallback(callback)
 end
