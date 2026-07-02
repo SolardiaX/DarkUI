@@ -10,6 +10,7 @@ local cfg = C.aura
 local GetTime = GetTime
 local floor, format = math.floor, string.format
 local unpack, select, strmatch, tonumber = unpack, select, strmatch, tonumber
+local issecretvalue = issecretvalue
 local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
 local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
 local C_UnitAuras_GetAuraDuration = C_UnitAuras.GetAuraDuration
@@ -61,15 +62,15 @@ end
 local function buttonUpdateTimer(button, elapsed)
     local onTooltip = GameTooltip:IsOwned(button)
 
-    if not (button.timeLeft or button.expiration or onTooltip) then
-        button:SetScript("OnUpdate", nil)
-        return
-    end
-
     if button.expiration then
         button.timeLeft = button.expiration / 1e3
     elseif button.timeLeft then
         button.timeLeft = button.timeLeft - elapsed
+    end
+
+    if not button.timeLeft and not onTooltip then
+        button:SetScript("OnUpdate", nil)
+        return
     end
 
     if button.nextUpdate > 0 then
