@@ -63,6 +63,11 @@ function S:QuestFrame()
         local bg = _G.QuestFrameRewardPanelBg:CreateBackdrop()
         bg:SetAlpha(1)
     end
+    if _G.QuestFrameProgressPanelBg then 
+        _G.QuestFrameProgressPanelBg:SetAlpha(0)
+        local bg = _G.QuestFrameProgressPanelBg:CreateBackdrop()
+        bg:SetAlpha(1)
+    end
 
     -- Greeting break line
     local line = _G.QuestFrameGreetingPanel:CreateTexture()
