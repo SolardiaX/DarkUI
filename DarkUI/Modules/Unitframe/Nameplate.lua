@@ -305,72 +305,65 @@ local function aurasPostUpdateIcon(element, button, unit, data)
     end
 end
 
-local PLATE_ELEMENTS = { "Health", "Castbar", "HealthPrediction", "ClassificationIndicator" }
-
 local function updatePlateByType(self)
-    local isNameOnly = cfg.friendly.nameOnly
-        and (self.plateType == "FRIENDLY_PLAYER" or self.plateType == "FRIENDLY_NPC")
-        and not self.widgetsOnly
+    local isFriendly = self.plateType == "FRIENDLY_PLAYER" or self.plateType == "FRIENDLY_NPC"
+    local isNameOnly = cfg.friendly.nameOnly and isFriendly and not self.widgetsOnly
 
-    if self.widgetsOnly then
-        for _, element in ipairs(PLATE_ELEMENTS) do
-            if self:IsElementEnabled(element) then self:DisableElement(element) end
-        end
-        self:DisableElement("Power")
-        self.Power:Hide()
-        self.Name:Hide()
-        self.Level:Hide()
-        if self.Auras then self.Auras:Hide() end
-        if self.Debuffs then self.Debuffs:Hide() end
-    elseif self.plateType == "PLAYER" then
-        for _, element in ipairs(PLATE_ELEMENTS) do
-            if not self:IsElementEnabled(element) then self:EnableElement(element) end
-        end
+    if self.plateType == "PLAYER" then
         self:EnableElement("Power")
         self.Power:Show()
+        self:EnableElement("ClassificationIndicator")
         self.Name:Hide()
-        self.Level:Hide()
+        self.Castbar:SetAlpha(0)
         self.RaidTargetIndicator:SetAlpha(0)
-        if self.Auras then self.Auras:Hide() end
-        if self.Debuffs then self.Debuffs:Hide() end
-    elseif isNameOnly then
-        for _, element in ipairs(PLATE_ELEMENTS) do
-            if self:IsElementEnabled(element) then self:DisableElement(element) end
-        end
-        self:DisableElement("Power")
-        self.Power:Hide()
-        self.Name:Show()
-        self.Name:ClearAllPoints()
-        self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
-        self.Name:SetJustifyH("CENTER")
-        self.Level:Hide()
-        self.RaidTargetIndicator:SetAlpha(1)
-        if self.Auras then self.Auras:Hide() end
-        if self.Debuffs then self.Debuffs:Hide() end
-        self.Highlight:ClearAllPoints()
-        self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
-        self.Highlight:SetSize(cfg.width, 20)
-        self.Highlight.texture:SetTexture(C.media.texture.spark)
-        self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
-        self.Highlight.texture:SetAlpha(0.5)
     else
-        for _, element in ipairs(PLATE_ELEMENTS) do
-            if not self:IsElementEnabled(element) then self:EnableElement(element) end
-        end
         self:DisableElement("Power")
         self.Power:Hide()
         self.Name:Show()
-        self.Name:ClearAllPoints()
-        self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
-        self.Name:SetJustifyH("LEFT")
-        self.Level:Show()
+        self.Castbar:SetAlpha(1)
         self.RaidTargetIndicator:SetAlpha(1)
-        if self.Auras then self.Auras:Show() end
-        if self.Debuffs then self.Debuffs:Show() end
-        self.Highlight:ClearAllPoints()
-        self.Highlight:SetAllPoints(self.Health)
-        self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
-        self.Highlight.texture:SetAlpha(1)
+
+        if self.widgetsOnly then
+            self.Health:SetAlpha(0)
+            self.Level:SetAlpha(0)
+            self.Name:SetAlpha(0)
+            self.Castbar:SetAlpha(0)
+            self:DisableElement("ClassificationIndicator")
+        else
+            self.Health:SetAlpha(1)
+            self.Level:SetAlpha(1)
+            self.Name:SetAlpha(1)
+            self.Castbar:SetAlpha(1)
+            self:EnableElement("ClassificationIndicator")
+        end
+
+        if isNameOnly then
+            self.Health:SetAlpha(0)
+            self.Level:SetAlpha(0)
+            self.Castbar:SetAlpha(0)
+            self:DisableElement("ClassificationIndicator")
+            if self.Auras then self.Auras:Hide() end
+            if self.Debuffs then self.Debuffs:Hide() end
+            self.Name:ClearAllPoints()
+            self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
+            self.Name:SetJustifyH("CENTER")
+            self.Highlight:ClearAllPoints()
+            self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
+            self.Highlight:SetSize(cfg.width, 20)
+            self.Highlight.texture:SetTexture(C.media.texture.spark)
+            self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
+            self.Highlight.texture:SetAlpha(0.5)
+        else
+            self.Name:ClearAllPoints()
+            self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
+            self.Name:SetJustifyH("LEFT")
+            if self.Auras then self.Auras:Show() end
+            if self.Debuffs then self.Debuffs:Show() end
+            self.Highlight:ClearAllPoints()
+            self.Highlight:SetAllPoints(self.Health)
+            self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
+            self.Highlight.texture:SetAlpha(1)
+        end
     end
 end
 
