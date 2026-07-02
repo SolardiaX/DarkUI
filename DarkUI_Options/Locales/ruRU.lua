@@ -68,6 +68,7 @@ L_OPT_UF_FOCUS_SHOW_STEALABLE_BUFFS = "Показывать похищаемые
 L_OPT_UF_BOSS_PLAYER_AURA_ONLY = "Показывать только свои эффекты на рамке босса"
 L_OPT_UF_BOSS_SHOW_STEALABLE_BUFFS = "Показывать похищаемые баффы на рамке босса"
 L_OPT_UF_PARTY_STANDMODE = "Использовать стандартные рамки группы (иначе — рейдовые)"
+L_OPT_UF_PARTY_ENABLE = "Включить рамки группы"
 L_OPT_UF_PARTY_SHOWPLAYER = "Показывать игрока в рамках группы"
 L_OPT_UF_PARTY_SHOWSOLO = "Показывать рамку группы вне группы"
 L_OPT_UF_PARTY_PLAYER_AURA_ONLY = "Показывать только свои эффекты на рамке группы"

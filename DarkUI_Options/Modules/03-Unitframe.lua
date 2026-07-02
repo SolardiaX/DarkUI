@@ -22,7 +22,7 @@ addon.OptionList["unitframe"] = {
     { CHECK, "unitframe.boss.aura.player_aura_only", L_OPT_UF_BOSS_PLAYER_AURA_ONLY },
     { CHECK, "unitframe.boss.aura.show_stealable_buffs", L_OPT_UF_BOSS_SHOW_STEALABLE_BUFFS },
     { HEADER, nil, "Party" },
-    { CHECK, "unitframe.party.enable", L_OPT_UF_RAID_ENABLE },
+    { CHECK, "unitframe.party.enable", L_OPT_UF_PARTY_ENABLE },
     { CHECK, "unitframe.party.standalone", L_OPT_UF_PARTY_STANDMODE },
     { CHECK, "unitframe.party.showPlayer", L_OPT_UF_PARTY_SHOWPLAYER },
     { CHECK, "unitframe.party.showSolo", L_OPT_UF_PARTY_SHOWSOLO },
