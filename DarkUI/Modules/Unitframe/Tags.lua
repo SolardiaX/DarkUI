@@ -174,8 +174,8 @@ oUF.Tags.Methods["dd:misshp"] = function(unit)
     elseif not UnitIsConnected(unit) then
         hpval = L.UNITFRAME_OFFLINE
     else
-        local loss = TruncateWhenZero(UnitHealthMissing(unit))
-        if issecretvalue(loss) then hpval = "-" .. loss end
+        hpval = format("%d%%", UnitHealthPercent(unit, true, CurveConstants.ScaleTo100))
+        -- hpval = C_StringUtil.WrapString(TruncateWhenZero(UnitHealthMissing(unit)), "-")
     end
     return "|cff" .. colorstr .. (hpval or "100%") .. "|r"
 end
