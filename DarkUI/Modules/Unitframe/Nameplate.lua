@@ -840,7 +840,5 @@ function module:OnInit()
         nameplateSelectedScale = 1,
         nameplateLargerScale = 1,
     })
-    driver.enemyNonInteractible = cfg.friendly.nameOnly
-    driver.friendlyNonInteractible = cfg.friendly.nameOnly
     driver:SetAddedCallback(callback)
 end
