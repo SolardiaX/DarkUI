@@ -12,7 +12,45 @@ addon.OptionList["automation"] = {
     { CHECK, "automation.auto_sell", L_OPT_AUTOMATION_AUTO_SELL },
     { CHECK, "automation.auto_confirm_de", L_OPT_AUTOMATION_AUTO_CONFIRM_DE },
     { CHECK, "automation.auto_greed", L_OPT_AUTOMATION_AUTO_GREED },
-    { CHECK, "automation.auto_quest", L_OPT_AUTOMATION_AUTO_QUEST },
+    {
+        CHECK,
+        "automation.auto_quest",
+        L_OPT_AUTOMATION_AUTO_QUEST,
+        nil,
+        function(widget, a)
+            widget:HookScript("OnClick", function(self)
+                local checked = self:GetChecked()
+                local w1 = a.widgets["automation.auto_quest_pausekey"]
+                local w2 = a.widgets["automation.auto_quest_pausekey_reverse"]
+                local w3 = a.widgets["automation.auto_quest_reward"]
+                if w1 then w1:SetShown(checked) end
+                if w2 then w2:SetShown(checked) end
+                if w3 then w3:SetShown(checked) end
+            end)
+        end,
+    },
+    {
+        DROP,
+        "automation.auto_quest_pausekey",
+        L_OPT_AUTOMATION_QUEST_PAUSEKEY,
+        {
+            { "SHIFT", "SHIFT" },
+            { "CTRL", "CTRL" },
+            { "ALT", "ALT" },
+        },
+    },
+    { CHECK, "automation.auto_quest_pausekey_reverse", L_OPT_AUTOMATION_QUEST_PAUSEKEY_REVERSE },
+    {
+        DROP,
+        "automation.auto_quest_reward",
+        L_OPT_AUTOMATION_QUEST_REWARD,
+        {
+            { L_OPT_AUTOMATION_QUEST_REWARD_1, 1 },
+            { L_OPT_AUTOMATION_QUEST_REWARD_2, 2 },
+            { L_OPT_AUTOMATION_QUEST_REWARD_3, 3 },
+            { L_OPT_AUTOMATION_QUEST_REWARD_4, 4 },
+        },
+    },
     { CHECK, "automation.tab_binder", L_OPT_AUTOMATION_TAB_BINDER },
     { HEADER, nil, L_OPT_AUTOMATION_HEADER_ANNOUNCEMENT },
     {
@@ -47,4 +85,13 @@ addon.Hooks["automation"] = function(a)
     local master = a.widgets["announcement.interrupt.enable"]
     local child = a.widgets["announcement.interrupt.channel"]
     if master and child then child:SetShown(master:GetChecked()) end
+
+    local questEnabled = a.widgets["automation.auto_quest"]
+    local checked = questEnabled and questEnabled:GetChecked()
+    local w1 = a.widgets["automation.auto_quest_pausekey"]
+    local w2 = a.widgets["automation.auto_quest_pausekey_reverse"]
+    local w3 = a.widgets["automation.auto_quest_reward"]
+    if w1 then w1:SetShown(checked) end
+    if w2 then w2:SetShown(checked) end
+    if w3 then w3:SetShown(checked) end
 end

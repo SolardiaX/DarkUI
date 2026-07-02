@@ -188,6 +188,11 @@ local ITEM_CASH_REWARDS = {
 local NPC_ID_PATTERN = "%w+%-.-%-.-%-.-%-.-%-(.-)%-"
 
 local function getNPCID(unit)
+    if UnitCreatureID then
+        local npcID = UnitCreatureID(unit or "npc")
+        if npcID ~= nil and issecretvalue(npcID) then return nil end
+        return npcID
+    end
     local guid = UnitGUID(unit or "npc")
     if not guid then return nil end
     if issecretvalue and issecretvalue(guid) then return nil end
@@ -201,17 +206,45 @@ local ignoredQuests = {}
 local popups = {}
 local questQueue = {}
 
+local repeatableClassifications = {
+    [Enum.QuestClassification.Recurring] = true,
+    [Enum.QuestClassification.Calling] = true,
+}
+
+local function isQuestRepeatable(questID)
+    return C_QuestLog.IsWorldQuest(questID)
+        or C_QuestLog.IsRepeatableQuest(questID)
+        or repeatableClassifications[C_QuestInfoSystem.GetQuestClassification(questID) or -1]
+end
+
+local function isPaused()
+    return paused or (InteractiveWormholes and InteractiveWormholes:IsActive())
+end
+
 local function isQuestIgnored(questID, _, override)
     if ignoredQuests[questID] then return true end
-    if C_QuestLog.IsWorldQuest(questID) then return true end
+
+    if C_QuestLog.IsWorldQuest(questID) then
+        ignoredQuests[questID] = true
+        return true
+    end
 
     if override then return false end
 
-    if C_QuestLog.IsQuestTrivial(questID) and not C_Minimap.IsTrackingHiddenQuests() then return true end
+    if C_QuestLog.IsQuestTrivial(questID) and not C_Minimap.IsTrackingHiddenQuests() then
+        ignoredQuests[questID] = true
+        return true
+    end
 
-    if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) and not C_Minimap.IsTrackingAccountCompletedQuests() then return true end
+    if C_QuestLog.IsQuestFlaggedCompletedOnAccount(questID) and not C_Minimap.IsTrackingAccountCompletedQuests() then
+        ignoredQuests[questID] = true
+        return true
+    end
 
-    if BLOCKLIST_QUESTS[questID] then return true end
+    if BLOCKLIST_QUESTS[questID] then
+        ignoredQuests[questID] = true
+        return true
+    end
 
     return false
 end
@@ -230,6 +263,8 @@ local function waitForItemData(itemID, callback) Item:CreateFromItemID(itemID):C
 function module:OnInit()
     if not cfg or not cfg.auto_quest then return end
 
+    if cfg.auto_quest_pausekey_reverse then paused = true end
+
     -- QUEST_DATA_LOAD_RESULT
     self:RegisterEvent("QUEST_DATA_LOAD_RESULT", function(_, questID)
         if questQueue[questID] then
@@ -238,12 +273,16 @@ function module:OnInit()
         end
     end)
 
+    -- MINIMAP_UPDATE_TRACKING: reset session ignore list
+    self:RegisterEvent("MINIMAP_UPDATE_TRACKING", function() wipe(ignoredQuests) end)
+
     -- GOSSIP_SHOW: auto-select single gossip options
     self:RegisterEvent("GOSSIP_SHOW", function()
-        if paused then return end
+        if isPaused() then return end
         if BLOCKLIST_NPCS[getNPCID()] then return end
 
         if C_PlayerInteractionManager.IsInteractingWithNpcOfType(Enum.PlayerInteractionType.TaxiNode) then return end
+        if InteractiveWormholes and InteractiveWormholes:IsActive() then return end
 
         local gossipQuests = {}
         local gossipSkips = {}
@@ -286,7 +325,7 @@ function module:OnInit()
 
     -- GOSSIP_SHOW: handle quest accept/complete via gossip
     local function handleGossipQuests()
-        if paused then return end
+        if isPaused() then return end
         if BLOCKLIST_NPCS[getNPCID()] then return end
 
         for _, questInfo in next, C_GossipInfo.GetActiveQuests() do
@@ -304,7 +343,7 @@ function module:OnInit()
                 C_GossipInfo.SelectAvailableQuest(questInfo.questID)
             elseif not questInfo.questLevel or questInfo.questLevel == 0 then
                 waitForQuestData(questInfo.questID, handleGossipQuests)
-            elseif questInfo.isRepeatable then
+            elseif isQuestRepeatable(questInfo.questID) then
                 -- skip
             elseif not isQuestIgnored(questInfo.questID) then
                 C_GossipInfo.SelectAvailableQuest(questInfo.questID)
@@ -315,7 +354,7 @@ function module:OnInit()
 
     -- QUEST_GREETING: NPC quest list (no gossip)
     local function handleQuestList()
-        if paused then return end
+        if isPaused() then return end
         if BLOCKLIST_NPCS[getNPCID()] then return end
 
         for index = 1, GetNumActiveQuests() do
@@ -325,13 +364,13 @@ function module:OnInit()
         end
 
         for index = 1, GetNumAvailableQuests() do
-            local _, _, isRepeatable, _, questID = GetAvailableQuestInfo(index)
+            local _, _, _, _, questID = GetAvailableQuestInfo(index)
             local questLevel = GetAvailableLevel(index)
             if not questLevel or questLevel == 0 then
                 waitForQuestData(questID, handleQuestList)
             elseif isQuestIgnored(questID) then
                 -- skip
-            elseif isRepeatable then
+            elseif isQuestRepeatable(questID) then
                 -- skip
             else
                 SelectAvailableQuest(index)
@@ -342,7 +381,7 @@ function module:OnInit()
 
     -- QUEST_DETAIL: auto-accept
     local function handleQuestDetail()
-        if paused then return end
+        if isPaused() then return end
 
         local questID = GetQuestID()
         if not questID or questID == 0 then return end
@@ -368,7 +407,7 @@ function module:OnInit()
 
     -- QUEST_PROGRESS: auto-complete prerequisites
     self:RegisterEvent("QUEST_PROGRESS", function()
-        if paused then return end
+        if isPaused() then return end
         if not IsQuestCompletable() then return end
 
         local questID = GetQuestID()
@@ -387,16 +426,24 @@ function module:OnInit()
 
     -- QUEST_COMPLETE: auto-select reward
     self:RegisterEvent("QUEST_COMPLETE", function()
-        if paused then return end
+        if isPaused() then return end
 
+        local questID = GetQuestID()
         local numChoices = GetNumQuestChoices()
-        if numChoices <= 1 and not isQuestIgnored(GetQuestID()) then
+        local rewardMode = cfg.auto_quest_reward
+
+        if rewardMode == 1 then return end
+
+        if numChoices <= 1 and not isQuestIgnored(questID) then
             GetQuestReward(1)
             return
         end
 
+        if numChoices <= 1 then return end
+
         local highestValue, highestValueIndex = 0, nil
         local function selectBest()
+            highestValue, highestValueIndex = 0, nil
             for index = 1, numChoices do
                 local _, _, _, _, _, itemID = GetQuestItemInfo("choice", index)
                 local isCached, _, _, _, _, _, _, _, _, _, itemValue = C_Item.GetItemInfo(itemID)
@@ -411,9 +458,18 @@ function module:OnInit()
                 end
             end
 
-            if highestValueIndex then
+            if not highestValueIndex then return end
+
+            local shouldComplete = (rewardMode == 4)
+                or (rewardMode == 3 and C_QuestLog.IsQuestTrivial(questID))
+
+            if shouldComplete then
+                GetQuestReward(highestValueIndex)
+            else
                 local rewardButtons = QuestInfoRewardsFrame and QuestInfoRewardsFrame.RewardButtons
-                if rewardButtons and rewardButtons[highestValueIndex] then QuestInfoItem_OnClick(rewardButtons[highestValueIndex]) end
+                if rewardButtons and rewardButtons[highestValueIndex] then
+                    QuestInfoItem_OnClick(rewardButtons[highestValueIndex])
+                end
             end
         end
         selectBest()
@@ -421,7 +477,7 @@ function module:OnInit()
 
     -- QUEST_LOG_UPDATE: handle auto-quest popups
     local function handleQuestPopup()
-        if paused then return end
+        if isPaused() then return end
         if WorldMapFrame:IsShown() then return end
         if QuestFrame:IsShown() then return end
 
@@ -446,13 +502,20 @@ function module:OnInit()
     self:RegisterEvent("QUEST_LOG_UPDATE", handleQuestPopup)
 
     -- QUEST_ACCEPT_CONFIRM: shared quests requiring confirmation
-    self:RegisterEvent("QUEST_ACCEPT_CONFIRM", function()
-        if paused then return end
+    self:RegisterEvent("QUEST_ACCEPT_CONFIRM", function(_, _, questTitle, questID)
+        if isPaused() then return end
+        if questID and BLOCKLIST_QUESTS[questID] then return end
         ConfirmAcceptQuest()
     end)
 
-    -- MODIFIER_STATE_CHANGED: pause key (SHIFT)
+    -- MODIFIER_STATE_CHANGED: configurable pause key with reverse mode
     self:RegisterEvent("MODIFIER_STATE_CHANGED", function(_, _, key, state)
-        if string.sub(key, 2) == "SHIFT" then paused = state == 1 end
+        if string.sub(key, 2) == cfg.auto_quest_pausekey then
+            if cfg.auto_quest_pausekey_reverse then
+                paused = state ~= 1
+            else
+                paused = state == 1
+            end
+        end
     end)
 end

@@ -237,6 +237,9 @@ C.automation = {
     auto_confirm_de = true,
     auto_greed = true,
     auto_quest = true,
+    auto_quest_pausekey = "SHIFT",
+    auto_quest_pausekey_reverse = false,
+    auto_quest_reward = 2,
     tab_binder = true,
 }
 
