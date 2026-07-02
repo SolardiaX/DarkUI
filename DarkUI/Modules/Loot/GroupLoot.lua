@@ -373,7 +373,6 @@ local function startLootRoll(rollID, time)
 
     if f.button.backdrop then f.button.backdrop:SetBackdropBorderColor(color.r, color.g, color.b, 0.7) end
 
-    f:SetPoint("CENTER", WorldFrame, "CENTER")
     f:Show()
 end
 
