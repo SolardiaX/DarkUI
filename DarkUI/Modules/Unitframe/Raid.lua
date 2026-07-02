@@ -224,7 +224,7 @@ local function createStyle(self)
     self.colors = C.oUF_colors
     self.cUnit = "raid"
 
-    self:RegisterForClicks("AnyUp")
+    core:SafeRegisterForClicks(self)
     self:SetScript("OnEnter", UnitFrame_OnEnter)
     self:SetScript("OnLeave", UnitFrame_OnLeave)
 

@@ -46,6 +46,25 @@ module:RegisterEvent("PLAYER_LOGIN PLAYER_TALENT_UPDATE", function()
     end
 end)
 
+local pendingClicks = {}
+
+local function registerPendingClicks()
+    for frame in next, pendingClicks do
+        frame:RegisterForClicks("AnyUp")
+        pendingClicks[frame] = nil
+    end
+end
+
+function module:SafeRegisterForClicks(frame)
+    if InCombatLockdown() then
+        pendingClicks[frame] = true
+    else
+        frame:RegisterForClicks("AnyUp")
+    end
+end
+
+module:RegisterEvent("PLAYER_REGEN_ENABLED", registerPendingClicks)
+
 ------------------------------------------------------------------
 --  methods for element                                         --
 ------------------------------------------------------------------

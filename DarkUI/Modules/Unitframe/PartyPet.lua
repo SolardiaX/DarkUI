@@ -112,7 +112,7 @@ local function createStyle(self)
 
     --self:SetSize(85, 85)
 
-    self:RegisterForClicks("AnyUp")
+    core:SafeRegisterForClicks(self)
     self:SetScript("OnEnter", UnitFrame_OnEnter)
     self:SetScript("OnLeave", UnitFrame_OnLeave)
 
