@@ -24,7 +24,6 @@ local UnitGroupRolesAssigned = UnitGroupRolesAssigned
 local UnitSelectionColor = UnitSelectionColor
 local UnitGUID = UnitGUID
 local UnitNameplateShowsWidgetsOnly = UnitNameplateShowsWidgetsOnly
-local UnitWidgetSet = UnitWidgetSet
 local UnitIsOwnerOrControllerOfUnit = UnitIsOwnerOrControllerOfUnit
 local IsInGroup, IsInRaid = IsInGroup, IsInRaid
 local GetNumGroupMembers = GetNumGroupMembers
@@ -306,99 +305,114 @@ local function aurasPostUpdateIcon(element, button, unit, data)
     end
 end
 
+local PLATE_ELEMENTS = { "Health", "Castbar", "HealthPrediction" }
+
+local function updatePlateByType(self)
+    local isNameOnly = cfg.friendly.nameOnly
+        and (self.plateType == "FRIENDLY_PLAYER" or self.plateType == "FRIENDLY_NPC")
+        and not self.widgetsOnly
+
+    if self.widgetsOnly then
+        for _, element in ipairs(PLATE_ELEMENTS) do
+            if self:IsElementEnabled(element) then self:DisableElement(element) end
+        end
+        self:DisableElement("Power")
+        self.Power:Hide()
+        self.Name:Hide()
+        self.Level:Hide()
+        self.ClassificationIndicator:Hide()
+        if self.Auras then self.Auras:Hide() end
+        if self.Debuffs then self.Debuffs:Hide() end
+    elseif self.plateType == "PLAYER" then
+        for _, element in ipairs(PLATE_ELEMENTS) do
+            if not self:IsElementEnabled(element) then self:EnableElement(element) end
+        end
+        self:EnableElement("Power")
+        self.Power:Show()
+        self.Name:Hide()
+        self.Level:Hide()
+        self.ClassificationIndicator:Hide()
+        self.RaidTargetIndicator:SetAlpha(0)
+        if self.Auras then self.Auras:Hide() end
+        if self.Debuffs then self.Debuffs:Hide() end
+    elseif isNameOnly then
+        for _, element in ipairs(PLATE_ELEMENTS) do
+            if self:IsElementEnabled(element) then self:DisableElement(element) end
+        end
+        self:DisableElement("Power")
+        self.Power:Hide()
+        self.Name:Show()
+        self.Name:ClearAllPoints()
+        self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
+        self.Name:SetJustifyH("CENTER")
+        self.Level:Hide()
+        self.ClassificationIndicator:Hide()
+        self.RaidTargetIndicator:SetAlpha(1)
+        if self.Auras then self.Auras:Hide() end
+        if self.Debuffs then self.Debuffs:Hide() end
+        self.Highlight:ClearAllPoints()
+        self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
+        self.Highlight:SetSize(cfg.width, 20)
+        self.Highlight.texture:SetTexture(C.media.texture.spark)
+        self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
+        self.Highlight.texture:SetAlpha(0.5)
+    else
+        for _, element in ipairs(PLATE_ELEMENTS) do
+            if not self:IsElementEnabled(element) then self:EnableElement(element) end
+        end
+        self:DisableElement("Power")
+        self.Power:Hide()
+        self.Name:Show()
+        self.Name:ClearAllPoints()
+        self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
+        self.Name:SetJustifyH("LEFT")
+        self.Level:Show()
+        self.ClassificationIndicator:Show()
+        self.RaidTargetIndicator:SetAlpha(1)
+        if self.Auras then self.Auras:Show() end
+        if self.Debuffs then self.Debuffs:Show() end
+        self.Highlight:ClearAllPoints()
+        self.Highlight:SetAllPoints(self.Health)
+        self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
+        self.Highlight.texture:SetAlpha(1)
+    end
+end
+
 local function callback(self, event, unit)
     if not self then return end
-    if unit then
-        local unitGUID = UnitGUID(unit)
-        if unitGUID and canaccessvalue(unitGUID) then
-            self.npcID = tonumber((select(6, strsplit("-", unitGUID))))
-        else
-            self.npcID = nil
+    if not unit then return end
+
+    local unitGUID = UnitGUID(unit)
+    if unitGUID and canaccessvalue(unitGUID) then
+        self.npcID = tonumber((select(6, strsplit("-", unitGUID))))
+    else
+        self.npcID = nil
+    end
+    local unitName = UnitName(unit)
+    self.unitName = unitName and canaccessvalue(unitName) and unitName or nil
+    self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
+
+    if UnitIsUnit(unit, "player") then
+        self.plateType = "PLAYER"
+    elseif (UnitReaction(unit, "player") or 0) > 4 then
+        self.plateType = UnitIsPlayer(unit) and "FRIENDLY_PLAYER" or "FRIENDLY_NPC"
+    else
+        self.plateType = UnitIsPlayer(unit) and "ENEMY_PLAYER" or "ENEMY_NPC"
+    end
+
+    updatePlateByType(self)
+
+    local blizzPlate = self:GetParent().UnitFrame
+    if blizzPlate then
+        self.widgetContainer = blizzPlate.WidgetContainer
+        if self.widgetContainer then
+            self.widgetContainer:SetParent(self)
+            self.widgetContainer:SetIgnoreParentAlpha(true)
         end
-        local unitName = UnitName(unit)
-        self.unitName = unitName and canaccessvalue(unitName) and unitName or nil
-        self.widgetsOnly = UnitNameplateShowsWidgetsOnly(unit)
-
-        if UnitIsUnit(unit, "player") then
-            self.plateType = "PLAYER"
-        elseif (UnitReaction(unit, "player") or 0) > 4 then
-            self.plateType = UnitIsPlayer(unit) and "FRIENDLY_PLAYER" or "FRIENDLY_NPC"
-        else
-            self.plateType = UnitIsPlayer(unit) and "ENEMY_PLAYER" or "ENEMY_NPC"
-        end
-
-        if self.plateType == "PLAYER" then
-            self:EnableElement("Power")
-            self.Power:Show()
-            self.Name:Hide()
-            self.Castbar:SetAlpha(0)
-            self.RaidTargetIndicator:SetAlpha(0)
-        else
-            self:DisableElement("Power")
-            self.Power:Hide()
-            self.Name:Show()
-            self.Castbar:SetAlpha(1)
-            self.RaidTargetIndicator:SetAlpha(1)
-
-            if self.widgetsOnly or UnitWidgetSet(unit) and UnitIsOwnerOrControllerOfUnit("player", unit) then
-                self.Health:SetAlpha(0)
-                self.Level:SetAlpha(0)
-                self.Name:SetAlpha(0)
-                self.Castbar:SetAlpha(0)
-                self.ClassificationIndicator:SetAlpha(0)
-            else
-                self.Health:SetAlpha(1)
-                self.Level:SetAlpha(1)
-                self.Name:SetAlpha(1)
-                self.Castbar:SetAlpha(1)
-                self.ClassificationIndicator:SetAlpha(1)
-            end
-
-            local isFriendly = self.plateType == "FRIENDLY_PLAYER" or self.plateType == "FRIENDLY_NPC"
-            if cfg.friendly.nameOnly and isFriendly and not self.widgetsOnly then
-                self.Health:SetAlpha(0)
-                self.Level:SetAlpha(0)
-                self.Castbar:SetAlpha(0)
-                self.ClassificationIndicator:SetAlpha(0)
-                if self.Auras then self.Auras:Hide() end
-                if self.Debuffs then self.Debuffs:Hide() end
-                self.Name:ClearAllPoints()
-                self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
-                self.Name:SetJustifyH("CENTER")
-                self.Highlight:ClearAllPoints()
-                self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
-                self.Highlight:SetSize(cfg.width, 20)
-                self.Highlight.texture:SetTexture(C.media.texture.spark)
-                self.Highlight.texture:SetVertexColor(1, 1, 1, 0.8)
-                self.Highlight.texture:SetAlpha(0.5)
-            else
-                self.Name:ClearAllPoints()
-                self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
-                self.Name:SetJustifyH("LEFT")
-                self.ClassificationIndicator:SetAlpha(1)
-                if self.Auras then self.Auras:Show() end
-                if self.Debuffs then self.Debuffs:Show() end
-                self.Highlight:ClearAllPoints()
-                self.Highlight:SetAllPoints(self.Health)
-                self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
-                self.Highlight.texture:SetAlpha(1)
-            end
-
-            local blizzPlate = self:GetParent().UnitFrame
-            if blizzPlate then
-                if not blizzPlate.__darkuiHidden then
-                    blizzPlate:Hide()
-                    blizzPlate:UnregisterAllEvents()
-                    blizzPlate:SetScript("OnEvent", nil)
-                    blizzPlate:SetScript("OnUpdate", nil)
-                    hooksecurefunc(blizzPlate, "Show", blizzPlate.Hide)
-                    if blizzPlate.healthBar then blizzPlate.healthBar:UnregisterAllEvents() end
-                    if blizzPlate.castBar then blizzPlate.castBar:UnregisterAllEvents() end
-                    blizzPlate.__darkuiHidden = true
-                end
-                self.widgetContainer = blizzPlate.WidgetContainer
-                if self.widgetContainer then self.widgetContainer:SetParent(self) end
-            end
+        self.softTargetFrame = blizzPlate.SoftTargetFrame
+        if self.softTargetFrame then
+            self.softTargetFrame:SetParent(self)
+            self.softTargetFrame:SetIgnoreParentAlpha(true)
         end
     end
 end
@@ -777,6 +791,18 @@ function module:PLAYER_LOGIN()
     C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
     C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
 
+    if cfg.friendly.nameOnly and NamePlateFriendlyFrameOptions then
+        local function purgeKey(t, k)
+            t[k] = nil
+            local c = 42
+            repeat
+                if t[c] == nil then t[c] = nil end
+                c = c + 1
+            until issecurevariable(t, k)
+        end
+        purgeKey(NamePlateFriendlyFrameOptions, "updateNameUsesGetUnitName")
+    end
+
     local function changeFont(self)
         self:SetFont(STANDARD_TEXT_FONT, 12, "THINOUTLINE")
         self:SetShadowOffset(1, -1)
@@ -814,6 +840,11 @@ function module:OnInit()
         namePlateMaxScale = 1,
         nameplateMinAlpha = 1,
         nameplateMaxAlpha = 1,
+        nameplateSelectedAlpha = 1,
+        nameplateSelectedScale = 1,
+        nameplateLargerScale = 1,
     })
+    driver.enemyNonInteractible = cfg.friendly.nameOnly
+    driver.friendlyNonInteractible = cfg.friendly.nameOnly
     driver:SetAddedCallback(callback)
 end
