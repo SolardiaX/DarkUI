@@ -12,6 +12,12 @@ local cfg = C.blizzard
 -- Widget Skin Helpers
 ------------------------------------------------------------------------
 
+local Type_StatusBar = Enum.UIWidgetVisualizationType.StatusBar
+local Type_DoubleStatusBar = Enum.UIWidgetVisualizationType.DoubleStatusBar
+local Type_CaptureBar = Enum.UIWidgetVisualizationType.CaptureBar
+local Type_SpellDisplay = Enum.UIWidgetVisualizationType.SpellDisplay
+local Type_ItemDisplay = Enum.UIWidgetVisualizationType.ItemDisplay
+
 local atlasColors = {
     ["UI-Frame-Bar-Fill-Blue"] = { 0.2, 0.6, 1 },
     ["UI-Frame-Bar-Fill-Red"] = { 0.9, 0.2, 0.2 },
@@ -20,28 +26,37 @@ local atlasColors = {
     ["objectivewidget-bar-fill-right"] = { 0.9, 0.2, 0.2 },
 }
 
-local function skinStatusBar(widget)
-    local bar = widget.Bar
-    if widget:IsForbidden() then
-        if bar and bar.tooltip then bar.tooltip = nil end
-        return
-    end
+local function skinBar(bar)
+    if not bar or bar.__styled then return end
 
+    if bar.BG then bar.BG:SetAlpha(0) end
+    if bar.BGLeft then bar.BGLeft:SetAlpha(0) end
+    if bar.BGRight then bar.BGRight:SetAlpha(0) end
+    if bar.BGCenter then bar.BGCenter:SetAlpha(0) end
+    if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
+    if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
+    if bar.BorderCenter then bar.BorderCenter:SetAlpha(0) end
+    if bar.Spark then bar.Spark:SetAlpha(0) end
+    if bar.SparkGlow then bar.SparkGlow:SetAlpha(0) end
+    if bar.BorderGlow then bar.BorderGlow:SetAlpha(0) end
+
+    bar:SetStatusBarTexture(C.media.texture.status_f)
+    bar:CreateBackdrop("Transparent")
+    bar:CreateBorder()
+    bar.__styled = true
+end
+
+local function skinStatusBar(widget)
+    if widget:IsForbidden() then return end
+
+    local bar = widget.Bar
     local atlas = bar:GetStatusBarTexture()
     if atlasColors[atlas] then
-        bar:SetStatusBarTexture(C.media.texture.status)
+        bar:SetStatusBarTexture(C.media.texture.status_f)
         bar:SetStatusBarColor(unpack(atlasColors[atlas]))
     end
 
     if not bar.__styled then
-        if bar.BGLeft then bar.BGLeft:SetAlpha(0) end
-        if bar.BGRight then bar.BGRight:SetAlpha(0) end
-        if bar.BGCenter then bar.BGCenter:SetAlpha(0) end
-        if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
-        if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
-        if bar.BorderCenter then bar.BorderCenter:SetAlpha(0) end
-        if bar.Spark then bar.Spark:SetAlpha(0) end
-
         local parent = widget:GetParent():GetParent()
         if parent and (parent.castBar or parent.UnitFrame) then
             Mixin(bar, BackdropTemplateMixin)
@@ -49,59 +64,108 @@ local function skinStatusBar(widget)
             bar:SetBackdrop({ bgFile = C.media.texture.blank, insets = { left = 0, right = 0, top = 0, bottom = 0 } })
             bar:SetBackdropColor(0.1, 0.1, 0.1, 1)
             bar:SetStatusBarTexture(C.media.texture.status_f)
+            bar:CreateBorder()
+            bar.__styled = true
         else
-            bar:SetStatusBarTexture(C.media.texture.status_f)
-            bar:CreateBackdrop("Transparent")
+            skinBar(bar)
         end
-        bar:CreateBorder()
-        bar.__styled = true
     end
 end
 
 local function skinDoubleStatusBar(widget)
+    if widget:IsForbidden() then return end
+
     for _, bar in pairs({ widget.LeftBar, widget.RightBar }) do
         local atlas = bar:GetStatusBarTexture()
         if atlasColors[atlas] then
             bar:SetStatusBarTexture(C.media.texture.status_f)
             bar:SetStatusBarColor(unpack(atlasColors[atlas]))
         end
-        if not bar.__styled then
-            if bar.BG then bar.BG:SetAlpha(0) end
-            if bar.BorderLeft then bar.BorderLeft:SetAlpha(0) end
-            if bar.BorderRight then bar.BorderRight:SetAlpha(0) end
-            if bar.BorderCenter then bar.BorderCenter:SetAlpha(0) end
-            if bar.Spark then bar.Spark:SetAlpha(0) end
-            if bar.SparkGlow then bar.SparkGlow:SetAlpha(0) end
-            bar:SetStatusBarTexture(C.media.texture.status_f)
-            bar:CreateBackdrop("Transparent")
-            bar:CreateBorder()
-            bar.__styled = true
+        skinBar(bar)
+    end
+end
+
+local function skinCaptureBar(widget)
+    if widget:IsForbidden() or widget.__styled then return end
+
+    if widget.LeftLine then widget.LeftLine:SetAlpha(0) end
+    if widget.RightLine then widget.RightLine:SetAlpha(0) end
+    if widget.BarBackground then widget.BarBackground:SetAlpha(0) end
+    if widget.Glow1 then widget.Glow1:SetAlpha(0) end
+    if widget.Glow2 then widget.Glow2:SetAlpha(0) end
+    if widget.Glow3 then widget.Glow3:SetAlpha(0) end
+
+    widget.LeftBar:SetTexture(C.media.texture.status)
+    widget.NeutralBar:SetTexture(C.media.texture.status)
+    widget.RightBar:SetTexture(C.media.texture.status)
+
+    widget.LeftBar:SetVertexColor(0.2, 0.6, 1)
+    widget.NeutralBar:SetVertexColor(0.8, 0.8, 0.8)
+    widget.RightBar:SetVertexColor(0.9, 0.2, 0.2)
+
+    widget:CreateBackdrop("Default")
+    widget.backdrop:SetPoint("TOPLEFT", widget.LeftBar, -2, 2)
+    widget.backdrop:SetPoint("BOTTOMRIGHT", widget.RightBar, 2, -2)
+
+    widget.__styled = true
+end
+
+local function skinSpellDisplay(widget)
+    if widget:IsForbidden() then return end
+
+    local spell = widget.Spell
+    if not spell or spell.__styled then return end
+
+    spell.Border:SetAlpha(0)
+    spell.DebuffBorder:SetAlpha(0)
+    spell.Icon:CreateBackdrop()
+    spell.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    spell.IconMask:Hide()
+
+    spell.__styled = true
+end
+
+local function skinItemDisplay(widget)
+    if widget:IsForbidden() then return end
+
+    local item = widget.Item
+    if not item or item.__styled then return end
+
+    item.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+    item.Icon:CreateBackdrop()
+    item.IconMask:Hide()
+
+    item.__styled = true
+end
+
+local function skinWidgetGroups(self)
+    if not self.widgetFrames then return end
+
+    for _, widget in pairs(self.widgetFrames) do
+        if not widget:IsForbidden() then
+            local widgetType = widget.widgetType
+            if widgetType == Type_StatusBar then
+                skinStatusBar(widget)
+            elseif widgetType == Type_DoubleStatusBar then
+                skinDoubleStatusBar(widget)
+            elseif widgetType == Type_CaptureBar then
+                skinCaptureBar(widget)
+            elseif widgetType == Type_SpellDisplay then
+                skinSpellDisplay(widget)
+            elseif widgetType == Type_ItemDisplay then
+                skinItemDisplay(widget)
+            end
         end
     end
 end
 
-local function skinCaptureBar(_, widget)
-    if not widget.skinned then
-        if widget.LeftLine then widget.LeftLine:SetAlpha(0) end
-        if widget.RightLine then widget.RightLine:SetAlpha(0) end
-        if widget.BarBackground then widget.BarBackground:SetAlpha(0) end
-        if widget.Glow1 then widget.Glow1:SetAlpha(0) end
-        if widget.Glow2 then widget.Glow2:SetAlpha(0) end
-        if widget.Glow3 then widget.Glow3:SetAlpha(0) end
+local function skinPowerBarWidgets(self)
+    if not self.widgetFrames then return end
 
-        widget.LeftBar:SetTexture(C.media.texture.status)
-        widget.NeutralBar:SetTexture(C.media.texture.status)
-        widget.RightBar:SetTexture(C.media.texture.status)
-
-        widget.LeftBar:SetVertexColor(0.2, 0.6, 1)
-        widget.NeutralBar:SetVertexColor(0.8, 0.8, 0.8)
-        widget.RightBar:SetVertexColor(0.9, 0.2, 0.2)
-
-        widget:CreateBackdrop("Default")
-        widget.backdrop:SetPoint("TOPLEFT", widget.LeftBar, -2, 2)
-        widget.backdrop:SetPoint("BOTTOMRIGHT", widget.RightBar, 2, -2)
-
-        widget.skinned = true
+    for _, widget in pairs(self.widgetFrames) do
+        if not widget:IsForbidden() and widget.widgetType == Type_StatusBar then
+            skinStatusBar(widget)
+        end
     end
 end
 
@@ -149,28 +213,25 @@ function module:OnInit()
         end)
     end
 
-    -- Skin hooks
-    local function updateWidgets()
-        for _, widget in pairs(UIWidgetTopCenterContainerFrame.widgetFrames) do
-            if widget.widgetType == Enum.UIWidgetVisualizationType.StatusBar then
-                skinStatusBar(widget)
-            elseif widget.widgetType == Enum.UIWidgetVisualizationType.DoubleStatusBar then
-                skinDoubleStatusBar(widget)
-            end
-        end
-        for _, widget in pairs(UIWidgetBelowMinimapContainerFrame.widgetFrames) do
-            if widget.widgetType == Enum.UIWidgetVisualizationType.CaptureBar then skinCaptureBar(nil, widget) end
-        end
+    -- Skin via UpdateWidgetLayout hooks
+    hooksecurefunc(top, "UpdateWidgetLayout", skinWidgetGroups)
+    skinWidgetGroups(top)
+
+    hooksecurefunc(below, "UpdateWidgetLayout", skinWidgetGroups)
+    skinWidgetGroups(below)
+
+    if power then
+        hooksecurefunc(power, "UpdateWidgetLayout", skinPowerBarWidgets)
+        skinPowerBarWidgets(power)
     end
 
-    local skinFrame = CreateFrame("Frame")
-    skinFrame:RegisterEvent("UPDATE_UI_WIDGET")
-    skinFrame:RegisterEvent("UPDATE_ALL_UI_WIDGETS")
-    skinFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
-    skinFrame:SetScript("OnEvent", updateWidgets)
+    if _G["ObjectiveTrackerUIWidgetContainer"] then
+        hooksecurefunc(_G["ObjectiveTrackerUIWidgetContainer"], "UpdateWidgetLayout", skinPowerBarWidgets)
+        skinPowerBarWidgets(_G["ObjectiveTrackerUIWidgetContainer"])
+    end
 
+    -- Mixin Setup hook as fallback for widgets not yet in a container
     hooksecurefunc(UIWidgetTemplateStatusBarMixin, "Setup", function(widget) skinStatusBar(widget) end)
-    hooksecurefunc(UIWidgetTemplateDoubleStatusBarMixin, "Setup", function(widget) skinDoubleStatusBar(widget) end)
 
     hooksecurefunc(UIWidgetTemplateScenarioHeaderCurrenciesAndBackgroundMixin, "Setup", function(widgetInfo)
         widgetInfo.Frame:SetAlpha(0)
