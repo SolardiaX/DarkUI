@@ -716,10 +716,24 @@ function module:PLAYER_REGEN_DISABLED()
 end
 
 function module:PLAYER_ENTERING_WORLD()
-    if InCombatLockdown() then
-        SetCVar("nameplateShowEnemies", 1)
-    else
-        SetCVar("nameplateShowEnemies", 0)
+    if cfg.combat then
+        if InCombatLockdown() then
+            SetCVar("nameplateShowEnemies", 1)
+        else
+            SetCVar("nameplateShowEnemies", 0)
+        end
+    end
+
+    if cfg.friendly.hideInInstance then
+        local inInstance = IsInInstance()
+        local friendly = cfg.visibility and cfg.visibility.friendly
+        if inInstance then
+            SetCVar("nameplateShowFriendlyNPCs", 0)
+            SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits", 0)
+        else
+            SetCVar("nameplateShowFriendlyNPCs", friendly and friendly.npcs and 1 or 0)
+            SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits", cfg.friendly.nameOnly and 1 or 0)
+        end
     end
 end
 
@@ -806,8 +820,7 @@ function module:OnInit()
     self:RegisterEvent("PLAYER_LOGIN")
     self:RegisterEvent("PLAYER_REGEN_ENABLED")
     self:RegisterEvent("PLAYER_REGEN_DISABLED")
-
-    if cfg.combat == true then self:RegisterEvent("PLAYER_ENTERING_WORLD") end
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
 
     hooksecurefunc(_G.NamePlateDriverFrame, "SetupClassNameplateBars", function(frame)
         if not frame or frame:IsForbidden() then return end

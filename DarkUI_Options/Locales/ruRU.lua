@@ -101,6 +101,8 @@ L_OPT_NAMEPLATE_CC_SIZE = "Размер иконок контроля"
 L_OPT_NAMEPLATE_TOTEM_ICONS = "Показывать иконки тотемов"
 L_OPT_NAMEPLATE_ARROW = "Показывать стрелку к текущей цели"
 L_OPT_NAMEPLATE_QUEST = "Показывать информацию о заданиях"
+L_OPT_NAMEPLATE_FRIENDLY_NAMEONLY = "Дружественные: только имя"
+L_OPT_NAMEPLATE_FRIENDLY_HIDE_IN_INSTANCE = "Скрывать дружественные в подземельях"
 
 -- Aura
 L_OPT_AURA_ENABLE = "Включить модуль баффов/дебаффов"

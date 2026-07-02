@@ -479,6 +479,7 @@ C.nameplate = {
     quest = true,
     friendly = {
         nameOnly = true,
+        hideInInstance = true,
     },
     visibility = {
         showAll = true,
@@ -666,7 +667,7 @@ C.unitframe = {
     },
     party = {
         enable = true,
-        standalone = false,
+        standalone = true,
         position = {
             auto = true,
             dps = { "TOPLEFT", "UIParent", "TOPLEFT", 30, -30 },

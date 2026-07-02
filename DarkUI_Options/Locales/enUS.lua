@@ -100,6 +100,8 @@ L_OPT_NAMEPLATE_CC_SIZE = "CC icon size"
 L_OPT_NAMEPLATE_TOTEM_ICONS = "Show totem icons"
 L_OPT_NAMEPLATE_ARROW = "Show arrow to current target"
 L_OPT_NAMEPLATE_QUEST = "Show quest info"
+L_OPT_NAMEPLATE_FRIENDLY_NAMEONLY = "Friendly name-only mode"
+L_OPT_NAMEPLATE_FRIENDLY_HIDE_IN_INSTANCE = "Hide friendly nameplates in instance"
 
 -- Aura
 L_OPT_AURA_ENABLE = "Enable buff/debuff module"
