@@ -249,11 +249,11 @@ function module:CreateAuraIcon(button)
     button.icon:SetTexCoord(unpack(C.media.texCoord))
 
     button.count = button:CreateFontString(nil, "OVERLAY")
-    button.count:SetPoint(unpack(cfg.count_pos))
+    button.count:SetPoint(cfg.count_pos[1], button, cfg.count_pos[1], cfg.count_pos[2], cfg.count_pos[3])
     button.count:SetFont(unpack(cfg.count_font_style))
 
     button.timer = button:CreateFontString(nil, "OVERLAY")
-    button.timer:SetPoint(unpack(cfg.dur_pos))
+    button.timer:SetPoint(cfg.dur_pos[1], button, cfg.dur_pos[1], cfg.dur_pos[2], cfg.dur_pos[3])
     button.timer:SetFont(unpack(cfg.dur_font_style))
 
     local cd = CreateFrame("Cooldown", "$parentCooldown", button, "CooldownFrameTemplate")
@@ -267,6 +267,9 @@ function module:CreateAuraIcon(button)
     cdText:ClearAllPoints()
     cdText:SetPoint(unpack(cfg.dur_pos))
     cdText:SetFont(unpack(cfg.dur_font_style))
+
+    button.count:SetParent(cd)
+    button.timer:SetParent(cd)
 
     E:StyleIconButton(button)
     button:CreateShadow()
