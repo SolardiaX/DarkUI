@@ -305,7 +305,7 @@ local function aurasPostUpdateIcon(element, button, unit, data)
     end
 end
 
-local PLATE_ELEMENTS = { "Health", "Castbar", "HealthPrediction" }
+local PLATE_ELEMENTS = { "Health", "Castbar", "HealthPrediction", "ClassificationIndicator" }
 
 local function updatePlateByType(self)
     local isNameOnly = cfg.friendly.nameOnly
@@ -320,7 +320,6 @@ local function updatePlateByType(self)
         self.Power:Hide()
         self.Name:Hide()
         self.Level:Hide()
-        self.ClassificationIndicator:Hide()
         if self.Auras then self.Auras:Hide() end
         if self.Debuffs then self.Debuffs:Hide() end
     elseif self.plateType == "PLAYER" then
@@ -331,7 +330,6 @@ local function updatePlateByType(self)
         self.Power:Show()
         self.Name:Hide()
         self.Level:Hide()
-        self.ClassificationIndicator:Hide()
         self.RaidTargetIndicator:SetAlpha(0)
         if self.Auras then self.Auras:Hide() end
         if self.Debuffs then self.Debuffs:Hide() end
@@ -346,7 +344,6 @@ local function updatePlateByType(self)
         self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
         self.Name:SetJustifyH("CENTER")
         self.Level:Hide()
-        self.ClassificationIndicator:Hide()
         self.RaidTargetIndicator:SetAlpha(1)
         if self.Auras then self.Auras:Hide() end
         if self.Debuffs then self.Debuffs:Hide() end
@@ -367,7 +364,6 @@ local function updatePlateByType(self)
         self.Name:SetPoint("LEFT", self.Level, "RIGHT", 2, 0)
         self.Name:SetJustifyH("LEFT")
         self.Level:Show()
-        self.ClassificationIndicator:Show()
         self.RaidTargetIndicator:SetAlpha(1)
         if self.Auras then self.Auras:Show() end
         if self.Debuffs then self.Debuffs:Show() end
