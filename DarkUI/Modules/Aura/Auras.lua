@@ -8,11 +8,15 @@ local module = E:Module("Aura"):Sub("Auras")
 local cfg = C.aura
 
 local GetTime = GetTime
-local floor, format, ceil = math.floor, string.format, math.ceil
+local floor, format = math.floor, string.format
 local unpack, select, strmatch, tonumber = unpack, select, strmatch, tonumber
 local GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo = GetInventoryItemQuality, GetInventoryItemTexture, GetWeaponEnchantInfo
 local C_UnitAuras_GetAuraDataByIndex = C_UnitAuras.GetAuraDataByIndex
+local C_UnitAuras_GetAuraDuration = C_UnitAuras.GetAuraDuration
+local C_UnitAuras_GetAuraApplicationDisplayCount = C_UnitAuras.GetAuraApplicationDisplayCount
 local GameTooltip, GameTooltip_Hide = GameTooltip, GameTooltip_Hide
+
+local MIN_SPELL_COUNT, MAX_SPELL_COUNT = 2, 999
 
 local dispelColorCurve = C_CurveUtil.CreateColorCurve()
 
@@ -37,14 +41,6 @@ local function formatAuraTime(s)
         return format("|cffffff00%.1f|r", s), s - format("%.1f", s)
     else
         return format("|cffff0000%.1f|r", s), s - format("%.1f", s)
-    end
-end
-
-local function startOrStopFlash(animation, timeleft)
-    if timeleft < cfg.flash_timer then
-        if not animation:IsPlaying() then animation:Play() end
-    elseif animation:IsPlaying() then
-        animation:Stop()
     end
 end
 
@@ -114,38 +110,20 @@ updateAuras = function(button, index)
 
     if not auraData then return end
 
-    local duration = auraData.duration
-    local hasDuration = not issecretvalue(duration) and duration > 0 and auraData.expirationTime
-
-    if hasDuration then
-        local timeLeft = auraData.expirationTime - GetTime()
-        if not button.timeLeft then
-            button.nextUpdate = -1
-            button.timeLeft = timeLeft
-            button:SetScript("OnUpdate", buttonUpdateTimer)
-        else
-            button.timeLeft = timeLeft
-        end
-        button.nextUpdate = -1
-        buttonUpdateTimer(button, 0)
-
-        if cfg.enable_flash and button.animation then startOrStopFlash(button.animation, timeLeft) end
-
-        if cfg.enable_animation and button.auraGrowth then
-            if timeLeft and auraData.duration == ceil(timeLeft) then button.auraGrowth:Play() end
-        end
+    local auraDuration = unit and C_UnitAuras_GetAuraDuration(unit, auraData.auraInstanceID)
+    if auraDuration then
+        button.Cooldown:SetCooldownFromDurationObject(auraDuration)
+        button.Cooldown:Show()
     else
-        button.timeLeft = nil
-        button.timer:SetText("")
-
-        if cfg.enable_flash and button.animation then button.animation:Stop() end
+        button.Cooldown:Hide()
     end
 
     local applications = auraData.applications
-    if not issecretvalue(applications) and applications and applications > 1 then
-        button.count:SetText(applications)
+    if issecretvalue(applications) then
+        button.count:SetText(C_UnitAuras_GetAuraApplicationDisplayCount(unit, auraData.auraInstanceID, MIN_SPELL_COUNT, MAX_SPELL_COUNT))
     else
-        button.count:SetText("")
+        local hideCount = not applications or applications < MIN_SPELL_COUNT
+        button.count:SetText(hideCount and "" or applications)
     end
 
     if filter == "HARMFUL" then
@@ -162,6 +140,8 @@ updateAuras = function(button, index)
     button.spellID = auraData.spellId
     button.icon:SetTexture(auraData.icon)
     button.expiration = nil
+    button.timeLeft = nil
+    button.timer:SetText("")
 end
 
 updateTempEnchant = function(button, index)
@@ -275,41 +255,24 @@ function module:CreateAuraIcon(button)
     button.timer:SetPoint(unpack(cfg.dur_pos))
     button.timer:SetFont(unpack(cfg.dur_font_style))
 
+    local cd = CreateFrame("Cooldown", "$parentCooldown", button, "CooldownFrameTemplate")
+    cd:SetReverse(true)
+    cd:SetDrawSwipe(true)
+    cd:SetDrawBling(false)
+    cd:SetAllPoints(button.icon)
+    button.Cooldown = cd
+
+    local cdText = cd:GetRegions()
+    cdText:ClearAllPoints()
+    cdText:SetPoint(unpack(cfg.dur_pos))
+    cdText:SetFont(unpack(cfg.dur_font_style))
+
     E:StyleIconButton(button)
     button:CreateShadow()
 
     button:SetScript("OnAttributeChanged", buttonOnAttributeChanged)
     button:SetScript("OnEnter", buttonOnEnter)
     button:SetScript("OnLeave", GameTooltip_Hide)
-
-    if cfg.enable_flash then
-        local animation = button:CreateAnimationGroup()
-        animation:SetLooping("BOUNCE")
-
-        local fadeOut = animation:CreateAnimation("Alpha")
-        fadeOut:SetFromAlpha(1)
-        fadeOut:SetToAlpha(0.5)
-        fadeOut:SetDuration(0.6)
-        fadeOut:SetSmoothing("IN_OUT")
-
-        button.animation = animation
-    end
-
-    if cfg.enable_animation then
-        local auraGrowth = button:CreateAnimationGroup()
-
-        local grow = auraGrowth:CreateAnimation("Scale")
-        grow:SetOrder(1)
-        grow:SetDuration(0.2)
-        grow:SetScale(1.25, 1.25)
-
-        local shrink = auraGrowth:CreateAnimation("Scale")
-        shrink:SetOrder(2)
-        shrink:SetDuration(0.2)
-        shrink:SetScale(0.75, 0.75)
-
-        button.auraGrowth = auraGrowth
-    end
 end
 
 ------------------------------------------------------------------------
