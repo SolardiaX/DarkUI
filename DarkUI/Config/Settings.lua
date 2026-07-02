@@ -666,7 +666,7 @@ C.unitframe = {
     },
     party = {
         enable = true,
-        standalone = true,
+        standalone = false,
         position = {
             auto = true,
             dps = { "TOPLEFT", "UIParent", "TOPLEFT", 30, -30 },

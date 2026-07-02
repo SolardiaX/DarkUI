@@ -326,114 +326,72 @@ end
 function module:OnInit()
     if not C.unitframe.raid.enable then return end
 
-    oUF:Factory(function()
-        if cfg.party.enable and not cfg.party.standalone then
-            oUF:RegisterStyle("DarkUI:party", createStyle)
-            oUF:SetActiveStyle("DarkUI:party")
+    local showParty = cfg.party.enable and not cfg.party.standalone
 
-            local party = oUF:SpawnHeader(
-                "DarkUIPartyHeader",
+    oUF:Factory(function()
+        oUF:RegisterStyle("DarkUI:raid", createStyle)
+        oUF:SetActiveStyle("DarkUI:raid")
+
+        local groups, group = {}, nil
+        local visibility = showParty and "custom [group] show; hide" or "custom [group:raid] show; hide"
+
+        for i = 1, NUM_RAID_GROUPS do
+            local name = "DarkUIRaidGroup" .. i
+
+            group = oUF:SpawnHeader(
+                name,
                 nil,
-                "showSolo",
-                cfg.party.showSolo,
                 "showPlayer",
-                cfg.party.showPlayer,
-                "showParty",
                 true,
+                "showSolo",
+                cfg.raid.showSolo,
+                "showParty",
+                showParty,
                 "showRaid",
-                false,
+                true,
                 "point",
                 "LEFT",
-                "xOffset",
-                -6,
                 "yOffset",
+                -6,
+                "xoffset",
                 -10,
+                "groupFilter",
+                tostring(i),
+                "groupBy",
+                "GROUP",
+                "groupingOrder",
+                "TANK,HEALER,DAMAGER,NONE",
+                "unitsPerColumn",
+                5,
                 "columnAnchorPoint",
                 "TOPLEFT",
-                "unitsPerColumn",
-                cfg.party.unitsPerColumn,
-                "maxColumns",
-                5,
-                -- "columnSpacing", 60,
                 "oUF-initialConfigFunction",
                 ([[
                         self:SetWidth(%d)
                         self:SetHeight(%d)
-                        self:SetScale(%f)
-                    ]]):format(cfg.raid.size, cfg.raid.size, cfg.scale)
+                    ]]):format(cfg.raid.size, cfg.raid.size)
             )
-            party:SetVisibility("custom [group:raid][@player,exists,nogroup:party] show;hide")
-            party:SetPoint(unpack(cfg.raid.position))
+            group:SetVisibility(visibility)
 
-            E:RegisterMover(party, L.UF_MOVER_PARTY, "unitframe.raid.position", 200, 90)
+            group:SetScale(cfg.scale)
+            groups[i] = group
 
-            if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
-        else
-            oUF:RegisterStyle("DarkUI:raid", createStyle)
-            oUF:SetActiveStyle("DarkUI:raid")
-
-            local groups, group = {}, nil
-
-            for i = 1, NUM_RAID_GROUPS do
-                local name = "DarkUIRaidGroup" .. i
-
-                group = oUF:SpawnHeader(
-                    name,
-                    nil,
-                    "showPlayer",
-                    true,
-                    "showSolo",
-                    cfg.raid.showSolo,
-                    "showParty",
-                    cfg.party.raidMode,
-                    "showRaid",
-                    true,
-                    "point",
-                    "LEFT",
-                    "yOffset",
-                    -6,
-                    "xoffset",
-                    -10,
-                    "groupFilter",
-                    tostring(i),
-                    "groupBy",
-                    "GROUP",
-                    "groupingOrder",
-                    "TANK,HEALER,DAMAGER,NONE",
-                    -- "maxColumns", 5,
-                    "unitsPerColumn",
-                    5,
-                    --"columnSpacing", 0,
-                    "columnAnchorPoint",
-                    "TOPLEFT",
-                    "oUF-initialConfigFunction",
-                    ([[
-                            self:SetWidth(%d)
-                            self:SetHeight(%d)
-                        ]]):format(cfg.raid.size, cfg.raid.size)
-                )
-                group:SetVisibility("custom [group:raid] show; hide")
-
-                group:SetScale(cfg.scale)
-                groups[i] = group
-
-                if i == 1 then
-                    group:SetPoint(unpack(cfg.raid.position))
-                    E:RegisterMover(group, L.UF_MOVER_RAID, "unitframe.raid.position", 200, 150)
-                else
-                    group:SetPoint("TOPLEFT", groups[i - 1], "BOTTOMLEFT", 0, 6)
-                end
+            if i == 1 then
+                group:SetPoint(unpack(cfg.raid.position))
+                E:RegisterMover(group, L.UF_MOVER_RAID, "unitframe.raid.position", 200, 150)
+            else
+                group:SetPoint("TOPLEFT", groups[i - 1], "BOTTOMLEFT", 0, 6)
             end
-
-            -- Hide Default Frames
-            if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
-            if CompactRaidFrameManager_SetSetting then
-                CompactRaidFrameManager_SetSetting("IsShown", "0")
-                UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
-                CompactRaidFrameManager:UnregisterAllEvents()
-                CompactRaidFrameManager:SetParent(E.FrameHider)
-            end
-            if _G.CompactRaidFrameContainer then _G.CompactRaidFrameContainer:UnregisterAllEvents() end
         end
+
+        -- Hide Default Frames
+        if CompactPartyFrame then CompactPartyFrame:UnregisterAllEvents() end
+        if CompactRaidFrameManager_SetSetting then
+            CompactRaidFrameManager_SetSetting("IsShown", "0")
+            UIParent:UnregisterEvent("GROUP_ROSTER_UPDATE")
+            CompactRaidFrameManager:UnregisterAllEvents()
+            CompactRaidFrameManager:SetParent(E.FrameHider)
+        end
+        if _G.CompactRaidFrameContainer then _G.CompactRaidFrameContainer:UnregisterAllEvents() end
     end)
 end
