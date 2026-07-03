@@ -325,15 +325,23 @@ local tagStrings = {
 
 	['raidcolor'] = [[function(u)
 		local _, class = UnitClass(u)
-		if(class) then
-			return _COLORS.class[class]:GenerateHexColorMarkup()
+		if(class and not issecretvalue(class)) then
+			local color = _COLORS.class[class]
+			if(color) then
+				return color:GenerateHexColorMarkup()
+			end
 		else
 			local id = u:match('arena(%d)$')
 			if(id) then
 				local specID = GetArenaOpponentSpec(tonumber(id))
 				if(specID and specID > 0) then
 					_, _, _, _, _, class = GetSpecializationInfoByID(specID)
-					return _COLORS.class[class]:GenerateHexColorMarkup()
+					if(class and not issecretvalue(class)) then
+						local color = _COLORS.class[class]
+						if(color) then
+							return color:GenerateHexColorMarkup()
+						end
+					end
 				end
 			end
 		end
