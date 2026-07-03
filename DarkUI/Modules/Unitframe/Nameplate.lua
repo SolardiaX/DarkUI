@@ -751,6 +751,8 @@ function module:PLAYER_LOGIN()
     SetCVar("nameplateResourceOnTarget", 0)
     SetCVar("nameplateMotion", 1)
     SetCVar("nameplateShowOnlyNameForFriendlyPlayerUnits", cfg.friendly.nameOnly and 1 or 0)
+    SetCVar("nameplateUseClassColorForFriendlyPlayerUnitNames", cfg.friendly.nameOnly and 1 or 0)
+    SetCVar("showQuestTrackingTooltips", 1)
 
     if cfg.enhance_threat == true then SetCVar("threatWarning", 3) end
     SetCVar("nameplateGlobalScale", 1)
@@ -771,6 +773,7 @@ function module:PLAYER_LOGIN()
     SetCVar("nameplateMaxScaleDistance", 40)
     SetCVar("nameplateTargetBehindMaxDistance", 40)
     SetCVar("nameplatePlayerMaxDistance", 60)
+    SetCVar("nameplateOverlapH", 0.8)
     SetCVar("nameplateOverlapV", 1.1)
     SetCVar("nameplateLargeTopInset", 0.08)
 
