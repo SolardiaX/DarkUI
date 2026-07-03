@@ -843,16 +843,17 @@ function module:OnInit()
 
     hooksecurefunc(_G.NamePlateDriverFrame, "UpdateNamePlateSize", function()
         if InCombatLockdown() then return end
-        C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
-        C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
+        if self.driver then
+            self.driver:SetSize(cfg.width, cfg.height)
+        end
     end)
 
     oUF:RegisterStyle("DarkUI:Nameplates", style)
     oUF:SetActiveStyle("DarkUI:Nameplates")
 
-    local driver = oUF:SpawnNamePlates("DarkUINameplates")
-    driver:SetSize(cfg.width, cfg.height)
-    driver:SetCVars({
+    self.driver = oUF:SpawnNamePlates("DarkUINameplates")
+    self.driver:SetSize(cfg.width, cfg.height)
+    self.driver:SetCVars({
         nameplateShowOnlyNameForFriendlyPlayerUnits = cfg.friendly.nameOnly and 1 or 0,
         nameplateGlobalScale = 1,
         namePlateMinScale = 1,
@@ -863,5 +864,5 @@ function module:OnInit()
         nameplateSelectedScale = 1,
         nameplateLargerScale = 1,
     })
-    driver:SetAddedCallback(callback)
+    self.driver:SetAddedCallback(callback)
 end
