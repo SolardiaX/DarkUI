@@ -347,6 +347,10 @@ local function updatePlateByType(self)
             self.Name:ClearAllPoints()
             self.Name:SetPoint("CENTER", self, "CENTER", 0, 4)
             self.Name:SetJustifyH("CENTER")
+            if self.QuestIcons then
+                self.QuestIcons:ClearAllPoints()
+                self.QuestIcons:SetPoint("LEFT", self.Name, "RIGHT", 2, 0)
+            end
             self.Highlight:ClearAllPoints()
             self.Highlight:SetPoint("CENTER", self, "CENTER", 0, 4)
             self.Highlight:SetSize(cfg.width, 20)
@@ -359,6 +363,10 @@ local function updatePlateByType(self)
             self.Name:SetJustifyH("LEFT")
             if self.Auras then self.Auras:Show() end
             if self.Debuffs then self.Debuffs:Show() end
+            if self.QuestIcons then
+                self.QuestIcons:ClearAllPoints()
+                self.QuestIcons:SetPoint("BOTTOMRIGHT", self, "TOPRIGHT", 3, 6)
+            end
             self.Highlight:ClearAllPoints()
             self.Highlight:SetAllPoints(self.Health)
             self.Highlight.texture:SetColorTexture(1, 1, 1, 0.15)
@@ -750,6 +758,9 @@ function module:PLAYER_LOGIN()
     SetCVar("namePlateMaxScale", 1)
     SetCVar("nameplateLargerScale", 1)
     SetCVar("nameplateSelectedScale", 1)
+    SetCVar("NamePlateHorizontalScale", 1)
+    SetCVar("NamePlateVerticalScale", 1)
+    SetCVar("NamePlateClassificationScale", 1)
     SetCVar("nameplateMinAlpha", 1)
     SetCVar("nameplateMaxAlpha", 1)
     SetCVar("nameplateSelectedAlpha", 1)
@@ -828,6 +839,12 @@ function module:OnInit()
             frame.classNamePlatePowerBar:Hide()
             frame.classNamePlatePowerBar:UnregisterAllEvents()
         end
+    end)
+
+    hooksecurefunc(_G.NamePlateDriverFrame, "UpdateNamePlateSize", function()
+        if InCombatLockdown() then return end
+        C_NamePlate.SetNamePlateEnemySize(cfg.width, cfg.height)
+        C_NamePlate.SetNamePlateFriendlySize(cfg.width, cfg.height)
     end)
 
     oUF:RegisterStyle("DarkUI:Nameplates", style)
