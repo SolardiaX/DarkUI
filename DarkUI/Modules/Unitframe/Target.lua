@@ -344,7 +344,6 @@ local function createStyle(self)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.GroupRoleIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "TOPRIGHT", "TOPRIGHT", -45, 22)
-    self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.QuestIndicator = core:CreateIcon(self, "BACKGROUND", 28, -1, self, "LEFT", "RIGHT", 20, 0)
 

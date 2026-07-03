@@ -43,13 +43,13 @@ local function Update(self, event)
 
 	local role = UnitGroupRolesAssigned(self.unit)
 	if(role == 'TANK') then
-		element:SetAtlas('UI-LFG-RoleIcon-Tank-Micro-Raid', element.useAtlasSize)
+		element:SetAtlas('groupfinder-icon-role-large-tank', element.useAtlasSize)
 		element:Show()
 	elseif(role == 'HEALER') then
-		element:SetAtlas('UI-LFG-RoleIcon-Healer-Micro-Raid', element.useAtlasSize)
+		element:SetAtlas('groupfinder-icon-role-large-heal', element.useAtlasSize)
 		element:Show()
 	elseif(role == 'DAMAGER') then
-		element:SetAtlas('UI-LFG-RoleIcon-DPS-Micro-Raid', element.useAtlasSize)
+		element:SetAtlas('groupfinder-icon-role-large-dps', element.useAtlasSize)
 		element:Show()
 	else
 		element:Hide()

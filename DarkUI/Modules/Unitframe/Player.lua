@@ -362,7 +362,6 @@ local function createStyle(self)
     self.RaidTargetIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     self.GroupRoleIndicator = core:CreateIcon(self.FrameFG, "ARTWORK", 28, -1, self, "TOPLEFT", "TOPLEFT", 45, 22)
-    self.GroupRoleIndicator:SetTexCoord(0, 0.5, 0, 0.421875)
 
     core:SetFader(self, cfg.player.fader)
     core:SetupClassPower(self)
