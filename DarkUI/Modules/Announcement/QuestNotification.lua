@@ -36,12 +36,13 @@ local initComplete
 local function getQuestLinkOrName(questID) return GetQuestLink(questID) or C_QuestLog_GetTitleForQuestID(questID) or "" end
 
 local function sendQuestMsg(msg)
+    if C_ChatInfo.InChatMessagingLockdown() then return end
     if IsPartyLFG() or C_PartyInfo.IsPartyWalkIn() then
-        SendChatMessage(msg, "INSTANCE_CHAT")
+        C_ChatInfo.SendChatMessage(msg, "INSTANCE_CHAT")
     elseif IsInRaid() then
-        SendChatMessage(msg, "RAID")
+        C_ChatInfo.SendChatMessage(msg, "RAID")
     elseif IsInGroup() then
-        SendChatMessage(msg, "PARTY")
+        C_ChatInfo.SendChatMessage(msg, "PARTY")
     end
 end
 

@@ -180,24 +180,25 @@ end
 -- Announce
 ------------------------------------------------------------------------
 local function announce(channel)
+    if C_ChatInfo.InChatMessagingLockdown() then return end
     local nums = GetNumLootItems()
     if nums == 0 or (nums == 1 and GetLootSlotType(1) == Enum.LootSlotType.Money) then return end
 
     if UnitIsPlayer("target") or not UnitExists("target") then
-        SendChatMessage(">> " .. LOOT .. ":", channel)
+        C_ChatInfo.SendChatMessage(">> " .. LOOT .. ":", channel)
     else
-        SendChatMessage(">> " .. LOOT .. " - '" .. UnitName("target") .. "':", channel)
+        C_ChatInfo.SendChatMessage(">> " .. LOOT .. " - '" .. UnitName("target") .. "':", channel)
     end
 
     for i = 1, nums do
         if LootSlotHasItem(i) then
             local link = GetLootSlotLink(i)
             if GetLootSlotType(i) ~= Enum.LootSlotType.Money then
-                SendChatMessage(format("- %s", link), channel)
+                C_ChatInfo.SendChatMessage(format("- %s", link), channel)
             else
                 local _, item = GetLootSlotInfo(i)
                 item = item:gsub("\n", ", ")
-                SendChatMessage(format("- %s", item), channel)
+                C_ChatInfo.SendChatMessage(format("- %s", item), channel)
             end
         end
     end
