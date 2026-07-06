@@ -66,6 +66,12 @@ Used for finding original sources when iterating or fixing bugs.
 | `Modules/Loot/Loot.lua` | ShestakUI `Modules/Loot/Loot.lua` | Custom loot frame with slot styling |
 | `Modules/Loot/GroupLoot.lua` | ShestakUI `Modules/Loot/GroupLoot.lua` | Custom group roll frames |
 
+## Quest
+
+| File | Reference | Notes |
+|------|-----------|-------|
+| `Modules/Quest/ObjectiveTracker.lua` | EllesmereUIQuestTracker `_Skin.lua`/`_Visibility.lua`; ElvUI `Game/Mainline/Blizzard/ObjectiveFrame.lua` + `Skins/ObjectiveTracker.lua` | Weak-table skin state (no keys on Blizzard frames), `SetTexture("")` anti-taint hiding, UIWidget-pool avoidance, event-driven difficulty color cache + dirty-flag Update hook, SplashFrame OnHide taint fix. Positioning stays anchor+hook — LEMO ApplyChanges enters/exits Edit Mode and taints secret encounter values |
+
 ## Tooltip
 
 | File | Reference | Notes |
