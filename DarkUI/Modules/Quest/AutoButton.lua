@@ -10,7 +10,7 @@ local cfg = C.quest
 local format = string.format
 local gsub = string.gsub
 
-local BUTTON_POS = { "CENTER", "UIParent", "CENTER", 0, -280 }
+local BUTTON_POS = { "CENTER", "UIParent", "CENTER", 0, -260 }
 
 ------------------------------------------------------------------------
 -- Lifecycle
@@ -59,15 +59,25 @@ function module:OnInit()
 
     self.button = button
 
+    -- Single named handler: Event:Register dedups by (handler, owner), so
+    -- repeated in-combat show/hide calls never stack registrations
+    local pendingMouse, pendingItem
+
+    local function onRegenEnabled()
+        self:UnregisterEvent("PLAYER_REGEN_ENABLED", onRegenEnabled)
+        button:EnableMouse(pendingMouse)
+        if pendingMouse and pendingItem then button:SetAttribute("item", pendingItem) end
+        pendingItem = nil
+    end
+
     local function hideButton()
         button:SetAlpha(0)
         if not InCombatLockdown() then
             button:EnableMouse(false)
         else
-            self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-                button:EnableMouse(false)
-                self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-            end)
+            pendingMouse = false
+            pendingItem = nil
+            self:RegisterEvent("PLAYER_REGEN_ENABLED", onRegenEnabled)
         end
     end
 
@@ -77,11 +87,9 @@ function module:OnInit()
             button:EnableMouse(true)
             if item then button:SetAttribute("item", item) end
         else
-            self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-                button:EnableMouse(true)
-                if item then button:SetAttribute("item", item) end
-                self:UnregisterEvent("PLAYER_REGEN_ENABLED")
-            end)
+            pendingMouse = true
+            pendingItem = item
+            self:RegisterEvent("PLAYER_REGEN_ENABLED", onRegenEnabled)
         end
     end
 
