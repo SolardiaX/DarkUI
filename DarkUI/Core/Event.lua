@@ -66,11 +66,12 @@ function Event:Unregister(event, handler, owner)
     local handlers = registry[event]
     if not handlers then return end
 
+    -- nil handler removes ALL of owner's handlers for this event
     for i = #handlers, 1, -1 do
         local entry = handlers[i]
-        if entry[1] == handler and entry[2] == owner then
+        if entry[2] == owner and (handler == nil or entry[1] == handler) then
             table.remove(handlers, i)
-            break
+            if handler then break end
         end
     end
 
