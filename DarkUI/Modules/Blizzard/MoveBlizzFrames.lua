@@ -39,7 +39,9 @@ function module:OnInit()
         "GuildRegistrarFrame",
         "ChatConfigFrame",
         "RaidBrowserFrame",
-        "WorldMapFrame",
+        -- WorldMapFrame must never be made movable: it is a protected frame, and an
+        -- insecure SetScript/StartMoving taints the map's secure pin refresh
+        -- (SetPassThroughButtons blocked in combat). See Modules/Map/WorldMap.lua.
         "GameMenuFrame",
         "GuildInviteFrame",
         "ItemTextFrame",

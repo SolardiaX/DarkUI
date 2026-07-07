@@ -11,7 +11,6 @@ local ChatEdit_ChooseBoxForSend = ChatEdit_ChooseBoxForSend
 local GetZoneText = GetZoneText
 local IsShiftKeyDown = IsShiftKeyDown
 local format = format
-local WorldMapFrame = WorldMapFrame
 
 module:Inject("Coords", {
     text = {
@@ -22,7 +21,9 @@ module:Inject("Coords", {
             ChatEdit_ActivateChat(ChatEdit_ChooseBoxForSend())
             ChatEdit_ChooseBoxForSend():Insert(format(" (%s: %s)", GetZoneText(), module:Coords()))
         else
-            WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
+            -- Go through the UIPanel system: a bare SetShown bypasses ShowUIPanel
+            -- bookkeeping and widens the taint surface of the map's OnShow chain.
+            ToggleWorldMap()
         end
     end,
 })

@@ -18,7 +18,6 @@ local CONTESTED_TERRITORY = CONTESTED_TERRITORY
 local COMBAT_ZONE = COMBAT_ZONE
 local FACTION_STANDING_LABEL4 = FACTION_STANDING_LABEL4
 local GameTooltip = GameTooltip
-local WorldMapFrame = WorldMapFrame
 
 local cfg = module.config.Location
 local font = C.datatext.font
@@ -75,7 +74,9 @@ module:Inject("Location", {
             ChatEdit_ChooseBoxForSend():Insert(format(" (%s: %s) %s", self.zone, module:Coords(), hyperlink))
             C_Map.ClearUserWaypoint()
         else
-            WorldMapFrame:SetShown(not WorldMapFrame:IsShown())
+            -- Go through the UIPanel system: a bare SetShown bypasses ShowUIPanel
+            -- bookkeeping and widens the taint surface of the map's OnShow chain.
+            ToggleWorldMap()
         end
     end,
 })
