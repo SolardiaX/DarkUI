@@ -849,7 +849,13 @@ function S:Garrison()
         button.Texture:Hide()
         S:ReskinArrow(button, strlower(name))
         button:SetSize(35, 35)
-        button.__texture:SetSize(16, 16)
+        -- DarkUI's ReskinArrow has no NDui-style standalone __texture: the arrow
+        -- IS the button textures (SetInside), so center them at arrow size instead
+        for _, tex in next, { button:GetNormalTexture(), button:GetPushedTexture(), button:GetDisabledTexture() } do
+            tex:ClearAllPoints()
+            tex:SetPoint("CENTER")
+            tex:SetSize(16, 16)
+        end
     end
 
     -- Shipyard
