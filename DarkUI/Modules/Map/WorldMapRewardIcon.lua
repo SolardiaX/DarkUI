@@ -310,6 +310,9 @@ local function setupPOIProvider()
                         local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(mapInfo.mapID, poiID)
                         if poiInfo and poiInfo.tooltipWidgetSet == SPECIAL_ASSIGNMENT_WIDGET_SET then
                             poiInfo.dataProvider = self
+                            -- Our pins run tainted; laying out widget-set tooltips
+                            -- compares secret widget sizes and errors. Name/description only.
+                            poiInfo.tooltipWidgetSet = nil
                             poiInfo.position = translatePosition(poiInfo.position, mapInfo.mapID, mapID)
                             if poiInfo.position then map:AcquirePin(self:GetPinTemplate(), poiInfo) end
                         end
@@ -346,6 +349,9 @@ local function setupEventProvider()
                         local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(mapInfo.mapID, poiID)
                         if poiInfo then
                             poiInfo.dataProvider = self
+                            -- Our pins run tainted; laying out widget-set tooltips
+                            -- compares secret widget sizes and errors. Name/description only.
+                            poiInfo.tooltipWidgetSet = nil
                             poiInfo.position = translatePosition(poiInfo.position, mapInfo.mapID, mapID)
                             if poiInfo.position then map:AcquirePin(self:GetPinTemplate(), poiInfo) end
                         end
