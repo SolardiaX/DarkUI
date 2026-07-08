@@ -287,17 +287,7 @@ C.datatext = {
     coords = { enable = true },
     durability = { enable = true, man = true, gear_icons = false },
     bags = { enable = true },
-    currencies = {
-        enable = true,
-        style = 1,
-        expansion = true,
-        tracking = true,
-        archaeology = true,
-        cooking = true,
-        raid = true,
-        pvp = true,
-        other = true,
-    },
+    currencies = { enable = true, style = 1 },
     time = { enable = true },
 }
 
