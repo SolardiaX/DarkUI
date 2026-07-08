@@ -74,6 +74,43 @@ local function disableBlizzard()
 end
 
 ------------------------------------------------------------------------
+-- Garrison Menu (12.0: MenuUtil replaces EasyMenu)
+------------------------------------------------------------------------
+
+local function showGarrisonMenu(anchor)
+    MenuUtil.CreateContextMenu(anchor, function(_, rootDescription)
+        rootDescription:CreateButton(GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, function()
+            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_9_0_Garrison) then
+                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+                return
+            end
+            ShowGarrisonLandingPage(Enum.GarrisonType.Type_9_0_Garrison)
+        end)
+        rootDescription:CreateButton(WAR_CAMPAIGN, function()
+            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_8_0_Garrison) then
+                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+                return
+            end
+            ShowGarrisonLandingPage(Enum.GarrisonType.Type_8_0_Garrison)
+        end)
+        rootDescription:CreateButton(ORDER_HALL_LANDING_PAGE_TITLE, function()
+            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_7_0_Garrison) then
+                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+                return
+            end
+            ShowGarrisonLandingPage(Enum.GarrisonType.Type_7_0_Garrison)
+        end)
+        rootDescription:CreateButton(GARRISON_LANDING_PAGE_TITLE, function()
+            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_6_0_Garrison) then
+                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
+                return
+            end
+            ShowGarrisonLandingPage(Enum.GarrisonType.Type_6_0_Garrison)
+        end)
+    end)
+end
+
+------------------------------------------------------------------------
 -- Icon Repositioning
 ------------------------------------------------------------------------
 
@@ -232,43 +269,6 @@ local function resetIcons()
         AddonCompartmentFrame:SetAlpha(0)
         AddonCompartmentFrame:Kill()
     end
-end
-
-------------------------------------------------------------------------
--- Garrison Menu (12.0: MenuUtil replaces EasyMenu)
-------------------------------------------------------------------------
-
-local function showGarrisonMenu(anchor)
-    MenuUtil.CreateContextMenu(anchor, function(_, rootDescription)
-        rootDescription:CreateButton(GARRISON_TYPE_9_0_LANDING_PAGE_TITLE, function()
-            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_9_0_Garrison) then
-                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
-                return
-            end
-            ShowGarrisonLandingPage(Enum.GarrisonType.Type_9_0_Garrison)
-        end)
-        rootDescription:CreateButton(WAR_CAMPAIGN, function()
-            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_8_0_Garrison) then
-                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
-                return
-            end
-            ShowGarrisonLandingPage(Enum.GarrisonType.Type_8_0_Garrison)
-        end)
-        rootDescription:CreateButton(ORDER_HALL_LANDING_PAGE_TITLE, function()
-            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_7_0_Garrison) then
-                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
-                return
-            end
-            ShowGarrisonLandingPage(Enum.GarrisonType.Type_7_0_Garrison)
-        end)
-        rootDescription:CreateButton(GARRISON_LANDING_PAGE_TITLE, function()
-            if not C_Garrison.HasGarrison(Enum.GarrisonType.Type_6_0_Garrison) then
-                UIErrorsFrame:AddMessage(CONTRIBUTION_TOOLTIP_UNLOCKED_WHEN_ACTIVE)
-                return
-            end
-            ShowGarrisonLandingPage(Enum.GarrisonType.Type_6_0_Garrison)
-        end)
-    end)
 end
 
 ------------------------------------------------------------------------
