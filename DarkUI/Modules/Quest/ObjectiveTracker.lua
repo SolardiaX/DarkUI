@@ -339,15 +339,22 @@ end
 -- method call on them taints the pool (secret-value comparison errors in
 -- GameTooltip_ClearWidgetSet / UIWidgetTemplateTextWithState later).
 local function skinStageBlock(block)
-    if styled[block] then return end
-    styled[block] = true
+    if not styled[block] then
+        styled[block] = true
 
-    block:CreateBackdrop("transparent")
-    block.backdrop:SetBackdropEdge("thin")
+        block:CreateBackdrop("transparent")
+        block.backdrop:SetBackdropEdge("thin")
 
+        -- Only faded in by AlphaAnim, never re-textured: one-time clear.
+        block.GlowTexture:SetTexture("")
+    end
+
+    -- UpdateStageBlock re-applies SetAtlas to NormalBG/FinalBG and re-shows
+    -- ThemeOverlay on every call (stage advance, textureKit change), so
+    -- these must be cleared on every pass, not just once.
     block.NormalBG:SetTexture("")
     block.FinalBG:SetTexture("")
-    block.GlowTexture:SetTexture("")
+    if block.ThemeOverlay then block.ThemeOverlay:SetTexture("") end
 end
 
 ------------------------------------------------------------------------
